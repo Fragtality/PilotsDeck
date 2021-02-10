@@ -1,0 +1,84 @@
+{
+  "Actions": [
+    {
+      "Icon": "Images/category/ActionDisplay",
+      "Name": "Display Value",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_Display.html",
+      "Tooltip": "Displays a Value as Text from an Offset, Lvar (or Script*) from the Sim",
+      "UUID": "com.extension.pilotsdeck.action.display"
+    },
+    {
+      "Icon": "Images/category/ActionSwitch",
+      "Name": "Simple Button",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "PropertyInspectorPath": "PI/pi_Switch.html",
+      "Tooltip": "A simple Switch or a Button",
+      "UUID": "com.extension.pilotsdeck.action.switch"
+    },
+    {
+      "Icon": "Images/category/ActionSwitchToggle",
+      "Name": "Button with Status",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_SwitchToggle.html",
+      "Tooltip": "A Switch or a Button with Status Indication of its current State in the Sim",
+      "UUID": "com.extension.pilotsdeck.action.switch.toggle"
+    },
+    {
+      "Icon": "Images/category/ActionDisplay",
+      "Name": "Diplay Value with Switch",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_DisplaySwitch.html",
+      "Tooltip": "The Display Value Action combined with a Simple Switch",
+      "UUID": "com.extension.pilotsdeck.action.display.switch"
+    }
+  ],
+  "Category": "Pilot's Deck",
+  "CategoryIcon": "Images/category/PluginIcon",
+  "Disabled": false,
+  "Author": "Fragtality",
+  "CodePathWin": "PilotsDeck.exe",
+  "Description": "Directly control Prepar3D from your StreamDeck via FSUIPC!",
+  "Name": "PilotsDeck",
+  "Icon": "Images/category/PluginIcon",
+  "URL": "https://www.elgato.com/gaming/stream-deck",
+  "Version": "0.3.2",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "4.1"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "7"
+    }
+  ]
+}

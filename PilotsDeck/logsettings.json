@@ -1,0 +1,16 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Verbose",
+    "WriteTo": [
+      {
+        "Name": "File",
+				"Args": {
+					"path": "log/PilotsDeck.log",
+					"rollingInterval": "Day",
+					"outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message} {NewLine}{Exception}"
+				}
+      }
+    ],
+    "Enrich": [ "FromLogContext" ]
+  }
+}
