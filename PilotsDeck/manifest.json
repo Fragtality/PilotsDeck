@@ -69,11 +69,17 @@
   "Description": "Directly control Prepar3D from your StreamDeck via FSUIPC!",
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
+  "DefaultWindowSize": [ 1280, 960],
   "URL": "https://www.elgato.com/gaming/stream-deck",
   "Version": "0.3.2",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "4.1"
+  },
+  "ApplicationsToMonitor": {
+    "windows": [
+      "Prepar3D.exe"
+    ]
   },
   "OS": [
     {

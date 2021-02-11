@@ -18,7 +18,7 @@ namespace PilotsDeck
 
         public static bool IsReadAddress(string address)
         {
-            if (address == null || address == "" || address == string.Empty)
+            if (string.IsNullOrEmpty(address))
                 return false;
             else if (rxOffset.IsMatch(address) || rxLvarRead.IsMatch(address))
                 return true;
@@ -28,7 +28,7 @@ namespace PilotsDeck
 
         public static bool IsWriteAddress(string address, ActionSwitchType type)
         {
-            if (address == null || address == "" || address == string.Empty)
+            if (string.IsNullOrEmpty(address))
                 return false;
 
             switch (type)

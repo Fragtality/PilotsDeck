@@ -59,7 +59,7 @@ namespace PilotsDeck
             }
         }
     }
-    public class IPCValueOffset : IPCValue, IDisposable
+    public class IPCValueOffset : IPCValue
     {
         private Offset offset = null;
         public OffsetParam Param { get; } = null;

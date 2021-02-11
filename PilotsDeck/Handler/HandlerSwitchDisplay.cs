@@ -1,84 +1,87 @@
-﻿using Serilog;
+﻿using System;
+using Serilog;
 
 namespace PilotsDeck
 {
     public class HandlerSwitchDisplay : HandlerSwitch, IHandlerValue
     {
+        public override ModelSwitch BaseSettings { get { return Settings; } }
         public virtual ModelSwitchDisplay DisplaySettings { get { return Settings; } }
-        public ModelSwitchDisplay Settings { get; protected set; }
+        public new ModelSwitchDisplay Settings { get; protected set; }
+        
 
-        public override string ActionID { get { return $"{Title} | Write: {CommonSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
-        public virtual string Address { get { return DisplaySettings.Address; } }
+        public override string ActionID { get { return $"{Title} | Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
+        public override string Address { get { return DisplaySettings.Address; } }
 
-        protected virtual IPCValue ValueRef { get; set; } = null;
-        protected override string currentValue { get { return ValueRef?.Value; } set { } }
+        //protected virtual IPCValue ValueRef { get; set; } = null;
+        //protected override string currentValue { get { return ValueRef?.Value; } set { } }
+        public virtual string CurrentValue { get; protected set; } = null;
+        public virtual string LastAddress { get; protected set; }
+        public virtual bool IsChanged { get; protected set; } = false;
+        protected override bool CanRedraw { get { return CurrentValue != null; } }
+
 
         public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings) : base(context, settings)
         {
             Settings = settings;
         }
 
-        public virtual void RegisterValue(IPCManager ipcManager)
+        public virtual void RefreshValue(IPCManager ipcManager)
         {
-            ValueRef = HandlerDisplay.RegisterValue(ipcManager, Context, Address);
+            IsChanged = HandlerValue.RefreshValue(ipcManager, Address, out string currentValue);
+            CurrentValue = currentValue;
         }
 
-        public virtual void UpdateValue(IPCManager ipcManager)
+        public virtual void RegisterAddress(IPCManager ipcManager)
         {
-            ValueRef = HandlerDisplay.UpdateValue(ipcManager, Context, Address);
+            //ValueRef = RegisterValue(ipcManager, Context, Address);
+            ipcManager.RegisterAddress(Address, AppSettings.groupStringRead);
+            LastAddress = Address;
         }
 
-        public virtual void DeregisterValue(IPCManager ipcManager)
+        public virtual void UpdateAddress(IPCManager ipcManager)
         {
-            HandlerDisplay.DeregisterValue(ipcManager, Context);
+            //ValueRef = UpdateValue(ipcManager, Context, Address);
+            LastAddress = HandlerValue.UpdateAddress(ipcManager, LastAddress, Address);
         }
 
-        public override void Update()
+        public virtual void DeregisterAddress(IPCManager ipcManager)
         {
-            base.Update();
-
-            if (!string.IsNullOrEmpty(CommonSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address))
-                CommonSettings.IsInitialized = true;
-            else
-                CommonSettings.IsInitialized = false;
-
-            currentValue = DisplaySettings.OffState;
+            ipcManager.DeregisterValue(Address);
+            if (Address != LastAddress)
+                throw new Exception($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Address} != {LastAddress} ] ");
         }
 
-        public override void Refresh(ImageManager imgManager)
+        protected override bool CheckInitialization()
         {
-            if (ValueRef == null || ValueRef.Value == null || AddressAction == "")
-            {
-                SetError();
+            return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
+        }
+
+        protected override void Redraw(ImageManager imgManager)
+        {
+            if (!IsChanged && !ForceUpdate)
                 return;
-            }
-            else
-            {
-                if (!ValueRef.IsChanged && !ForceUpdate)
-                    return;
-                string lastImage = DrawImage;
+            string lastImage = DrawImage;
 
-                string value = ValueRef.Value;
-                if (Settings.OnState == value || Settings.OffState == value)
-                {
-                    if (Settings.OnState == value)
-                        DrawImage = Settings.OnImage;
-                    else
-                        DrawImage = Settings.OffImage;
-                }
-                else if (Settings.HasIndication)
-                {
-                    if (Settings.IndicationValueAny || Settings.IndicationValue == value)
-                        DrawImage = Settings.IndicationImage;
-                    else
-                        DrawImage = Settings.ErrorImage;
-                }
+            if (Settings.OnState == CurrentValue || Settings.OffState == CurrentValue)
+            {
+                if (Settings.OnState == CurrentValue)
+                    DrawImage = Settings.OnImage;
+                else
+                    DrawImage = Settings.OffImage;
+            }
+            else if (Settings.HasIndication)
+            {
+                if (Settings.IndicationValueAny || Settings.IndicationValue == CurrentValue)
+                    DrawImage = Settings.IndicationImage;
                 else
                     DrawImage = Settings.ErrorImage;
-
-                if (lastImage != DrawImage || ForceUpdate)
-                    NeedRedraw = true;
             }
+            else
+                DrawImage = Settings.ErrorImage;
+
+            if (lastImage != DrawImage || ForceUpdate)
+                NeedRedraw = true;
         }
 
     }

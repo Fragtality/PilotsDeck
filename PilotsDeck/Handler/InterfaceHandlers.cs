@@ -6,34 +6,48 @@ namespace PilotsDeck
     {
         string ActionID { get; }
         string Context { get; }
+        
+        string Address { get; }
+        //bool NeedRegistration { get; }
 
         string DrawImage { get; }
         bool IsRawImage { get; }
         string DefaultImage { get; }
         string ErrorImage { get; }
         string Title { get; set; }
+        bool UseFont { get; }
 
         bool ForceUpdate { get; set; }
         bool NeedRedraw { get; set; }
         bool IsInitialized { get; }
 
+        //void Register(ImageManager imgManager, IPCManager ipcManager);
+        //void Deregister(ImageManager imgManager, IPCManager ipcManager);
+
         void SetError();
         void ResetDrawState();
-        void Refresh(ImageManager imgManager);
-        void Update();
+        void Refresh(ImageManager imgManager, IPCManager ipcManager);
+        void Update(IPCManager ipcManager);
+        void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
     }
 
-    public interface IHandlerValue : IHandler
+    public interface IHandlerValue : IHandler //NEEDED WITH register/unregister?!
     {
-        void RegisterValue(IPCManager ipcManager);
-        void UpdateValue(IPCManager ipcManager);
-        void DeregisterValue(IPCManager ipcManager);
+        string CurrentValue { get; }
+        string LastAddress { get; }
+        bool IsChanged { get; }
+        
+        void RefreshValue(IPCManager ipcManager);
+
+        void RegisterAddress(IPCManager ipcManager);
+        void UpdateAddress(IPCManager ipcManager);
+        void DeregisterAddress(IPCManager ipcManager);
     }
 
-    public interface IHandlerDisplay : IHandler
-    {
-        void SetTitleParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters);
-    }
+    //public interface IHandlerDisplay : IHandler //NEEDED ?!
+    //{
+    //    void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
+    //}
 
     public interface IHandlerSwitch : IHandler
     {

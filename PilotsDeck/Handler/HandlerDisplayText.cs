@@ -2,11 +2,16 @@
 
 namespace PilotsDeck
 {
-    public class HandlerDisplayText : HandlerDisplay
+    public class HandlerDisplayText : HandlerValue
     {
         public virtual ModelDisplayText TextSettings { get { return Settings; } }
         public ModelDisplayText Settings { get; protected set; }
 
+        public override string Address { get { return TextSettings.Address; } }
+
+        public override bool UseFont { get { return true; } }
+
+        protected override bool CanRedraw { get { return CurrentValue != null; } }
         protected string lastText = "";
 
         public HandlerDisplayText(string context, ModelDisplayText settings) : base(context, settings)
@@ -14,57 +19,43 @@ namespace PilotsDeck
             Settings = settings;
         }
 
-        public override void Refresh(ImageManager imgManager)
+        protected override void Redraw(ImageManager imgManager)
         {
-            if (ValueRef == null || ValueRef.Value == null)
-            {
-                SetError();
+            if (!IsChanged && !ForceUpdate)
                 return;
+
+            string value = CurrentValue;
+            if (Settings.DecodeBCD)
+                value = ModelDisplay.ConvertFromBCD(value);
+
+            value = TextSettings.ScaleValue(value);
+            value = TextSettings.RoundValue(value);
+
+            //evaluate value and set indication
+            string background = DefaultImage;
+            TextSettings.GetFontParameters(TitleParameters, out Font drawFont, out Color drawColor);
+
+            string text = "";
+            if (TextSettings.HasIndication && TextSettings.IndicationValue == value)
+            {
+                background = TextSettings.IndicationImage;
+                if (!TextSettings.IndicationHideValue)
+                {
+                    text = TextSettings.FormatValue(value);
+                    if (TextSettings.IndicationUseColor)
+                        drawColor = ColorTranslator.FromHtml(TextSettings.IndicationColor);
+                }
             }
             else
+                text = TextSettings.FormatValue(value);
+
+            if (text != lastText || ForceUpdate)
             {
-                if (!ValueRef.IsChanged && !ForceUpdate)
-                    return;
-
-                string value = ValueRef.Value;
-                if (Settings.DecodeBCD)
-                    value = ConvertFromBCD(value);
-
-                value = CommonSettings.ScaleValue(value);
-                value = CommonSettings.RoundValue(value);
-
-                //evaluate value and set indication
-                string background = DefaultImage;
-                string color = TextSettings.FontColor;
-                string text = "";
-                if (TextSettings.HasIndication && TextSettings.IndicationValue == value)
-                {
-                    background = TextSettings.IndicationImage;
-                    if (!TextSettings.IndicationHideValue)
-                    {
-                        text = CommonSettings.FormatValue(value);
-                        if (TextSettings.IndicationUseColor)
-                            color = TextSettings.IndicationColor;
-                    }
-                }
-                else
-                    text = CommonSettings.FormatValue(value);
-
-                if (text != lastText || ForceUpdate)
-                {
-                    ConvertFontParameter(out Font drawFont);
-                    DrawImage = ImageTools.DrawText(text, imgManager.GetImageObject(background), drawFont, ColorTranslator.FromHtml(color), TextSettings.FontRect);
-                    IsRawImage = true;
-                    NeedRedraw = true;
-                    lastText = text;
-                }
+                DrawImage = ImageTools.DrawText(text, imgManager.GetImageObject(background), drawFont, drawColor, TextSettings.GetRectangle());
+                IsRawImage = true;
+                NeedRedraw = true;
+                lastText = text;
             }
         }
-
-        protected virtual void ConvertFontParameter(out Font drawFont)
-        {
-            drawFont = new Font(TextSettings.FontName, TextSettings.FontSize, (FontStyle)TextSettings.FontStyle); //GraphicsUnit.Point ?
-        }
-
     }
 }

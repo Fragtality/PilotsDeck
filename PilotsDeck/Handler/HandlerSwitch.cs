@@ -5,41 +5,37 @@ namespace PilotsDeck
 {
     public class HandlerSwitch : HandlerBase, IHandlerSwitch
     {
-        public ModelSwitch CommonSettings { get; }
-        
-        public override string DefaultImage { get { return CommonSettings.DefaultImage; } }
-        public override string ErrorImage { get { return CommonSettings.ErrorImage; } }
-        public override bool IsInitialized { get { return CommonSettings.IsInitialized; } }
+        public virtual ModelSwitch BaseSettings { get { return Settings; } }
+        public virtual ModelSwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"{Title} | Write: {CommonSettings.AddressAction}"; } }
-        public virtual string AddressAction { get { return CommonSettings.AddressAction; } }
-        public virtual int ActionType { get { return CommonSettings.ActionType; } }
+        public override string ActionID { get { return $"{Title} | Write: {Address}"; } }
+        public override string Address { get { return BaseSettings.AddressAction; } }
+        //public virtual string AddressAction { get { return Settings.AddressAction; } }
+        //public virtual int ActionType { get { return Settings.ActionType; } }
 
-        protected virtual string currentValue { get; set; }
+        protected virtual string LastSwitchState { get; set; }
 
 
         public HandlerSwitch(string context, ModelSwitch settings) : base(context, settings)
         {
-            CommonSettings = settings;
-            currentValue = CommonSettings.OffState;
+            Settings = settings;
+            LastSwitchState = Settings.OffState;
         }
 
-        public override void Update()
+        public override void Update(IPCManager ipcManager)
         {
-            if (!string.IsNullOrEmpty(CommonSettings.AddressAction))
-                CommonSettings.IsInitialized = true;
-            else
-                CommonSettings.IsInitialized = false;
+            base.Update(ipcManager);
 
-            currentValue = CommonSettings.OffState;
+            if (this.GetType().IsAssignableFrom(typeof(HandlerSwitch)) && LastSwitchState != BaseSettings.OffState && LastSwitchState != BaseSettings.OnState)
+                LastSwitchState = BaseSettings.OffState;
         }
 
         public virtual bool Action(IPCManager ipcManager)
         {
-            string newValue = ToggleValue(currentValue, CommonSettings.OffState, CommonSettings.OnState);
-            bool result = RunAction(ipcManager, CommonSettings.AddressAction, (ActionSwitchType)CommonSettings.ActionType, newValue);
+            string newValue = ToggleValue(LastSwitchState, BaseSettings.OffState, BaseSettings.OnState);
+            bool result = RunAction(ipcManager, BaseSettings.AddressAction, (ActionSwitchType)BaseSettings.ActionType, newValue);
             if (result)
-                currentValue = newValue;
+                LastSwitchState = newValue;
 
             return result;
         }

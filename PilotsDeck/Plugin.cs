@@ -7,22 +7,22 @@ using System.Threading;
 
 namespace PilotsDeck
 {
-    public class PilotsDeckPlugin
+    public class Plugin
     {
 
         static async Task Main(string[] args)
         {
-//#if DEBUG
-//            while (!Debugger.IsAttached)
-//            {
-//                Thread.Sleep(500);
-//                Debugger.Launch();
-//            }
-//#endif
+#if DEBUG
+            while (!Debugger.IsAttached)
+            {
+                Thread.Sleep(500);
+                Debugger.Launch();
+            }
+#endif
             using (var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args))
             {
                 await ConnectionManager.Initialize(args, config.LoggerFactory)
-                                                         .RegisterAllActions(typeof(PilotsDeckPlugin).Assembly)
+                                                         .RegisterAllActions(typeof(Plugin).Assembly)
                                                          .StartAsync();
             }
 

@@ -4,7 +4,7 @@ using Serilog;
 
 namespace PilotsDeck
 {
-    public class IPCValueLvar : IPCValue, IDisposable
+    public class IPCValueLvar : IPCValue
     {
         private bool isChanged = false;
         private double currentValue = 0;

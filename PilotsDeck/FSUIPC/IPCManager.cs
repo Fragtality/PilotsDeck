@@ -8,7 +8,7 @@ namespace PilotsDeck
     public class IPCManager : IDisposable
     {
         private Dictionary<string, IPCValue> currentValues = new Dictionary<string, IPCValue>();
-        private Dictionary<string, string> currentRegistrations = new Dictionary<string, string>();
+        private Dictionary<string, int> currentRegistrations = new Dictionary<string, int>();
         private static readonly string inMenuAddr = "3365:1";
         private IPCValueOffset inMenuValue;
 
@@ -30,12 +30,12 @@ namespace PilotsDeck
 
         public int Length => currentValues.Count;
 
-        public IPCValue this[string context]
+        public IPCValue this[string address]
         {
             get
             {
-                if (currentRegistrations.ContainsKey(context) && currentValues.ContainsKey(currentRegistrations[context]))
-                    return currentValues[currentRegistrations[context]];
+                if (currentValues.ContainsKey(address))
+                    return currentValues[address];
                 else
                     return null;
             }
@@ -95,59 +95,75 @@ namespace PilotsDeck
             return !IsConnected;
         }
 
-        public IPCValue RegisterValue(string context, string address, string group)
+        public IPCValue RegisterAddress(string address, string group)
         {
             IPCValue value = null;
-            if (!IPCTools.IsReadAddress(address))
-                return value;
+            try
+            {
+                if (!IPCTools.IsReadAddress(address))
+                {
+                    Log.Logger.Error($"RegisterValue: Not an Read-Address! {address}");
+                    return value;
+                }
 
-            if (currentValues.ContainsKey(address) && !currentRegistrations.ContainsKey(context)) //address Registered, button Unregistered
-            {
-                value = currentValues[address];
-                currentRegistrations.Add(context, address);
-            }
-            else if (!currentValues.ContainsKey(address) && !currentRegistrations.ContainsKey(context)) //address Unregistered, button Unregistered
-            {
-                if (IPCTools.rxOffset.IsMatch(address))
-                    value = new IPCValueOffset(address, group);
+                if (currentValues.ContainsKey(address))
+                {
+                    value = currentValues[address];
+                    currentRegistrations[address]++;
+                }
                 else
-                    value = new IPCValueLvar(address);
+                {
+                    if (IPCTools.rxOffset.IsMatch(address))
+                        value = new IPCValueOffset(address, group);
+                    else
+                        value = new IPCValueLvar(address);
 
-                currentValues.Add(address, value);
-                currentRegistrations.Add(context, address);
+                    currentValues.Add(address, value);
+                    currentRegistrations.Add(address, 1);
+                }                
             }
-            else
-                Log.Logger.Verbose($"RegisterValue: Context already registered! ({context} | {address})");
+            catch
+            {
+                Log.Logger.Error($"RegisterValue: Exception while registering Address {address}");
+            }
+
+            if (value == null)
+                Log.Logger.Error($"RegisterValue: Null Reference for Address {address}");
 
             return value;
         }
 
-        public void DeregisterValue(string context)
+        public void DeregisterValue(string address)
         {
-            if (currentRegistrations.ContainsKey(context)) //button Registered
-            {
-                string address = currentRegistrations[context];
-                currentRegistrations.Remove(context);
-
-                if (!currentRegistrations.ContainsValue(address)) //no other Button Registered for that Address
+            try
+            { 
+                if (!string.IsNullOrEmpty(address) && currentValues.ContainsKey(address))
                 {
-                    currentValues[address].Dispose();
-                    currentValues[address] = null;
-                    currentValues.Remove(address);
+                    if (currentRegistrations[address]-- == 0)
+                    {
+                        currentRegistrations.Remove(address);
+
+                        currentValues[address].Dispose();
+                        currentValues.Remove(address);
+                    }
                 }
+                else
+                    Log.Logger.Error($"DeregisterValue: Could not find Address {address}");
             }
-            else
-                Log.Logger.Error($"DeregisterValue: Could not find Context {context}");
+            catch
+            {
+                Log.Logger.Error($"RegisterValue: Exception while deregistering Address {address}");
+            }
         }
 
-        public IPCValue UpdateValue(string context, string newAddress, string group)
-        {
-            if (!IPCTools.IsReadAddress(newAddress))
-                return null;
+        //public IPCValue UpdateValue(string newAddress, string oldAddress, string group)
+        //{
+        //    if (!IPCTools.IsReadAddress(newAddress))
+        //        return null;
 
-            DeregisterValue(context);
-            return RegisterValue(context, newAddress, group);
-        }
+        //    DeregisterValue(context);
+        //    return RegisterValue(context, newAddress, group);
+        //}
 
         public bool Process(string group)
         {

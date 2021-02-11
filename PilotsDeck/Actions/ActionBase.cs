@@ -47,7 +47,7 @@ namespace PilotsDeck
         {
             await base.OnPropertyInspectorDidAppear(args);
 
-            if (Manager.ActionController[args.context] is IHandlerDisplay)
+            if (Manager.ActionController[args.context].UseFont)
                 await Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspectorFonts());
             else
                 await Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspector());

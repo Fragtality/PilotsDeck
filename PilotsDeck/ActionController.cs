@@ -30,7 +30,7 @@ namespace PilotsDeck
         {
             currentActions = new Dictionary<string, IHandler>();
             ipcManager = new IPCManager(AppSettings.groupStringRead);
-            imgManager = new ImageManager(StreamDeckTools.ReadImageDirectory());
+            imgManager = new ImageManager();
             deckMangager = manager;
             Log.Logger.Information("ActionController and IPCManager created");
         }
@@ -99,12 +99,12 @@ namespace PilotsDeck
                             lastConnectState = true;
                             lastProcessState = true;
                             Log.Logger.Information("ActionController: Changed to Online and Process okay - RefreshAll forced");
-                            RefreshAll(token, true);
+                            RefreshActions(token, true);
                         }
                         else //still online
                         {
                             lastProcessState = true;
-                            RefreshAll(token, false);
+                            RefreshActions(token, false);
                         }
                     }
                     else
@@ -123,7 +123,7 @@ namespace PilotsDeck
             }
         }
 
-        protected void RefreshAll(CancellationToken token, bool forceUpdate = false)
+        protected void RefreshActions(CancellationToken token, bool forceUpdate = false)
         {
             foreach (var action in currentActions.Values)
             {
@@ -133,7 +133,8 @@ namespace PilotsDeck
                 if (forceUpdate)
                     action.ForceUpdate = forceUpdate;
                 
-                action.Refresh(imgManager);
+                if (action.IsInitialized)
+                    action.Refresh(imgManager, ipcManager);
             }
         }
 
@@ -210,12 +211,7 @@ namespace PilotsDeck
                 {
                     if (currentActions.ContainsKey(context))
                     {
-                        currentActions[context].Title = title;
-                        if (currentActions[context] is IHandlerDisplay)
-                        {
-                            (currentActions[context] as IHandlerDisplay).SetTitleParameters(StreamDeckTools.ConvertFontParameter(titleParameters));
-                            currentActions[context].ForceUpdate = true;
-                        }
+                        currentActions[context].SetTitleParameters(title, StreamDeckTools.ConvertTitleParameter(titleParameters));
                     }
                     else
                     {
@@ -237,7 +233,7 @@ namespace PilotsDeck
                 {
                     if (currentActions.ContainsKey(context))
                     {
-                        currentActions[context].Update();
+                        currentActions[context].Update(ipcManager);
 
                         if (ipcManager.IsConnected && lastConnectState)
                             currentActions[context].ForceUpdate = true;
@@ -248,7 +244,7 @@ namespace PilotsDeck
                             imgManager.UpdateImage(currentActions[context].DrawImage);
 
                         if (currentActions[context] is IHandlerValue)
-                            (currentActions[context] as IHandlerValue).UpdateValue(ipcManager);
+                            (currentActions[context] as IHandlerValue).UpdateAddress(ipcManager);
 
                         currentActions[context].NeedRedraw = true;
                         redrawRequested = true;
@@ -282,7 +278,7 @@ namespace PilotsDeck
                         imgManager.AddImage(handler.DrawImage);
 
                         if (currentActions[context] is IHandlerValue)
-                            (currentActions[context] as IHandlerValue).RegisterValue(ipcManager);
+                            (currentActions[context] as IHandlerValue).RegisterAddress(ipcManager);
 
                         handler.NeedRedraw = true;
                         redrawRequested = true;
@@ -308,7 +304,7 @@ namespace PilotsDeck
                     if (currentActions.ContainsKey(context))
                     {
                         if (currentActions[context] is IHandlerValue)
-                            (currentActions[context] as IHandlerValue).DeregisterValue(ipcManager);
+                            (currentActions[context] as IHandlerValue).DeregisterAddress(ipcManager);
 
                         if (!currentActions[context].IsRawImage)
                             imgManager.RemoveImage(currentActions[context].DrawImage);

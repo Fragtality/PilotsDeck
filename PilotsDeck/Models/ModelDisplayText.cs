@@ -5,72 +5,57 @@ namespace PilotsDeck
 {
     public class ModelDisplayText : ModelDisplay
     {
-		public bool HasIndication { get; set; } = false;
-		public bool IndicationHideValue { get; set; } = false;
-		public bool IndicationUseColor { get; set; } = false;
-		public string IndicationColor { get; set; } = "#ffffff";
-		public string IndicationImage { get; set; } = @"Images/ValueFault.png";
-		public string IndicationValue { get; set; } = "0";
+		public virtual bool HasIndication { get; set; } = false;
+		public virtual bool IndicationHideValue { get; set; } = false;
+		public virtual bool IndicationUseColor { get; set; } = false;
+		public virtual string IndicationColor { get; set; } = "#ffffff";
+		public virtual string IndicationImage { get; set; } = @"Images/ValueFault.png";
+		public virtual string IndicationValue { get; set; } = "0";
 
-		public bool FontInherit { get; set; } = true;
-		public string FontName { get; set; } = "Arial";
-		public int FontSize { get; set; } = 10;
-		public int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
-		public string FontColor { get; set; } = "#ffffff";
-		public RectangleF FontRect = new RectangleF(11, 23, 48, 40); //-1 -1 -2 0
-		public string RectCoord { get; set; } = "11; 23; 48; 40";
+		public virtual bool FontInherit { get; set; } = true;
+		public virtual string FontName { get; set; } = "Arial";
+		public virtual int FontSize { get; set; } = 10;
+		public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
+		public virtual string FontColor { get; set; } = "#ffffff";
+		//public RectangleF FontRect = new RectangleF(11, 23, 48, 40); //-1 -1 -2 0
+		public virtual string RectCoord { get; set; } = "11; 23; 48; 40";
 
 
 		public ModelDisplayText()
 		{
 			DefaultImage = @"Images/ValueFrame.png";
 			ErrorImage = @"Images/ValueError.png";
+		}		
 
-			//RectCoord = $"{FontRect.X}; {FontRect.Y}; {FontRect.Width}; {FontRect.Height}";
-			UpdateRectangle();
-		}
-
-        public override void Update()
+		public virtual void GetFontParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters, out Font drawFont, out Color drawColor)
         {
-			UpdateRectangle();
-
 			if (FontInherit)
-				RestoreDeckFont();
-		}
+            {
+				drawFont = StreamDeckTools.ConvertFontParameter(titleParameters);
+				drawColor = StreamDeckTools.ConvertColorParameter(titleParameters);
+            }
+			else
+            {
+				drawFont = new Font(FontName, FontSize, (FontStyle)FontStyle);
+				drawColor = ColorTranslator.FromHtml(titleParameters.FontColor);
+			}
+        }
 
-		public override void SetTitleParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters)
-		{
-			base.SetTitleParameters(titleParameters);
-
-			if (FontInherit)
-				RestoreDeckFont();
-		}
-
-		//      public virtual void SetFontParameter(ModelDisplayText model)
-		//      {
+		//public virtual void SetTitleParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters)
+		//{
 		//	if (FontInherit)
-		//	{
-		//		FontName = model.FontName;
-		//		FontSize = model.FontSize;
-		//		FontStyle = model.FontStyle;
-		//		FontColor = model.FontColor;
-		//	}
-
-		//	DeckFontName = model.FontName;
-		//	DeckFontSize = model.FontSize;
-		//	DeckFontStyle = model.FontStyle;
-		//	DeckFontColor = model.FontColor;
+		//		RestoreDeckFont(titleParameters);
 		//}
 
-		protected virtual void RestoreDeckFont()
-        {
-			FontName = TitleParameters.FontName;
-			FontSize = TitleParameters.FontSize;
-			FontStyle = TitleParameters.FontStyle;
-			FontColor = TitleParameters.FontColor;
-		}
+		//protected virtual void RestoreDeckFont(StreamDeckTools.StreamDeckTitleParameters titleParameters)
+  //      {
+		//	FontName = titleParameters.FontName;
+		//	FontSize = titleParameters.FontSize;
+		//	FontStyle = titleParameters.FontStyle;
+		//	FontColor = titleParameters.FontColor;
+		//}
 
-		protected virtual void UpdateRectangle()
+		public virtual RectangleF GetRectangle()
         {
 			string[] parts = RectCoord.Trim().Split(';');
 			if (parts.Length == 4)
@@ -81,8 +66,11 @@ namespace PilotsDeck
 						parses++;
 
 				if (parses == parts.Length)
-					FontRect = new RectangleF(Convert.ToSingle(parts[0]), Convert.ToSingle(parts[1]), Convert.ToSingle(parts[2]), Convert.ToSingle(parts[3]));
-            }
-        }
+					return new RectangleF(Convert.ToSingle(parts[0]), Convert.ToSingle(parts[1]), Convert.ToSingle(parts[2]), Convert.ToSingle(parts[3]));
+				else
+					return new RectangleF(11, 23, 48, 40); //-1 -1 -2 0 from actual
+			}
+			return new RectangleF(11, 23, 48, 40);
+		}
 	}
 }

@@ -104,7 +104,7 @@ namespace PilotsDeck
             public string FontColor { get; set; }
         }
 
-        public static StreamDeckTitleParameters ConvertFontParameter(StreamDeckEventPayload.TitleParameters titleParameters)
+        public static StreamDeckTitleParameters ConvertTitleParameter(StreamDeckEventPayload.TitleParameters titleParameters)
         {
             StreamDeckTitleParameters result = new StreamDeckTitleParameters()
             {
@@ -128,6 +128,16 @@ namespace PilotsDeck
                 result.FontStyle |= (int)FontStyle.Underline;
 
             return result;
+        }
+
+        public static Font ConvertFontParameter(StreamDeckTitleParameters titleParameters)
+        {
+            return new Font(titleParameters.FontName, titleParameters.FontSize, (FontStyle)titleParameters.FontStyle); //GraphicsUnit.Point ?
+        }
+
+        public static Color ConvertColorParameter(StreamDeckTitleParameters titleParameters)
+        {
+            return ColorTranslator.FromHtml(titleParameters.FontColor);
         }
     }
 }

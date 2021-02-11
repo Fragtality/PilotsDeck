@@ -160,6 +160,9 @@
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
+    <Reference Include="System.Diagnostics.EventLog, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.EventLog.5.0.1\lib\net461\System.Diagnostics.EventLog.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
@@ -249,7 +252,7 @@
     <Compile Include="FSUIPC\IPCValueOffset.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handler\HandlerBase.cs" />
-    <Compile Include="Handler\HandlerDisplay.cs" />
+    <Compile Include="Handler\HandlerValue.cs" />
     <Compile Include="Handler\HandlerDisplayText.cs" />
     <Compile Include="Handler\HandlerDisplayRadio.cs" />
     <Compile Include="Handler\HandlerDisplaySwitch.cs" />
@@ -280,6 +283,7 @@
     <Compile Include="StreamDeckLib\Extensions\DependencyInjectionExtensions.cs" />
     <Compile Include="StreamDeckLib\Extensions\HostingExtensions.cs" />
     <Compile Include="StreamDeckLib\HostedServices\StreamDeckHostedService.cs" />
+    <Compile Include="StreamDeckLib\IActionController.cs" />
     <Compile Include="StreamDeckLib\IGlobalSettings.cs" />
     <Compile Include="StreamDeckLib\IStreamDeckProxy.cs" />
     <Compile Include="StreamDeckLib\Messages\BaseStreamDeckArgs.cs" />
@@ -423,12 +427,15 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)RegisterPluginAndStartStreamDeck.ps1" $(ConfigurationName)</PostBuildEvent>
+  </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
+    </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Extensions.Configuration.UserSecrets.5.0.0\build\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Extensions.Configuration.UserSecrets.5.0.0\build\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Extensions.Configuration.UserSecrets.5.0.0\build\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Extensions.Configuration.UserSecrets.5.0.0\build\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Extensions.Configuration.UserSecrets.5.0.0\build\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.targets" Condition="Exists('..\packages\Microsoft.Extensions.Configuration.UserSecrets.5.0.0\build\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.targets')" />
-  <PropertyGroup>
-    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)RegisterPluginAndStartStreamDeck.ps1" $(ConfigurationName)</PostBuildEvent>
-  </PropertyGroup>
 </Project>
