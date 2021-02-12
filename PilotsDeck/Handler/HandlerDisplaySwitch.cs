@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-namespace PilotsDeck
+﻿namespace PilotsDeck
 {
     public class HandlerDisplaySwitch : HandlerDisplayText, IHandlerSwitch
     {
@@ -9,8 +7,6 @@ namespace PilotsDeck
         public new ModelDisplaySwitch Settings { get; protected set; }
 
         public override string ActionID { get { return $"{Title} | Read: {TextSettings.Address} | Write: {SwitchSettings.AddressAction}"; } }
-        //public virtual string AddressAction { get { return SwitchSettings.AddressAction; } }
-        //public virtual int ActionType { get { return SwitchSettings.ActionType; } }
         protected virtual string LastSwitchState { get; set; }
 
 
@@ -19,7 +15,7 @@ namespace PilotsDeck
             Settings = settings;
         }
 
-        protected override bool CheckInitialization()
+        protected override bool InitializationTest()
         {
             return !string.IsNullOrEmpty(Address) && !string.IsNullOrEmpty(SwitchSettings.AddressAction);
         }

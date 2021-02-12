@@ -12,20 +12,9 @@ namespace PilotsDeck
         {
             await base.OnWillAppear(args);
 
-            base.OnWillAppear(args, new HandlerDisplaySwitch(args.context, SettingsModel));
-        }
+            Plugin.ActionController.RegisterAction(args.context, new HandlerDisplaySwitch(args.context, SettingsModel));
 
-        public override async Task OnKeyUp(StreamDeckEventPayload args)
-        {
-            await base.OnKeyUp(args);
-
-            Log.Logger.Verbose($"ActionSwitch:OnKeyUp {args.context} | {Manager.ActionController[args.context]?.ActionID}");
-
-            if (!Manager.ActionController.RunAction(args.context))
-            {
-                await Manager.ShowAlertAsync(args.context);
-                Log.Logger.Error($"Could not send command to Sim! Address: {args.context} | {Manager.ActionController[args.context]?.ActionID}");
-            }
+            Log.Logger.Verbose($"ActionDisplaySwitch:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
     }
 }

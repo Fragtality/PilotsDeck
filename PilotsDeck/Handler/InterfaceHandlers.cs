@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PilotsDeck
+﻿namespace PilotsDeck
 {
     public interface IHandler
     {
@@ -8,7 +6,6 @@ namespace PilotsDeck
         string Context { get; }
         
         string Address { get; }
-        //bool NeedRegistration { get; }
 
         string DrawImage { get; }
         bool IsRawImage { get; }
@@ -21,8 +18,8 @@ namespace PilotsDeck
         bool NeedRedraw { get; set; }
         bool IsInitialized { get; }
 
-        //void Register(ImageManager imgManager, IPCManager ipcManager);
-        //void Deregister(ImageManager imgManager, IPCManager ipcManager);
+        void Register(ImageManager imgManager, IPCManager ipcManager);
+        void Deregister(ImageManager imgManager, IPCManager ipcManager);
 
         void SetError();
         void ResetDrawState();
@@ -31,7 +28,7 @@ namespace PilotsDeck
         void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
     }
 
-    public interface IHandlerValue : IHandler //NEEDED WITH register/unregister?!
+    public interface IHandlerValue : IHandler
     {
         string CurrentValue { get; }
         string LastAddress { get; }
@@ -43,11 +40,6 @@ namespace PilotsDeck
         void UpdateAddress(IPCManager ipcManager);
         void DeregisterAddress(IPCManager ipcManager);
     }
-
-    //public interface IHandlerDisplay : IHandler //NEEDED ?!
-    //{
-    //    void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
-    //}
 
     public interface IHandlerSwitch : IHandler
     {

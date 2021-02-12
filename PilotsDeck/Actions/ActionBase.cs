@@ -7,52 +7,63 @@ namespace PilotsDeck
 {
     public class ActionBase<T> : BaseStreamDeckActionWithSettingsModel<T>
     {
-        public virtual void OnWillAppear(StreamDeckEventPayload args, IHandler actionHandler)
-        {
-            Manager.ActionController.RegisterAction(args.context, actionHandler);
-
-            Log.Logger.Verbose($"ActionBase:OnWillAppear {args.context} | {actionHandler.ActionID}");
-        }
-
         public override async Task OnWillDisappear(StreamDeckEventPayload args)
         {
             await base.OnWillDisappear(args);
 
-            Log.Logger.Verbose($"ActionBase:OnWillDisappear {args.context} | {Manager.ActionController[args.context]?.ActionID}");
+            Log.Logger.Verbose($"ActionBase:OnWillDisappear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 
-            Manager.ActionController.DeregisterAction(args.context);
+            Plugin.ActionController.DeregisterAction(args.context);
         }
 
         public override async Task OnDidReceiveSettings(StreamDeckEventPayload args)
         {
             await base.OnDidReceiveSettings(args);
 
-            Manager.ActionController.UpdateAction(args.context);
+            Plugin.ActionController.UpdateAction(args.context);
 
-            Log.Logger.Verbose($"ActionBase:OnDidReceiveSettings {args.context} | {Manager.ActionController[args.context]?.ActionID}");
+            Log.Logger.Verbose($"ActionBase:OnDidReceiveSettings {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
 
-        public override async Task OnTitleParametersDidChange(StreamDeckEventPayload args)
+        public override Task OnTitleParametersDidChange(StreamDeckEventPayload args)
         {
-            await base.OnTitleParametersDidChange(args);
-            
-            Manager.ActionController.SetTitleParameters(args.context, args.payload.title, args.payload.titleParameters);
+            Plugin.ActionController.SetTitleParameters(args.context, args.payload.title, args.payload.titleParameters);
 
-            await Manager.SetSettingsAsync(args.context, SettingsModel);
+            Log.Logger.Verbose($"ActionBase:OnTitleParametersDidChange {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 
-            Log.Logger.Verbose($"ActionBase:OnTitleParametersDidChange {args.context} | {Manager.ActionController[args.context]?.ActionID}");
+            return Task.CompletedTask;
         }
 
-        public override async Task OnPropertyInspectorDidAppear(StreamDeckEventPayload args)
+        public override Task OnKeyUp(StreamDeckEventPayload args)
         {
-            await base.OnPropertyInspectorDidAppear(args);
+            Log.Logger.Verbose($"ActionBase:OnKeyUp {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 
-            if (Manager.ActionController[args.context].UseFont)
-                await Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspectorFonts());
+            if ((Plugin.ActionController[args.context] is IHandlerSwitch) &&  !Plugin.ActionController.RunAction(args.context))
+                _ = Manager.ShowAlertAsync(args.context);
+
+            return Task.CompletedTask;
+        }
+
+        public override async Task OnApplicationDidLaunchAsync(StreamDeckEventPayload args)
+        {
+            Log.Logger.Verbose($"ActionBase:OnApplicationDidLaunchAsync {args.payload.application}");
+        }
+
+        public override async Task OnApplicationDidTerminateAsync(StreamDeckEventPayload args)
+        {
+            Log.Logger.Verbose($"ActionBase:OnApplicationDidTerminateAsync {args.payload.application}");
+        }
+
+        public override Task OnPropertyInspectorDidAppear(StreamDeckEventPayload args)
+        {
+            if (Plugin.ActionController[args.context].UseFont)
+                _ = Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspectorFonts());
             else
-                await Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspector());
+                _ = Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspector());
 
-            Log.Logger.Verbose($"ActionBase:OnPropertyInspectorDidAppear {args.context} | {Manager.ActionController[args.context]?.ActionID}");
+            Log.Logger.Verbose($"ActionBase:OnPropertyInspectorDidAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+
+            return Task.CompletedTask;
         }
 
     }

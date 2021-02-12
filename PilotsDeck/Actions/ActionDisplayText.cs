@@ -1,6 +1,7 @@
 ﻿using StreamDeckLib;
 using StreamDeckLib.Messages;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace PilotsDeck
 {
@@ -11,7 +12,9 @@ namespace PilotsDeck
         {
             await base.OnWillAppear(args);
 
-            base.OnWillAppear(args, new HandlerDisplayText(args.context, SettingsModel));
+            Plugin.ActionController.RegisterAction(args.context, new HandlerDisplayText(args.context, SettingsModel));
+
+            Log.Logger.Verbose($"ActionDisplayText:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
     }
 }

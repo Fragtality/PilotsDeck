@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PilotsDeck
 {
@@ -13,18 +9,6 @@ namespace PilotsDeck
         public virtual bool DecodeBCD { get; set; } = false;
         public virtual double Scalar { get; set; } = 1.0f;
         public virtual string Format { get; set; } = "";
-
-        //protected virtual StreamDeckTools.StreamDeckTitleParameters TitleParameters { get; set; }
-
-        //public virtual void Update()
-        //{
-
-        //}
-
-        //public virtual void SetTitleParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters)
-        //{
-        //    TitleParameters = titleParameters;
-        //}
 
         public virtual string ScaleValue(string value)
         {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using Serilog;
 
 namespace PilotsDeck
 {
@@ -21,7 +19,7 @@ namespace PilotsDeck
             Settings = settings;
         }
 
-        protected override bool CheckInitialization()
+        protected override bool InitializationTest()
         {
             return !string.IsNullOrEmpty(SwitchSettings.AddressAction) && (!string.IsNullOrEmpty(Settings.AddressRadio0) || !string.IsNullOrEmpty(Settings.AddressRadio1));
         }

@@ -17,7 +17,6 @@ namespace PilotsDeck
 		public virtual int FontSize { get; set; } = 10;
 		public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
 		public virtual string FontColor { get; set; } = "#ffffff";
-		//public RectangleF FontRect = new RectangleF(11, 23, 48, 40); //-1 -1 -2 0
 		public virtual string RectCoord { get; set; } = "11; 23; 48; 40";
 
 
@@ -29,7 +28,7 @@ namespace PilotsDeck
 
 		public virtual void GetFontParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters, out Font drawFont, out Color drawColor)
         {
-			if (FontInherit)
+			if (FontInherit && titleParameters != null)
             {
 				drawFont = StreamDeckTools.ConvertFontParameter(titleParameters);
 				drawColor = StreamDeckTools.ConvertColorParameter(titleParameters);
@@ -37,23 +36,9 @@ namespace PilotsDeck
 			else
             {
 				drawFont = new Font(FontName, FontSize, (FontStyle)FontStyle);
-				drawColor = ColorTranslator.FromHtml(titleParameters.FontColor);
+				drawColor = ColorTranslator.FromHtml(FontColor);
 			}
         }
-
-		//public virtual void SetTitleParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters)
-		//{
-		//	if (FontInherit)
-		//		RestoreDeckFont(titleParameters);
-		//}
-
-		//protected virtual void RestoreDeckFont(StreamDeckTools.StreamDeckTitleParameters titleParameters)
-  //      {
-		//	FontName = titleParameters.FontName;
-		//	FontSize = titleParameters.FontSize;
-		//	FontStyle = titleParameters.FontStyle;
-		//	FontColor = titleParameters.FontColor;
-		//}
 
 		public virtual RectangleF GetRectangle()
         {

@@ -19,6 +19,22 @@ namespace PilotsDeck
             Settings = settings;
         }
 
+        public override void Register(ImageManager imgManager, IPCManager ipcManager)
+        {
+            base.Register(imgManager, ipcManager);
+
+            if (TextSettings.HasIndication)
+                imgManager.AddImage(TextSettings.IndicationImage);
+        }
+
+        public override void Deregister(ImageManager imgManager, IPCManager ipcManager)
+        {
+            base.Deregister(imgManager, ipcManager);
+
+            if (TextSettings.HasIndication)
+                imgManager.RemoveImage(TextSettings.IndicationImage);
+        }
+
         protected override void Redraw(ImageManager imgManager)
         {
             if (!IsChanged && !ForceUpdate)

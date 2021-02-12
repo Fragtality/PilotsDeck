@@ -10,8 +10,6 @@ namespace PilotsDeck
 
         public override string ActionID { get { return $"{Title} | Write: {Address}"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
-        //public virtual string AddressAction { get { return Settings.AddressAction; } }
-        //public virtual int ActionType { get { return Settings.ActionType; } }
 
         protected virtual string LastSwitchState { get; set; }
 

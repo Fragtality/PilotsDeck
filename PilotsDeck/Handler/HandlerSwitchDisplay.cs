@@ -1,5 +1,4 @@
 ﻿using System;
-using Serilog;
 
 namespace PilotsDeck
 {
@@ -13,8 +12,6 @@ namespace PilotsDeck
         public override string ActionID { get { return $"{Title} | Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
         public override string Address { get { return DisplaySettings.Address; } }
 
-        //protected virtual IPCValue ValueRef { get; set; } = null;
-        //protected override string currentValue { get { return ValueRef?.Value; } set { } }
         public virtual string CurrentValue { get; protected set; } = null;
         public virtual string LastAddress { get; protected set; }
         public virtual bool IsChanged { get; protected set; } = false;
@@ -24,6 +21,26 @@ namespace PilotsDeck
         public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings) : base(context, settings)
         {
             Settings = settings;
+        }
+
+        public override void Register(ImageManager imgManager, IPCManager ipcManager)
+        {
+            base.Register(imgManager, ipcManager);
+
+            imgManager.AddImage(DisplaySettings.OnImage);
+            imgManager.AddImage(DisplaySettings.OffImage);
+            if (DisplaySettings.HasIndication)
+                imgManager.AddImage(DisplaySettings.IndicationImage);
+        }
+
+        public override void Deregister(ImageManager imgManager, IPCManager ipcManager)
+        {
+            base.Deregister(imgManager, ipcManager);
+
+            imgManager.RemoveImage(DisplaySettings.OnImage);
+            imgManager.RemoveImage(DisplaySettings.OffImage);
+            if (DisplaySettings.HasIndication)
+                imgManager.RemoveImage(DisplaySettings.IndicationImage);
         }
 
         public virtual void RefreshValue(IPCManager ipcManager)
@@ -52,7 +69,7 @@ namespace PilotsDeck
                 throw new Exception($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Address} != {LastAddress} ] ");
         }
 
-        protected override bool CheckInitialization()
+        protected override bool InitializationTest()
         {
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }

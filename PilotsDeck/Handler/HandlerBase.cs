@@ -1,7 +1,4 @@
-﻿using System;
-using Serilog;
-
-namespace PilotsDeck
+﻿namespace PilotsDeck
 {
     public abstract class HandlerBase : IHandler
     {
@@ -11,7 +8,6 @@ namespace PilotsDeck
         public string Context { get; protected set; }
 
         public abstract string Address { get; }
-        //public virtual bool NeedRegistration { get; } = false;
 
         public string DrawImage { get; protected set; } = "";
         public bool IsRawImage { get; protected set; } = false;
@@ -23,11 +19,7 @@ namespace PilotsDeck
         public bool ForceUpdate { get; set; } = false;
         public bool NeedRedraw { get; set; } = false;
         protected virtual bool CanRedraw { get { return true; } }
-        public virtual bool IsInitialized
-        {
-            get { return CommonSettings.IsInitialized; }
-            set { CommonSettings.IsInitialized = value; }
-        }
+        public virtual bool IsInitialized { get; set; }
 
         protected virtual StreamDeckTools.StreamDeckTitleParameters TitleParameters { get; set; }
 
@@ -36,6 +28,26 @@ namespace PilotsDeck
             Context = context;
             CommonSettings = settings;
             DrawImage = DefaultImage;
+        }
+
+        public virtual void Register(ImageManager imgManager, IPCManager ipcManager)
+        {
+            SetInitialization();
+            
+            imgManager.AddImage(DefaultImage);
+            imgManager.AddImage(ErrorImage);
+            
+            if (this is IHandlerValue)
+                (this as IHandlerValue).RegisterAddress(ipcManager);
+        }
+
+        public virtual void Deregister(ImageManager imgManager, IPCManager ipcManager)
+        {
+            imgManager.RemoveImage(DefaultImage);
+            imgManager.RemoveImage(ErrorImage);
+
+            if (this is IHandlerValue)
+                (this as IHandlerValue).DeregisterAddress(ipcManager);
         }
 
         public virtual void SetError()
@@ -79,33 +91,30 @@ namespace PilotsDeck
 
         protected virtual void Redraw(ImageManager imgManager)
         {
-            //if (DrawImage != DefaultImage || ForceUpdate)
-            //{
-            //    DrawImage = DefaultImage;
-            //    IsRawImage = false;
-            //    NeedRedraw = true;
-            //}
-
             if (!IsInitialized && DrawImage != DefaultImage)
             {
                 DrawImage = DefaultImage;
                 IsRawImage = false;
                 NeedRedraw = true;
-                imgManager.AddImage(DrawImage);
             }
         }
 
-        protected virtual bool CheckInitialization()
+        protected virtual bool InitializationTest()
         {
             return !string.IsNullOrEmpty(Address);
         }
 
-        public virtual void Update(IPCManager ipcManager)
+        protected virtual void SetInitialization()
         {
-            if (CheckInitialization())
+            if (InitializationTest())
                 IsInitialized = true;
             else
                 IsInitialized = false;
+        }
+
+        public virtual void Update(IPCManager ipcManager)
+        {
+            SetInitialization();
 
             if (this is IHandlerValue)
                 (this as IHandlerValue).UpdateAddress(ipcManager);
@@ -116,20 +125,5 @@ namespace PilotsDeck
             Title = title;
             TitleParameters = titleParameters;
         }
-
-        //public static IPCValue RegisterValue(IPCManager ipcManager, string address)
-        //{
-        //    return ipcManager.RegisterValue(address, AppSettings.groupStringRead);
-        //}
-
-        //public static IPCValue UpdateValue(IPCManager ipcManager, string newAddress, string oldAddress)
-        //{
-        //    return ipcManager.UpdateValue(newAddress, oldAddress, AppSettings.groupStringRead);
-        //}
-
-        //public static void DeregisterValue(IPCManager ipcManager, string context)
-        //{
-        //    ipcManager.DeregisterValue(context);
-        //}
     }
 }

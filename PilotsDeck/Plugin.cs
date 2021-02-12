@@ -9,6 +9,7 @@ namespace PilotsDeck
 {
     public class Plugin
     {
+        public static ActionController ActionController { get; } = new ActionController();
 
         static async Task Main(string[] args)
         {
@@ -21,7 +22,7 @@ namespace PilotsDeck
 #endif
             using (var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args))
             {
-                await ConnectionManager.Initialize(args, config.LoggerFactory)
+                await ConnectionManager.Initialize(args, config.LoggerFactory, ActionController)
                                                          .RegisterAllActions(typeof(Plugin).Assembly)
                                                          .StartAsync();
             }
