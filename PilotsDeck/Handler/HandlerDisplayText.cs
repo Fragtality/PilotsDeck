@@ -67,10 +67,14 @@ namespace PilotsDeck
 
             if (text != lastText || ForceUpdate)
             {
-                DrawImage = ImageTools.DrawText(text, imgManager.GetImageObject(background), drawFont, drawColor, TextSettings.GetRectangle());
+                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background));
+                render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangle());
+                
+                DrawImage = render.RenderImage64();
                 IsRawImage = true;
                 NeedRedraw = true;
                 lastText = text;
+                render.Dispose();
             }
         }
     }

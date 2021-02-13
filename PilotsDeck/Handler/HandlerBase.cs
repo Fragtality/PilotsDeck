@@ -102,7 +102,7 @@
         {
             if (this is IHandlerValue)
                 (this as IHandlerValue).RefreshValue(ipcManager);
-
+            
             if (!CanRedraw)
                 SetError();
             else
@@ -138,12 +138,15 @@
 
             if (this is IHandlerValue)
                 (this as IHandlerValue).UpdateAddress(ipcManager);
+
+            ForceUpdate = true;
         }
 
         public virtual void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters)
         {
             Title = title;
             TitleParameters = titleParameters;
+            ForceUpdate = true;
         }
     }
 }

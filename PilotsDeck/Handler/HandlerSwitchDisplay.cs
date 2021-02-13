@@ -51,14 +51,12 @@ namespace PilotsDeck
 
         public virtual void RegisterAddress(IPCManager ipcManager)
         {
-            //ValueRef = RegisterValue(ipcManager, Context, Address);
             ipcManager.RegisterAddress(Address, AppSettings.groupStringRead);
             LastAddress = Address;
         }
 
         public virtual void UpdateAddress(IPCManager ipcManager)
         {
-            //ValueRef = UpdateValue(ipcManager, Context, Address);
             LastAddress = HandlerValue.UpdateAddress(ipcManager, LastAddress, Address);
         }
 

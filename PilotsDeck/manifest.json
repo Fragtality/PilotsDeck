@@ -27,12 +27,12 @@
       ],
       "SupportedInMultiActions": true,
       "PropertyInspectorPath": "PI/pi_Switch.html",
-      "Tooltip": "A simple Switch or a Button",
+      "Tooltip": "A simple Switch or a Button. Can be used in MultiActions!",
       "UUID": "com.extension.pilotsdeck.action.switch"
     },
     {
-      "Icon": "Images/category/ActionSwitchToggle",
-      "Name": "Button with Status",
+      "Icon": "Images/category/ActionSwitchDisplay",
+      "Name": "Dynamic Button",
       "States": [
         {
           "Image": "Images/Wait",
@@ -41,9 +41,9 @@
         }
       ],
       "SupportedInMultiActions": false,
-      "PropertyInspectorPath": "PI/pi_SwitchToggle.html",
+      "PropertyInspectorPath": "PI/pi_SwitchDisplay.html",
       "Tooltip": "A Switch or a Button with Status Indication of its current State in the Sim",
-      "UUID": "com.extension.pilotsdeck.action.switch.toggle"
+      "UUID": "com.extension.pilotsdeck.action.switch.display"
     },
     {
       "Icon": "Images/category/ActionDisplay",
@@ -59,6 +59,21 @@
       "PropertyInspectorPath": "PI/pi_DisplaySwitch.html",
       "Tooltip": "The Display Value Action combined with a Simple Switch",
       "UUID": "com.extension.pilotsdeck.action.display.switch"
+    },
+    {
+      "Icon": "Images/category/ActionRadio",
+      "Name": "COM Radio",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "middle",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_DisplayRadio.html",
+      "Tooltip": "Can display and swap your active & standby COM Frequencies",
+      "UUID": "com.extension.pilotsdeck.action.display.radio"
     }
   ],
   "Category": "Pilot's Deck",
@@ -66,12 +81,11 @@
   "Disabled": false,
   "Author": "Fragtality",
   "CodePathWin": "PilotsDeck.exe",
-  "Description": "Directly control Prepar3D from your StreamDeck via FSUIPC!",
+  "Description": "Directly control Prepar3D(R) from your StreamDeck via FSUIPC!",
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
-  "DefaultWindowSize": [ 1280, 960],
   "URL": "https://www.elgato.com/gaming/stream-deck",
-  "Version": "0.4.1",
+  "Version": "0.4.2",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "4.1"

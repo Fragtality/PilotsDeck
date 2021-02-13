@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="sdpi-wrapper">
-        <div class="sdpi-heading">Control Type</div>
+        <div class="sdpi-heading">Swap Control</div>
         <div class="sdpi-item" id="Config_ActionType">
             <div class="sdpi-item-label">Action Type</div>
             <select id="ActionType" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
@@ -17,33 +17,35 @@
             <div class="sdpi-item-label">Action Address</div>
             <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
         </div>
-        
-        <div class="sdpi-heading">Control States</div>
-        <div class="sdpi-item" id="Config_OnState">
-            <div class="sdpi-item-label" id="lblOnState">On Value</div>
-            <input id="OnState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to send for On" />
-        </div>
         <div class="sdpi-item" id="Config_OffState">
-            <div class="sdpi-item-label" id="lblOffState">Off Value</div>
+            <div class="sdpi-item-label" id="lblOffState">Toggle Value</div>
             <input id="OffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
         </div>
-        
+
         <div class="sdpi-heading">Background</div>
         <div class="sdpi-item" id="Config_DefaultImage">
             <div class="sdpi-item-label">Normal</div>
             <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
+        <div class="sdpi-item" id="Config_IndicationImage">
+            <div class="sdpi-item-label" id="lblIndicationImage">Swap</div>
+            <select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
         <div class="sdpi-item" id="Config_ErrorImage">
             <div class="sdpi-item-label">Error</div>
             <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
-       
-        <div class="sdpi-heading">Read Value</div>
-        <div class="sdpi-item" id="Config_Address">
-            <div class="sdpi-item-label">Address</div>
-            <input id="Address" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
+
+        <div class="sdpi-heading">Freq. Values</div>
+        <div class="sdpi-item" id="Config_AddressRadioActiv">
+            <div class="sdpi-item-label">Addr. Active</div>
+            <input id="AddressRadioActiv" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
         </div>
-        
+        <div class="sdpi-item" id="Config_AddressRadioStandby">
+            <div class="sdpi-item-label">Addr. Standby</div>
+            <input id="AddressRadioStandby" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
+        </div>
+
         <div class="sdpi-heading">Value Format</div>
         <div type="checkbox" class="sdpi-item" id="Config_DecodeBCD">
             <div class="sdpi-item-label" id="lblDecodeBCD">Decode BCD</div>
@@ -58,36 +60,25 @@
             <div class="sdpi-item-label">Format</div>
             <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^:.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
         </div>
-        
-        <div class="sdpi-heading">Special Value Indication</div>
-        <div type="checkbox" class="sdpi-item" id="Config_HasIndication">
-            <div class="sdpi-item-label">Enable</div>
-            <input class="sdpi-item-value" id="HasIndication" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="HasIndication"><span></span></label>
+        <div type="checkbox" class="sdpi-item" id="Config_StbyHasDiffFormat">
+            <div class="sdpi-item-label" id="lblStbyHasDiffFormat">Different Format</div>
+            <input class="sdpi-item-value" id="StbyHasDiffFormat" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="StbyHasDiffFormat"><span></span></label>
         </div>
-        <div type="checkbox" class="sdpi-item" id="Config_IndicationHideValue">
-            <div class="sdpi-item-label" id="lblIndicationHideValue">Hide Value</div>
-            <input class="sdpi-item-value" id="IndicationHideValue" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="IndicationHideValue"><span></span></label>
+        <div type="checkbox" class="sdpi-item" id="Config_DecodeBCDStby">
+            <div class="sdpi-item-label" id="lblDecodeBCDStby">Decode BCD</div>
+            <input class="sdpi-item-value" id="DecodeBCDStby" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="DecodeBCDStby"><span></span></label>
         </div>
-        <div type="checkbox" class="sdpi-item" id="Config_IndicationUseColor">
-            <div class="sdpi-item-label" id="lblIndicationUseColor">Diff. Text Color</div>
-            <input class="sdpi-item-value" id="IndicationUseColor" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="IndicationUseColor"><span></span></label>
+        <div class="sdpi-item" id="Config_ScalarStby">
+            <div class="sdpi-item-label" id="lblScalarStby">Scalar</div>
+            <input id="ScalarStby" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
-        <div class="sdpi-item" id="Config_IndicationColor">
-            <div class="sdpi-item-label" id="lblIndicationColor">Color</div>
-            <input id="IndicationColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
+        <div class="sdpi-item" id="Config_FormatStby">
+            <div class="sdpi-item-label" id="lblFormatStby">Format</div>
+            <input id="FormatStby" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^:.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
         </div>
-        <div class="sdpi-item" id="Config_IndicationImage">
-            <div class="sdpi-item-label" id="lblIndicationImage">Background</div>
-            <select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-        <div class="sdpi-item" id="Config_IndicationValue">
-            <div class="sdpi-item-label" id="lblIndicationValue">Value</div>
-            <input id="IndicationValue" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" placeholder="Value for Indication (rounded) to show" />
-        </div>
-        
+
         <div class="sdpi-heading">Font Settings</div>
         <div type="checkbox" class="sdpi-item" id="Config_FontInherit">
             <div class="sdpi-item-label" id="lblFontInherit">Inherit Font</div>
@@ -103,21 +94,25 @@
             <input id="FontSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
         </div>
         <div class="sdpi-item" id="Config_FontColor">
-            <div class="sdpi-item-label" id="lblFontColor">Color</div>
+            <div class="sdpi-item-label" id="lblFontColor">Color Active</div>
             <input id="FontColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
         </div>
-        <div class="sdpi-item" id="Config_FontStyle">
-            <div class="sdpi-item-label" id="lblFontStyle">Style</div>
-            <select id="FontStyle" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        <div class="sdpi-item" id="Config_FontColorStby">
+            <div class="sdpi-item-label" id="lblFontColorStby">Color Standby</div>
+            <input id="FontColorStby" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
         </div>
-        
+
         <div class="sdpi-heading">Tweak Position</div>
         <div class="sdpi-item" id="Config_RectCoord">
-            <div class="sdpi-item-label" id="lblRectCoord">Draw Rectangle</div>
+            <div class="sdpi-item-label" id="lblRectCoord">Rectangle Active</div>
             <input id="RectCoord" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+        </div>
+        <div class="sdpi-item" id="Config_RectCoordStby">
+            <div class="sdpi-item-label" id="lblRectCoordStby">Rect. Standby</div>
+            <input id="RectCoordStby" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
     </div>
     <script src="js/pi_Common.js"></script>
-    <script src="js/pi_DisplaySwitch.js"></script>
+    <script src="js/pi_DisplayRadio.js"></script>
 </body>
 </html>

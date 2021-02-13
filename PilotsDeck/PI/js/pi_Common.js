@@ -51,7 +51,7 @@ function fillTypeSelectBox(values, elementID, configured) {
 
 function refreshSettings(settings) {
 	if (settings) {
-        for (var key in settings) {
+		for (var key in settings) {
 			if (settingsModel.hasOwnProperty(key)) {
 				settingsModel[key] = settings[key];
 				var elem = document.getElementById(key);
@@ -62,24 +62,27 @@ function refreshSettings(settings) {
 					elem.value = settingsModel[key];
 				}
 			}
-        }
-    }
+		}
+	}
 }
 
-function toggleConfigItem(value, block, label, input) {
+function toggleConfigItem(value, name) {
+	var block = "Config_" + name;
+	var label = "lbl" + name;
+
 	if (value) {
 		document.getElementById(block).style.display = displayInfo[block];
 		document.getElementById(label).style.display = displayInfo[label];
-		document.getElementById(input).style.display = displayInfo[input];
+		document.getElementById(name).style.display = displayInfo[name];
 	}
 	else if (document.getElementById(block).style.display != "none") {
 		displayInfo[block] = document.getElementById(block).style.display;
 		displayInfo[label] = document.getElementById(label).style.display;
-		displayInfo[input] = document.getElementById(input).style.display;
+		displayInfo[name] = document.getElementById(name).style.display;
 
 		document.getElementById(block).style.display = "none";
 		document.getElementById(label).style.display = "none";
-		document.getElementById(input).style.display = "none";
+		document.getElementById(name).style.display = "none";
 	}
 }
 
@@ -110,11 +113,13 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 	inInfo = JSON.parse(inInfo);
 	websocket = new WebSocket('ws://localhost:' + inPort);
 
-	refreshSettings(actionInfo.payload.settings.settingsModel);
+	if (actionInfo.payload.settings.settingsModel)
+		refreshSettings(actionInfo.payload.settings.settingsModel);
+	else
+		refreshSettings(settingsModel);
+
 	updateForm();
-	
-	fillSelectBoxes();
-	
+		
 	websocket.onopen = function () {
 		var json = { event: inRegisterEvent, uuid: inUUID };
 		// register property inspector to Stream Deck

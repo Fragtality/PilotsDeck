@@ -13,7 +13,7 @@ function fillSelectBoxes() {
 		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
 		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
 	}
-	if (ActionTypes || ActionTypes != "") {
+	if (ActionTypes && ActionTypes != "") {
 		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
 	}
 }
@@ -24,28 +24,28 @@ function updateForm() {
 
 	//On/Off States
 	if (settingsModel.ActionType == 0) { //macro
-		toggleConfigItem(false, 'Config_OnState', 'lblOnState', 'OnState');
-		toggleConfigItem(false, 'Config_OffState', 'lblOffState', 'OffState');
+		toggleConfigItem(false, 'OnState');
+		toggleConfigItem(false, 'OffState');
 	}
 	else if (settingsModel.ActionType == 1) { //script
-		toggleConfigItem(false, 'Config_OnState', 'lblOnState', 'OnState');
-		toggleConfigItem(false, 'Config_OffState', 'lblOffState', 'OffState');
+		toggleConfigItem(false, 'OnState');
+		toggleConfigItem(false, 'OffState');
 	}
 	else if (settingsModel.ActionType == 2) { //control
-		toggleConfigItem(false, 'Config_OnState', 'lblOnState', 'OnState');
-		toggleConfigItem(false, 'Config_OffState', 'lblOffState', 'OffState');
+		toggleConfigItem(false, 'OnState');
+		toggleConfigItem(false, 'OffState');
 	}
-	else if (settingsModel.ActionType == 3)  { //lvar
-		toggleConfigItem(true, 'Config_OnState', 'lblOnState', 'OnState');
-		toggleConfigItem(true, 'Config_OffState', 'lblOffState', 'OffState');
+	else if (settingsModel.ActionType == 3) { //lvar
+		toggleConfigItem(true, 'OnState');
+		toggleConfigItem(true, 'OffState');
 	}
-	else if (settingsModel.ActionType == 4)  { //offset
-		toggleConfigItem(true, 'Config_OnState', 'lblOnState', 'OnState');
-		toggleConfigItem(true, 'Config_OffState', 'lblOffState', 'OffState');
+	else if (settingsModel.ActionType == 4) { //offset
+		toggleConfigItem(true, 'OnState');
+		toggleConfigItem(true, 'OffState');
 	}
 	else {
-		toggleConfigItem(false, 'Config_OnState', 'lblOnState', 'OnState');
-		toggleConfigItem(false, 'Config_OffState', 'lblOffState', 'OffState');
+		toggleConfigItem(false, 'OnState');
+		toggleConfigItem(false, 'OffState');
 	}
 
 }

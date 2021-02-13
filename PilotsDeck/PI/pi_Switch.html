@@ -8,11 +8,6 @@
 </head>
 <body>
     <div class="sdpi-wrapper">
-        <!-- for more examples of the types of fields supported in property inspector visit:
-                Elgato Github PiSamples -> https://github.com/elgatosf/streamdeck-pisamples
-                and
-                Elgato SDK Documentation -> https://developer.elgato.com/documentation/stream-deck/sdk/property-inspector/
-        -->
         <div class="sdpi-heading">Control Type</div>
         <div class="sdpi-item" id="Config_ActionType">
             <div class="sdpi-item-label">Action Type</div>
@@ -22,6 +17,7 @@
             <div class="sdpi-item-label">Action Address</div>
             <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
         </div>
+        
         <div class="sdpi-heading">Control States</div>
         <div class="sdpi-item" id="Config_OnState">
             <div class="sdpi-item-label" id="lblOnState">On Value</div>
@@ -31,6 +27,7 @@
             <div class="sdpi-item-label" id="lblOffState">Off Value</div>
             <input id="OffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
         </div>
+        
         <div class="sdpi-heading">Default Images</div>
         <div class="sdpi-item" id="Config_ErrorImage">
             <div class="sdpi-item-label">Error Image</div>

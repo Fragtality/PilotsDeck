@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Collections.Generic;
 using FSUIPC;
 using Serilog;
@@ -156,15 +155,6 @@ namespace PilotsDeck
                 Log.Logger.Error($"RegisterValue: Exception while deregistering Address {address}");
             }
         }
-
-        //public IPCValue UpdateValue(string newAddress, string oldAddress, string group)
-        //{
-        //    if (!IPCTools.IsReadAddress(newAddress))
-        //        return null;
-
-        //    DeregisterValue(context);
-        //    return RegisterValue(context, newAddress, group);
-        //}
 
         public bool Process(string group)
         {

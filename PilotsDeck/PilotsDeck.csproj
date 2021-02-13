@@ -161,6 +161,7 @@
   <ItemGroup>
     <Compile Include="ActionController.cs" />
     <Compile Include="Actions\ActionBase.cs" />
+    <Compile Include="Actions\ActionDisplayRadio.cs" />
     <Compile Include="Actions\ActionDisplayText.cs" />
     <Compile Include="Actions\ActionDisplaySwitch.cs" />
     <Compile Include="Actions\ActionSwitchDisplay.cs" />
@@ -190,7 +191,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\ImageManager.cs" />
-    <Compile Include="Tools\ImageTools.cs" />
+    <Compile Include="Tools\ImageRenderer.cs" />
     <Compile Include="Tools\StreamDeckTools.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -209,13 +210,22 @@
     <None Include="RegisterPluginAndStartStreamDeck.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\Arrow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ArrowBright.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\category\ActionDisplay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\category\ActionRadio.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\category\ActionSwitch.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\category\ActionSwitchToggle.png">
+    <Content Include="Images\category\ActionSwitchDisplay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\category\PluginIcon.png">
@@ -272,16 +282,22 @@
     <Content Include="PI\js\pi_Common.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PI\js\pi_DisplayRadio.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PI\js\pi_DisplaySwitch.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PI\js\pi_SwitchToggle.js">
+    <Content Include="PI\js\pi_SwitchDisplay.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PI\pi_DisplayRadio.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\pi_DisplaySwitch.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PI\pi_SwitchToggle.html">
+    <Content Include="PI\pi_SwitchDisplay.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PluginIcon.ico" />

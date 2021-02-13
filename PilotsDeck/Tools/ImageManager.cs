@@ -141,20 +141,5 @@ namespace PilotsDeck
             cachedImageFiles.Clear();
             currentRegistrations.Clear();
         }
-
-        //public string DrawTextToImage(string text, string image, ModelDisplayText model, string colorOverride = null)
-        //{
-        //    if (!IsCached(image))
-        //        AddImage(image);
-
-        //    using (MemoryStream stream = new MemoryStream(cachedImageFiles[image]))
-        //    {
-        //        ImageTools.ConvertFontParameter(model, out Font drawFont, out Color drawColor);
-        //        if (colorOverride != null)
-        //            drawColor = ColorTranslator.FromHtml(colorOverride);
-
-        //        return ImageTools.DrawText(text, Image.FromStream(stream), drawFont, drawColor, model.FontRect);
-        //    }
-        //}
     }
 }

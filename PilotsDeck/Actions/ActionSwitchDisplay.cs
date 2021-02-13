@@ -5,7 +5,7 @@ using Serilog;
 
 namespace PilotsDeck
 {
-    [ActionUuid(Uuid = "com.extension.pilotsdeck.action.switch.toggle")]
+    [ActionUuid(Uuid = "com.extension.pilotsdeck.action.switch.display")]
     public class ActionSwitchDisplay : ActionBase<ModelSwitchDisplay>
     {
         public override async Task OnWillAppear(StreamDeckEventPayload args)

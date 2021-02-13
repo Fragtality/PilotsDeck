@@ -23,7 +23,7 @@ function fillSelectBoxes() {
 		fillImageSelectBox(ImageFiles, 'OnImage', settingsModel.OnImage);
 		fillImageSelectBox(ImageFiles, 'OffImage', settingsModel.OffImage);
 	}
-	if (ActionTypes || ActionTypes != "") {
+	if (ActionTypes && ActionTypes != "") {
 		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
 	}
 }
@@ -33,7 +33,7 @@ function updateForm() {
 	setPattern('AddressAction', settingsModel.ActionType);
 
 	//INDICATION
-	toggleConfigItem(settingsModel.HasIndication, 'Config_IndicationImage', 'lblIndicationImage', 'IndicationImage');
-	toggleConfigItem(settingsModel.HasIndication, 'Config_IndicationValueAny', 'lblIndicationValueAny', 'IndicationValueAny');
-	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationValueAny, 'Config_IndicationValue', 'lblIndicationValue', 'IndicationValue');
+	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');
+	toggleConfigItem(settingsModel.HasIndication, 'IndicationValueAny');
+	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationValueAny, 'IndicationValue');
 }

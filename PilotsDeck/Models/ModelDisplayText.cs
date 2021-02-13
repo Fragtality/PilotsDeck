@@ -42,7 +42,13 @@ namespace PilotsDeck
 
 		public virtual RectangleF GetRectangle()
         {
-			string[] parts = RectCoord.Trim().Split(';');
+			return GetRectangle(RectCoord);
+		}
+
+		public static RectangleF GetRectangle(string rect)
+        {
+			//x y w h
+			string[] parts = rect.Trim().Split(';');
 			if (parts.Length == 4)
 			{
 				int parses = 0;

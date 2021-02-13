@@ -30,7 +30,7 @@ function fillSelectBoxes() {
 	if (FontNames && FontNames != "") {
 		fillFontSelectBox(FontNames, 'FontName', settingsModel.FontName);
 	}
-	if (FontStyles || FontStyles != "") {
+	if (FontStyles && FontStyles != "") {
 		fillTypeSelectBox(FontStyles, 'FontStyle', settingsModel.FontStyle);
 	}
 }
@@ -40,19 +40,16 @@ function updateForm() {
 	//PATTERN
 	setPattern('Address', 5);
 
-	//FORMAT
-	//toggleConfigItem(!settingsModel.DecodeBCD, 'Config_Scalar', 'lblScalar', 'Scalar');
-
 	//INDICATION
-	toggleConfigItem(settingsModel.HasIndication, 'Config_IndicationHideValue', 'lblIndicationHideValue', 'IndicationHideValue');
-	toggleConfigItem(settingsModel.HasIndication, 'Config_IndicationImage', 'lblIndicationImage', 'IndicationImage');
-	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationHideValue, 'Config_IndicationUseColor', 'lblIndicationUseColor', 'IndicationUseColor');
-	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationHideValue && settingsModel.IndicationUseColor, 'Config_IndicationColor', 'lblIndicationColor', 'IndicationColor');
-	toggleConfigItem(settingsModel.HasIndication, 'Config_IndicationValue', 'lblIndicationValue', 'IndicationValue');
+	toggleConfigItem(settingsModel.HasIndication, 'IndicationHideValue');
+	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');
+	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationHideValue, 'IndicationUseColor');
+	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationHideValue && settingsModel.IndicationUseColor, 'IndicationColor');
+	toggleConfigItem(settingsModel.HasIndication, 'IndicationValue');
 
 	//FONT
-	toggleConfigItem(!settingsModel.FontInherit, 'Config_FontName', 'lblFontName', 'FontName')
-	toggleConfigItem(!settingsModel.FontInherit, 'Config_FontSize', 'lblFontSize', 'FontSize')
-	toggleConfigItem(!settingsModel.FontInherit, 'Config_FontStyle', 'lblFontStyle', 'FontStyle')
-	toggleConfigItem(!settingsModel.FontInherit, 'Config_FontColor', 'lblFontColor', 'FontColor')
+	toggleConfigItem(!settingsModel.FontInherit, 'FontName');
+	toggleConfigItem(!settingsModel.FontInherit, 'FontSize');
+	toggleConfigItem(!settingsModel.FontInherit, 'FontStyle');
+	toggleConfigItem(!settingsModel.FontInherit, 'FontColor');
 }
