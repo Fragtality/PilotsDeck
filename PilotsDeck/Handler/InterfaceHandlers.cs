@@ -22,6 +22,8 @@
         void Deregister(ImageManager imgManager, IPCManager ipcManager);
 
         void SetError();
+        void SetDefault();
+        void SetWait();
         void ResetDrawState();
         void Refresh(ImageManager imgManager, IPCManager ipcManager);
         void Update(IPCManager ipcManager);

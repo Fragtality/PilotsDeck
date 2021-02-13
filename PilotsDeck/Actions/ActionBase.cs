@@ -44,14 +44,24 @@ namespace PilotsDeck
             return Task.CompletedTask;
         }
 
-        public override async Task OnApplicationDidLaunchAsync(StreamDeckEventPayload args)
+        public override Task OnApplicationDidLaunchAsync(StreamDeckEventPayload args)
         {
             Log.Logger.Verbose($"ActionBase:OnApplicationDidLaunchAsync {args.payload.application}");
+
+            if (args.payload.application == Plugin.ActionController.Application)
+                Plugin.ActionController.IsApplicationOpen = true;
+
+            return Task.CompletedTask;
         }
 
-        public override async Task OnApplicationDidTerminateAsync(StreamDeckEventPayload args)
+        public override Task OnApplicationDidTerminateAsync(StreamDeckEventPayload args)
         {
             Log.Logger.Verbose($"ActionBase:OnApplicationDidTerminateAsync {args.payload.application}");
+
+            if (args.payload.application == Plugin.ActionController.Application)
+                Plugin.ActionController.IsApplicationOpen = false;
+
+            return Task.CompletedTask;
         }
 
         public override Task OnPropertyInspectorDidAppear(StreamDeckEventPayload args)

@@ -72,6 +72,26 @@
             }
         }
 
+        public virtual void SetDefault()
+        {
+            if (DrawImage != DefaultImage)
+            {
+                DrawImage = DefaultImage;
+                IsRawImage = false;
+                NeedRedraw = true;
+            }
+        }
+
+        public virtual void SetWait()
+        {
+            if (IsInitialized && DrawImage != AppSettings.waitImage)
+            {
+                DrawImage = AppSettings.waitImage;
+                IsRawImage = false;
+                NeedRedraw = true;
+            }
+        }
+
         public virtual void ResetDrawState()
         {
             NeedRedraw = false;

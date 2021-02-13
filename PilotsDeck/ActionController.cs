@@ -17,9 +17,12 @@ namespace PilotsDeck
 
         public ConnectionManager DeckManager { get; set; }
         public int Timing { get { return AppSettings.waitTicks; } }
+        public bool IsApplicationOpen { get; set; }
+        public string Application { get; } = AppSettings.applicationName;
 
         private long tickCounter = 0;
-        private bool lastConnectState = true;
+        private bool lastAppState = true;
+        private bool lastConnectState = false;
         private bool lastProcessState = false;
         private bool redrawRequested = false;
         private readonly int waitTicks = AppSettings.waitTicks;
@@ -61,66 +64,144 @@ namespace PilotsDeck
             stopWatch.Restart();
 
             tickCounter++;
-            if (tickCounter < waitTicks / 15) //wait till streamdeck<>plugin init is done
+            if (tickCounter < waitTicks / 7.5) //wait till streamdeck<>plugin init is done ( <150> / 15 = 10 Ticks => 10 * <200> = 2s )
                 return;
 
-            bool connected = ipcManager.IsConnected;
-            if (!connected && tickCounter % waitTicks == 0 || !connected && tickCounter == waitTicks / 15) //reduce retries while not connected
-                connected = ipcManager.Connect();
-                
-            if (!connected) //offline
+            if (!IsApplicationOpen || tickCounter == waitTicks / 7.5)     //P3D closed or the first tick
             {
-                if (!lastConnectState && !redrawRequested) //still offline
-                    return;
-                else if (redrawRequested)
+                if (lastAppState)       //P3D changed to closed
                 {
-                    RedrawAll(token);
-                    return;
+                    lastAppState = false;
+                    CallOnAll(handler => handler.SetDefault());
+                    redrawRequested = true;
                 }
-                else //changed to offline
+            }
+            else                        //P3D open
+            {
+                if (!lastAppState)      //P3D changed to opened
                 {
+                    lastAppState = true;
                     lastConnectState = false;
                     lastProcessState = false;
-                    Log.Logger.Information("ActionController: Changed to Offline - SetErrorAll");
-                    SetErrorAll(token);
-                    return;
+                    CallOnAll(handler => handler.SetWait());
+                    redrawRequested = true;
+                    ipcManager.Connect();
                 }
-            }
-            else //online
-            {
-                bool result = ipcManager.Process(AppSettings.groupStringRead);
-
-                if (result)
+                
+                if (!ipcManager.IsConnected && tickCounter % waitTicks / 7.5 == 0) //still open not connected, check retry connection every 1s when not connected
                 {
-                    if (!lastConnectState || !lastProcessState) //changed to online
+                    ipcManager.Connect();
+                }
+                else if (ipcManager.IsConnected)            //open and connected
+                {
+                    if (!lastConnectState)                  //connection changed to opened
                     {
                         lastConnectState = true;
-                        lastProcessState = true;
-                        Log.Logger.Information("ActionController: Changed to Online and Process okay - RefreshAll forced");
-                        RefreshActions(token, true);
+                        CallOnAll(handler => handler.SetWait());
                     }
-                    else //still online
+                    
+                    if (ipcManager.Process(AppSettings.groupStringRead))
                     {
+                        RefreshActions(token, !lastProcessState);   //toggles process change
                         lastProcessState = true;
-                        RefreshActions(token, false);
+                    }
+                    else
+                        lastProcessState = false;
+
+                    redrawRequested = true;
+                }
+                else if (!ipcManager.IsConnected)       //open and disconnected
+                {
+                    if (lastConnectState)               //changed to disconnected
+                    {
+                        lastConnectState = false;
+                        lastProcessState = false;
+                        CallOnAll(handler => handler.SetError());
+                        redrawRequested = true;
                     }
                 }
-                else
-                    lastProcessState = false;
 
-                RedrawAll(token);
+
             }
+
+            if (redrawRequested)
+                RedrawAll(token);
 
             stopWatch.Stop();
             averageTime += stopWatch.ElapsedMilliseconds;
-            if (tickCounter % (waitTicks / 2) == 0)
+            if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
                 Log.Logger.Verbose($"ActionController: Refresh Tick #{tickCounter}, average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2)}ms");
                 averageTime = 0;
             }
-
-            return;
         }
+
+        //public void Run(CancellationToken token)
+        //{
+        //    stopWatch.Restart();
+
+        //    tickCounter++;
+        //    if (tickCounter < waitTicks / 15) //wait till streamdeck<>plugin init is done ( <150> / 15 = 10 Ticks => 10 * <200> = 2s )
+        //        return;
+
+        //    bool connected = ipcManager.IsConnected;
+        //    if (!connected && tickCounter % waitTicks == 0 || !connected && tickCounter == waitTicks / 15) //reduce retries while not connected ( only every <150> Ticks / <150> * <200> = 30s )
+        //        connected = ipcManager.Connect();
+                
+        //    if (!connected) //offline
+        //    {
+        //        if (!lastConnectState && !redrawRequested) //still offline
+        //            return;
+        //        else if (redrawRequested)
+        //        {
+        //            RedrawAll(token);
+        //            return;
+        //        }
+        //        else //changed to offline
+        //        {
+        //            lastConnectState = false;
+        //            lastProcessState = false;
+        //            Log.Logger.Information("ActionController: Changed to Offline - SetErrorAll");
+        //            //SetErrorAll(token);
+        //            CallOnAll((handler) => { handler.SetError(); });
+        //            return;
+        //        }
+        //    }
+        //    else //online
+        //    {
+        //        bool result = ipcManager.Process(AppSettings.groupStringRead);
+
+        //        if (result)
+        //        {
+        //            if (!lastConnectState || !lastProcessState) //changed to online
+        //            {
+        //                lastConnectState = true;
+        //                lastProcessState = true;
+        //                Log.Logger.Information("ActionController: Changed to Online and Process okay - RefreshAll forced");
+        //                RefreshActions(token, true);
+        //            }
+        //            else //still online
+        //            {
+        //                lastProcessState = true;
+        //                RefreshActions(token, false);
+        //            }
+        //        }
+        //        else
+        //            lastProcessState = false;
+
+        //        RedrawAll(token);
+        //    }
+
+        //    stopWatch.Stop();
+        //    averageTime += stopWatch.ElapsedMilliseconds;
+        //    if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
+        //    {
+        //        Log.Logger.Verbose($"ActionController: Refresh Tick #{tickCounter}, average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2)}ms");
+        //        averageTime = 0;
+        //    }
+
+        //    return;
+        //}
 
         protected void RefreshActions(CancellationToken token, bool forceUpdate = false)
         {
@@ -137,13 +218,19 @@ namespace PilotsDeck
             }
         }
 
-        protected void SetErrorAll(CancellationToken token)
+        protected void CallOnAll(Action<IHandler> method)
         {
             foreach (var action in currentActions.Values)
-                action.SetError();
-
-            RedrawAll(token);
+                method(action);
         }
+
+        //protected void SetErrorAll(CancellationToken token)
+        //{
+        //    foreach (var action in currentActions.Values)
+        //        action.SetError();
+
+        //    RedrawAll(token);
+        //}
 
         protected void RedrawAll(CancellationToken token)
         {
@@ -178,7 +265,7 @@ namespace PilotsDeck
         {
             try
             {
-                if (!ipcManager.IsReady)
+                if (!ipcManager.IsReady || !ipcManager.IsConnected)
                 {
                     Log.Logger.Error($"RunAction: IPC not ready {context}");
                     return false;
@@ -190,7 +277,7 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RunAction: Not ready or could not find Context {context}");
+                    Log.Logger.Error($"RunAction: Could not find Context {context}");
                     return false;
                 }
             }
@@ -220,6 +307,23 @@ namespace PilotsDeck
             }
         }
 
+        protected void SetActionState(IHandler handler)
+        {
+            if (!IsApplicationOpen || !handler.IsInitialized)
+                handler.SetDefault();
+            else if (!ipcManager.IsConnected)
+                handler.SetError();
+            else if (!lastProcessState)
+                handler.SetWait();
+            else //if (lastProcessState)
+            {
+                //handler.Update(ipcManager);
+                handler.ForceUpdate = true;
+            }
+
+            handler.NeedRedraw = true;
+        }
+
         public void UpdateAction(string context)
         {
             try
@@ -227,19 +331,20 @@ namespace PilotsDeck
                 if (currentActions.ContainsKey(context))
                 {
                     currentActions[context].Update(ipcManager);
+                    SetActionState(currentActions[context]);                        
 
-                    if (ipcManager.IsConnected && lastConnectState)
-                        currentActions[context].ForceUpdate = true;
-                    else
-                        currentActions[context].SetError();
+                    //if (ipcManager.IsConnected && lastConnectState)
+                    //    currentActions[context].ForceUpdate = true;
+                    //else
+                    //    currentActions[context].SetError();
 
                     if (!currentActions[context].IsRawImage)
                         imgManager.UpdateImage(currentActions[context].DrawImage);
 
-                    if (currentActions[context] is IHandlerValue)
-                        (currentActions[context] as IHandlerValue).UpdateAddress(ipcManager);
+                    //if (currentActions[context] is IHandlerValue)
+                    //    (currentActions[context] as IHandlerValue).UpdateAddress(ipcManager);
 
-                    currentActions[context].NeedRedraw = true;
+                    //currentActions[context].NeedRedraw = true;
                     redrawRequested = true;
                 }
                 else
@@ -261,13 +366,14 @@ namespace PilotsDeck
                 {
                     currentActions.Add(context, handler);
                     handler.Register(imgManager, ipcManager);
+                    SetActionState(handler);
 
-                    if (ipcManager.IsConnected && lastConnectState)
-                        handler.ForceUpdate = true;
-                    else
-                        handler.SetError();
+                    //if (ipcManager.IsConnected && lastConnectState)
+                    //    handler.ForceUpdate = true;
+                    //else
+                    //    handler.SetError();
 
-                    handler.NeedRedraw = true;
+                    //handler.NeedRedraw = true;
                     redrawRequested = true;
                 }
                 else

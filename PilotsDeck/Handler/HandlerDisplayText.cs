@@ -11,7 +11,7 @@ namespace PilotsDeck
 
         public override bool UseFont { get { return true; } }
 
-        protected override bool CanRedraw { get { return CurrentValue != null; } }
+        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue); } }
         protected string lastText = "";
 
         public HandlerDisplayText(string context, ModelDisplayText settings) : base(context, settings)
