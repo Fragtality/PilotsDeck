@@ -199,7 +199,7 @@
     <None Include="logsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="FSUIPC\PilotsDeck.lua">
+    <None Include="lua\PilotsDeck.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="KILL.ps1" />

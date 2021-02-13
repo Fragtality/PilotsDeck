@@ -16,6 +16,21 @@
       "UUID": "com.extension.pilotsdeck.action.display"
     },
     {
+      "Icon": "Images/category/ActionDisplay",
+      "Name": "Diplay Value with Switch",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_DisplaySwitch.html",
+      "Tooltip": "The Display Value Action combined with a Simple Switch",
+      "UUID": "com.extension.pilotsdeck.action.display.switch"
+    },
+    {
       "Icon": "Images/category/ActionSwitch",
       "Name": "Simple Button",
       "States": [
@@ -44,21 +59,6 @@
       "PropertyInspectorPath": "PI/pi_SwitchDisplay.html",
       "Tooltip": "A Switch or a Button with Status Indication of its current State in the Sim",
       "UUID": "com.extension.pilotsdeck.action.switch.display"
-    },
-    {
-      "Icon": "Images/category/ActionDisplay",
-      "Name": "Diplay Value with Switch",
-      "States": [
-        {
-          "Image": "Images/Wait",
-          "TitleAlignment": "top",
-          "FontSize": "10"
-        }
-      ],
-      "SupportedInMultiActions": false,
-      "PropertyInspectorPath": "PI/pi_DisplaySwitch.html",
-      "Tooltip": "The Display Value Action combined with a Simple Switch",
-      "UUID": "com.extension.pilotsdeck.action.display.switch"
     },
     {
       "Icon": "Images/category/ActionRadio",
