@@ -10,7 +10,10 @@ namespace PilotsDeck
         private Dictionary<string, IPCValue> currentValues = new Dictionary<string, IPCValue>();
         private Dictionary<string, int> currentRegistrations = new Dictionary<string, int>();
         private static readonly string inMenuAddr = "3365:1";
+        private static readonly string isPausedAddr = "0262:2";
+
         private IPCValueOffset inMenuValue;
+        private IPCValueOffset isPausedValue;
 
         public bool IsConnected
         {
@@ -24,7 +27,7 @@ namespace PilotsDeck
         {
             get
             {
-                return inMenuValue.Value == "0";
+                return inMenuValue.Value == "0" && isPausedValue.Value == "0"; 
             }
         }
 
@@ -45,6 +48,9 @@ namespace PilotsDeck
         {
             inMenuValue = new IPCValueOffset(inMenuAddr, group);
             currentValues.Add(inMenuAddr, inMenuValue);
+
+            isPausedValue = new IPCValueOffset(isPausedAddr, group);
+            currentValues.Add(isPausedAddr, isPausedValue);
         }       
 
         public bool Connect()
