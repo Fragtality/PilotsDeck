@@ -132,7 +132,7 @@
                 IsInitialized = false;
         }
 
-        public virtual void Update(IPCManager ipcManager)
+        public virtual void Update(ImageManager imgManager, IPCManager ipcManager)
         {
             SetInitialization();
 

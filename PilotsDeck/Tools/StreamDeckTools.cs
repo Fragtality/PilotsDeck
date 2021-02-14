@@ -13,6 +13,7 @@ namespace PilotsDeck
         {
             public string ImageFiles { get; set; } = "";
             public string ActionTypes { get; set; } = "";
+            public string GaugeOrientations { get; set; } = "";
 
             public ModelPropertyInspector()
             {
@@ -24,6 +25,14 @@ namespace PilotsDeck
                     ActionTypes += (int)values.GetValue(i) + "=" + Enum.GetName(typeof(ActionSwitchType), values.GetValue(i));
                     if (i + 1 < values.Length)
                         ActionTypes += "|";
+                }
+
+                values = Enum.GetValues(typeof(GaugeOrientation));
+                for (int i = 0; i < values.Length; i++)
+                {
+                    GaugeOrientations += (int)values.GetValue(i) + "=" + Enum.GetName(typeof(GaugeOrientation), values.GetValue(i));
+                    if (i + 1 < values.Length)
+                        GaugeOrientations += "|";
                 }
             }
         }

@@ -164,6 +164,7 @@
     <Compile Include="Actions\ActionDisplayRadio.cs" />
     <Compile Include="Actions\ActionDisplayText.cs" />
     <Compile Include="Actions\ActionDisplaySwitch.cs" />
+    <Compile Include="Actions\ActionDisplayGauge.cs" />
     <Compile Include="Actions\ActionSwitchDisplay.cs" />
     <Compile Include="Actions\ActionSwitch.cs" />
     <Compile Include="AppSettings.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="FSUIPC\IPCValueOffset.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handler\HandlerBase.cs" />
+    <Compile Include="Handler\HandlerDisplayGauge.cs" />
     <Compile Include="Handler\HandlerValue.cs" />
     <Compile Include="Handler\HandlerDisplayText.cs" />
     <Compile Include="Handler\HandlerDisplayRadio.cs" />
@@ -186,6 +188,7 @@
     <Compile Include="Models\ModelDisplayText.cs" />
     <Compile Include="Models\ModelDisplayRadio.cs" />
     <Compile Include="Models\ModelDisplaySwitch.cs" />
+    <Compile Include="Models\ModelDisplayGauge.cs" />
     <Compile Include="Models\ModelSwitch.cs" />
     <Compile Include="Models\ModelSwitchDisplay.cs" />
     <Compile Include="Plugin.cs" />
@@ -217,6 +220,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\category\ActionDisplay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\category\ActionGaugeBar.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\category\ActionRadio.png">
@@ -264,6 +270,9 @@
     <Content Include="Images\SwitchError.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\test.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ValueBlue.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -282,6 +291,9 @@
     <Content Include="PI\js\pi_Common.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PI\js\pi_DisplayGauge.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PI\js\pi_DisplayRadio.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -289,6 +301,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\js\pi_SwitchDisplay.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PI\pi_DisplayGauge.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\pi_DisplayRadio.html">

@@ -17,7 +17,7 @@
     },
     {
       "Icon": "Images/category/ActionDisplay",
-      "Name": "Diplay Value with Switch",
+      "Name": "Display Value with Switch",
       "States": [
         {
           "Image": "Images/Wait",
@@ -74,6 +74,21 @@
       "PropertyInspectorPath": "PI/pi_DisplayRadio.html",
       "Tooltip": "Can display and swap your active & standby COM Frequencies",
       "UUID": "com.extension.pilotsdeck.action.display.radio"
+    },
+    {
+      "Icon": "Images/category/ActionGaugeBar",
+      "Name": "Display Gauge",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_DisplayGauge.html",
+      "Tooltip": "A graphical representation of a Value",
+      "UUID": "com.extension.pilotsdeck.action.display.gauge"
     }
   ],
   "Category": "Pilot's Deck",
@@ -85,7 +100,7 @@
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://www.elgato.com/gaming/stream-deck",
-  "Version": "0.4.2",
+  "Version": "0.4.3",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "4.1"

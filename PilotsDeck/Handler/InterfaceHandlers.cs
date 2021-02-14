@@ -26,7 +26,7 @@
         void SetWait();
         void ResetDrawState();
         void Refresh(ImageManager imgManager, IPCManager ipcManager);
-        void Update(IPCManager ipcManager);
+        void Update(ImageManager imgManager, IPCManager ipcManager);
         void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
     }
 

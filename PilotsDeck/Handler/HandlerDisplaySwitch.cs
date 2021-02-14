@@ -20,9 +20,9 @@
             return !string.IsNullOrEmpty(Address) && !string.IsNullOrEmpty(SwitchSettings.AddressAction);
         }
 
-        public override void Update(IPCManager ipcManager)
+        public override void Update(ImageManager imgManager, IPCManager ipcManager)
         {
-            base.Update(ipcManager);
+            base.Update(imgManager, ipcManager);
 
             if (LastSwitchState != SwitchSettings.OffState && LastSwitchState != SwitchSettings.OnState)
                 LastSwitchState = SwitchSettings.OffState;

@@ -1,14 +1,15 @@
 ﻿// global websocket, used to communicate from/to Stream Deck software
 // as well as some info about our plugin, as sent by Stream Deck software 
 var websocket = null,
-  uuid = null,
-  inInfo = null,
-  actionInfo = {},
-  ImageFiles = "",
-  ActionTypes = "",
-  FontNames = "",
-  FontStyles = "",
-  displayInfo = {};
+	uuid = null,
+	inInfo = null,
+	actionInfo = {},
+	ImageFiles = "",
+	ActionTypes = "",
+	GaugeOrientations = "",
+	FontNames = "",
+	FontStyles = "",
+	displayInfo = {};
 
 function fillImageSelectBox(values, elementID, configured) {
 	values = values.split('|');
@@ -162,6 +163,14 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 					}
 					else {
 						FontStyles = jsonObj.payload.FontStyles;
+					}
+				}
+				if (jsonObj.payload && jsonObj.payload.GaugeOrientations && jsonObj.payload.GaugeOrientations != "") {
+					if (!GaugeOrientations || GaugeOrientations == "") {
+						GaugeOrientations = jsonObj.payload.GaugeOrientations;
+					}
+					else {
+						GaugeOrientations = jsonObj.payload.GaugeOrientations;
 					}
 				}
 				fillSelectBoxes();

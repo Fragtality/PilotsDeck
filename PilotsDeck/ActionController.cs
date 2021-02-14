@@ -27,7 +27,7 @@ namespace PilotsDeck
         private bool redrawRequested = false;
         private readonly int waitTicks = AppSettings.waitTicks;
         private Stopwatch stopWatch = new Stopwatch();
-        private long averageTime = 0;
+        private double averageTime = 0;
        
 
         public ActionController()
@@ -126,10 +126,10 @@ namespace PilotsDeck
                 RedrawAll(token);
 
             stopWatch.Stop();
-            averageTime += stopWatch.ElapsedMilliseconds;
+            averageTime += stopWatch.Elapsed.TotalMilliseconds;
             if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
-                Log.Logger.Verbose($"ActionController: Refresh Tick #{tickCounter}, average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2)}ms");
+                Log.Logger.Verbose($"ActionController: Refresh Tick #{tickCounter}, average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms");
                 averageTime = 0;
             }
         }
@@ -166,7 +166,7 @@ namespace PilotsDeck
 
                     if (action.Value.NeedRedraw || action.Value.ForceUpdate)
                     {
-                        Log.Logger.Verbose($"RedrawAll: Needs Redraw [{action.Value.ActionID}] [{action.Key}] ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
+                        //Log.Logger.Verbose($"RedrawAll: Needs Redraw [{action.Value.ActionID}] [{action.Key}] ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
                         if (action.Value.IsRawImage)
                             _ = DeckManager.SetImageRawAsync(action.Key, action.Value.DrawImage);
                         else 
@@ -252,7 +252,7 @@ namespace PilotsDeck
             {
                 if (currentActions.ContainsKey(context))
                 {
-                    currentActions[context].Update(ipcManager);
+                    currentActions[context].Update(imgManager, ipcManager);
                     SetActionState(currentActions[context]);                        
 
                     if (!currentActions[context].IsRawImage)

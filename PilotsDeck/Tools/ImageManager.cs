@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Drawing;
 using System.IO;
 using Serilog;
@@ -51,17 +52,20 @@ namespace PilotsDeck
         {
             if (!cachedImageFiles.ContainsKey(image))
             {
-                AddImage(image);
-                Log.Logger.Verbose($"ImageManager: Cached new Image {image}");
-                return cachedImageFiles[image];
+                if (AddImage(image))
+                {
+                    Log.Logger.Verbose($"ImageManager: Cached new Image {image}");
+                    return cachedImageFiles[image];
+                }
+                return cachedImageFiles.Values.First();
             }
             else if (image.Length > 0)
                 return cachedImageFiles[image];
             else
-                return new byte[1];
+                return cachedImageFiles.Values.First();
         }
 
-        public void AddImage(string image)
+        public bool AddImage(string image)
         {
             try
             {
@@ -71,17 +75,20 @@ namespace PilotsDeck
                     throw new Exception("AddImage: Empty image string!");
                 }
 
-                    if (!cachedImageFiles.ContainsKey(image))
+                if (!cachedImageFiles.ContainsKey(image))
                 {
                     cachedImageFiles.Add(image, StreamDeckTools.ReadImageBytes(image));
                     currentRegistrations.Add(image, 1);
                 }
                 else
                     currentRegistrations[image]++;
+
+                return true;
             }
             catch
             {
                 Log.Logger.Error($"AddImage: Exception while loading Image {image}");
+                return false;
             }
         }
 

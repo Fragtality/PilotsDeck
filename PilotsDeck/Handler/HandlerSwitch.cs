@@ -20,9 +20,9 @@ namespace PilotsDeck
             LastSwitchState = Settings.OffState;
         }
 
-        public override void Update(IPCManager ipcManager)
+        public override void Update(ImageManager imgManager, IPCManager ipcManager)
         {
-            base.Update(ipcManager);
+            base.Update(imgManager, ipcManager);
 
             if (this.GetType().IsAssignableFrom(typeof(HandlerSwitch)) && LastSwitchState != BaseSettings.OffState && LastSwitchState != BaseSettings.OnState)
                 LastSwitchState = BaseSettings.OffState;
