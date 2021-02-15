@@ -21,6 +21,9 @@ namespace PilotsDeck
             await base.OnDidReceiveSettings(args);
 
             Plugin.ActionController.UpdateAction(args.context);
+            
+            if (Plugin.ActionController[args.context].UpdateSettingsModel)
+                _ = Manager.SetSettingsAsync(args.context, SettingsModel);
 
             Log.Logger.Verbose($"ActionBase:OnDidReceiveSettings {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }

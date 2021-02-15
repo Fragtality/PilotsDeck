@@ -121,8 +121,8 @@ namespace PilotsDeck
                     }
                 }
             }
-
-            if (redrawRequested)
+            RefreshActions(token, false);
+            //if (redrawRequested)
                 RedrawAll(token);
 
             stopWatch.Stop();
@@ -144,7 +144,7 @@ namespace PilotsDeck
                 if (forceUpdate)
                     action.ForceUpdate = forceUpdate;
                 
-                if (action.IsInitialized)
+                //if (action.IsInitialized)
                     action.Refresh(imgManager, ipcManager);
             }
         }

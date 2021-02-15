@@ -43,19 +43,39 @@
             <input id="MaximumValue" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
 
-        <div class="sdpi-heading">Bar Settings</div>
-        <div class="sdpi-item" id="Config_BarSize">
-            <div class="sdpi-item-label" id="lblBarSize">Size</div>
-            <input id="BarSize" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
+        <div class="sdpi-heading">Gauge Settings</div>
+        <div class="sdpi-item" id="Config_GaugeSize">
+            <div class="sdpi-item-label" id="lblGaugeSize">Size</div>
+            <input id="GaugeSize" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
         </div>
-        <div class="sdpi-item" id="Config_BarColor">
-            <div class="sdpi-item-label" id="lblBarColor">Bar Color</div>
-            <input id="BarColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
+        <div class="sdpi-item" id="Config_GaugeColor">
+            <div class="sdpi-item-label" id="lblGaugeColor">Bar Color</div>
+            <input id="GaugeColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
         </div>
         <div class="sdpi-item" id="Config_BarOrientation">
-            <div class="sdpi-item-label">Orientation</div>
+            <div class="sdpi-item-label" id="lblBarOrientation">Orientation</div>
             <select id="BarOrientation" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
+
+        <div type="checkbox" class="sdpi-item" id="Config_DrawArc">
+            <div class="sdpi-item-label" id="lblDrawArc">Draw Arc</div>
+            <input class="sdpi-item-value" id="DrawArc" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="DrawArc"><span></span></label>
+        </div>
+        <div class="sdpi-item" id="Config_StartAngle">
+            <div class="sdpi-item-label" id="lblStartAngle">Start Angle</div>
+            <input id="StartAngle" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Start at Angle (in Degree)" />
+        </div>
+        <div class="sdpi-item" id="Config_SweepAngle">
+            <div class="sdpi-item-label" id="lblSweepAngle">Sweep Angle</div>
+            <input id="SweepAngle" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="&quot;Size&quot; of the Arc (in Degree)" />
+        </div>
+        <div class="sdpi-item" id="Config_Offset">
+            <div class="sdpi-item-label" id="lblOffset">Offset Arc</div>
+            <input id="Offset" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Move Arc diagonally" />
+        </div>
+
+        <div class="sdpi-heading">Indicator Settings</div>
         <div class="sdpi-item" id="Config_IndicatorColor">
             <div class="sdpi-item-label" id="lblIndicatorColor">Indicator Color</div>
             <input id="IndicatorColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />

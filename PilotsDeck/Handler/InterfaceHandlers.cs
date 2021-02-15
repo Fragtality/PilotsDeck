@@ -16,6 +16,7 @@
 
         bool ForceUpdate { get; set; }
         bool NeedRedraw { get; set; }
+        bool UpdateSettingsModel { get; }
         bool IsInitialized { get; }
 
         void Register(ImageManager imgManager, IPCManager ipcManager);

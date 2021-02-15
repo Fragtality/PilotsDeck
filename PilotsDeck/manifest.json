@@ -77,7 +77,7 @@
     },
     {
       "Icon": "Images/category/ActionGaugeBar",
-      "Name": "Gauge: Bar",
+      "Name": "Display Gauge",
       "States": [
         {
           "Image": "Images/Wait",
@@ -87,12 +87,12 @@
       ],
       "SupportedInMultiActions": false,
       "PropertyInspectorPath": "PI/pi_DisplayGauge.html",
-      "Tooltip": "A graphical representation of a Value",
+      "Tooltip": "Display a Value on a Bar or Arc",
       "UUID": "com.extension.pilotsdeck.action.display.gauge"
     },
     {
-      "Icon": "Images/category/ActionGaugeBar",
-      "Name": "Gauge: Bar (Dual)",
+      "Icon": "Images/category/ActionGaugeBarDual",
+      "Name": "Display Gauge (Dual)",
       "States": [
         {
           "Image": "Images/Wait",
@@ -107,7 +107,7 @@
     }
   ],
   "Category": "Pilot's Deck",
-  "CategoryIcon": "Images/category/PluginIcon",
+  "CategoryIcon": "Images/category/category",
   "Disabled": false,
   "Author": "Fragtality",
   "CodePathWin": "PilotsDeck.exe",
@@ -115,7 +115,7 @@
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://www.elgato.com/gaming/stream-deck",
-  "Version": "0.4.4",
+  "Version": "0.4.5",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "4.1"
