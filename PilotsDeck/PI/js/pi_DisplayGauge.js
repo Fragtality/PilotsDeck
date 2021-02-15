@@ -26,7 +26,7 @@ var settingsModel = {
 	CriticalColor: "#8b0000",
 	WarnColor: "#ff8c00",
 	CriticalRange: "0; 10",
-	WarnRange: "11; 25",
+	WarnRange: "10; 20",
 	ShowText: true,
 	UseWarnColors: true,
 	FontInherit: true,
@@ -75,7 +75,6 @@ function updateForm() {
 	toggleConfigItem(settingsModel.DrawWarnRange, 'CriticalRange');
 	toggleConfigItem(settingsModel.DrawWarnRange, 'WarnColor');
 	toggleConfigItem(settingsModel.DrawWarnRange, 'WarnRange');
-	toggleConfigItem(settingsModel.ShowText && settingsModel.DrawWarnRange, 'UseWarnColors');
 
 	//FONT
 	toggleConfigItem(settingsModel.ShowText, 'Format');

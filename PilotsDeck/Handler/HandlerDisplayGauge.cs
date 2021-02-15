@@ -86,13 +86,17 @@ namespace PilotsDeck
             value = GaugeSettings.ScaleValue(value);
 
             ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage));
-            if (GaugeSettings.DrawArc)
-                DrawArc(value, render);
-            else
-                DrawBar(value, render);
 
-            if (!GaugeSettings.DrawArc)
+            if (GaugeSettings.DrawArc)
+            {
                 DrawText(value, render);
+                DrawArc(value, render);
+            }
+            else
+            {
+                DrawBar(value, render);
+                DrawText(value, render);
+            }
 
             DrawImage = render.RenderImage64();
             render.Dispose();
@@ -134,8 +138,6 @@ namespace PilotsDeck
             
             if (GaugeSettings.CenterLine)
                 render.DrawArcCenterLine(drawArc, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), GaugeSettings.CenterLineThickness);
-
-            DrawText(value, render);
 
             render.DrawArcIndicator(drawArc, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
         }

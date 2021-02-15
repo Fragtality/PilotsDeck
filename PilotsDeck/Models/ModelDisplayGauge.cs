@@ -38,7 +38,7 @@ namespace PilotsDeck
         public virtual string CriticalColor { get; set; } = "#8b0000";
         public virtual string WarnColor { get; set; } = "#ff8c00";
         public virtual string CriticalRange { get; set; } = "0; 10";
-        public virtual string WarnRange { get; set; } = "11; 25";
+        public virtual string WarnRange { get; set; } = "10; 20";
 
         public virtual bool ShowText { get; set; } = true;
         public virtual bool UseWarnColors { get; set; } = true;

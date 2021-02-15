@@ -13,5 +13,15 @@ namespace PilotsDeck
         {
             IndicatorFlip = true;
         }
+
+        public override void ResetCoords()
+        {
+            base.ResetCoords();
+
+            if (!DrawArc)
+                IndicatorFlip = true;
+            else
+                IndicatorFlip = false;
+        }
     }
 }

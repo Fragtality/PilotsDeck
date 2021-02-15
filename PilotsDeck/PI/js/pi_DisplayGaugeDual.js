@@ -9,9 +9,13 @@ var settingsModel = {
     Format: "",
 	MinimumValue: "0",
 	MaximumValue: "100",
-	BarSize: "58; 10",
+	GaugeSize: "58; 10",
 	BarOrientation: 0,
-	BarColor: "#006400",
+	GaugeColor: "#006400",
+	DrawArc: false,
+	StartAngle: 135,
+	SweepAngle: 180,
+	Offset: 0,
 	IndicatorColor: "#c7c7c7",
 	IndicatorSize: 10,
 	IndicatorFlip: true,
@@ -23,7 +27,7 @@ var settingsModel = {
 	CriticalColor: "#8b0000",
 	WarnColor: "#ff8c00",
 	CriticalRange: "0; 10",
-	WarnRange: "11; 25",
+	WarnRange: "10; 20",
 	ShowText: true,
 	UseWarnColors: true,
 	FontInherit: true,
@@ -31,8 +35,8 @@ var settingsModel = {
 	FontSize: 10,
 	FontStyle: 0,
 	FontColor: "#ffffff",
-	RectCoord: "6; 45; 60; 21",
-	RectCoord2: "6; 6; 60; 21"
+	RectCoord: "7; 45; 60; 21",
+	RectCoord2: "7; 6; 60; 21"
 };
 
 // Fill Select Boxes for Actions here
@@ -58,6 +62,13 @@ function updateForm() {
 	setPattern('Address', 5);
 	setPattern('Address2', 5);
 
+	//ARC
+	toggleConfigItem(settingsModel.DrawArc, 'StartAngle');
+	toggleConfigItem(settingsModel.DrawArc, 'SweepAngle');
+	toggleConfigItem(settingsModel.DrawArc, 'Offset');
+	toggleConfigItem(!settingsModel.DrawArc, 'BarOrientation');
+	toggleConfigItem(settingsModel.DrawArc, 'IndicatorFlip');
+
 	//LINE
 	toggleConfigItem(settingsModel.CenterLine, 'CenterLineColor');
 	toggleConfigItem(settingsModel.CenterLine, 'CenterLineThickness');
@@ -67,7 +78,6 @@ function updateForm() {
 	toggleConfigItem(settingsModel.DrawWarnRange, 'CriticalColor');
 	toggleConfigItem(settingsModel.DrawWarnRange, 'CriticalRange');
 	toggleConfigItem(settingsModel.DrawWarnRange, 'WarnColor');
-	toggleConfigItem(settingsModel.DrawWarnRange, 'WarnRange');
 
 	//FONT
 	toggleConfigItem(settingsModel.ShowText, 'Format');
@@ -78,5 +88,5 @@ function updateForm() {
 	toggleConfigItem(settingsModel.ShowText && !settingsModel.FontInherit, 'FontStyle');
 	toggleConfigItem(settingsModel.ShowText && !settingsModel.FontInherit, 'FontColor');
 	toggleConfigItem(settingsModel.ShowText, 'RectCoord');
-	toggleConfigItem(settingsModel.ShowText, 'RectCoord2');
+	toggleConfigItem(settingsModel.ShowText && !settingsModel.DrawArc, 'RectCoord2');
 }

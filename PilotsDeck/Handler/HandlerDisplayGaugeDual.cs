@@ -83,21 +83,39 @@ namespace PilotsDeck
             render.DrawBarIndicator(GaugeSettings.GetRectangleBar(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
         }
 
-        protected override void DrawText(string value, ImageRenderer render)
+        protected override void DrawArc(string value, ImageRenderer render)
         {
-            base.DrawText(value, render);
+            base.DrawArc(value, render);
 
             value = CurrentValue2;
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            if (GaugeSettings.ShowText)
-            {
-                value = GaugeSettings.RoundValue(value);
+            float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
+            float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-                GaugeSettings.GetFontParameters(TitleParameters, value, out Font drawFont, out Color drawColor);
-                render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangle(Settings.RectCoord2));
+            render.DrawArcIndicator(GaugeSettings.GetArc(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
+        }
+
+        protected override void DrawText(string value, ImageRenderer render)
+        {
+            base.DrawText(value, render);
+
+            if (!GaugeSettings.DrawArc)
+            {
+                value = CurrentValue2;
+                if (GaugeSettings.DecodeBCD)
+                    value = ModelDisplay.ConvertFromBCD(value);
+                value = GaugeSettings.ScaleValue(value);
+
+                if (GaugeSettings.ShowText)
+                {
+                    value = GaugeSettings.RoundValue(value);
+
+                    GaugeSettings.GetFontParameters(TitleParameters, value, out Font drawFont, out Color drawColor);
+                    render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangle(Settings.RectCoord2));
+                }
             }
         }
     }

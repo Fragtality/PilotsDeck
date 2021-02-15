@@ -28,6 +28,7 @@ namespace PilotsDeck
         private readonly int waitTicks = AppSettings.waitTicks;
         private Stopwatch stopWatch = new Stopwatch();
         private double averageTime = 0;
+        private bool redrawAlways = false;
        
 
         public ActionController()
@@ -121,9 +122,15 @@ namespace PilotsDeck
                     }
                 }
             }
-            RefreshActions(token, false);
-            //if (redrawRequested)
+
+            if (redrawRequested)
                 RedrawAll(token);
+
+            if (redrawAlways)
+            {
+                RefreshActions(token, true);
+                RedrawAll(token);
+            }
 
             stopWatch.Stop();
             averageTime += stopWatch.Elapsed.TotalMilliseconds;
@@ -144,7 +151,7 @@ namespace PilotsDeck
                 if (forceUpdate)
                     action.ForceUpdate = forceUpdate;
                 
-                //if (action.IsInitialized)
+                if (action.IsInitialized || redrawAlways)
                     action.Refresh(imgManager, ipcManager);
             }
         }
