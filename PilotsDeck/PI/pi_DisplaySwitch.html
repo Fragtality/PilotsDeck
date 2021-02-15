@@ -114,7 +114,7 @@
         <div class="sdpi-heading">Tweak Position</div>
         <div class="sdpi-item" id="Config_RectCoord">
             <div class="sdpi-item-label" id="lblRectCoord">Draw Rectangle</div>
-            <input id="RectCoord" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
     </div>
     <script src="js/pi_Common.js"></script>

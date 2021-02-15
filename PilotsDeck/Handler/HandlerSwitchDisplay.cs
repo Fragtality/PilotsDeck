@@ -9,7 +9,7 @@ namespace PilotsDeck
         public new ModelSwitchDisplay Settings { get; protected set; }
         
 
-        public override string ActionID { get { return $"{Title} | Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerSwitchDisplay] Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
         public override string Address { get { return DisplaySettings.Address; } }
 
         public virtual string CurrentValue { get; protected set; } = null;

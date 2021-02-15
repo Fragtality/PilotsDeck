@@ -11,6 +11,7 @@ namespace PilotsDeck
         public ModelDisplayGauge Settings { get; protected set; }
 
         public override string Address { get { return GaugeSettings.Address; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayGauge] Read: {Address}"; } }
         public override bool UseFont { get { return true; } }
         public virtual string DefaultImageRender { get; set; }
 
@@ -66,6 +67,7 @@ namespace PilotsDeck
             string value = CurrentValue;
 
             DrawBar(value, render);
+            DrawText(value, render);
 
             DrawImage = render.RenderImage64();
             render.Dispose();
@@ -97,7 +99,10 @@ namespace PilotsDeck
                 render.DrawBarCenterLine(drawRect, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), GaugeSettings.CenterLineThickness);
 
             render.DrawBarIndicator(drawRect, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
+        }
 
+        protected virtual void DrawText(string value, ImageRenderer render)
+        {
             if (GaugeSettings.ShowText)
             {
                 value = GaugeSettings.RoundValue(value);

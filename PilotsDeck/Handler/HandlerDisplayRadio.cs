@@ -9,7 +9,7 @@ namespace PilotsDeck
         public override ModelDisplaySwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplayRadio Settings { get; protected set; }
 
-        public override string ActionID { get { return $"{Title} | Read1: {Settings.AddressRadioActiv} | Read2: {Settings.AddressRadioStandby} | Write: {SwitchSettings.AddressAction}"; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayRadio] Read1: {Settings.AddressRadioActiv} | Read2: {Settings.AddressRadioStandby} | Write: {SwitchSettings.AddressAction}"; } }
 
         protected new string[] CurrentValue { get; set; } = new string[2];
         protected virtual string[] CurrentAddress { get; set; } = new string[2];

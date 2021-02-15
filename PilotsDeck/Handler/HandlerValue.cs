@@ -4,7 +4,7 @@ namespace PilotsDeck
 {
     public abstract class HandlerValue : HandlerBase, IHandlerValue
     {        
-        public override string ActionID { get { return $"{Title} | Read: {Address}"; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerValue] Read: {Address}"; } }
 
         public virtual string CurrentValue { get; protected set; } = null;
         public virtual string LastAddress { get; protected set; }

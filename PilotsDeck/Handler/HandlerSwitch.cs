@@ -8,7 +8,7 @@ namespace PilotsDeck
         public virtual ModelSwitch BaseSettings { get { return Settings; } }
         public virtual ModelSwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"{Title} | Write: {Address}"; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerSwitch] Write: {Address}"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
 
         protected virtual string LastSwitchState { get; set; }

@@ -8,6 +8,7 @@ namespace PilotsDeck
         public ModelDisplayText Settings { get; protected set; }
 
         public override string Address { get { return TextSettings.Address; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayText] Read: {TextSettings.Address}"; } }
 
         public override bool UseFont { get { return true; } }
 

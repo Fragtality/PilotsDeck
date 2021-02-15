@@ -161,6 +161,7 @@
   <ItemGroup>
     <Compile Include="ActionController.cs" />
     <Compile Include="Actions\ActionBase.cs" />
+    <Compile Include="Actions\ActionDisplayGaugeDual.cs" />
     <Compile Include="Actions\ActionDisplayRadio.cs" />
     <Compile Include="Actions\ActionDisplayText.cs" />
     <Compile Include="Actions\ActionDisplaySwitch.cs" />
@@ -176,6 +177,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handler\HandlerBase.cs" />
     <Compile Include="Handler\HandlerDisplayGauge.cs" />
+    <Compile Include="Handler\HandlerDisplayGaugeDual.cs" />
     <Compile Include="Handler\HandlerValue.cs" />
     <Compile Include="Handler\HandlerDisplayText.cs" />
     <Compile Include="Handler\HandlerDisplayRadio.cs" />
@@ -185,6 +187,7 @@
     <Compile Include="Handler\InterfaceHandlers.cs" />
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Models\ModelDisplay.cs" />
+    <Compile Include="Models\ModelDisplayGaugeDual.cs" />
     <Compile Include="Models\ModelDisplayText.cs" />
     <Compile Include="Models\ModelDisplayRadio.cs" />
     <Compile Include="Models\ModelDisplaySwitch.cs" />
@@ -300,6 +303,9 @@
     <Content Include="PI\js\pi_Common.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PI\js\pi_DisplayGaugeDual.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PI\js\pi_DisplayGauge.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -310,6 +316,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\js\pi_SwitchDisplay.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PI\pi_DisplayGaugeDual.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\pi_DisplayGauge.html">

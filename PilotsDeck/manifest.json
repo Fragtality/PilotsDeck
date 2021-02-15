@@ -77,7 +77,7 @@
     },
     {
       "Icon": "Images/category/ActionGaugeBar",
-      "Name": "Display Gauge",
+      "Name": "Gauge: Bar",
       "States": [
         {
           "Image": "Images/Wait",
@@ -89,6 +89,21 @@
       "PropertyInspectorPath": "PI/pi_DisplayGauge.html",
       "Tooltip": "A graphical representation of a Value",
       "UUID": "com.extension.pilotsdeck.action.display.gauge"
+    },
+    {
+      "Icon": "Images/category/ActionGaugeBar",
+      "Name": "Gauge: Bar (Dual)",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_DisplayGaugeDual.html",
+      "Tooltip": "A graphical representation of two Values",
+      "UUID": "com.extension.pilotsdeck.action.display.gauge.dual"
     }
   ],
   "Category": "Pilot's Deck",
@@ -100,7 +115,7 @@
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://www.elgato.com/gaming/stream-deck",
-  "Version": "0.4.3",
+  "Version": "0.4.4",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "4.1"

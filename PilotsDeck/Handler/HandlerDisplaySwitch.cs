@@ -6,7 +6,7 @@
         public virtual ModelDisplaySwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplaySwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"{Title} | Read: {TextSettings.Address} | Write: {SwitchSettings.AddressAction}"; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplaySwitch] Read: {TextSettings.Address} | Write: {SwitchSettings.AddressAction}"; } }
         protected virtual string LastSwitchState { get; set; }
 
 
