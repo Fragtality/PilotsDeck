@@ -63,8 +63,7 @@ Addresses and Format are separated by "**:**".
   \[ Lua:File ] (Command)
   - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with "*Lua:*".
 <br/>
-#### DecodeBCD, Scale, Format
-WTF?
+#### DecodeBCD & Scale & Format
 * **DecodeBCD**: If the Value is an BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1022 = 16352). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
 * **Format**: Round the Value and/or add Text to it \[ Digits:Text %s Text ]
