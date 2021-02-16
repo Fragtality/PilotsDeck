@@ -128,8 +128,8 @@ This Action can display a Value on a Bar or an Arc. The graphics are rendered on
  * **Indicator Settings** Define the Color and Size of the Triangle that indicates the current Value in the Sim. You can *Flip* it to draw it on the "other side".
  * **Center Line** Draw a Line at the Center (50%) in the specified *Color* and *Size*
  * **Warning Range**: If there should be "dangerous" or "critical" area on the Bar/Arc, you can define it here.
-  - *Critical / Warning Range* In this *Range*, lying between Minimum and Maximum, the Area will be drawn in the specified *Color*. The Ranges can be at the start, end, center, anywhere you want.
-  - *Symmetric Range*: If these colored areas should be at both Ends for Example, you can enable that here. The Ranges will then be "mirrored".
+ 	- *Critical / Warning Range* In this *Range*, lying between Minimum and Maximum, the Area will be drawn in the specified *Color*. The Ranges can be at the start, end, center, anywhere you want.
+	- *Symmetric Range*: If these colored areas should be at both Ends for Example, you can enable that here. The Ranges will then be "mirrored".
  * **Text Settings**: If the Indicator is in one the Ranges (if used) the Text (if shown) can be drawn in the respective Range Color. Everything else here works the same.
 <br/><br/>
 ### Display Gauge (Dual)
@@ -139,8 +139,8 @@ The most notabel Difference: with a Bar, both Values can be displayed as Text. W
 ## Lua Values
 Somewhere along the way, I wanted to add a Feature to read the current State of a Switch in the Sim with a Lua-Script. Maybe the State can't be read via one Lvar/Offset (FSL APU Avail...) and needs some "logic" from a Script to determine the State. Or it is just easier to read via Lua ("Copilot lua script" for FSL). Wouldn't it be cool if the Plugin could run Lua-Scripts to read their return Values and display/use these Values? :thinking:<br/>
 You can!! Strictly speaking it is just one Script, it returns nothing, is not run by the Plugin and there is really no third way to read a Value from the Sim - but it still works. :laughing: Here is how:<br/>
-The [Lua-Script](PilotsDeck\lua\PilotsDeck.lua) which is provided in the \lua Subfolder is called by FSUIPC every 250ms as soon as it is started (given that you installed/configured it like described in that File). In that File (only) you can add your own Code to do that Control / State checking logic and generate a Value. Then you have to write these Values to the "General Use" Range 66C0-66FF (64 bytes) via one of the ipc.writeXX Functions provided by FSUIPC. Where you put them (in that Range) and in which Type (int/float/string/...) is up to you. You have to keep track of these and allocate these Addresses all by yourself! And then you read these Addresses via any Plugin Action like any other Offset. Yeah ... it is more a "mechanic" than a "Feature", but let's ignore that :shushing_face:<br/>
-A small (hopefully helpful) Quick Reference is in the provided Script. But let's view my Script as an Example:<br/>
+The [Lua-Script](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) which is provided in the \lua Subfolder is called by FSUIPC every 250ms as soon as it is started (given that you installed/configured it like described in that File). In that File (only) you can add your own Code to do that Control / State checking logic and generate a Value. Then you have to write these Values to the "General Use" Range 66C0-66FF (64 bytes) via one of the ipc.writeXX Functions provided by FSUIPC. Where you put them (in that Range) and in which Type (int/float/string/...) is up to you. You have to keep track of these and allocate these Addresses all by yourself! And then you read these Addresses via any Plugin Action like any other Offset. Yeah ... it is more a "mechanic" than a "Feature", but let's ignore that :shushing_face:<br/>
+A small (hopefully helpful) Quick Reference is in the provided Script. Let's view my Script as an Example:<br/>
 ```lua
 function Pilotsdeck_Poll ()
 	readLDG()
@@ -174,6 +174,14 @@ Within the Plugin I then use
 - "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle the Packs via two Macro Calls.
 <br/><br/>
 ## Applicaton Settings
+You can configure some of the Plugin's behavior via the Configuration File. The File is found in the Plugin's Directory and is called "*app.config*". These are the available Settings and their Default:
+* **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection.
+* **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
+* **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
+* **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
+* **fontDefault**="Standard"		- Your locale for the normal Font Style. (For Font Inheritance to work)
+* **fontBold**="Fett"			- Your locale for the **bold** Font Style. (For Font Inheritance to work)
+* **fontItalic**="Kursiv"		- Your locale for the *italic* Font Style. (For Font Inheritance to work)
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
