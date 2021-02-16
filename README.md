@@ -11,7 +11,7 @@ Another "Highlight" would be that you can "read" (generate) Values via Lua-Scrip
 ## Plugin Requirements
 Uhm ... I'd say Prepar3D, FSUIPC and StreamDeck (Software) installed would be a bloody good Start :laughing:<br/>
 It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff!<br/>
-It may work with FSX and older Versions of P3D/FSUIPC. It just works on Windows.<br/>
+It may work with FSX and older Versions of P3D/FSUIPC - the Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Application Settings]<br/>
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
@@ -32,7 +32,7 @@ As of now, there are 7 Actions:<br/>
 <br/><br/>
 ## Action Configuration
 Now we're getting to the "Fun" part! :flushed:<br/>
-The Actions behave like any other Actions on the StreamDeck. They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like normal. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
+The Actions behave like any other Actions on the StreamDeck. All the Action's Settings are stored in the StreamDeck Profiles. They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like normal. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
 All Configuration is done via the Property Inspector. Some Input-Fields combine multiple Fiels/Inputs in one string, so let's start with the common Syntax:<br/>
 ### Common Syntax & Fields
 Plain Numeric Values are separated by "**;**". E.g. an Size or Range Definition like "0; 10"<br/>
@@ -62,7 +62,7 @@ Addresses and Format are separated by "**:**".
 * **Script**
   \[ Lua:File ] (Command)
   - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with "*Lua:*".<br/>
-#### DecodeBCD & Scale & Format
+#### DecodeBCD / Scale / Format
 * **DecodeBCD**: If the Value is an BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1022 = 16352). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
 * **Format**: Round the Value and/or add Text to it \[ Digits:Text %s Text ]
@@ -72,8 +72,29 @@ Addresses and Format are separated by "**:**".
 * **Examples**
   - *1*     One Digit after the Decimal Point, Value will be display as 20.5% for Example.
   - *2:1%s* Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!
-  - *%s ft* Add "ft" after the Value
-
+  - *%s ft* Add "ft" after the Value<br/>
+#### Images
+All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used (displayed) Images are cached, so all Actions using that Image must disappear before an Image is loaded from Disk.
+* **Default Image**: The Image to be shown when the Action is in their normal/working State or P3D is not loaded.
+* **Error Image**: The Image to be shown when FSUIPC disconnects or the Value could not be read.
+* **Special / Indication Image**: If the Value / Switch has an Special 2nd or 3rd State, you can indicate that by the Image specified. For Example if the Baro is on STD/1013, the PACK is on "Fault", the APU is "Avail", ...<br/>
+#### Font Settings
+For Actions which show Text, the used Font can be customized.<br/>
+The default Behavior is to Inherit the Font from the StreamDeck. Whatever you set there in Font, Size, Style is applied to the Text (all but Alignment and Show/Hide).<br/>
+*BUT, there is a caveat in the StreamDeck SDK.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text and for now I have only the german strings for that. These strings can be edited in the [Application Settings]. If you share with me what works for your language, I can surely put it in.<br>
+If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like.
+<br/><br/>
+### Display Value
+<br/><br/>
+### Switch / Display Value with Switch
+<br/><br/>
+### Dynamic Button
+<br/><br/>
+### COM Radio
+<br/><br/>
+### Display Gauge
+<br/><br/>
+### Display Gauge (Dual)
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
