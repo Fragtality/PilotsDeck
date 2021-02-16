@@ -4,15 +4,14 @@ Directly control Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
 ## Introduction
 As the Title suggests, this is a Plugin for Elegato's StreamDeck for the FlightSimmers out there in need of just more Buttons! :wink:<br/>
 It is build arround FSUIPC - so nearly everything which can be done with FSUIPC, can also be done via this Plugin. It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
-The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best four your Aircraft(s).<br/><br/>
+The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best four your Aircraft(s).<br/><br/>
 The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want.<br/>
-Another "Highlight" would be that you can "read" (generate) Values via Lua-Scripts.
+Another "Highlight" would be that you can "read" (generate) Values via [Lua-Scripts](README.md#lua-values).
 <br/><br/>
 ## Plugin Requirements
 Uhm ... I'd say Prepar3D, FSUIPC and StreamDeck (Software) installed would be a bloody good Start :laughing:<br/>
 It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff!<br/>
-It may work with FSX and older Versions of P3D and FSUIPC (Tested and developed on v5 and FSUIPC6).
-The Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Application Settings](README.md#application-settings)<br/>
+The Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Application Settings](README.md#applicaton-settings). It may work with FSX and older Versions of P3D and FSUIPC.<br/>
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
@@ -57,16 +56,16 @@ Addresses and Format are separated by "**:**".
 * **Control**
   \[ Control(:Parameter)* ] (Command)
   - The known "FS Controls". First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at one)<br/>
-  Example: *"66587:72497:72507"* (Control 66587, Parameters 72497 and 72507)
+  Example: *"66587:72497:72507"* (Send Control 66587 with Parameter 72497 and then Control 66587 with Parameter 72507)
 * **Macro**
   \[ File\:Macro(:Macro)* ] (Command)
   - *File*: The FSUIPC Macro File Name without Extension
   - *Macro*: The Macro's Name within that File. You can specify multiple Macros within one File (e.g. both Packs-Controls on one Button)<br/>
-  Example: *"FSLA3XX_MAIN:ACPACK1:ACPACK2"* (Run Macros ACPACK1 and ACPACK2 from Macro-File FSLA3XX_MAIN)
+  Example: *"FSLA3XX_MAIN:ACPACK1:ACPACK2"* (Run Macro ACPACK1 from Macro-File FSLA3XX_MAIN and then ACPACK2 from the same File)
 * **Script**
   \[ Lua:File ] (Command)
   - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with "*Lua:*".<br/>
-  Example: *"Lua:Baro_Toggle"* (run Lua-Script Baro_Toggle.lua)<br/>
+  Example: *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")<br/>
 #### DecodeBCD / Scale / Format
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
@@ -75,32 +74,32 @@ Addresses and Format are separated by "**:**".
   - *Text*: The Value is embedded at the "*%s*" in the Text you specify here. E.g. to add Units to the Value like "%s kg" or "%s %". Or put something in front of it. Every "%s" will be replaced by the Value.
 * **Order**: DecodeBCD -> Scale -> Round -> Format. If the Value is to be matched (On/Off/Special State e.g.) it is done after Round and before Format.
 * **Examples**
-  - *1*     One Digit after the Decimal Point, Value will be display as 20.5% for Example. Match for zero would be "0.0".
+  - *1*     One Digit after the Decimal Point, the current Value of 20.522534 will be displayed as 20.5 for Example. Match for zero would be "0.0".
   - *2:1%s* Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!
   - *%s ft* Add "ft" after the Value<br/>
 #### Images
-All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used (displayed) Images are cached, so all Actions using that Image must disappear before an Image is loaded again from Disk.
+All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.
 * **Default Image / Background Normal**: The Image to be shown when the Action is in their normal/working State or P3D is not loaded.
 * **Error Image**: The Image to be shown when FSUIPC disconnects or the Value could not be read.
 * **Special Value / State**: If the Value / Switch has an Special 2nd or 3rd State, you can indicate that by the Image specified. For Example if the Baro is on STD/1013, the PACK is on "Fault", the APU is "Avail", ...<br/>
 #### Font Settings
 For Actions which show Text, the used Font can be customized.<br/>
 The default Behavior is to Inherit the Font from StreamDeck. Whatever you set there in Font, Size, Style is applied to the Text (all but Alignment and Show/Hide).<br/>
-*BUT, there is a caveat in the StreamDeck SDK.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text and for now I have only the german strings for that. These strings can be edited in the [Application Settings](README.md#application-settings). If you share with me what works for your language, I can surely put it in.<br>
-If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on an (international) API, so this SDK limitation does not have an effect here.
+*BUT, there is a caveat in the StreamDeck SDK.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text and for now I have only the german strings for that. These strings can be edited in the [Application Settings](README.md#applicaton-settings). If you share what works for your language, I can surely put it in.<br/>
+If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect here.
 <br/><br/>
 ### Display Value
 Most Settings should be explained by the common part.
-* **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals the one you specified here. It will reset to the Normal Background if it is unequal again. Mind Scale and Round - the Matching is done after that. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
+* **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals the one you specified here. It will reset to the Normal Background if it is unequal again. Mind Scale and Round - the Matching is done after both. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
 You can optionally hide the Text when the Values match. Maybe you want to display a nice "STD" Image?
 You can also specify a different Text Color when the Values match. This Color has priority over both inheritted or customized Font Settings.
-* **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background. It is *"X; Y; Width; Height"*. The Text is always drawn horizontal/vertical centered within that Box. (Top-Left is 0, 0)
+* **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background. It is *"X; Y; Width; Height"*. The Text is always drawn horizontal/vertical centered within that Box. (0, 0 is Top-Left)
 <br/><br/>
 ### Simple Button / Display Value with Button
-Since Diplay Value is explained above and a simple Button has nothing much to configure visually, let's dive into how you define Commands and how they are send to the Sim.
+Since Diplay Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
-* **Action Address**: This, in essence, is your Mapping. The Syntax is refrenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar) multiple Requests will be send to the Sim in fast Sequence.
-* **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when you push it and sends it to the Sim. It will always start in the "Off" State (sends "On" on nex Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
+* **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is refrenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar), multiple Requests will be send to the Sim in fast Sequence.
+* **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when you push it and sends it to the Sim. It will always start in the "Off" State (sends "On" on next Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
 <br/><br/>
 ### Dynamic Button
 Action Type and Address work exactly like described above.<br/>
@@ -114,18 +113,18 @@ Most fields work the same as described before, you define the Addresses where th
 * **Swap Background**: When your defined Swap Action was (successfully) send to the Sim, the Button will show that Image for 3.2s (=16 Ticks).
 * **Value Format**: You can define a *Different Format* for the Standby Value. So if you read the int32 Value from 05C4 for the Active Frequency and the BCD encoded int16 Value from 034E for the Standby Frequency, you can do that and have both look like a Frequency.
 * **Font Settings**: Both Frequencies will always use the same Font, regardless how it is defined. The Font Style is ignored and is not configurable: the Active (top) Frequency is always bold, the Standby (bottom) Frequency is always regular.
-* **Tweak Position**: There are two instead of one ... if you wish so, you can swap what is on top :wink:
+* **Tweak Position**: There are two instead of one ... if you wish so, you can swap what is on top. :wink:
 <br/><br/>
 ### Display Gauge
 This Action can display a Value on a Bar or an Arc. The graphics are rendered on refresh.
 * **Normal Background**: The graphics are rendered on that Background. 
-* **Value Format**: Yo have to define a minimum and maximum Value for that Action to work. Again, the Value matching is done after Decoding and Scaling.
+* **Value Format**: Yo have to define a minimum and maximum Value for that Action to work. The Value after Decoding and Scaling is used for the Indicator.
 * **Gauge Settings**
   - *Gauge Size*: The Size of the Bar or Arc. For a Bar it is "Width; Height", for an Arc it is "Radius; Thickness".
-  - *Orientation*: Define if this Bar is horizontal or vertical and if the Values is increasing right/left or up/down. An Arc does not need (ignores) that - it is a Circle, it has all directions :laugh: If the Value is increasing clock-wise or counterclock-wise is defined by a positive or negative *Sweep Angle*.
-  - *Start Angle*: The Angle at wich the Arc starts. 0° is at right center.
-  - *Sweep Angle*: This Angle defines how "big" or "long" the Arc is from the *Start Angle*. For positive angles the Indicator moves clock-wise, for negative counterclock-wise.
-  - *Offset*: You can diagonally move the Arc (and Text) from the top-left corner by that Value.
+  - *Orientation* (Bar): Define if this Bar is horizontal or vertical and if the Values is increasing right/left or up/down. An Arc does not need (ignores) that - it is a Circle, it has all directions. :smile:
+  - *Start Angle* (Arc): The Angle at wich the Arc starts. 0° is at right center.
+  - *Sweep Angle* (Arc): This Angle defines how "big" or "long" the Arc is from the *Start Angle*. For positive angles the Indicator moves clock-wise, for negative counterclock-wise.
+  - *Offset* (Arc): You can diagonally move the Arc (and Text) from the top-left corner by that Value.
  * **Indicator Settings** Define the Color and Size of the Triangle that indicates the current Value in the Sim. You can *Flip* it to draw it on the "other side".
  * **Center Line** Draw a Line at the Center (50%) in the specified *Color* and *Size*
  * **Warning Range**: If there should be "dangerous" or "critical" area on the Bar/Arc, you can define it here.
