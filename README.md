@@ -137,6 +137,41 @@ Shows two Values on the same Bar or Arc. So they share the same Minimum, Maximum
 The most notabel Difference: with a Bar, both Values can be displayed as Text. With an Arc, only the first Value is displayed. The Arc therefore allows to swap (*Flip*) the Indicators.
 <br/><br/>
 ## Lua Values
+Somewhere along the way, I wanted to add a Feature to read the current State of a Switch in the Sim with a Lua-Script. Maybe the State can't be read via one Lvar/Offset (FSL APU Avail...) and needs some "logic" from a Script to determine the State. Or it is just easier to read via Lua ("Copilot lua script" for FSL). Wouldn't it be cool if the Plugin could run Lua-Scripts to read their return Values and display/use these Values? :thinking:<br/>
+You can!! Strictly speaking it is just one Script, it returns nothing, is not run by the Plugin and there is really no third way to read a Value from the Sim - but it still works. :laughing: Here is how:<br/>
+The [Lua-Script](PilotsDeck\lua\PilotsDeck.lua) which is provided in the \lua Subfolder is called by FSUIPC every 250ms as soon as it is started (given that you installed/configured it like described in that File). In that File (only) you can add your own Code to do that Control / State checking logic and generate a Value. Then you have to write these Values to the "General Use" Range 66C0-66FF (64 bytes) via one of the ipc.writeXX Functions provided by FSUIPC. Where you put them (in that Range) and in which Type (int/float/string/...) is up to you. You have to keep track of these and allocate these Addresses all by yourself! And then you read these Addresses via any Plugin Action like any other Offset. Yeah ... it is more a "mechanic" than a "Feature", but let's ignore that :shushing_face:<br/>
+A small (hopefully helpful) Quick Reference is in the provided Script. But let's view my Script as an Example:<br/>
+```lua
+function Pilotsdeck_Poll ()
+	readLDG()
+	readTCAS()
+	readPACK()
+end
+
+event.timer(250, "Pilotsdeck_Poll")
+
+function readLDG()
+	local FSL = require "FSL2Lua"
+	FSL:setPilot(1)
+	ipc.writeSTR(0x66C0, FSL.OVHD_EXTLT_Land_L_Switch:getPosn(), 4)
+end
+
+function readTCAS()
+	local FSL = require "FSL2Lua"
+	FSL:setPilot(1)
+	ipc.writeSTR(0x66C5, FSL.PED_ATCXPDR_MODE_Switch:getPosn(), 4)
+end
+
+function readPACK()
+	local pack1 = ipc.readLvar("VC_OVHD_AC_Pack_1_Button")
+	local pack2 = ipc.readLvar("VC_OVHD_AC_Pack_2_Button")
+	ipc.writeUB(0x66CA, pack1+pack2)
+end
+```
+Within the Plugin I then use
+- "66C5:4:s" to read the TCAS State and display & toggle it with a "Display Value with Button" Action.
+- "66C0:4:s" to read the Position/State of the Left Landing Light in a "Dynamic Button" and display the appropiate Images for the three States On, Off and Retracted (via Special State). One Button which sends "Up" for both Landing Lights, one to send "Down" for both Landing Lights via FSControls.
+- "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle the Packs via two Macro Calls.
 <br/><br/>
 ## Applicaton Settings
 <br/><br/>
