@@ -84,7 +84,7 @@ All Images are stored in the \Images Subdirectory. You can change and remove the
 * **Special Value / State**: If the Value / Switch has an Special 2nd or 3rd State, you can indicate that by the Image specified. For Example if the Baro is on STD/1013, the PACK is on "Fault", the APU is "Avail", ...<br/>
 #### Font Settings
 For Actions which show Text, the used Font can be customized.<br/>
-The default Behavior is to Inherit the Font from StreamDeck. Whatever you set there in Font, Size, Style is applied to the Text (all but Alignment and Show/Hide).<br/>
+The default Behavior is to Inherit the Font Style from the Buttons Title Settings. Whatever you set there in Font, Size, Style is applied to the Text of that Button (all but Alignment and Show/Hide).<br/>
 *BUT, there is a caveat in the StreamDeck SDK.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text and for now I have only the german strings for that. These strings can be edited in the [Application Settings](README.md#applicaton-settings). If you share what works for your language, I can surely put it in.<br/>
 If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect here.
 <br/><br/>
