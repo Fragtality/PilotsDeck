@@ -86,7 +86,7 @@ All Images are stored in the \Images Subdirectory. You can change and remove the
 For Actions which show Text, the used Font can be customized.<br/>
 The default Behavior is to Inherit the Font Style from the Buttons Title Settings. Whatever you set there in Font, Size, Style is applied to the Text of that Button (all but Alignment and Show/Hide).<br/>
 *BUT, there is a caveat in the StreamDeck SDK.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text and for now I have only the german strings for that. These strings can be edited in the [Application Settings](README.md#applicaton-settings). If you share what works for your language, I can surely put it in.<br/>
-If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect here.
+If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect on the custom Font Settings.
 <br/><br/>
 ### Display Value
 Most Settings should be explained by the common part.
@@ -99,14 +99,14 @@ You can also specify a different Text Color when the Values match. This Color ha
 Since Diplay Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is refrenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar), multiple Requests will be send to the Sim in fast Sequence.
-* **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when you push it and sends it to the Sim. It will always start in the "Off" State (sends "On" on next Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
+* **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when pushed ("keyUp") and sends it to the Sim. It will always start in the "Off" State (sends "On" on next Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
 <br/><br/>
 ### Dynamic Button
 Action Type and Address work exactly like described above.<br/>
 * **Address** (Control Status Value): Here you specify where the current State (Value) of a Switch in the Sim can be read. Since there are only two Ways to read something from the Sim via FSUIPC, it is either an Offset or a (single) Lvar.<br/>The Syntax works as described [before](README.md#address-fields). The "third" Way, reading a Lua Value is described [below](README.md#lua-values).
 * **On / Off State**: When the Value matches On or Off, the respective Image is displayed.<br/>
-For Offset and Lvar Actions: Since the Button knows the real current State of a Switch in the Sim, it will send the correct toggled Value to the Sim on push. The Assumption is that Action Address and Address are the same Offset or Lvar, but if you have the Use-Case that they have to be different, you can configure it that way! Just mind that the same On/Off Values will be used for both reading and writing.
-* **Special State**: For Switches which have something "in between" / other than the On/Off States, this Special State can (probably) be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches to the current Value. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
+For Offset and Lvar Actions: Since the Button knows the real current State of a Switch in the Sim, it will send the correct toggled Value to the Sim when pushed. The Assumption is that Action Address and Address are the same Offset or Lvar, but if you have the Use-Case that they have to be different, you can configure it that way! Just mind that the same On/Off Values will be used for both reading and writing.
+* **Special State**: For Switches which have something "in between" or other than the On/Off States, this Special State can be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches to the current Value. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
 <br/><br/>
 ### COM Radio
 Most fields work the same as described before, you define the Addresses where the Active (top) and Standby (bottom) Frequency can be read and define an Action how they are swapped in the Sim.<br/>On the fields that differ or are new:
@@ -118,22 +118,22 @@ Most fields work the same as described before, you define the Addresses where th
 ### Display Gauge
 This Action can display a Value on a Bar or an Arc. The graphics are rendered on refresh.
 * **Normal Background**: The graphics are rendered on that Background. 
-* **Value Format**: Yo have to define a minimum and maximum Value for that Action to work. The Value after Decoding and Scaling is used for the Indicator.
+* **Value Format**: Yo have to define a *Minimum* and *Maximum* Value for that Action to work. The Value after Decoding and Scaling is used for the Indicator.
 * **Gauge Settings**
   - *Gauge Size*: The Size of the Bar or Arc. For a Bar it is "Width; Height", for an Arc it is "Radius; Thickness".
-  - *Orientation* (Bar): Define if this Bar is horizontal or vertical and if the Values is increasing right/left or up/down. An Arc does not need (ignores) that - it is a Circle, it has all directions. :smile:
+  - *Orientation* (Bar): Define if this Bar is horizontal or vertical and if the Values are increasing right/left or up/down. An Arc does not need (and ignores) that - it is a Circle, it has all directions. :smile:
   - *Start Angle* (Arc): The Angle at wich the Arc starts. 0° is at right center.
   - *Sweep Angle* (Arc): This Angle defines how "big" or "long" the Arc is from the *Start Angle*. For positive angles the Indicator moves clock-wise, for negative counterclock-wise.
   - *Offset* (Arc): You can diagonally move the Arc (and Text) from the top-left corner by that Value.
  * **Indicator Settings** Define the Color and Size of the Triangle that indicates the current Value in the Sim. You can *Flip* it to draw it on the "other side".
  * **Center Line** Draw a Line at the Center (50%) in the specified *Color* and *Size*
  * **Warning Range**: If there should be "dangerous" or "critical" area on the Bar/Arc, you can define it here.
- 	- *Critical / Warning Range* In this *Range*, lying between Minimum and Maximum, the Area will be drawn in the specified *Color*. The Ranges can be at the start, end, center, anywhere you want.
+ 	- *Critical / Warning Range* In this *Range*, lying between *Minimum* and *Maximum*, the Area will be drawn in the specified *Color*. The Ranges can be at the start, end, center, anywhere you want.
 	- *Symmetric Range*: If these colored areas should be at both Ends for Example, you can enable that here. The Ranges will then be "mirrored".
- * **Text Settings**: If the Indicator is in one the Ranges (if used) the Text (if shown) can be drawn in the respective Range Color. Everything else here works the same.
+ * **Text Settings**: If the Indicator is in one the Ranges the Text can be drawn in the respective Range Color. Everything else here works the same.
 <br/><br/>
 ### Display Gauge (Dual)
-Shows two Values on the same Bar or Arc. So they share the same Minimum, Maximum and Format (and Font-Settings).
+Shows two Values on the same Bar or Arc. So they share the same Minimum, Maximum and Format (and Font-Settings).<br/>
 The most notabel Difference: with a Bar, both Values can be displayed as Text. With an Arc, only the first Value is displayed. The Arc therefore allows to swap (*Flip*) the Indicators.
 <br/><br/>
 ## Lua Values
