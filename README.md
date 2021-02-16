@@ -51,7 +51,7 @@ Addresses and Format are separated by "**:**".
   - 0x0ec6:2:i for "Pressure QNH"
 * **Lvar**
   \[ (L:)Name | (L:)Name((:L):Name)* ] (Read / Command)
-  - *Name*: The Lvar's Name with or without the preceding "L:". For Switches you can bind multiple Lvars to it, every Lvar is separated by ":". Multiple Lvars only make sense if they react same for a same value (e.g. Landing Light Switches, all reacting as "on" for "1")<br/>
+  - *Name*: The Lvar's Name with or without the preceding "L:". For Switches you can bind multiple Lvars to it, every Lvar is separated by ":". Multiple Lvars only make sense if they react same for a same value (e.g. both Pack Switches, both reacting as "On" for "10")<br/>
   Example: *"VC_OVHD_AC_Pack_1_Button:VC_OVHD_AC_Pack_2_Button"*
 * **Control**
   \[ Control(:Parameter)* ] (Command)
