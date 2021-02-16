@@ -72,6 +72,12 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
+        public override bool Action(IPCManager ipcManager)
+        {
+            LastSwitchState = CurrentValue;
+            return base.Action(ipcManager);
+        }
+
         protected override void Redraw(ImageManager imgManager)
         {
             if (!IsChanged && !ForceUpdate)
