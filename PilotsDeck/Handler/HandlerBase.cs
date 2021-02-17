@@ -18,7 +18,7 @@
 
         public bool ForceUpdate { get; set; } = false;
         public bool NeedRedraw { get; set; } = false;
-        public virtual bool UpdateSettingsModel { get; protected set; } = false;
+        public virtual bool UpdateSettingsModel { get; set; } = false;
         protected virtual bool CanRedraw { get { return true; } }
         public virtual bool IsInitialized { get; set; }
         
@@ -65,12 +65,7 @@
             }
             else
             {
-                if (DrawImage != DefaultImage)
-                {
-                    DrawImage = DefaultImage;
-                    IsRawImage = false;
-                    NeedRedraw = true;
-                }
+                SetDefault();
             }
         }
 

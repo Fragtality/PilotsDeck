@@ -14,7 +14,7 @@
 
         public ModelSwitchDisplay()
         {
-            DefaultImage = @"Images/category/SwitchDefault.png";
+            DefaultImage = @"Images/SwitchDefault.png";
             ErrorImage = @"Images/Error.png";
         }
     }

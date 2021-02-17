@@ -22,6 +22,7 @@ namespace PilotsDeck
 #endif
             using (var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args))
             {
+                ActionController.Init();
                 await ConnectionManager.Initialize(args, config.LoggerFactory, ActionController)
                                                          .RegisterAllActions(typeof(Plugin).Assembly)
                                                          .StartAsync();

@@ -19,6 +19,7 @@
             DefaultImage = @"Images/Arrow.png";
             ErrorImage = @"Images/SwitchError.png";
             IndicationImage = @"Images/ArrowBright.png";
+            DrawBox = false;
         }
     }
 }

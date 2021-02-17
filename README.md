@@ -85,15 +85,16 @@ All Images are stored in the \Images Subdirectory. You can change and remove the
 #### Font Settings
 For Actions which show Text, the used Font can be customized.<br/>
 The default Behavior is to Inherit the Font Style from the Buttons Title Settings. Whatever you set there in Font, Size, Style is applied to the Text of that Button (all but Alignment and Show/Hide).<br/>
-*BUT, there is a caveat in the StreamDeck SDK.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text and for now I have only the german strings for that. These strings can be edited in the [Application Settings](README.md#applicaton-settings). If you share what works for your language, I can surely put it in.<br/>
+*BUT, there is a caveat in the StreamDeck API.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text. I have put in the Strings for German and English. You can alter the [Application Settings](README.md#applicaton-settings) to customize them or add your language. If you let me know which Strings are working for which Language, I can add that to the Plugin.<br/>
 If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect on the custom Font Settings.
 <br/><br/>
 ### Display Value
 Most Settings should be explained by the common part.
+* **Draw Box**: Will draw a Frame in the configured *Thickness* and *Color* arround the Value. The Frame's *Size & Position* is defined as *"X; Y; Width; Height"* (0, 0 is Top-Left).
 * **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals the one you specified here. It will reset to the Normal Background if it is unequal again. Mind Scale and Round - the Matching is done after both. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
 You can optionally hide the Text when the Values match. Maybe you want to display a nice "STD" Image?
-You can also specify a different Text Color when the Values match. This Color has priority over both inheritted or customized Font Settings.
-* **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background. It is *"X; Y; Width; Height"*. The Text is always drawn horizontal/vertical centered within that Box. (0, 0 is Top-Left)
+You can also specify a *Different Color* when the Values match. This Color has priority over both inheritted or customized Font Settings. This Color is also used for the Frame, if *Draw Frame* is enabled.
+* **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background defined as *"X; Y; Width; Height"*. If *Draw Frame* is enabled, it is relative to the Frame's *Size & Position*. If it not enabled it is relative to the whole Button. The Text is always drawn horizontal/vertical centered within that Box. When *Draw Frame* is toggled this will reset to the respective Default.
 <br/><br/>
 ### Simple Button / Display Value with Button
 Since Diplay Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
@@ -112,7 +113,7 @@ For Offset and Lvar Actions: Since the Button knows the real current State of a 
 Most fields work the same as described before, you define the Addresses where the Active (top) and Standby (bottom) Frequency can be read and define an Action how they are swapped in the Sim.<br/>On the fields that differ or are new:
 * **Swap Background**: When your defined Swap Action was (successfully) send to the Sim, the Button will show that Image for 3.2s (=16 Ticks).
 * **Value Format**: You can define a *Different Format* for the Standby Value. So if you read the int32 Value from 05C4 for the Active Frequency and the BCD encoded int16 Value from 034E for the Standby Frequency, you can do that and have both look like a Frequency.
-* **Font Settings**: Both Frequencies will always use the same Font, regardless how it is defined. The Font Style is ignored and is not configurable: the Active (top) Frequency is always bold, the Standby (bottom) Frequency is always regular.
+* **Font Settings**: Both Frequencies will always use the same Font, regardless how it is defined. The Font Style is ignored and is not configurable: the Active (top) Frequency is always bold, the Standby (bottom) Frequency is always regular. The Font Color for the Standby Frequency will be darkened.
 * **Tweak Position**: There are two instead of one ... if you wish so, you can swap what is on top. :wink:
 <br/><br/>
 ### Display Gauge
@@ -174,14 +175,16 @@ Within the Plugin I then use
 - "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle the Packs via two Macro Calls.
 <br/><br/>
 ## Applicaton Settings
-You can configure some of the Plugin's behavior via the Configuration File. The File is found in the Plugin's Directory and is called "*app.config*". These are the available Settings and their Default:
+You can configure some of the Plugin's behavior via the Configuration File. The File is found in the Plugin's Directory and is called "*PilotsDeck.exe.config". These are the available Settings and their Default:
 * **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection.
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
-* **fontDefault**="Standard"		- Your locale for the normal Font Style. (For Font Inheritance to work)
-* **fontBold**="Fett"			- Your locale for the **bold** Font Style. (For Font Inheritance to work)
-* **fontItalic**="Kursiv"		- Your locale for the *italic* Font Style. (For Font Inheritance to work)
+* **redrawAlways**="false*		- With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.
+For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
+* **fontDefault_XX**="Regular"
+* **fontBold_XX**="Bold"
+* **fontItalic_XX**="Italic"
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>

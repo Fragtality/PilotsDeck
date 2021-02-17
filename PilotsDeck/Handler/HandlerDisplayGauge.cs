@@ -22,6 +22,7 @@ namespace PilotsDeck
         public HandlerDisplayGauge(string context, ModelDisplayGauge settings) : base(context, settings)
         {
             Settings = settings;
+            IsArc = Settings.DrawArc;
         }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)

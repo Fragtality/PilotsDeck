@@ -129,7 +129,7 @@ namespace PilotsDeck
                     colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
 
                 ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background));
-                render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangle());
+                render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
                 render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangle(Settings.RectCoordStby));
 
                 DrawImage = render.RenderImage64();

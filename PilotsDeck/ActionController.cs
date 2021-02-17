@@ -28,15 +28,23 @@ namespace PilotsDeck
         private readonly int waitTicks = AppSettings.waitTicks;
         private Stopwatch stopWatch = new Stopwatch();
         private double averageTime = 0;
-        private bool redrawAlways = false;
+        private bool redrawAlways = AppSettings.redrawAlways;
        
 
         public ActionController()
         {
             currentActions = new Dictionary<string, IHandler>();
             ipcManager = new IPCManager(AppSettings.groupStringRead);
-            imgManager = new ImageManager();
-            Log.Logger.Information("ActionController and IPCManager created");
+            imgManager = new ImageManager();           
+        }
+
+        public void Init()
+        {
+            if (currentActions != null && ipcManager != null && imgManager != null)
+                Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
+
+            AppSettings.SetLocale();
+            Log.Logger.Information($"Locale is set to \"{AppSettings.locale}\" - FontStyles: {AppSettings.fontDefault} / {AppSettings.fontBold} / {AppSettings.fontItalic}");
         }
 
         public void Dispose()

@@ -58,6 +58,13 @@ namespace PilotsDeck
             drawBrush.Dispose();
         }
 
+        public void DrawBox(Color drawColor, int lineSize, RectangleF drawRectangle)
+        {
+            Pen pen = new Pen(drawColor, lineSize);
+            render.DrawRectangle(pen, drawRectangle.X, drawRectangle.Y, drawRectangle.Width, drawRectangle.Height);
+            pen.Dispose();
+        }
+
         public void Rotate(float angle, float offset = 0)
         {
             render.TranslateTransform(buttonSizeH + offset, buttonSizeH + offset);

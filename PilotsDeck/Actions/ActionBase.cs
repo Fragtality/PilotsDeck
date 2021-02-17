@@ -23,7 +23,10 @@ namespace PilotsDeck
             Plugin.ActionController.UpdateAction(args.context);
             
             if (Plugin.ActionController[args.context].UpdateSettingsModel)
+            {
                 _ = Manager.SetSettingsAsync(args.context, SettingsModel);
+                Plugin.ActionController[args.context].UpdateSettingsModel = false;
+            }
 
             Log.Logger.Verbose($"ActionBase:OnDidReceiveSettings {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
@@ -32,7 +35,7 @@ namespace PilotsDeck
         {
             Plugin.ActionController.SetTitleParameters(args.context, args.payload.title, args.payload.titleParameters);
 
-            Log.Logger.Verbose($"ActionBase:OnTitleParametersDidChange {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Verbose($"ActionBase:OnTitleParametersDidChange {args.context} | {Plugin.ActionController[args.context]?.ActionID} | {args.payload.titleParameters.fontStyle}");
 
             return Task.CompletedTask;
         }

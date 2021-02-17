@@ -5,11 +5,16 @@ namespace PilotsDeck
 {
     public class ModelDisplayText : ModelDisplay
     {
+		public virtual bool DrawBox { get; set; } = true;
+		public virtual int BoxSize { get; set; } = 2;
+		public virtual string BoxColor { get; set; } = "#ffffff";
+		public virtual string BoxRect { get; set; } = "9; 21; 54; 44";
+
 		public virtual bool HasIndication { get; set; } = false;
 		public virtual bool IndicationHideValue { get; set; } = false;
 		public virtual bool IndicationUseColor { get; set; } = false;
-		public virtual string IndicationColor { get; set; } = "#ffffff";
-		public virtual string IndicationImage { get; set; } = @"Images/ValueFault.png";
+		public virtual string IndicationColor { get; set; } = "#ffcc00";
+		public virtual string IndicationImage { get; set; } = @"Images/Empty.png";
 		public virtual string IndicationValue { get; set; } = "0";
 
 		public virtual bool FontInherit { get; set; } = true;
@@ -17,13 +22,14 @@ namespace PilotsDeck
 		public virtual int FontSize { get; set; } = 10;
 		public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
 		public virtual string FontColor { get; set; } = "#ffffff";
-		public virtual string RectCoord { get; set; } = "11; 23; 48; 40";
+		//public virtual string RectCoord { get; set; } = "11; 23; 48; 40";
+		public virtual string RectCoord { get; set; } = "-1; 0; 0; 0";
 
 
 		public ModelDisplayText()
 		{
-			DefaultImage = @"Images/ValueFrame.png";
-			ErrorImage = @"Images/ValueError.png";
+			DefaultImage = @"Images/Empty.png";
+			ErrorImage = @"Images/Error.png";
 		}		
 
 		public virtual void GetFontParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters, out Font drawFont, out Color drawColor)
@@ -40,9 +46,36 @@ namespace PilotsDeck
 			}
         }
 
-		public virtual RectangleF GetRectangle()
+		public virtual void ResetRectText()
         {
-			return GetRectangle(RectCoord);
+			if (DrawBox)
+				RectCoord = "-1; 0; 0; 0";
+			else
+				RectCoord = "-1; 1; 72; 72";
+
+		}
+
+		public virtual RectangleF GetRectangleBox()
+        {
+			return GetRectangle(BoxRect);
+        }
+
+		public virtual RectangleF GetRectangleText()
+        {
+			if (!DrawBox)
+				return GetRectangle(RectCoord);
+			else
+			{
+				RectangleF box = GetRectangle(BoxRect);
+				RectangleF text = GetRectangle(RectCoord);
+				float size = (float)Math.Round(BoxSize / 2.0d, 0, MidpointRounding.ToEven);
+				text.X = text.X + box.X + size;
+				text.Y = text.Y + box.Y + size;
+				text.Width = text.Width + box.Width - size * 2.0f;
+				text.Height = text.Height + box.Height - size * 2.0f;
+
+				return text;
+			}
 		}
 
 		public static RectangleF GetRectangle(string rect)

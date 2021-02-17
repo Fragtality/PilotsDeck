@@ -1,6 +1,6 @@
 ﻿// Implement settingsModel for the Action
 var settingsModel = {
-	DefaultImage: "Images/category/SwitchDefault.png",
+	DefaultImage: "Images/SwitchDefault.png",
 	ErrorImage: "Images/Error.png",
 	Address: "",
     HasIndication: false,
