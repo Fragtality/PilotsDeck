@@ -292,6 +292,7 @@
     <Compile Include="Actions\ActionDisplayText.cs" />
     <Compile Include="Actions\ActionDisplaySwitch.cs" />
     <Compile Include="Actions\ActionDisplayGauge.cs" />
+    <Compile Include="Actions\ActionProfileSwitcher.cs" />
     <Compile Include="Actions\ActionSwitchDisplay.cs" />
     <Compile Include="Actions\ActionSwitch.cs" />
     <Compile Include="AppSettings.cs" />
@@ -318,6 +319,7 @@
     <Compile Include="Models\ModelDisplayRadio.cs" />
     <Compile Include="Models\ModelDisplaySwitch.cs" />
     <Compile Include="Models\ModelDisplayGauge.cs" />
+    <Compile Include="Models\ModelProfileSwitcher.cs" />
     <Compile Include="Models\ModelSwitch.cs" />
     <Compile Include="Models\ModelSwitchDisplay.cs" />
     <Compile Include="Plugin.cs" />
@@ -343,6 +345,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="PilotsDeck - Alpha.streamDeckProfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PilotsDeck - X-Ray.streamDeckProfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PilotsDeck - Yankee.streamDeckProfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PilotsDeck - Zulu.streamDeckProfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="RegisterPluginAndStartStreamDeck.ps1" />
   </ItemGroup>
   <ItemGroup>
@@ -378,6 +392,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\category\PluginIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\category\StreamDeck_BtnOff.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\category\StreamDeck_BtnOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\SwitchDefault.png">
@@ -431,6 +451,9 @@
     <Content Include="PI\js\pi_Common.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PI\js\pi_ProfileSwitcher.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PI\js\pi_DisplayGaugeDual.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -444,6 +467,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\js\pi_SwitchDisplay.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PI\pi_ProfileSwitcher.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\pi_DisplayGaugeDual.html">
@@ -481,7 +507,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Profiles\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)RegisterPluginAndStartStreamDeck.ps1" $(ConfigurationName)</PostBuildEvent>

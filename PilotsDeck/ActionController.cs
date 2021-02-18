@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using StreamDeckLib;
@@ -29,7 +30,12 @@ namespace PilotsDeck
         private Stopwatch stopWatch = new Stopwatch();
         private double averageTime = 0;
         private bool redrawAlways = AppSettings.redrawAlways;
-       
+
+        public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
+        private IPCValueOffset loadedFSProfile;
+        private string lastFSProfile = null;
+        private IPCValueOffset loadedAircraft;
+        private string lastAircraft = "none";
 
         public ActionController()
         {
@@ -41,7 +47,11 @@ namespace PilotsDeck
         public void Init()
         {
             if (currentActions != null && ipcManager != null && imgManager != null)
+            {
+                loadedFSProfile = ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead) as IPCValueOffset;
+                loadedAircraft = ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead) as IPCValueOffset;
                 Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
+            }
 
             AppSettings.SetLocale();
             Log.Logger.Information($"Locale is set to \"{AppSettings.locale}\" - FontStyles: {AppSettings.fontDefault} / {AppSettings.fontBold} / {AppSettings.fontItalic}");
@@ -68,11 +78,54 @@ namespace PilotsDeck
             }
         }
 
+        public void OnGlobalEvent(StreamDeckEventPayload args)
+        {
+            switch (args.Event)
+            {
+                case "applicationDidLaunch":
+                    OnApplicationDidLaunch(args);
+                    break;
+                case "applicationDidTerminate":
+                    OnApplicationDidTerminate(args);
+                    break;
+                case "didReceiveGlobalSettings":
+                    OnDidReceiveGlobalSettings(args);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        protected void OnDidReceiveGlobalSettings(StreamDeckEventPayload args)
+        {
+            StreamDeckEventPayload.SetModelProperties(args, GlobalProfileSettings);
+            Log.Logger.Information($"ActionController:OnDidReceiveGlobalSettings - Switching => {GlobalProfileSettings.EnableSwitching} | X => {GlobalProfileSettings.ProfileX_Name} | Y => {GlobalProfileSettings.ProfileY_Name} | Z => {GlobalProfileSettings.ProfileZ_Name}");
+        }
+
+        protected void OnApplicationDidLaunch(StreamDeckEventPayload args)
+        {
+            Log.Logger.Verbose($"ActionController:OnApplicationDidLaunchAsync {args.payload.application}");
+
+            if (args.payload.application == Application)
+                IsApplicationOpen = true;
+        }
+
+        protected void OnApplicationDidTerminate(StreamDeckEventPayload args)
+        {
+            Log.Logger.Verbose($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
+
+            if (args.payload.application == Application)
+                IsApplicationOpen = false;
+        }
+
         public void Run(CancellationToken token)
         {
             stopWatch.Restart();
-
             tickCounter++;
+
+            if (tickCounter == 1)
+                _ = DeckManager.GetGlobalSettingsAsync(DeckManager.PluginUUID);
+
             if (tickCounter < waitTicks / 7.5) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 5 Ticks => 5 * <200> = 1s )
                 return;
 
@@ -140,6 +193,9 @@ namespace PilotsDeck
                 RedrawAll(token);
             }
 
+            if (GlobalProfileSettings.EnableSwitching && IsApplicationOpen && ipcManager.IsReady && !string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
+                SwitchProfiles();
+
             stopWatch.Stop();
             averageTime += stopWatch.Elapsed.TotalMilliseconds;
             if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
@@ -147,6 +203,39 @@ namespace PilotsDeck
                 Log.Logger.Verbose($"ActionController: Refresh Tick #{tickCounter}, average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms");
                 averageTime = 0;
             }
+        }
+
+        protected void SwitchProfiles()
+        {
+            string switchTo = "";
+            
+            if (string.IsNullOrEmpty(loadedFSProfile.Value) && GlobalProfileSettings.UseAlphaDefault)
+                switchTo = @"PilotsDeck - Alpha";
+            else if (ModelProfileSwitcher.IsInProfile(GlobalProfileSettings.ProfileX_Name, loadedFSProfile.Value))
+                switchTo = @"PilotsDeck - X-Ray";
+            else if (ModelProfileSwitcher.IsInProfile(GlobalProfileSettings.ProfileY_Name, loadedFSProfile.Value))
+                switchTo = @"PilotsDeck - Yankee";
+            else if (ModelProfileSwitcher.IsInProfile(GlobalProfileSettings.ProfileZ_Name, loadedFSProfile.Value))
+                switchTo = @"PilotsDeck - Zulu";
+
+            if (switchTo != "")
+            {
+                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, switchTo);
+                Log.Logger.Information($"ActionController: FSUIPC Profile [{lastFSProfile}] active -> switching to [{switchTo}]");
+            }
+            
+            lastFSProfile = loadedFSProfile.Value;
+            lastAircraft = loadedAircraft.Value;
+        }
+
+        public void LoadProfiles()
+        {
+            if (!GlobalProfileSettings.ProfilesInstalled)
+            {
+                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, @"PilotsDeck - Alpha");
+            }
+            GlobalProfileSettings.ProfilesInstalled = true;
+            DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
         }
 
         protected void RefreshActions(CancellationToken token, bool forceUpdate = false)

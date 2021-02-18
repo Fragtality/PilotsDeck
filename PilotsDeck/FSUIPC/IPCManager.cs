@@ -27,7 +27,7 @@ namespace PilotsDeck
         {
             get
             {
-                return inMenuValue.Value == "0" && isPausedValue.Value == "0"; 
+                return inMenuValue.Value == "0" && isPausedValue.Value == "0" && IsConnected; 
             }
         }
 

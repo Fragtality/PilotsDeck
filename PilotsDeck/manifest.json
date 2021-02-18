@@ -104,6 +104,21 @@
       "PropertyInspectorPath": "PI/pi_DisplayGaugeDual.html",
       "Tooltip": "A graphical representation of two Values",
       "UUID": "com.extension.pilotsdeck.action.display.gauge.dual"
+    },
+    {
+      "Icon": "Images/category/category",
+      "Name": "Profile Switcher",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_ProfileSwitcher.html",
+      "Tooltip": "Allows to switch between StreamDeck Profiles based on the loaded FSUIPC Profile",
+      "UUID": "com.extension.pilotsdeck.action.profile.switcher"
     }
   ],
   "Category": "Pilot's Deck",
@@ -117,6 +132,32 @@
   "URL": "https://github.com/Fragtality/PilotsDeck",
   "Version": "0.4.6",
   "SDKVersion": 2,
+  "Profiles": [
+    {
+      "Name": "PilotsDeck - Alpha",
+      "DeviceType": 0,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
+      "Name": "PilotsDeck - X-Ray",
+      "DeviceType": 0,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
+      "Name": "PilotsDeck - Yankee",
+      "DeviceType": 0,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
+      "Name": "PilotsDeck - Zulu",
+      "DeviceType": 0,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    }
+  ],
   "Software": {
     "MinimumVersion": "4.1"
   },
