@@ -199,8 +199,7 @@ These are the available Settings and their Default:
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
-* **fontItalic_XX**="Italic"
-<br/>
+* **fontItalic_XX**="Italic"<br/><br/>
 ### manifest.json
 <br/><br/>
 ## License
