@@ -3,7 +3,7 @@ Directly control Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
 <br/><br/>
 ## Introduction
 As the Title suggests, this is a Plugin for Elegato's StreamDeck for the FlightSimmers out there in need of just more Buttons! :wink:<br/>
-It is build arround FSUIPC, so ifsomething in the Sim can be triggered via Macros, Scripts, Luas, Lvars or Offsets - it can also be triggered via this Plugin from your StreamDeck! It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
+It is build arround FSUIPC, so if something in the Sim can be triggered via Macros, Scripts, Luas, Lvars or Offsets - it can also be triggered via this Plugin from your StreamDeck! It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
 The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best four your Aircraft(s).<br/><br/>
 The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want (as Text or Graphical Representation).<br/>
 The Plugin can also switch between StreamDeck Profiles when the Aircraft (Model) and FSUIPC Profile change.<br/>
@@ -12,7 +12,7 @@ Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.m
 ## Plugin Requirements
 Uhm ... I'd say Prepar3D, FSUIPC and StreamDeck (Software) installed would be a bloody good Start :laughing:<br/>
 It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff!<br/>
-The Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Application Settings](README.md#applicaton-settings). It may work with FSX and older Versions of P3D and FSUIPC.<br/>
+The Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Plugin Settings](README.md#plugin-settings). It may work with FSX and older Versions of P3D and FSUIPC.<br/>
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
@@ -87,7 +87,7 @@ All Images are stored in the \Images Subdirectory. You can change and remove the
 #### Font Settings
 For Actions which show Text, the used Font can be customized.<br/>
 The default Behavior is to Inherit the Font Style from the Buttons Title Settings. Whatever you set there in Font, Size, Style is applied to the Text of that Button (all but Alignment and Show/Hide).<br/>
-*BUT, there is a caveat in the StreamDeck API.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text. I have put in the Strings for German and English. You can alter the [Application Settings](README.md#applicaton-settings) to customize them or add your language. If you let me know which Strings are working for which Language, I can add that to the Plugin.<br/>
+*BUT, there is a caveat in the StreamDeck API.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text. I have put in the Strings for German and English. You can alter the [Plugin Settings](README.md#plugin-settings) to customize them or add your language. If you let me know which Strings are working for which Language, I can add that to the Plugin.<br/>
 If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect on the custom Font Settings.
 <br/><br/>
 ### Display Value
@@ -184,9 +184,14 @@ Within the Plugin I then use
 - "66C0:4:s" to read the Position/State of the Left Landing Light in a "Dynamic Button" and display the appropiate Images for the three States On, Off and Retracted (via Special State). One Button which sends "Up" for both Landing Lights, one to send "Down" for both Landing Lights via FSControls.
 - "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle the Packs via two Macro Calls.
 <br/><br/>
-## Applicaton Settings
-You can configure some of the Plugin's behavior via the Configuration File. The File is found in the Plugin's Directory and is called "*PilotsDeck.exe.config". These are the available Settings and their Default:
-* **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection.
+## Plugin Settings
+There are two Files where Settings can be altered (both can be found in the Plugins' directory):<br/>
+The first is the [PilotsDeck.exe.config](#PilotsDeck.exe.config) File which is the "main" Configuration File for the General Application/Plugin Settings.<br/>
+The second is the [manifest.json](#manifest.json) which is specific for StreamDeck (it defines it as Plugin so to speak). This only needs to be touched for a different Application to monitor and to customize (or add) StreamDeck Profiles to switch to.<br/>
+Generally take care when editing them, the XML/JSON Syntax must be the correct for the Application/Plugin to start at all. Backups FTW! :laugh:<br/>
+### PilotsDeck.exe.config
+These are the available Settings and their Default:
+* **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection. Must also be changed in the Manifest!
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
@@ -195,6 +200,8 @@ For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "X
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
 * **fontItalic_XX**="Italic"
+<br/>
+### manifest.json
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
