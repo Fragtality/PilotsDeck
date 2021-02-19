@@ -3,9 +3,9 @@ Directly control Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
 <br/><br/>
 ## Introduction
 As the Title suggests, this is a Plugin for Elegato's StreamDeck for the FlightSimmers out there in need of just more Buttons! :wink:<br/>
-It is build arround FSUIPC - so nearly everything which can be done with FSUIPC, can also be done via this Plugin. It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
+It is build arround FSUIPC, so ifsomething in the Sim can be triggered via Macros, Scripts, Luas, Lvars or Offsets - it can also be triggered via this Plugin from your StreamDeck! It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
 The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best four your Aircraft(s).<br/><br/>
-The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want.<br/>
+The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want (as Text or Graphical Representation).<br/>
 The Plugin can also switch between StreamDeck Profiles when the Aircraft (Model) and FSUIPC Profile change.<br/>
 Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).
 <br/><br/>
