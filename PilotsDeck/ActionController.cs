@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq;
+using System.IO;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using StreamDeckLib;
@@ -32,6 +33,7 @@ namespace PilotsDeck
         private bool redrawAlways = AppSettings.redrawAlways;
 
         public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
+        private List<string> manifestProfiles;
         private IPCValueOffset loadedFSProfile;
         private string lastFSProfile = null;
         private IPCValueOffset loadedAircraft;
@@ -41,17 +43,30 @@ namespace PilotsDeck
         {
             currentActions = new Dictionary<string, IHandler>();
             ipcManager = new IPCManager(AppSettings.groupStringRead);
-            imgManager = new ImageManager();           
+            imgManager = new ImageManager();
+            manifestProfiles = new List<string>();
         }
 
         public void Init()
         {
-            if (currentActions != null && ipcManager != null && imgManager != null)
+            if (currentActions != null && ipcManager != null && imgManager != null && manifestProfiles != null)
             {
                 loadedFSProfile = ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead) as IPCValueOffset;
                 loadedAircraft = ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead) as IPCValueOffset;
                 Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
             }
+
+            dynamic manifest = JObject.Parse(File.ReadAllText(@"manifest.json"));
+            if (manifest?.Profiles != null)
+            {
+                foreach (var profile in manifest.Profiles)
+                {
+                    string name = profile?.Name;
+                    if (!string.IsNullOrEmpty(name))
+                        manifestProfiles.Add(name);
+                }
+            }
+            Log.Logger.Information($"Loaded {manifestProfiles.Count} StreamDeck Profiles from Manifest.");
 
             AppSettings.SetLocale();
             Log.Logger.Information($"Locale is set to \"{AppSettings.locale}\" - FontStyles: {AppSettings.fontDefault} / {AppSettings.fontBold} / {AppSettings.fontItalic}");
@@ -99,7 +114,15 @@ namespace PilotsDeck
         protected void OnDidReceiveGlobalSettings(StreamDeckEventPayload args)
         {
             StreamDeckEventPayload.SetModelProperties(args, GlobalProfileSettings);
-            Log.Logger.Information($"ActionController:OnDidReceiveGlobalSettings - Switching => {GlobalProfileSettings.EnableSwitching} | X => {GlobalProfileSettings.ProfileX_Name} | Y => {GlobalProfileSettings.ProfileY_Name} | Z => {GlobalProfileSettings.ProfileZ_Name}");
+            GlobalProfileSettings.UpdateSettings(manifestProfiles);
+            DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
+
+            //For Test/Debugging - clear GlobalSettings
+            //GlobalProfileSettings = new ModelProfileSwitcher();
+            //GlobalProfileSettings.ExportToJson();
+            //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
+
+            Log.Logger.Information($"ActionController:OnDidReceiveGlobalSettings - Switching => {GlobalProfileSettings.EnableSwitching} | Default: {GlobalProfileSettings.UseDefault} | Profiles => {GlobalProfileSettings?.ProfileMappings?.Count}");
         }
 
         protected void OnApplicationDidLaunch(StreamDeckEventPayload args)
@@ -208,20 +231,28 @@ namespace PilotsDeck
         protected void SwitchProfiles()
         {
             string switchTo = "";
-            
-            if (string.IsNullOrEmpty(loadedFSProfile.Value) && GlobalProfileSettings.UseAlphaDefault)
-                switchTo = @"PilotsDeck - Alpha";
-            else if (ModelProfileSwitcher.IsInProfile(GlobalProfileSettings.ProfileX_Name, loadedFSProfile.Value))
-                switchTo = @"PilotsDeck - X-Ray";
-            else if (ModelProfileSwitcher.IsInProfile(GlobalProfileSettings.ProfileY_Name, loadedFSProfile.Value))
-                switchTo = @"PilotsDeck - Yankee";
-            else if (ModelProfileSwitcher.IsInProfile(GlobalProfileSettings.ProfileZ_Name, loadedFSProfile.Value))
-                switchTo = @"PilotsDeck - Zulu";
+
+            if (string.IsNullOrEmpty(loadedFSProfile.Value) && GlobalProfileSettings.UseDefault && !string.IsNullOrEmpty(GlobalProfileSettings.DefaultProfile))
+                switchTo = GlobalProfileSettings.DefaultProfile;
+            else if (GlobalProfileSettings?.ProfileMappings != null)
+            {
+                foreach (var profile in GlobalProfileSettings.ProfileMappings)
+                {
+                    if (ModelProfileSwitcher.IsInProfile(profile.Mappings, loadedFSProfile.Value))
+                    {
+                        switchTo = profile.Name;
+                        break;
+                    }    
+                }
+
+                if (switchTo == "" && GlobalProfileSettings.UseDefault && !string.IsNullOrEmpty(GlobalProfileSettings.DefaultProfile))
+                    switchTo = GlobalProfileSettings.DefaultProfile;
+            }
 
             if (switchTo != "")
             {
                 _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, switchTo);
-                Log.Logger.Information($"ActionController: FSUIPC Profile [{lastFSProfile}] active -> switching to [{switchTo}]");
+                Log.Logger.Information($"ActionController: FSUIPC Profile [{loadedFSProfile.Value}] active for Aircraft [{loadedAircraft.Value}]-> switching to [{switchTo}]");
             }
             
             lastFSProfile = loadedFSProfile.Value;
@@ -232,7 +263,7 @@ namespace PilotsDeck
         {
             if (!GlobalProfileSettings.ProfilesInstalled)
             {
-                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, @"PilotsDeck - Alpha");
+                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, @"Default");
             }
             GlobalProfileSettings.ProfilesInstalled = true;
             DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);

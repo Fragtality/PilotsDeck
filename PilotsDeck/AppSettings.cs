@@ -8,6 +8,7 @@ namespace PilotsDeck
     {
         public static readonly string groupStringRead = "PilotsdeckRead";
         public static readonly string groupStringWrite = "PilotsdeckWrite";
+        public static readonly string deckDefaultProfile = "Profiles/PilotsDeck - Default";
 
         public static readonly string applicationName = Convert.ToString(ConfigurationManager.AppSettings["applicationName"]);
         public static readonly string waitImage = @"Images/Wait.png";

@@ -345,16 +345,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="PilotsDeck - Alpha.streamDeckProfile">
+    <None Include="Profiles\PilotsDeck - Default.streamDeckProfile">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="PilotsDeck - X-Ray.streamDeckProfile">
+    <None Include="Profiles\PilotsDeck - X-Ray.streamDeckProfile">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="PilotsDeck - Yankee.streamDeckProfile">
+    <None Include="Profiles\PilotsDeck - Yankee.streamDeckProfile">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="PilotsDeck - Zulu.streamDeckProfile">
+    <None Include="Profiles\PilotsDeck - Zulu.streamDeckProfile">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="RegisterPluginAndStartStreamDeck.ps1" />
@@ -507,9 +507,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Profiles\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)RegisterPluginAndStartStreamDeck.ps1" $(ConfigurationName)</PostBuildEvent>

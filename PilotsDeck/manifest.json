@@ -130,29 +130,29 @@
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://github.com/Fragtality/PilotsDeck",
-  "Version": "0.4.6",
+  "Version": "0.4.7",
   "SDKVersion": 2,
   "Profiles": [
     {
-      "Name": "PilotsDeck - Alpha",
+      "Name": "Profiles/PilotsDeck - Default",
       "DeviceType": 0,
       "ReadOnly": false,
       "DontAutoSwitchWhenInstalled": true
     },
     {
-      "Name": "PilotsDeck - X-Ray",
+      "Name": "Profiles/PilotsDeck - X-Ray",
       "DeviceType": 0,
       "ReadOnly": false,
       "DontAutoSwitchWhenInstalled": true
     },
     {
-      "Name": "PilotsDeck - Yankee",
+      "Name": "Profiles/PilotsDeck - Yankee",
       "DeviceType": 0,
       "ReadOnly": false,
       "DontAutoSwitchWhenInstalled": true
     },
     {
-      "Name": "PilotsDeck - Zulu",
+      "Name": "Profiles/PilotsDeck - Zulu",
       "DeviceType": 0,
       "ReadOnly": false,
       "DontAutoSwitchWhenInstalled": true

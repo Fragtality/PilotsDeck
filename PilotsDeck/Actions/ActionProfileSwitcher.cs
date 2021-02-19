@@ -1,6 +1,7 @@
 ﻿using StreamDeckLib;
 using StreamDeckLib.Messages;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Serilog;
 
 namespace PilotsDeck
@@ -13,6 +14,9 @@ namespace PilotsDeck
             await base.OnWillAppear(args);
 
             SetActionImage(args.context, SettingsModel.EnableSwitching);
+            SettingsModel.ProfileMappings = new List<ModelProfileSwitcher.Profile>();
+            SettingsModel.MappingsJson = "";
+            await Manager.SetSettingsAsync(args.context, SettingsModel);
 
             Log.Logger.Verbose($"ActionProfileSwitcher:OnWillAppear {args.context}");
         }
@@ -46,6 +50,7 @@ namespace PilotsDeck
             Plugin.ActionController.LoadProfiles();
 
             Log.Logger.Verbose($"ActionProfileSwitcher:OnPropertyInspectorDidAppear {args.context}");
+            Plugin.ActionController.GlobalProfileSettings.ExportToJson();
             Manager.SetSettingsAsync(args.context, Plugin.ActionController.GlobalProfileSettings);
 
             return Task.CompletedTask;
