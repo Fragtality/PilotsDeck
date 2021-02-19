@@ -195,7 +195,7 @@ Within the Plugin I then use
 There are two Files where Settings can be altered (both can be found in the Plugin's directory):<br/>
 The first is the [PilotsDeck.exe.config](README.md#pilotsdeckexeconfig) File which is the "main" Configuration File for the General Application/Plugin Settings.<br/>
 The second is the [manifest.json](README.md#manifestjson) which is specific for StreamDeck (it defines it as Plugin so to speak). This only needs to be touched for a different Application to monitor and to customize (or add) StreamDeck Profiles to switch to.<br/>
-Generally take care when editing them, the XML/JSON Syntax must be the correct for the Application/Plugin to start at all. Backups FTW! :laugh:<br/>
+Generally take care when editing them, the XML/JSON Syntax must be the correct for the Application/Plugin to start at all. Backups FTW! :laughing:<br/>
 ### PilotsDeck.exe.config
 These are the available Settings and their Default:
 * **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection. Must also be changed in the [Manifest](README.md#manifestjson)!
