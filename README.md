@@ -1,5 +1,6 @@
 # Pilot's Deck
 Directly control Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
+![Example01](img/Example01.png)
 <br/><br/>
 ## Introduction
 As the Title suggests, this is a Plugin for Elegato's StreamDeck for the FlightSimmers out there in need of just more Buttons! :wink:<br/>
