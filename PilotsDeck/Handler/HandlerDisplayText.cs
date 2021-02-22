@@ -21,7 +21,7 @@ namespace PilotsDeck
         public HandlerDisplayText(string context, ModelDisplayText settings) : base(context, settings)
         {
             Settings = settings;
-            DrawBox = Settings.DrawBox;
+            DrawBox = settings.DrawBox;
         }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)

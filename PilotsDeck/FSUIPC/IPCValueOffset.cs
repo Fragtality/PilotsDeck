@@ -88,6 +88,12 @@ namespace PilotsDeck
             }
         }
 
+        public override void Connect()
+        {
+            if (!offset.IsConnected)
+                offset.Reconnect();
+        }
+
         public override bool IsChanged
         {
             get

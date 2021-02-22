@@ -1,5 +1,4 @@
-﻿using System;
-using FSUIPC;
+﻿using FSUIPC;
 using Serilog;
 
 namespace PilotsDeck

@@ -14,7 +14,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.RegisterAction(args.context, new HandlerDisplayText(args.context, SettingsModel));
 
-            Log.Logger.Verbose($"ActionDisplayText:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Debug($"ActionDisplayText:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
     }
 }

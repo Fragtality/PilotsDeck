@@ -22,20 +22,6 @@
             <input id="OffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
         </div>
 
-        <div class="sdpi-heading">Background</div>
-        <div class="sdpi-item" id="Config_DefaultImage">
-            <div class="sdpi-item-label">Normal</div>
-            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-        <div class="sdpi-item" id="Config_IndicationImage">
-            <div class="sdpi-item-label" id="lblIndicationImage">Swap</div>
-            <select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-        <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error</div>
-            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-
         <div class="sdpi-heading">Freq. Values</div>
         <div class="sdpi-item" id="Config_AddressRadioActiv">
             <div class="sdpi-item-label">Addr. Active</div>
@@ -100,6 +86,20 @@
         <div class="sdpi-item" id="Config_FontColorStby">
             <div class="sdpi-item-label" id="lblFontColorStby">Color Standby</div>
             <input id="FontColorStby" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
+        </div>
+
+        <div class="sdpi-heading">Background</div>
+        <div class="sdpi-item" id="Config_DefaultImage">
+            <div class="sdpi-item-label">Normal</div>
+            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_IndicationImage">
+            <div class="sdpi-item-label" id="lblIndicationImage">Swap</div>
+            <select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_ErrorImage">
+            <div class="sdpi-item-label">Error</div>
+            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
 
         <div class="sdpi-heading">Tweak Position</div>

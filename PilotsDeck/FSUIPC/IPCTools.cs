@@ -8,7 +8,7 @@ namespace PilotsDeck
     {
         static string validName = @"[a-zA-Z0-9\x2D\x5F]+";
         public static Regex rxMacro = new Regex($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
-        public static Regex rxScript= new Regex($"^(Lua:){{1}}{validName}$", RegexOptions.Compiled);
+        public static Regex rxScript= new Regex($"^(Lua(Set|Clear|Toggle)?:){{1}}{validName}(:[0-9]+)?$", RegexOptions.Compiled);
         public static Regex rxControl = new Regex(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         //public static Regex rxLvar = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}(:(L:){{0,1}}{validName})*$", RegexOptions.Compiled);
         public static Regex rxLvarRead = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);

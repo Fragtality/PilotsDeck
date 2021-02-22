@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using FSUIPC;
 using Serilog;
@@ -9,6 +10,7 @@ namespace PilotsDeck
     {
         private Dictionary<string, IPCValue> currentValues = new Dictionary<string, IPCValue>();
         private Dictionary<string, int> currentRegistrations = new Dictionary<string, int>();
+        private List<string> persistentValues = new List<string>();
         private static readonly string inMenuAddr = "3365:1";
         private static readonly string isPausedAddr = "0262:2";
 
@@ -46,11 +48,9 @@ namespace PilotsDeck
 
         public IPCManager(string group)
         {
-            inMenuValue = new IPCValueOffset(inMenuAddr, group);
-            currentValues.Add(inMenuAddr, inMenuValue);
+            inMenuValue = RegisterAddress(inMenuAddr, group, true) as IPCValueOffset;
 
-            isPausedValue = new IPCValueOffset(isPausedAddr, group);
-            currentValues.Add(isPausedAddr, isPausedValue);
+            isPausedValue = RegisterAddress(isPausedAddr, group, true) as IPCValueOffset;
         }       
 
         public bool Connect()
@@ -81,12 +81,21 @@ namespace PilotsDeck
         {
             try
             {
-                foreach (var value in currentValues.Values)
-                    value.Dispose();
-                currentValues.Clear();
-                currentRegistrations.Clear();
+                var delAddresses = currentValues.Keys.Where(adr => !persistentValues.Contains(adr)).ToList();
+                foreach (var address in delAddresses)
+                {
+                    currentValues.Remove(address);
+                    currentRegistrations.Remove(address);
+                }
+            }
+            catch
+            {
+                Log.Logger.Error("IPCManager: Exception while removing Registrations!");
+            }
 
-                FSUIPCConnection.Close();
+            try
+            {
+                    FSUIPCConnection.Close();
 
                 if (!FSUIPCConnection.IsOpen)
                 {
@@ -101,7 +110,7 @@ namespace PilotsDeck
             return !IsConnected;
         }
 
-        public IPCValue RegisterAddress(string address, string group)
+        public IPCValue RegisterAddress(string address, string group, bool persistent = false)
         {
             IPCValue value = null;
             try
@@ -116,6 +125,7 @@ namespace PilotsDeck
                 {
                     value = currentValues[address];
                     currentRegistrations[address]++;
+                    Log.Logger.Debug($"RegisterValue: Added Registration for Address {address}, Registrations: {currentRegistrations[address]}");
                 }
                 else
                 {
@@ -126,6 +136,10 @@ namespace PilotsDeck
 
                     currentValues.Add(address, value);
                     currentRegistrations.Add(address, 1);
+                    if (persistent)
+                        persistentValues.Add(address);
+
+                    Log.Logger.Debug($"RegisterValue: Added Address {address}, Persistent: {persistent}");
                 }                
             }
             catch
@@ -145,12 +159,19 @@ namespace PilotsDeck
             { 
                 if (!string.IsNullOrEmpty(address) && currentValues.ContainsKey(address))
                 {
-                    if (currentRegistrations[address]-- == 0)
+                    if (currentRegistrations[address] == 1)
                     {
                         currentRegistrations.Remove(address);
 
                         currentValues[address].Dispose();
                         currentValues.Remove(address);
+
+                        Log.Logger.Debug($"DeregisterValue: Removed Address {address}");
+                    }
+                    else
+                    {
+                        currentRegistrations[address]--;
+                        Log.Logger.Debug($"DeregisterValue: Deregistered Address {address}, Registrations open: {currentRegistrations[address]}");
                     }
                 }
                 else
@@ -166,6 +187,9 @@ namespace PilotsDeck
         {
             try
             {
+                foreach (var address in persistentValues)
+                    currentValues[address].Connect();
+
                 FSUIPCConnection.Process(group); //should update all offsets in currentOffsets (type OFFSETx and SCRIPT)
                 if (!IsReady)
                     return false;
@@ -236,7 +260,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public bool RunScriptMacro(string name)
+        public bool RunMacro(string name)
         {
             try
             {
@@ -248,7 +272,41 @@ namespace PilotsDeck
             }
             catch
             {
-                Log.Logger.Error($"IPCManager: Exception while Executing Macro/Script: {name}");
+                Log.Logger.Error($"IPCManager: Exception while Executing Macro: {name}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool RunScript(string name)
+        {
+            try
+            {
+                string[] parts = name.Split(':');
+                Offset param = null;
+                if (parts.Length > 2 && int.TryParse(parts[2], out int result))
+                {
+                    param = new Offset(0x0D6C, 4);
+                    param.SetValue(result);
+                    FSUIPCConnection.Process();
+                }
+
+                Offset request = new Offset(0x0D70, 128);
+                request.SetValue(parts[0] + ":" + parts[1]);
+
+                FSUIPCConnection.Process();
+                request.Disconnect();
+                request = null;
+                if (parts.Length > 2)
+                {
+                    param.Disconnect();
+                    param = null;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
                 return false;
             }
 

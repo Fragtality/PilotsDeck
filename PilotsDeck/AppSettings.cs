@@ -15,6 +15,8 @@ namespace PilotsDeck
 
         public static readonly int pollInterval = Convert.ToInt32(ConfigurationManager.AppSettings["pollInterval"]);
         public static readonly int waitTicks = Convert.ToInt32(ConfigurationManager.AppSettings["waitTicks"]);
+        public static readonly int longPressTicks = Convert.ToInt32(ConfigurationManager.AppSettings["longPressTicks"]);
+        public static readonly int appStartDelay = Convert.ToInt32(ConfigurationManager.AppSettings["appStartDelay"]);
 
         public static readonly string stringReplace = Convert.ToString(ConfigurationManager.AppSettings["stringReplace"]);
 

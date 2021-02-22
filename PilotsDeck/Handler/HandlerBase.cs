@@ -108,7 +108,7 @@
 
         protected virtual void Redraw(ImageManager imgManager)
         {
-            if (!IsInitialized && DrawImage != DefaultImage)
+            if (!IsInitialized && DrawImage != DefaultImage || ForceUpdate)
             {
                 DrawImage = DefaultImage;
                 IsRawImage = false;

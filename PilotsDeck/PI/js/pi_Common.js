@@ -95,7 +95,7 @@ function setPattern(field, type) {
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
 	else if (type == 1) //script
-		document.getElementById(field).pattern = `^Lua:${regName}$`;
+		document.getElementById(field).pattern = `^Lua(Set|Clear|Toggle)?:${regName}(:[0-9]+)?$`;
 	else if (type == 2) //control
 		document.getElementById(field).pattern = "^[0-9]+(:[0-9]+)*$";
 	else if (type == 3)  //lvar
@@ -106,6 +106,34 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = `${regOffset}|${regLvar}`;
 	else
 		document.getElementById(field).pattern = "";
+}
+
+function toggleOnOffState(actionType, onField, offField) {
+	//On/Off States
+	if (actionType == 0) { //macro
+		toggleConfigItem(false, onField);
+		toggleConfigItem(false, offField);
+	}
+	else if (actionType == 1) { //script
+		toggleConfigItem(false, onField);
+		toggleConfigItem(false, offField);
+	}
+	else if (actionType == 2) { //control
+		toggleConfigItem(false, onField);
+		toggleConfigItem(false, offField);
+	}
+	else if (actionType == 3) { //lvar
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
+	else if (actionType == 4) { //offset
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
+	else {
+		toggleConfigItem(false, onField);
+		toggleConfigItem(false, offField);
+	}
 }
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {

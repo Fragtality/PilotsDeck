@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Serilog;
 
 namespace PilotsDeck
 {
@@ -64,7 +64,7 @@ namespace PilotsDeck
         {
             ipcManager.DeregisterValue(Address);
             if (Address != LastAddress)
-                throw new Exception($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Address} != {LastAddress} ] ");
+                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Address} != {LastAddress} ] ");
         }
 
         protected override bool InitializationTest()
@@ -72,10 +72,11 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
-        public override bool Action(IPCManager ipcManager)
+        public override bool Action(IPCManager ipcManager, bool longPress)
         {
             LastSwitchState = CurrentValue;
-            return base.Action(ipcManager);
+            LastSwitchStateLong = CurrentValue;
+            return base.Action(ipcManager, longPress);
         }
 
         protected override void Redraw(ImageManager imgManager)

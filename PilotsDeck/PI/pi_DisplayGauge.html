@@ -8,16 +8,6 @@
 </head>
 <body>
     <div class="sdpi-wrapper">
-        <div class="sdpi-heading">Background</div>
-        <div class="sdpi-item" id="Config_DefaultImage">
-            <div class="sdpi-item-label">Normal</div>
-            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-        <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error</div>
-            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-
         <div class="sdpi-heading">Read Value</div>
         <div class="sdpi-item" id="Config_Address">
             <div class="sdpi-item-label">Address</div>
@@ -174,6 +164,15 @@
             <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
 
+        <div class="sdpi-heading">Background</div>
+        <div class="sdpi-item" id="Config_DefaultImage">
+            <div class="sdpi-item-label">Normal</div>
+            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_ErrorImage">
+            <div class="sdpi-item-label">Error</div>
+            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
     </div>
     <script src="js/pi_Common.js"></script>
     <script src="js/pi_DisplayGauge.js"></script>

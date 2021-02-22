@@ -7,6 +7,11 @@ var settingsModel = {
 	ActionType: 0,
 	OnState: "",
 	OffState: "",
+	HasLongPress: false,
+	AddressActionLong: "",
+	ActionTypeLong: 0,
+	OnStateLong: "",
+	OffStateLong: "",
 	DecodeBCD: false,
 	Scalar: 1,
 	Format: "",
@@ -43,6 +48,7 @@ function fillSelectBoxes() {
 	}
 	if (ActionTypes && ActionTypes != "") {
 		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
+		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
 	}
 }
 
@@ -51,32 +57,18 @@ function updateForm() {
 	//PATTERN
 	setPattern('Address', 5);
 	setPattern('AddressAction', settingsModel.ActionType);
+	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
 	//On/Off States
-	if (settingsModel.ActionType == 0) { //macro
-		toggleConfigItem(false, 'OnState');
-		toggleConfigItem(false, 'OffState');
-	}
-	else if (settingsModel.ActionType == 1) { //script
-		toggleConfigItem(false, 'OnState');
-		toggleConfigItem(false, 'OffState');
-	}
-	else if (settingsModel.ActionType == 2) { //control
-		toggleConfigItem(false, 'OnState');
-		toggleConfigItem(false, 'OffState');
-	}
-	else if (settingsModel.ActionType == 3) { //lvar
-		toggleConfigItem(true, 'OnState');
-		toggleConfigItem(true, 'OffState');
-	}
-	else if (settingsModel.ActionType == 4) { //offset
-		toggleConfigItem(true, 'OnState');
-		toggleConfigItem(true, 'OffState');
-	}
-	else {
-		toggleConfigItem(false, 'OnState');
-		toggleConfigItem(false, 'OffState');
-	}
+	toggleOnOffState(settingsModel.ActionType, 'OnState', 'OffState');
+	if (settingsModel.HasLongPress)
+		toggleOnOffState(settingsModel.ActionTypeLong, 'OnStateLong', 'OffStateLong');
+	else
+		toggleOnOffState(-1, 'OnStateLong', 'OffStateLong');
+
+	//LongPress
+	toggleConfigItem(settingsModel.HasLongPress, 'ActionTypeLong');
+	toggleConfigItem(settingsModel.HasLongPress, 'AddressActionLong');
 
 	//BOX
 	toggleConfigItem(settingsModel.DrawBox, 'BoxSize');

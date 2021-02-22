@@ -14,7 +14,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.RegisterAction(args.context, new HandlerSwitch(args.context, SettingsModel));
 
-            Log.Logger.Verbose($"ActionSwitch:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Debug($"ActionSwitch:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
     }
 }

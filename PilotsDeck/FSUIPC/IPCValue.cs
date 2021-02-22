@@ -19,6 +19,11 @@ namespace PilotsDeck
 
         }
 
+        public virtual void Connect()
+        {
+
+        }
+
         public string Address { get; protected set; }
         public string Value
         {

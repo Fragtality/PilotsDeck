@@ -18,7 +18,7 @@ namespace PilotsDeck
             SettingsModel.MappingsJson = "";
             await Manager.SetSettingsAsync(args.context, SettingsModel);
 
-            Log.Logger.Verbose($"ActionProfileSwitcher:OnWillAppear {args.context}");
+            Log.Logger.Debug($"ActionProfileSwitcher:OnWillAppear {args.context}");
         }
 
         private void SetActionImage(string context, bool switchState)
@@ -38,7 +38,7 @@ namespace PilotsDeck
             Manager.SetGlobalSettingsAsync(Manager.PluginUUID, SettingsModel);
             Manager.GetGlobalSettingsAsync(Manager.PluginUUID);
 
-            Log.Logger.Verbose($"ActionProfileSwitcher:OnDidReceiveSettings {args.context}");
+            Log.Logger.Debug($"ActionProfileSwitcher:OnDidReceiveSettings {args.context}");
             return Task.CompletedTask;
         }
 
@@ -49,7 +49,7 @@ namespace PilotsDeck
             SetActionImage(args.context, Plugin.ActionController.GlobalProfileSettings.EnableSwitching);
             Plugin.ActionController.LoadProfiles();
 
-            Log.Logger.Verbose($"ActionProfileSwitcher:OnPropertyInspectorDidAppear {args.context}");
+            Log.Logger.Debug($"ActionProfileSwitcher:OnPropertyInspectorDidAppear {args.context}");
             Plugin.ActionController.GlobalProfileSettings.ExportToJson();
             Manager.SetSettingsAsync(args.context, Plugin.ActionController.GlobalProfileSettings);
 

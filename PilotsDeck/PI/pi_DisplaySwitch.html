@@ -8,17 +8,21 @@
 </head>
 <body>
     <div class="sdpi-wrapper">
-        <div class="sdpi-heading">Control Type</div>
+        <div class="sdpi-heading">Read Value</div>
+        <div class="sdpi-item" id="Config_Address">
+            <div class="sdpi-item-label">Address</div>
+            <input id="Address" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
+        </div>
+
+        <div class="sdpi-heading">Control</div>
         <div class="sdpi-item" id="Config_ActionType">
-            <div class="sdpi-item-label">Action Type</div>
+            <div class="sdpi-item-label" id="lblActionType">Action Type</div>
             <select id="ActionType" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
         <div class="sdpi-item" id="Config_AddressAction">
-            <div class="sdpi-item-label">Action Address</div>
+            <div class="sdpi-item-label" id="lblAddressAction">Action Address</div>
             <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
         </div>
-
-        <div class="sdpi-heading">Control States</div>
         <div class="sdpi-item" id="Config_OnState">
             <div class="sdpi-item-label" id="lblOnState">On Value</div>
             <input id="OnState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to send for On" />
@@ -28,37 +32,27 @@
             <input id="OffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
         </div>
 
-        <div class="sdpi-heading">Background</div>
-        <div class="sdpi-item" id="Config_DefaultImage">
-            <div class="sdpi-item-label">Normal</div>
-            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        <div class="sdpi-heading">Second Control</div>
+        <div type="checkbox" class="sdpi-item" id="Config_HasLongPress">
+            <div class="sdpi-item-label">Long Press</div>
+            <input class="sdpi-item-value" id="HasLongPress" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="HasLongPress"><span></span>&gt;&#61; 600ms</label>
         </div>
-        <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error</div>
-            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        <div class="sdpi-item" id="Config_ActionTypeLong">
+            <div class="sdpi-item-label" id="lblActionTypeLong">Action Type</div>
+            <select id="ActionTypeLong" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
-        <div type="checkbox" class="sdpi-item" id="Config_DrawBox">
-            <div class="sdpi-item-label" id="lblDrawBox">Draw Frame</div>
-            <input class="sdpi-item-value" id="DrawBox" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="DrawBox"><span></span></label>
+        <div class="sdpi-item" id="Config_AddressActionLong">
+            <div class="sdpi-item-label" id="lblAddressActionLong">Action Address</div>
+            <input id="AddressActionLong" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
         </div>
-        <div class="sdpi-item" id="Config_BoxSize">
-            <div class="sdpi-item-label" id="lblBoxSize">Thickness</div>
-            <input id="BoxSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Thickness in px" />
+        <div class="sdpi-item" id="Config_OnStateLong">
+            <div class="sdpi-item-label" id="lblOnStateLong">On Value</div>
+            <input id="OnStateLong" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to send for On" />
         </div>
-        <div class="sdpi-item" id="Config_BoxColor">
-            <div class="sdpi-item-label" id="lblBoxColor">Color</div>
-            <input id="BoxColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
-        </div>
-        <div class="sdpi-item" id="Config_BoxRect">
-            <div class="sdpi-item-label" id="lblBoxRect">Size &amp; Position</div>
-            <input id="BoxRect" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
-        </div>
-
-        <div class="sdpi-heading">Read Value</div>
-        <div class="sdpi-item" id="Config_Address">
-            <div class="sdpi-item-label">Address</div>
-            <input id="Address" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
+        <div class="sdpi-item" id="Config_OffStateLong">
+            <div class="sdpi-item-label" id="lblOffStateLong">Off Value</div>
+            <input id="OffStateLong" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
         </div>
 
         <div class="sdpi-heading">Value Format</div>
@@ -103,6 +97,33 @@
         <div class="sdpi-item" id="Config_IndicationValue">
             <div class="sdpi-item-label" id="lblIndicationValue">Value</div>
             <input id="IndicationValue" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" placeholder="Value for Indication (rounded) to show" />
+        </div>
+
+        <div class="sdpi-heading">Background</div>
+        <div class="sdpi-item" id="Config_DefaultImage">
+            <div class="sdpi-item-label">Normal</div>
+            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_ErrorImage">
+            <div class="sdpi-item-label">Error</div>
+            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div type="checkbox" class="sdpi-item" id="Config_DrawBox">
+            <div class="sdpi-item-label" id="lblDrawBox">Draw Frame</div>
+            <input class="sdpi-item-value" id="DrawBox" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="DrawBox"><span></span></label>
+        </div>
+        <div class="sdpi-item" id="Config_BoxSize">
+            <div class="sdpi-item-label" id="lblBoxSize">Thickness</div>
+            <input id="BoxSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Thickness in px" />
+        </div>
+        <div class="sdpi-item" id="Config_BoxColor">
+            <div class="sdpi-item-label" id="lblBoxColor">Color</div>
+            <input id="BoxColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
+        </div>
+        <div class="sdpi-item" id="Config_BoxRect">
+            <div class="sdpi-item-label" id="lblBoxRect">Size &amp; Position</div>
+            <input id="BoxRect" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
 
         <div class="sdpi-heading">Font Settings</div>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-
-namespace PilotsDeck
+﻿namespace PilotsDeck
 {
     public class ModelDisplayGaugeDual : ModelDisplayGauge
     {

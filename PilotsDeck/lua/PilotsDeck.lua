@@ -1,7 +1,7 @@
 ﻿--[[
 1:	Copy this Script to your FSUIPC Folder
 2:	Add this Script to your FSUIPC ini File:
-			- Start/Stop P3D or manually add it to the [LuaFiles] Section
+			- Start/Stop P3D or manually add it to the [LuaFiles] Section (Preferred: let FSUIPC add it automatically)
 			- Add it to your [Auto] Section, if this doesn't exist:
 			[Auto]
 			1=Lua PilotsDeck
@@ -14,7 +14,7 @@
 	integer	ipc.writeSB(0x66XX, value)				1		yes		X+1				66XX:1:i:s
 	integer	ipc.writeUB(0x66XX, value)				1		no		X+1				66XX:1:i
 	float	ipc.writeFLT(0x66XX, value)				4		n/a		X+4				66XX:4:f
-	string	ipc.writeSTR(0x66XX, value, Length)		L+1		n/a		X+L+2 (zero!)	66XX:L:s
+	string	ipc.writeSTR(0x66XX, value, Length)		L+1		n/a		X+L+1 (zero!)	66XX:L:s
 --]]
 
 function Pilotsdeck_Poll ()

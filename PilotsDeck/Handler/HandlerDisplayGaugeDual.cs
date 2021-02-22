@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Serilog;
 using System.Drawing;
 
 namespace PilotsDeck
@@ -45,7 +45,7 @@ namespace PilotsDeck
 
             ipcManager.DeregisterValue(Settings.Address2);
             if (Settings.Address2 != LastAddress2)
-                throw new Exception($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.Address2} != {LastAddress2} ] ");
+                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.Address2} != {LastAddress2} ] ");
         }
 
         public override void RefreshValue(IPCManager ipcManager)

@@ -54,7 +54,7 @@ namespace PilotsDeck
             {
                 if (AddImage(image))
                 {
-                    Log.Logger.Verbose($"ImageManager: Cached new Image {image}");
+                    Log.Logger.Debug($"ImageManager: Cached new Image {image}");
                     return cachedImageFiles[image];
                 }
                 return cachedImageFiles.Values.First();
@@ -72,7 +72,6 @@ namespace PilotsDeck
                 if (string.IsNullOrEmpty(image))
                 {
                     Log.Logger.Error($"AddImage: Empty image string!");
-                    throw new Exception("AddImage: Empty image string!");
                 }
 
                 if (!cachedImageFiles.ContainsKey(image))
@@ -99,7 +98,6 @@ namespace PilotsDeck
                 if (string.IsNullOrEmpty(image))
                 {
                     Log.Logger.Error($"UpdateImage: Empty image string!");
-                    throw new Exception("UpdateImage: Empty image string!");
                 }
 
                 if (cachedImageFiles.ContainsKey(image))
@@ -118,7 +116,6 @@ namespace PilotsDeck
                 if (string.IsNullOrEmpty(image))
                 {
                     Log.Logger.Error($"RemoveImage: Empty image string!");
-                    throw new Exception("RemoveImage: Empty image string!");
                 }
 
                 if (cachedImageFiles.ContainsKey(image))

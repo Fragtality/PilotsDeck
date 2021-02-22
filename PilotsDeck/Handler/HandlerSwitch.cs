@@ -8,32 +8,52 @@ namespace PilotsDeck
         public virtual ModelSwitch BaseSettings { get { return Settings; } }
         public virtual ModelSwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerSwitch] Write: {Address}"; } }
+        public override string ActionID { get { return $"\"{Title}\" [HandlerSwitch] Write: {Address} | LongWrite: {BaseSettings.HasLongPress} - {BaseSettings.AddressActionLong}"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
 
         protected virtual string LastSwitchState { get; set; }
+        protected virtual string LastSwitchStateLong { get; set; }
 
 
         public HandlerSwitch(string context, ModelSwitch settings) : base(context, settings)
         {
             Settings = settings;
-            LastSwitchState = Settings.OffState;
+            LastSwitchState = settings.OffState;
+            LastSwitchStateLong = settings.OffStateLong;
         }
 
         public override void Update(ImageManager imgManager, IPCManager ipcManager)
         {
             base.Update(imgManager, ipcManager);
 
-            if (this.GetType().IsAssignableFrom(typeof(HandlerSwitch)) && LastSwitchState != BaseSettings.OffState && LastSwitchState != BaseSettings.OnState)
+            if (this.GetType().IsAssignableFrom(typeof(HandlerSwitch)) &&
+                ((LastSwitchState != BaseSettings.OffState && LastSwitchState != BaseSettings.OnState) ||
+                (LastSwitchStateLong != BaseSettings.OffStateLong && LastSwitchStateLong != BaseSettings.OnStateLong)))
+            {
                 LastSwitchState = BaseSettings.OffState;
+                LastSwitchStateLong = BaseSettings.OffStateLong;
+            }
         }
 
-        public virtual bool Action(IPCManager ipcManager)
+        public virtual bool Action(IPCManager ipcManager, bool longPress)
         {
             string newValue = ToggleValue(LastSwitchState, BaseSettings.OffState, BaseSettings.OnState);
-            bool result = RunAction(ipcManager, BaseSettings.AddressAction, (ActionSwitchType)BaseSettings.ActionType, newValue);
-            if (result)
-                LastSwitchState = newValue;
+            bool result;
+
+            if (longPress && BaseSettings.HasLongPress)
+            {
+                newValue = ToggleValue(LastSwitchStateLong, BaseSettings.OffStateLong, BaseSettings.OnStateLong);
+                result = RunAction(ipcManager, BaseSettings.AddressActionLong, (ActionSwitchType)BaseSettings.ActionTypeLong, newValue);
+                if (result)
+                    LastSwitchStateLong = newValue;
+            }
+            else
+            {
+                result = RunAction(ipcManager, BaseSettings.AddressAction, (ActionSwitchType)BaseSettings.ActionType, newValue);
+                if (result)
+                    LastSwitchState = newValue;
+
+            }
 
             return result;
         }
@@ -45,7 +65,7 @@ namespace PilotsDeck
                 newValue = onState;
             else
                 newValue = offState;
-            Log.Logger.Verbose($"Value toggled {lastValue} -> {newValue}");
+            Log.Logger.Debug($"Value toggled {lastValue} -> {newValue}");
             return newValue;
         }
 
@@ -53,7 +73,7 @@ namespace PilotsDeck
         {
             if (ipcManager.IsConnected && IPCTools.IsWriteAddress(Address, actionType))
             {
-                Log.Logger.Verbose($"HandlerBase:RunAction Writing to {Address}");
+                Log.Logger.Debug($"HandlerBase:RunAction Writing to {Address}");
                 switch (actionType)
                 {
                     case ActionSwitchType.MACRO:
@@ -78,7 +98,7 @@ namespace PilotsDeck
 
         public static bool RunScript(IPCManager ipcManager, string address)
         {
-            return ipcManager.RunScriptMacro(address);
+            return ipcManager.RunScript(address);
         }
 
         public static bool RunMacros(IPCManager ipcManager, string address)
@@ -87,14 +107,14 @@ namespace PilotsDeck
 
             string[] tokens = address.Split(':');
             if (tokens.Length == 2)
-                result = ipcManager.RunScriptMacro(address);
+                result = ipcManager.RunMacro(address);
             else
             {
                 string macroFile = tokens[0];
                 int fails = 0;
                 for (int i = 1; i < tokens.Length; i++)
                 {
-                    if (!ipcManager.RunScriptMacro(macroFile + ":" + tokens[i]))
+                    if (!ipcManager.RunMacro(macroFile + ":" + tokens[i]))
                         fails++;
                 }
                 if (fails == 0)

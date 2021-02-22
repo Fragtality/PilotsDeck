@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using Serilog;
 
 namespace PilotsDeck
 {
@@ -22,6 +23,8 @@ namespace PilotsDeck
         public HandlerDisplayRadio(string context, ModelDisplayRadio settings) : base(context, settings)
         {
             Settings = settings;
+            LastSwitchState = settings.OffState;
+            LastSwitchStateLong = settings.OffStateLong;
         }
 
         protected override bool InitializationTest()
@@ -49,9 +52,9 @@ namespace PilotsDeck
             ipcManager.DeregisterValue(Settings.AddressRadioStandby);
 
             if (Settings.AddressRadioActiv != CurrentAddress[0])
-                throw new Exception($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.AddressRadioActiv} != {CurrentAddress[0]} ] ");
+                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.AddressRadioActiv} != {CurrentAddress[0]} ] ");
             if (Settings.AddressRadioStandby != CurrentAddress[1])
-                throw new Exception($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.AddressRadioStandby} != {CurrentAddress[1]} ] ");
+                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.AddressRadioStandby} != {CurrentAddress[1]} ] ");
         }
 
         public override void RefreshValue(IPCManager ipcManager)
@@ -69,10 +72,10 @@ namespace PilotsDeck
                 IsChanged = true;
         }
 
-        public override bool Action(IPCManager ipcManager)
+        public override bool Action(IPCManager ipcManager, bool longPress)
         {
             LastSwitchState = "";
-            bool result = base.Action(ipcManager);
+            bool result = base.Action(ipcManager, longPress);
             if (result)
                 wasPushed = true;
 

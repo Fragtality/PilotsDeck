@@ -7,11 +7,13 @@ namespace PilotsDeck
 {
     public class ActionBase<T> : BaseStreamDeckActionWithSettingsModel<T>
     {
+        protected long ticksDown = 0;
+
         public override async Task OnWillDisappear(StreamDeckEventPayload args)
         {
             await base.OnWillDisappear(args);
 
-            Log.Logger.Verbose($"ActionBase:OnWillDisappear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Debug($"ActionBase:OnWillDisappear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 
             Plugin.ActionController.DeregisterAction(args.context);
         }
@@ -28,24 +30,46 @@ namespace PilotsDeck
                 Plugin.ActionController[args.context].UpdateSettingsModel = false;
             }
 
-            Log.Logger.Verbose($"ActionBase:OnDidReceiveSettings {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Debug($"ActionBase:OnDidReceiveSettings {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }
 
         public override Task OnTitleParametersDidChange(StreamDeckEventPayload args)
         {
             Plugin.ActionController.SetTitleParameters(args.context, args.payload.title, args.payload.titleParameters);
 
-            Log.Logger.Verbose($"ActionBase:OnTitleParametersDidChange {args.context} | {Plugin.ActionController[args.context]?.ActionID} | {args.payload.titleParameters.fontStyle}");
+            Log.Logger.Debug($"ActionBase:OnTitleParametersDidChange {args.context} | {Plugin.ActionController[args.context]?.ActionID} | {args.payload.titleParameters.fontStyle}");
+
+            return Task.CompletedTask;
+        }
+
+        public override Task OnKeyDown(StreamDeckEventPayload args)
+        {
+            Log.Logger.Debug($"ActionBase:OnKeyDown {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+
+            if (Plugin.ActionController[args.context] is IHandlerSwitch)
+                ticksDown = Plugin.ActionController.Ticks;
+            
 
             return Task.CompletedTask;
         }
 
         public override Task OnKeyUp(StreamDeckEventPayload args)
         {
-            Log.Logger.Verbose($"ActionBase:OnKeyUp {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Debug($"ActionBase:OnKeyUp {args.context} | {Plugin.ActionController[args.context]?.ActionID} | Ticks: {Plugin.ActionController.Ticks - ticksDown}");
 
-            if ((Plugin.ActionController[args.context] is IHandlerSwitch) &&  !Plugin.ActionController.RunAction(args.context))
-                _ = Manager.ShowAlertAsync(args.context);
+            if (Plugin.ActionController[args.context] is IHandlerSwitch)
+            {
+                if (!Plugin.ActionController.RunAction(args.context, Plugin.ActionController.Ticks - ticksDown >= AppSettings.longPressTicks))
+                {
+                    Log.Logger.Error($"ActionBase: RunAction NOT successful (Long: {Plugin.ActionController.Ticks - ticksDown >= AppSettings.longPressTicks}) for Action {Plugin.ActionController[args.context]?.ActionID}");
+                    _ = Manager.ShowAlertAsync(args.context);
+                }
+                else
+                {
+                    Log.Logger.Information($"ActionBase: RunAction successful (Long: {Plugin.ActionController.Ticks - ticksDown >= AppSettings.longPressTicks}) for Action {Plugin.ActionController[args.context]?.ActionID}");
+                }
+                ticksDown = 0;
+            }
 
             return Task.CompletedTask;
         }
@@ -57,7 +81,7 @@ namespace PilotsDeck
             else
                 _ = Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspector());
 
-            Log.Logger.Verbose($"ActionBase:OnPropertyInspectorDidAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
+            Log.Logger.Debug($"ActionBase:OnPropertyInspectorDidAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 
             return Task.CompletedTask;
         }

@@ -6,8 +6,10 @@
 #CUSTOM
 Backups/
 Artwork/
+Releases/
 desktop.ini
 RegisterPluginAndStartStreamDeck.ps1
+Release.ps1
 
 # User-specific files
 *.rsuser

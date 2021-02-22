@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using Serilog;
+﻿using System.Drawing;
 
 namespace PilotsDeck
 {
@@ -22,7 +19,7 @@ namespace PilotsDeck
         public HandlerDisplayGauge(string context, ModelDisplayGauge settings) : base(context, settings)
         {
             Settings = settings;
-            IsArc = Settings.DrawArc;
+            IsArc = settings.DrawArc;
         }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
@@ -105,7 +102,7 @@ namespace PilotsDeck
             NeedRedraw = true;
             
             //sw.Stop();
-            //Log.Logger.Verbose($"Time for Gauge-Frame: {sw.Elapsed.TotalMilliseconds}ms [{ActionID}]");
+            //Log.Logger.Debug($"Time for Gauge-Frame: {sw.Elapsed.TotalMilliseconds}ms [{ActionID}]");
         }
 
         protected virtual void DrawBar(string value, ImageRenderer render)

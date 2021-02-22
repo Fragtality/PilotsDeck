@@ -22,13 +22,18 @@ namespace PilotsDeck
         public bool IsApplicationOpen { get; set; }
         public string Application { get; } = AppSettings.applicationName;
 
+        public long Ticks { get { return tickCounter; } }
         private long tickCounter = 0;
-        private bool lastAppState = true;
+        private bool lastAppState = false;
+        private bool appIsStarting = false;
+        private bool appAlreadyRunning = false;
         private bool lastConnectState = false;
         private bool lastProcessState = false;
         private bool redrawRequested = false;
         private readonly int waitTicks = AppSettings.waitTicks;
-        private Stopwatch stopWatch = new Stopwatch();
+        private readonly int firstTick = (int)(AppSettings.waitTicks / 7.5);
+        private Stopwatch watchRefresh = new Stopwatch();
+        private Stopwatch watchLoading = new Stopwatch();
         private double averageTime = 0;
         private bool redrawAlways = AppSettings.redrawAlways;
 
@@ -51,8 +56,8 @@ namespace PilotsDeck
         {
             if (currentActions != null && ipcManager != null && imgManager != null && manifestProfiles != null)
             {
-                loadedFSProfile = ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead) as IPCValueOffset;
-                loadedAircraft = ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead) as IPCValueOffset;
+                loadedFSProfile = ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead, true) as IPCValueOffset;
+                loadedAircraft = ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead, true) as IPCValueOffset;
                 Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
             }
 
@@ -127,15 +132,19 @@ namespace PilotsDeck
 
         protected void OnApplicationDidLaunch(StreamDeckEventPayload args)
         {
-            Log.Logger.Verbose($"ActionController:OnApplicationDidLaunchAsync {args.payload.application}");
+            Log.Logger.Debug($"ActionController:OnApplicationDidLaunchAsync {args.payload.application}");
 
             if (args.payload.application == Application)
+            {
                 IsApplicationOpen = true;
+                appAlreadyRunning = tickCounter < firstTick;
+                appIsStarting = true;
+            }
         }
 
         protected void OnApplicationDidTerminate(StreamDeckEventPayload args)
         {
-            Log.Logger.Verbose($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
+            Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
 
             if (args.payload.application == Application)
                 IsApplicationOpen = false;
@@ -143,22 +152,29 @@ namespace PilotsDeck
 
         public void Run(CancellationToken token)
         {
-            stopWatch.Restart();
+            watchRefresh.Restart();
             tickCounter++;
 
             if (tickCounter == 1)
                 _ = DeckManager.GetGlobalSettingsAsync(DeckManager.PluginUUID);
 
-            if (tickCounter < waitTicks / 7.5) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 5 Ticks => 5 * <200> = 1s )
+            if (tickCounter < firstTick) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 20 Ticks => 20 * <200> = 4s )
                 return;
 
-            if (!IsApplicationOpen || tickCounter == waitTicks / 7.5)     //P3D closed or the first tick
+            if (!IsApplicationOpen)     //P3D closed          ????or the first tick || tickCounter == firstTick
             {
                 if (lastAppState)       //P3D changed to closed
                 {
                     lastAppState = false;
+                    appAlreadyRunning = false;
+                    appIsStarting = false;
+                    lastAircraft = "none";
+                    lastFSProfile = null;
+                    ipcManager.Close();
                     CallOnAll(handler => handler.SetDefault());
                     redrawRequested = true;
+                    if (GlobalProfileSettings.EnableSwitching && GlobalProfileSettings.ProfilesInstalled)
+                        _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, null);
                 }
             }
             else                        //P3D open
@@ -173,7 +189,7 @@ namespace PilotsDeck
                     ipcManager.Connect();
                 }
                 
-                if (!ipcManager.IsConnected && (tickCounter % waitTicks == 0 || tickCounter == waitTicks / 7.5)) //still open not connected, check retry connection every 30s when not connected (every <150> Ticks * <200>ms)
+                if (!ipcManager.IsConnected && (tickCounter % waitTicks == 0 || tickCounter == firstTick)) //still open not connected, check retry connection every 30s when not connected (every <150> Ticks * <200>ms)
                 {
                     ipcManager.Connect();
                 }
@@ -184,14 +200,51 @@ namespace PilotsDeck
                         lastConnectState = true;
                         CallOnAll(handler => handler.SetWait());
                     }
-                    
-                    if (ipcManager.Process(AppSettings.groupStringRead))
+
+                    if (!lastProcessState && tickCounter % (waitTicks / 3) != 0 && tickCounter != firstTick && !appAlreadyRunning)  //throttle process calls to every 10s (150/3 * 200ms) if last was unsuccessful (but not on first)
                     {
+                        lastProcessState = false;
+                        //Log.Logger.Verbose("PROC - Throttle (not proc)");
+                    }
+                    else if (!appAlreadyRunning && appIsStarting && tickCounter % (waitTicks / 3) != 0) //throttle calls while still loading (60s timer still running) to every 10s
+                    {
+                        //Log.Logger.Verbose($"PROC - Throttle (starting) - Delay Elapsed: {watchLoading.Elapsed.Seconds} | Total: {watchLoading.Elapsed.TotalSeconds} | in ms {watchLoading.ElapsedMilliseconds}");
+                    }
+                    else if (ipcManager.Process(AppSettings.groupStringRead))
+                    {
+                        if (!appAlreadyRunning && appIsStarting)
+                        {
+                            if (!watchLoading.IsRunning)
+                            {
+                                watchLoading.Restart();
+                                //Log.Logger.Verbose("PROC - Processed OK - Start App Delay");
+                            }
+                            else
+                                Log.Logger.Debug($"ActionController: Throttled Processing, awaiting appStartDelay - elapsed: {watchLoading.Elapsed.TotalSeconds:n0}");
+
+                            if (watchLoading.Elapsed.TotalSeconds > AppSettings.appStartDelay)
+                            {
+                                watchLoading.Stop();
+                                watchLoading.Reset();
+                                appIsStarting = false;
+                                //Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
+                            }
+                        }
+                        else if (appAlreadyRunning && appIsStarting)
+                            appIsStarting = false;
+                        //else
+                        //    Log.Logger.Verbose("PROC - Processed OK");
+
                         RefreshActions(token, !lastProcessState);   //toggles process change
                         lastProcessState = true;
+                        if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
+                            SwitchProfiles();
                     }
                     else
+                    {
+                        //Log.Logger.Verbose("PROC - Processed ERR");
                         lastProcessState = false;
+                    }
 
                     redrawRequested = true;
                 }
@@ -201,6 +254,7 @@ namespace PilotsDeck
                     {
                         lastConnectState = false;
                         lastProcessState = false;
+                        ipcManager.Close();
                         CallOnAll(handler => handler.SetError());
                         redrawRequested = true;
                     }
@@ -216,15 +270,18 @@ namespace PilotsDeck
                 RedrawAll(token);
             }
 
-            if (GlobalProfileSettings.EnableSwitching && IsApplicationOpen && ipcManager.IsReady && !string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
-                SwitchProfiles();
-
-            stopWatch.Stop();
-            averageTime += stopWatch.Elapsed.TotalMilliseconds;
-            if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
+            watchRefresh.Stop();
+            if (IsApplicationOpen)
             {
-                Log.Logger.Verbose($"ActionController: Refresh Tick #{tickCounter}, average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms");
-                averageTime = 0;
+                averageTime += watchRefresh.Elapsed.TotalMilliseconds;
+                if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
+                {
+                    Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}");
+                    averageTime = 0;
+                }
+
+                if (appAlreadyRunning && tickCounter > waitTicks)
+                    appAlreadyRunning = false;
             }
         }
 
@@ -263,7 +320,7 @@ namespace PilotsDeck
         {
             if (!GlobalProfileSettings.ProfilesInstalled)
             {
-                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, @"Default");
+                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, AppSettings.deckDefaultProfile);
             }
             GlobalProfileSettings.ProfilesInstalled = true;
             DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
@@ -315,11 +372,11 @@ namespace PilotsDeck
             }
             catch (Exception ex)
             {
-                Log.Logger.Verbose($"RedrawAll: Exception {ex.Message}");
+                Log.Logger.Debug($"RedrawAll: Exception {ex.Message}");
             }
         }
 
-        public bool RunAction(string context)
+        public bool RunAction(string context, bool longPress)
         {
             try
             {
@@ -331,7 +388,7 @@ namespace PilotsDeck
 
                 if (currentActions.ContainsKey(context))
                 {
-                    return (currentActions[context] as IHandlerSwitch).Action(ipcManager);
+                    return (currentActions[context] as IHandlerSwitch).Action(ipcManager, longPress);
                 }
                 else
                 {

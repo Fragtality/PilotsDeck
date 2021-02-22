@@ -46,6 +46,6 @@
 
     public interface IHandlerSwitch : IHandler
     {
-        bool Action(IPCManager ipcManager);
+        bool Action(IPCManager ipcManager, bool longPress);
     }
 }
