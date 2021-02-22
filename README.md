@@ -90,7 +90,8 @@ The default Behavior is to Inherit the Font Style from the Buttons Title Setting
 *BUT, there is a caveat in the StreamDeck API.* The Font Style (Regular, Bold, Italic) is transmitted as *localized* Text. I have put in the Strings for German and English. You can alter the [Plugin Settings](README.md#plugin-settings) to customize them or add your language. If you let me know which Strings are working for which Language, I can add that to the Plugin.<br/>
 If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect on the custom Font Settings.
 <br/><br/>
-### Display Value <img src="img/DisplayXpndr.png" width="92px">
+### Display Value
+<img src="img/DisplayXpndr.png" width="92px">
 Most Settings should be explained by the common part.
 * **Draw Box**: Will draw a Frame in the configured *Thickness* and *Color* arround the Value. The Frame's *Size & Position* is defined as *"X; Y; Width; Height"* (0, 0 is Top-Left).
 * **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals the one you specified here. It will reset to the Normal Background if it is unequal again. Mind Scale and Round - the Matching is done after both. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
@@ -98,7 +99,8 @@ You can optionally hide the Text when the Values match. Maybe you want to displa
 You can also specify a *Different Color* when the Values match. This Color has priority over both inheritted or customized Font Settings. This Color is also used for the Frame, if *Draw Frame* is enabled.
 * **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background defined as *"X; Y; Width; Height"*. If *Draw Frame* is enabled, it is relative to the Frame's *Size & Position*. If it not enabled it is relative to the whole Button. The Text is always drawn horizontal/vertical centered within that Box. When *Draw Frame* is toggled this will reset to the respective Default.
 <br/><br/>
-### Simple Button / Display Value with Button ![ActionDisplay](img/DisplayXpndr.png){:width="92px"}
+### Simple Button / Display Value with Button
+![ActionDisplay](img/DisplayXpndr.png){:width="92px"}
 Since Diplay Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is refrenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar), multiple Requests will be send to the Sim in fast Sequence.
