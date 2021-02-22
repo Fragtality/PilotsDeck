@@ -91,6 +91,7 @@ The default Behavior is to Inherit the Font Style from the Buttons Title Setting
 If you care at all to inherit the Font: Since the Plugin reads *all* installed Fonts on your System (in Contrast to StreamDeck), you can use nearly any fancy Font you like. The Font Style there is based on the (international) System API, so this StreamDeck caveat does not have an effect on the custom Font Settings.
 <br/><br/>
 ### Display Value
+![ActionDisplay](img/DisplayXpndr.png)<br/>
 Most Settings should be explained by the common part.
 * **Draw Box**: Will draw a Frame in the configured *Thickness* and *Color* arround the Value. The Frame's *Size & Position* is defined as *"X; Y; Width; Height"* (0, 0 is Top-Left).
 * **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals the one you specified here. It will reset to the Normal Background if it is unequal again. Mind Scale and Round - the Matching is done after both. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
@@ -99,14 +100,14 @@ You can also specify a *Different Color* when the Values match. This Color has p
 * **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background defined as *"X; Y; Width; Height"*. If *Draw Frame* is enabled, it is relative to the Frame's *Size & Position*. If it not enabled it is relative to the whole Button. The Text is always drawn horizontal/vertical centered within that Box. When *Draw Frame* is toggled this will reset to the respective Default.
 <br/><br/>
 ### Simple Button / Display Value with Button
-![ActionDisplay](img/DisplayXpndr.png){:height="92px" :width="92px"}<br/>
+![ActionSwitch](img/SimpleButton.png)![ActionDisplaySwitch](img/DisplaySwitchTcas.png)<br/>
 Since Diplay Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is refrenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar), multiple Requests will be send to the Sim in fast Sequence.
 * **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when pushed ("keyUp") and sends it to the Sim. It will always start in the "Off" State (sends "On" on next Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
 <br/><br/>
 ### Dynamic Button
-<img src="img/DisplayXpndr.png" height="92px" width="92px" />
+![ActionSwitchDisplay](img/DynamicButtonKorry.png)![ActionSwitchDisplay](img/DynamicButtonGear.png)![ActionSwitchDisplay](img/DynamicButtonLight.png)<br/>
 Action Type and Address work exactly like described above.<br/>
 * **Address** (Control Status Value): Here you specify where the current State (Value) of a Switch in the Sim can be read. Since there are only two Ways to read something from the Sim via FSUIPC, it is either an Offset or a (single) Lvar.<br/>The Syntax works as described [before](README.md#address-fields). The "third" Way, reading a Lua Value is described [below](README.md#lua-values).
 * **On / Off State**: When the Value matches On or Off, the respective Image is displayed.<br/>
@@ -114,6 +115,7 @@ For Offset and Lvar Actions: Since the Button knows the real current State of a 
 * **Special State**: For Switches which have something "in between" or other than the On/Off States, this Special State can be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches to the current Value. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
 <br/><br/>
 ### COM Radio
+![ActionDisplayRadio](img/ComRadio1.png)<br/>
 Most fields work the same as described before, you define the Addresses where the Active (top) and Standby (bottom) Frequency can be read and define an Action how they are swapped in the Sim.<br/>On the fields that differ or are new:
 * **Swap Background**: When your defined Swap Action was (successfully) send to the Sim, the Button will show that Image for 3.2s (=16 Ticks).
 * **Value Format**: You can define a *Different Format* for the Standby Value. So if you read the int32 Value from 05C4 for the Active Frequency and the BCD encoded int16 Value from 034E for the Standby Frequency, you can do that and have both look like a Frequency.
@@ -121,6 +123,7 @@ Most fields work the same as described before, you define the Addresses where th
 * **Tweak Position**: There are two instead of one ... if you wish so, you can swap what is on top. :wink:
 <br/><br/>
 ### Display Gauge
+![ActionDisplayGauge](img/GaugeBarRudder.png)<br/>
 This Action can display a Value on a Bar or an Arc. The graphics are rendered on refresh.
 * **Normal Background**: The graphics are rendered on that Background. 
 * **Value Format**: Yo have to define a *Minimum* and *Maximum* Value for that Action to work. The Value after Decoding and Scaling is used for the Indicator.
@@ -138,10 +141,12 @@ This Action can display a Value on a Bar or an Arc. The graphics are rendered on
  * **Text Settings**: If the Indicator is in one the Ranges the Text can be drawn in the respective Range Color. Everything else here works the same.
 <br/><br/>
 ### Display Gauge (Dual)
+![ActionDisplayGaugeDual](img/GaugeBarFuel.png)![ActionDisplayGaugeDual](img/GaugeArcEng.png)<br/>
 Shows two Values on the same Bar or Arc. So they share the same Minimum, Maximum and Format (and Font-Settings).<br/>
 The most notabel Difference: with a Bar, both Values can be displayed as Text. With an Arc, only the first Value is displayed. The Arc therefore allows to swap (*Flip*) the Indicators.
 <br/><br/>
 ### Profile Switcher
+![ActionProfileSwitcher](img/ProfileSwitcher.png)<br/>
 With this Action the Profile Switching is configured. If you want to use that (disabled by default), drag this Action somewhere on your StreamDeck. Upon first use, as soon as you select this Action and the Property Inspector appears, you will be asked if you want to install preconfigured Profiles (sometimes this Dialog pops up two times - you only have to acknowledge one, cancel the other one). This is *required* for the Switching to work! The StreamDeck API only allows to switch Profiles which came preconfigured with a Plugin and internally keeps Track of that (meaning, the StreamDeck *knows* if a Profile came frome a User or from a Plugin). You only have to install the Profiles if you want to use the Switching capabilities.<br/>
 For that Reason the Plugin conveniently includes 4 StreamDeck Profiles (Default, X-Ray, Yankee, Zulu) that you can map to any FSUIPC Profiles. You don't have to use them, that is also customizable, but that requires a change in the Plugin Settings (they have to be "published" to StreamDeck upon Plugin Start and have to be installed by the Plugin)<br/>
 * **Enabled** When this is checked, this Feature is activated. You don not have to keep this Action anywhere on your StreamDeck after Configuration (it is a Global Setting).
