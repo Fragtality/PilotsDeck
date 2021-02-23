@@ -211,6 +211,7 @@ function readPACK()
 	ipc.writeUB(0x66CA, pack1+pack2)
 end
 ```
+(Note to FSLabs Users: if you do use Lua Copilot, it would be wise to load it globally in that Script and not in every Function)<br/>
 Within the Plugin I then use
 - "66C5:4:s" to read the TCAS State and display & toggle it with a "Display Value with Button" Action (toggling via Lua-Script). Displayed with a nice quick-google-searched LCD Font.
 - "66C0:4:s" to read the Position/State of both Landing Lights in a "Dynamic Button" and display the appropiate Images for the three States On, Off and Retracted (via Special State). One Button which sends "Up" for both Landing Lights, one to send "Down" for both Landing Lights via FSControls. (If both Landing Lights positions differ, the Action will show the Error Image which is configured for "Fault". Since the current Value does not match the On, Off or Special State, the Plugin "assumes" a Read-Error. So there is some kind of fourth State to display :wink:)
