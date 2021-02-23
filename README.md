@@ -13,6 +13,12 @@ Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.m
 ## Plugin Requirements
 Uhm ... I'd say Prepar3D, FSUIPC and StreamDeck (Software) installed would be a bloody good Start :laughing:<br/>
 It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff!<br/>
+You can check your installed Framework Version with Powershell:
+```powershell
+(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release -ge 528040
+(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Version
+```
+The first Command should show "True", the second something with "4.8.x".<br/>
 The Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Plugin Settings](README.md#plugin-settings). It may work with FSX and older Versions of P3D and FSUIPC.
 <br/><br/>
 ## Plugin Installation
