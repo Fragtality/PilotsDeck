@@ -240,6 +240,17 @@ There are only two Use-Cases to fiddle in that file, so these are the interestin
 * **ApplicationsToMonitor**: Change this (and *applicationName* in the above File) to alter the Executable the Plugin reacts upon.
 * **Profiles**: Like described under [Profile Switcher](README.md#customization) - here you add or change the StreamDeck Profiles. If the .streamDeckProfile File is in the \Profiles Subdirectory, you must prefix the Name with "*Profiles/*". Mind the JSON-Syntax: the last Entry must not have a "**,**" at the End, but all others have to be separated by that.
 <br/><br/>
+## Examples
+Tired of aiming at the number Keys with your Mouse in the VC? Make yourself a Transponder Control on the Deck:<br/>
+![Example02](img/Example02.png)<br/>
+All "Simple Buttons" mapped to usual Macros. And one "Display Value" to read the Offset 0x0354.<br/><br/>
+Do you have GSX? Want to have a "cooler" Way to navigate through its Menu? Make yourself a GSX Menu on the Deck:<br/>
+![Example03](img/Example03.png)<br/>
+All "Simple Buttons". The Numbers use (FS)Controls, the Menu a Lua-Script with ipc.keypress and the Push is a Lua-Script which flicks the Int/Rad Switch (FSL specific).<br/><br/>
+Need your Lights, usual Korrys and Buttons at Hand? Make yourself a Folder and put them there:<br/>
+![Example04](img/Example04.png)<br/>
+"Dynamic Buttons" for the Lights and Korrys (using Controls, Macros, Scripts), a "Simple Button" for the TO Conf (Macro), and two "Display Value with Button" with Lua-Scripts. The Values for TCAS/PWS are generated in the PilotsDeck.lua and are then read-out via Offset.<br/><br/>
+<br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
 Uses "StreamDeckToolkit" from FritzAndFriends, published under [MIT License](https://github.com/FritzAndFriends/StreamDeckToolkit/blob/dev/LICENSE)<br/>
