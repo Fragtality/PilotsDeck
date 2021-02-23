@@ -1,5 +1,5 @@
 # Pilot's Deck
-Directly control Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
+Directly control and view Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
 ![Example01](img/Example01.png)
 <br/><br/>
 ## Introduction
@@ -35,11 +35,14 @@ As of now, there are 7-8 Actions:<br/>
 <br/><br/>
 ## Action Configuration
 Now we're getting to the "Fun" part! :flushed:<br/>
-The Actions behave like any other Actions on the StreamDeck. All the Action's Settings are stored in the StreamDeck Profiles. They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like normal. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
+The Actions behave like any other Actions on the StreamDeck. All the Action's Settings are stored in the StreamDeck Profiles (and therefore are saved when you Backup/Export Profiles). They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like normal. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
 All Configuration is done via the Property Inspector. Some Input-Fields combine multiple Fiels/Inputs in one string, so let's start with the common Syntax:<br/>
-### Common Syntax & Fields
+### Common Syntax & Fields & Behavior
 Plain Numeric Values are separated by "**;**". E.g. an Size or Range Definition like "0; 10"<br/>
-Addresses, Format and Profiles are separated by "**:**".
+Addresses, Format and Profiles are separated by "**:**".<br/>
+Address Fields and some other Fields are using Syntax Checking on the Input. So if an Exclamation Mark is shown in the Input Field, it could be wrong. The Property Inspector matches not all Cases and in any Case the Input will be saved. The "real" Syntax Checking is done when a Button is pressed and then will only allow valid Syntax. Mind the Difference between "Syntax" and "Semantics": The Plugin can check if the Input is correct to specifiy a Macro e.g. via FSUIPC, but it can't check if that Macrofile or Macro exists :wink:<br/>
+If a Button Press could not be executed for whatever Reason (P3D closed, not ready, Syntax incorecct, Action not configured ...), the Plugin will show the StreamDeck Alert-Symbol (yellow Triangle with an Exclamation Mark).<br/>
+If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or while loading, all Actions will show a "..." Background.<br/>
 #### Address Fields
 * **Offset**
   \[ (0x)Hex-Address:Size(:Type:Signedness) ] (Read / Command)
@@ -48,10 +51,10 @@ Addresses, Format and Profiles are separated by "**:**".
   - *Type*: Specify if the Offset is Integer "**i**", Float/Double "**f**" or String "**s**". Defaults to ":i" for Integers if not specified.
   - *Signedness*: Specify if the Offset is Signed "**s**" or Unsigned "**u**". Defaults to ":u" for Unsigned if not specified.<br/><br/>
 *Examples*:
-  - 2118:8:f for "Turbine Engine 2 corrected N1" (8 byte double/float64)
-  - 034E:2 for "COM1 frequency in BCD" (2 byte integer)
-  - 3544:4:i:s for "standby alitmeter in feet" (4 byte signed integer)
-  - 0x0ec6:2:i for "Pressure QNH"
+  - *2118:8:f* for "Turbine Engine 2 corrected N1" (8 byte double/float64)
+  - *034E:2* for "COM1 frequency in BCD" (2 byte integer)
+  - *3544:4:i:s* for "standby alitmeter in feet" (4 byte signed integer)
+  - *0x0ec6:2:i* for "Pressure QNH"
 * **Lvar**
   \[ (L:)Name | (L:)Name((:L):Name)* ] (Read / Command)
   - *Name*: The Lvar's Name with or without the preceding "L:". For Switches you can bind multiple Lvars to it, every Lvar is separated by ":". Multiple Lvars only make sense if they react same for a same value (e.g. both Pack Switches, both reacting as "On" for "10")<br/>
@@ -66,9 +69,11 @@ Addresses, Format and Profiles are separated by "**:**".
   - *Macro*: The Macro's Name within that File. You can specify multiple Macros within one File (e.g. both Packs-Controls on one Button)<br/>
   Example: *"FSLA3XX_MAIN:ACPACK1:ACPACK2"* (Run Macro ACPACK1 from Macro-File FSLA3XX_MAIN and then ACPACK2 from the same File)
 * **Script**
-  \[ Lua:File ] (Command)
-  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with "*Lua:*".<br/>
-  Example: *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")<br/>
+  \[ Lua|LuaToggle|LuaSet|LuaClear:File(:flag) ] (Command)
+  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*" and don't specifiy a *:flag*. To use the Lua Controls Set, Clear or Toggle the *:flag* has to be specified, as the correct Control. Set, Clear, Toggle work as described in FSUIPC's Documentation.<br/>
+  *Examples*:
+  - *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")
+  - *LuaToggle:FSL_CMD:21* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")<br/>
 #### DecodeBCD / Scale / Format
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
@@ -82,7 +87,7 @@ Addresses, Format and Profiles are separated by "**:**".
   - *%s ft* Add "ft" after the Value<br/>
 #### Images
 All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.
-* **Default Image / Background Normal**: The Image to be shown when the Action is in their normal/working State or P3D is not loaded.
+* **Default Image / Background Normal**: The Image to be shown (or drawn to) when the Action is in their normal/working State or P3D is not loaded.
 * **Error Image**: The Image to be shown when FSUIPC disconnects or the Value could not be read.
 * **Special Value / State**: If the Value / Switch has an Special 2nd or 3rd State, you can indicate that by the Image specified. For Example if the Baro is on STD/1013, the PACK is on "Fault", the APU is "Avail", ...<br/>
 #### Font Settings
@@ -106,6 +111,7 @@ Since Diplay Value is explained above and a simple Button has nothing much to co
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is refrenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar), multiple Requests will be send to the Sim in fast Sequence.
 * **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when pushed ("keyUp") and sends it to the Sim. It will always start in the "Off" State (sends "On" on next Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
+* **Long Press**: When enabled, the Button can execute a completely different Command when pressed for longer than 600ms (with the default [Plugin Settings](README.md#plugin-settings). This second Command Settings' work exactly like described before. Note that the internal Mechanic is based on "keyUp": regardless of how long you press the Button, it will only execute when released!
 <br/><br/>
 ### Dynamic Button
 ![ActionSwitchDisplay](img/DynamicButtonKorry.png)![ActionSwitchDisplay](img/DynamicButtonGear.png)![ActionSwitchDisplay](img/DynamicButtonLight.png)<br/>
@@ -120,7 +126,7 @@ For Offset and Lvar Actions: Since the Button knows the real current State of a 
 Most fields work the same as described before, you define the Addresses where the Active (top) and Standby (bottom) Frequency can be read and define an Action how they are swapped in the Sim.<br/>On the fields that differ or are new:
 * **Swap Background**: When your defined Swap Action was (successfully) send to the Sim, the Button will show that Image for 3.2s (=16 Ticks).
 * **Value Format**: You can define a *Different Format* for the Standby Value. So if you read the int32 Value from 05C4 for the Active Frequency and the BCD encoded int16 Value from 034E for the Standby Frequency, you can do that and have both look like a Frequency.
-* **Font Settings**: Both Frequencies will always use the same Font, regardless how it is defined. The Font Style is ignored and is not configurable: the Active (top) Frequency is always bold, the Standby (bottom) Frequency is always regular. The Font Color for the Standby Frequency will be darkened.
+* **Font Settings**: Both Frequencies will always use the same Font, regardless how it is defined. The Font Style is ignored and is not configurable: the Active (top) Frequency is always bold, the Standby (bottom) Frequency is always regular. The Font Color for the Standby Frequency will be darkened if the Settings are inherited. With custom Settings you can choose different Colors for both.
 * **Tweak Position**: There are two instead of one ... if you wish so, you can swap what is on top. :wink:
 <br/><br/>
 ### Display Gauge
@@ -150,6 +156,7 @@ The most notabel Difference: with a Bar, both Values can be displayed as Text. W
 ![ActionProfileSwitcher](img/ProfileSwitcher.png)<br/>
 With this Action the Profile Switching is configured. If you want to use that (disabled by default), drag this Action somewhere on your StreamDeck. Upon first use, as soon as you select this Action and the Property Inspector appears, you will be asked if you want to install preconfigured Profiles (sometimes this Dialog pops up two times - you only have to acknowledge one, cancel the other one). This is *required* for the Switching to work! The StreamDeck API only allows to switch Profiles which came preconfigured with a Plugin and internally keeps Track of that (meaning, the StreamDeck *knows* if a Profile came frome a User or from a Plugin). You only have to install the Profiles if you want to use the Switching capabilities.<br/>
 For that Reason the Plugin conveniently includes 4 StreamDeck Profiles (Default, X-Ray, Yankee, Zulu) that you can map to any FSUIPC Profiles. You don't have to use them, that is also customizable, but that requires a change in the Plugin Settings (they have to be "published" to StreamDeck upon Plugin Start and have to be installed by the Plugin)<br/>
+The Plugin will switch to a Profile as soon FSUIPC is ready (somewhere while P3D loads). It attempts to switch back to the previous used Profile, but that only works if you don't use Folders (did not switch between them within the Profile) - again for API Reasons.<br/>
 * **Enabled** When this is checked, this Feature is activated. You don not have to keep this Action anywhere on your StreamDeck after Configuration (it is a Global Setting).
 * **Profiles Installed** You can reset the Installed flag (uncheck), if you wish. The next Time the Property Inspector (for this Action) is openend, the Profiles will be installed again. Profiles that already exist will *not* be overwritten - StreamDeck will add a "xyz copy" Profile.
 * **Use Default** For unknown FSUIPC Profiles (or Aircrafts which do not have a FSUIPC Profile), the Plugin will switch to the Profile configured by *Name* if this Option is checked. If unchecked, only mapped FSUIPC Profiles will be switched. Default is obviously the bundled Default Profile :wink:
@@ -209,6 +216,8 @@ These are the available Settings and their Default:
 * **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection. Must also be changed in the [Manifest](README.md#manifestjson)!
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
+* **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
+* **appStartDelay**="30"		- When P3D is started, it will throttle the Process Calls to FSUIPC to every 10s (based on Ticks) in the first X seconds after FSUIPC successfully processed. Depending on how fast/slow P3D and the selected Aircraft are loading this could be too long/short. This only applies to when the Plugin (StreamDeck Software) was already running, if the Plugin is started when P3D was already running, it will directly connect and process.
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.<br/><br/>
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
