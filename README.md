@@ -46,7 +46,7 @@ All Configuration is done via the Property Inspector. Some Input-Fields combine 
 ### Common Syntax & Fields & Behavior
 Plain Numeric Values are separated by "**;**". E.g. an Size or Range Definition like "0; 10"<br/>
 Addresses, Format and Profiles are separated by "**:**".<br/>
-Address Fields and some other Fields are using Syntax Checking on the Input. So if an Exclamation Mark is shown in the Input Field, it could be wrong. The Property Inspector matches not all Cases and in any Case the Input will be saved. The "real" Syntax Checking is done when a Button is pressed and then will only allow valid Syntax. Mind the Difference between "Syntax" and "Semantics": The Plugin can check if the Input is correct to specifiy a Macro e.g. via FSUIPC, but it can't check if that Macrofile or Macro exists :wink:<br/>
+Address Fields and some other Fields are using Syntax Checking on the Input. So if an Exclamation Mark is shown in the Input Field, it could be wrong. The Property Inspector matches not all Cases and in any Case the Input will be saved. The "real" Syntax Checking is done when a Button is pressed and then will only allow valid Syntax. Mind the Difference between "Syntax" and "Semantics": The Plugin can check if the Input is correct to specifiy e.g. a Macro via FSUIPC, but it can't check if that Macrofile or Macro exists :wink:<br/>
 If a Button Press could not be executed for whatever Reason (P3D closed, not ready, Syntax incorecct, Action not configured ...), the Plugin will show the StreamDeck Alert-Symbol (yellow Triangle with an Exclamation Mark).<br/>
 If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or while loading, all Actions will show a "..." Background.<br/>
 #### Address Fields
