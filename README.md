@@ -129,7 +129,7 @@ For Offset and Lvar Actions: Since the Button knows the real current State of a 
 * **Special State**: For Switches which have something "in between" or other than the On/Off States, this Special State can be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches to the current Value. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
 <br/><br/>
 ### Korry Button
-![ActionSwitchKorry](img/DynamicButtonKorry.png)![DisplaySwitchKorry](img/DisplaySwitchKorry.png)<br/>
+![DisplaySwitchKorry](img/DisplaySwitchKorry.png)<br/>
 The Addresses work the same as before, but now there can be two of them. In contrast to the Dynamic Button, this Button does not change the whole Image, it can draw two Images independently. There is some overlapping with the Dynamic Button (for Korrys), you could easily get the same functionality with a Dynamic Button in some Use-Cases. But the Benefit here is, not every Korry-Combination (Top+Bottom) has to be provided as complete Image. You can just create a new "Label" and combine that with the existing ones.
 * **Top Address only**: You can use only one (the top) Address for both Halves, if you wish.
 * **Show Value**: When the current Value (from the specified Address) matches the Value specified here, the selected Image will show in the respective Half (regardless what the other Half is displaying).
