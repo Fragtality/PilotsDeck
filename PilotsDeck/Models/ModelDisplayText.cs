@@ -22,7 +22,6 @@ namespace PilotsDeck
 		public virtual int FontSize { get; set; } = 10;
 		public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
 		public virtual string FontColor { get; set; } = "#ffffff";
-		//public virtual string RectCoord { get; set; } = "11; 23; 48; 40";
 		public virtual string RectCoord { get; set; } = "-1; 0; 0; 0";
 
 
@@ -57,17 +56,17 @@ namespace PilotsDeck
 
 		public virtual RectangleF GetRectangleBox()
         {
-			return GetRectangle(BoxRect);
+			return GetRectangleF(BoxRect);
         }
 
 		public virtual RectangleF GetRectangleText()
         {
 			if (!DrawBox)
-				return GetRectangle(RectCoord);
+				return GetRectangleF(RectCoord);
 			else
 			{
-				RectangleF box = GetRectangle(BoxRect);
-				RectangleF text = GetRectangle(RectCoord);
+				RectangleF box = GetRectangleF(BoxRect);
+				RectangleF text = GetRectangleF(RectCoord);
 				float size = (float)Math.Round(BoxSize / 2.0d, 0, MidpointRounding.ToEven);
 				text.X = text.X + box.X + size;
 				text.Y = text.Y + box.Y + size;
@@ -78,7 +77,12 @@ namespace PilotsDeck
 			}
 		}
 
-		public static RectangleF GetRectangle(string rect)
+		public static Rectangle GetRectangle(string rect)
+        {
+			return Rectangle.Round(GetRectangleF(rect));
+        }
+
+		public static RectangleF GetRectangleF(string rect)
         {
 			//x y w h
 			string[] parts = rect.Trim().Split(';');

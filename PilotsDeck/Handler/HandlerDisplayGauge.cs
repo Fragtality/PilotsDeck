@@ -150,7 +150,7 @@ namespace PilotsDeck
                     render.Rotate(180);
 
                 GaugeSettings.GetFontParameters(TitleParameters, value, out Font drawFont, out Color drawColor);
-                render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangle(GaugeSettings.RectCoord));
+                render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangleF(GaugeSettings.RectCoord));
             }
         }
     }

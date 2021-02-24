@@ -61,6 +61,21 @@
       "UUID": "com.extension.pilotsdeck.action.switch.display"
     },
     {
+      "Icon": "Images/category/ActionSwitchKorry",
+      "Name": "Korry Button",
+      "States": [
+        {
+          "Image": "Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "PI/pi_SwitchKorry.html",
+      "Tooltip": "A Button with Status Indication, with two independent Halves (top, bottom)",
+      "UUID": "com.extension.pilotsdeck.action.switch.korry"
+    },
+    {
       "Icon": "Images/category/ActionRadio",
       "Name": "COM Radio",
       "States": [
@@ -130,7 +145,7 @@
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://github.com/Fragtality/PilotsDeck",
-  "Version": "0.4.8",
+  "Version": "0.4.9",
   "SDKVersion": 2,
   "Profiles": [
     {

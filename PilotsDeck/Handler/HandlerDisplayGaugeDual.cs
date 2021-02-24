@@ -114,7 +114,7 @@ namespace PilotsDeck
                     value = GaugeSettings.RoundValue(value);
 
                     GaugeSettings.GetFontParameters(TitleParameters, value, out Font drawFont, out Color drawColor);
-                    render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangle(Settings.RectCoord2));
+                    render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangleF(Settings.RectCoord2));
                 }
             }
         }

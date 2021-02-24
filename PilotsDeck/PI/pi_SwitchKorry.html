@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>PilotsDeck Property Inspector</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+    <link rel="stylesheet" href="css/property-inspector.css">
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-heading">Control</div>
+        <div class="sdpi-item" id="Config_ActionType">
+            <div class="sdpi-item-label">Action Type</div>
+            <select id="ActionType" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_AddressAction">
+            <div class="sdpi-item-label">Action Address</div>
+            <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
+        </div>
+        <div class="sdpi-item" id="Config_OnState">
+            <div class="sdpi-item-label" id="lblOnState">On Value</div>
+            <input id="OnState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to send for On" />
+        </div>
+        <div class="sdpi-item" id="Config_OffState">
+            <div class="sdpi-item-label" id="lblOffState">Off Value</div>
+            <input id="OffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
+        </div>
+
+        <div class="sdpi-heading">Second Control</div>
+        <div type="checkbox" class="sdpi-item" id="Config_HasLongPress">
+            <div class="sdpi-item-label">Long Press</div>
+            <input class="sdpi-item-value" id="HasLongPress" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="HasLongPress"><span></span>&gt;&#61; 600ms</label>
+        </div>
+        <div class="sdpi-item" id="Config_ActionTypeLong">
+            <div class="sdpi-item-label" id="lblActionTypeLong">Action Type</div>
+            <select id="ActionTypeLong" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_AddressActionLong">
+            <div class="sdpi-item-label" id="lblAddressActionLong">Action Address</div>
+            <input id="AddressActionLong" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
+        </div>
+        <div class="sdpi-item" id="Config_OnStateLong">
+            <div class="sdpi-item-label" id="lblOnStateLong">On Value</div>
+            <input id="OnStateLong" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to send for On" />
+        </div>
+        <div class="sdpi-item" id="Config_OffStateLong">
+            <div class="sdpi-item-label" id="lblOffStateLong">Off Value</div>
+            <input id="OffStateLong" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Valueto send for Off" />
+        </div>
+
+        <div class="sdpi-heading">Top Half</div>
+        <div class="sdpi-item" id="Config_AddressTop">
+            <div class="sdpi-item-label" id="lblAddressTop">Address</div>
+            <input id="AddressTop" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of LVar or Offset" />
+        </div>
+        <div type="checkbox" class="sdpi-item" id="Config_ShowTopNonZero">
+            <div class="sdpi-item-label">Show while non-zero</div>
+            <input class="sdpi-item-value" id="ShowTopNonZero" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="ShowTopNonZero"><span></span></label>
+        </div>
+        <div class="sdpi-item" id="Config_TopState">
+            <div class="sdpi-item-label" id="lblTopState">Show Value</div>
+            <input id="TopState" class="sdpi-item-value" type="text" required onchange="setSettings(event.target.value, event.target.id)" placeholder="" />
+        </div>
+        <div class="sdpi-item" id="Config_TopImage">
+            <div class="sdpi-item-label" id="lblTopImage">Image</div>
+            <select id="TopImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+
+        <div class="sdpi-heading">Bottom Half</div>
+        <div type="checkbox" class="sdpi-item" id="Config_UseOnlyTopAddr">
+            <div class="sdpi-item-label">Top Address only</div>
+            <input class="sdpi-item-value" id="UseOnlyTopAddr" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="UseOnlyTopAddr"><span></span></label>
+        </div>
+        <div class="sdpi-item" id="Config_AddressBot">
+            <div class="sdpi-item-label" id="lblAddressBot">Address</div>
+            <input id="AddressBot" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of LVar or Offset" />
+        </div>
+        <div type="checkbox" class="sdpi-item" id="Config_ShowBotNonZero">
+            <div class="sdpi-item-label">Show while non-zero</div>
+            <input class="sdpi-item-value" id="ShowBotNonZero" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="ShowBotNonZero"><span></span></label>
+        </div>
+        <div class="sdpi-item" id="Config_BotState">
+            <div class="sdpi-item-label" id="lblBotState">Show Value</div>
+            <input id="BotState" class="sdpi-item-value" type="text" required onchange="setSettings(event.target.value, event.target.id)" placeholder="" />
+        </div>
+        <div class="sdpi-item" id="Config_BotImage">
+            <div class="sdpi-item-label" id="lblBotImage">Image</div>
+            <select id="BotImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+
+        <div class="sdpi-heading">Default Images</div>
+        <div class="sdpi-item" id="Config_ErrorImage">
+            <div class="sdpi-item-label">Error Image</div>
+            <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_DefaultImage">
+            <div class="sdpi-item-label">Default Image</div>
+            <select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+
+        <div class="sdpi-heading">Tweak Position</div>
+        <div class="sdpi-item" id="Config_TopRect">
+            <div class="sdpi-item-label" id="lblTopRect">Rectangle Top</div>
+            <input id="TopRect" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+        </div>
+        <div class="sdpi-item" id="Config_BotRect">
+            <div class="sdpi-item-label" id="lblBotRect">Rect. Bottom</div>
+            <input id="BotRect" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+        </div>
+    </div>
+    <script src="js/pi_Common.js"></script>
+    <script src="js/pi_SwitchKorry.js"></script>
+</body>
+</html>
