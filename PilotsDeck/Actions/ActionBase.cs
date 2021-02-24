@@ -79,7 +79,7 @@ namespace PilotsDeck
             if (Plugin.ActionController[args.context].UseFont)
                 _ = Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspectorFonts());
             else
-                _ = Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspector());
+                _ = Manager.SendToPropertyInspectorAsync(args.context, new StreamDeckTools.ModelPropertyInspector(Plugin.ActionController[args.context] is HandlerSwitchKorry));
 
             Log.Logger.Debug($"ActionBase:OnPropertyInspectorDidAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 

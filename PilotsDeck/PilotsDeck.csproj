@@ -289,6 +289,7 @@
     <Compile Include="Actions\ActionDisplaySwitch.cs" />
     <Compile Include="Actions\ActionDisplayGauge.cs" />
     <Compile Include="Actions\ActionProfileSwitcher.cs" />
+    <Compile Include="Actions\ActionSwitchKorry.cs" />
     <Compile Include="Actions\ActionSwitchDisplay.cs" />
     <Compile Include="Actions\ActionSwitch.cs" />
     <Compile Include="AppSettings.cs" />
@@ -301,6 +302,7 @@
     <Compile Include="Handler\HandlerBase.cs" />
     <Compile Include="Handler\HandlerDisplayGauge.cs" />
     <Compile Include="Handler\HandlerDisplayGaugeDual.cs" />
+    <Compile Include="Handler\HandlerSwitchKorry.cs" />
     <Compile Include="Handler\HandlerValue.cs" />
     <Compile Include="Handler\HandlerDisplayText.cs" />
     <Compile Include="Handler\HandlerDisplayRadio.cs" />
@@ -318,6 +320,7 @@
     <Compile Include="Models\ModelProfileSwitcher.cs" />
     <Compile Include="Models\ModelSwitch.cs" />
     <Compile Include="Models\ModelSwitchDisplay.cs" />
+    <Compile Include="Models\ModelSwitchKorry.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\ImageManager.cs" />
@@ -380,6 +383,9 @@
     <Content Include="Images\category\ActionSwitchDisplay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\category\ActionSwitchKorry.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\category\category%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -395,6 +401,9 @@
     <Content Include="Images\category\StreamDeck_BtnOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\INOP.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\KorryOnBlueBot.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -402,6 +411,33 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\KorryOnWhiteBot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-AVAIL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-DECEL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-FAULT.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-HOT.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-OFF-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-ON-Blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-ON-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-OPEN.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\INOP.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\SeatClosed.png">
@@ -458,7 +494,13 @@
     <Content Include="Images\SwitchGreenOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\SwitchINOP.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\test.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ValueFault.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Wait.png">
@@ -482,6 +524,9 @@
     <Content Include="PI\js\pi_DisplaySwitch.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PI\js\pi_SwitchKorry.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PI\js\pi_SwitchDisplay.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -498,6 +543,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\pi_DisplaySwitch.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PI\pi_SwitchKorry.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PI\pi_SwitchDisplay.html">

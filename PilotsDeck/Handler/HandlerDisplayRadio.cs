@@ -14,7 +14,7 @@ namespace PilotsDeck
 
         protected new string[] CurrentValue { get; set; } = new string[2];
         protected virtual string[] CurrentAddress { get; set; } = new string[2];
-        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue[0]) && !string.IsNullOrEmpty(CurrentValue[1]);  } }
+        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue[0]) && !string.IsNullOrEmpty(CurrentValue[1]); } }
 
         protected int ticksIndication = 0;
         protected static readonly int ticksActive = 16;
@@ -34,42 +34,71 @@ namespace PilotsDeck
 
         public override void RegisterAddress(IPCManager ipcManager)
         {
-            ipcManager.RegisterAddress(Settings.AddressRadioActiv, AppSettings.groupStringRead);
-            ipcManager.RegisterAddress(Settings.AddressRadioStandby, AppSettings.groupStringRead);
-            CurrentAddress[0] = Settings.AddressRadioActiv;
-            CurrentAddress[1] = Settings.AddressRadioStandby;
+            CurrentAddress = RegisterAddress(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentAddress);
+        }
+
+        public static string[] RegisterAddress(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentAddresses)
+        {
+            ipcManager.RegisterAddress(firstAddress, AppSettings.groupStringRead);
+            ipcManager.RegisterAddress(secondAddress, AppSettings.groupStringRead);
+            currentAddresses[0] = firstAddress;
+            currentAddresses[1] = secondAddress;
+
+            return currentAddresses;
         }
 
         public override void UpdateAddress(IPCManager ipcManager)
         {
-            CurrentAddress[0] = UpdateAddress(ipcManager, CurrentAddress[0], Settings.AddressRadioActiv);
-            CurrentAddress[1] = UpdateAddress(ipcManager, CurrentAddress[1], Settings.AddressRadioStandby);
+            CurrentAddress = UpdateAddress(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentAddress);
+        }
+
+        public static string[] UpdateAddress(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentAddresses)
+        {
+            currentAddresses[0] = UpdateAddress(ipcManager, currentAddresses[0], firstAddress);
+            currentAddresses[1] = UpdateAddress(ipcManager, currentAddresses[1], secondAddress);
+
+            return currentAddresses;
         }
 
         public override void DeregisterAddress(IPCManager ipcManager)
         {
-            ipcManager.DeregisterValue(Settings.AddressRadioActiv);
-            ipcManager.DeregisterValue(Settings.AddressRadioStandby);
+            DeregisterAddress(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentAddress, ActionID);
+        }
 
-            if (Settings.AddressRadioActiv != CurrentAddress[0])
-                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.AddressRadioActiv} != {CurrentAddress[0]} ] ");
-            if (Settings.AddressRadioStandby != CurrentAddress[1])
-                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.AddressRadioStandby} != {CurrentAddress[1]} ] ");
+        public static void DeregisterAddress(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentAddresses, string actionID)
+        {
+            ipcManager.DeregisterValue(firstAddress);
+            ipcManager.DeregisterValue(secondAddress);
+
+            if (firstAddress != currentAddresses[0])
+                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {actionID} [ {firstAddress} != {currentAddresses[0]} ] ");
+            if (secondAddress != currentAddresses[1])
+                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {actionID} [ {secondAddress} != {currentAddresses[1]} ] ");
         }
 
         public override void RefreshValue(IPCManager ipcManager)
         {
+            CurrentValue = RefreshValue(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentValue, out bool isChanged);
+            IsChanged = isChanged;
+        }
+
+        public static string[] RefreshValue(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentValues, out bool isChanged)
+        {
             int results = 0;
-            if (RefreshValue(ipcManager, Settings.AddressRadioActiv, out string currentValue))
+            if (RefreshValue(ipcManager, firstAddress, out string currentValue))
                 results++;
-            CurrentValue[0] = currentValue;
-            
-            if (RefreshValue(ipcManager, Settings.AddressRadioStandby, out currentValue))
+            currentValues[0] = currentValue;
+
+            if (RefreshValue(ipcManager, secondAddress, out currentValue))
                 results++;
-            CurrentValue[1] = currentValue;
+            currentValues[1] = currentValue;
 
             if (results > 0)
-                IsChanged = true;
+                isChanged = true;
+            else
+                isChanged = false;
+
+            return currentValues;
         }
 
         public override bool Action(IPCManager ipcManager, bool longPress)
@@ -133,7 +162,7 @@ namespace PilotsDeck
 
                 ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background));
                 render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
-                render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangle(Settings.RectCoordStby));
+                render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
                 DrawImage = render.RenderImage64();
                 IsRawImage = true;

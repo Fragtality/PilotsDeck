@@ -51,6 +51,11 @@ namespace PilotsDeck
             render.CompositingQuality = CompositingQuality.HighQuality;
         }
 
+        public void DrawImage(Image image, Rectangle drawRectangle)
+        {
+            render.DrawImage(image, drawRectangle.X, drawRectangle.Y, drawRectangle.Width, drawRectangle.Height);
+        }
+
         public void DrawText(string text, Font drawFont, Color drawColor, RectangleF drawRectangle)
         {
             SolidBrush drawBrush = new SolidBrush(drawColor);

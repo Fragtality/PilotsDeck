@@ -117,7 +117,7 @@ namespace PilotsDeck
             {
                 if (!IPCTools.IsReadAddress(address))
                 {
-                    Log.Logger.Error($"RegisterValue: Not an Read-Address! {address}");
+                    Log.Logger.Error($"RegisterValue: Not an Read-Address! [{address}]");
                     return value;
                 }
 

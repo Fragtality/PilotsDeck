@@ -12,12 +12,15 @@ namespace PilotsDeck
         public class ModelPropertyInspector
         {
             public string ImageFiles { get; set; } = "";
+            public string KorryFiles { get; set; } = "";
             public string ActionTypes { get; set; } = "";
             public string GaugeOrientations { get; set; } = "";
 
-            public ModelPropertyInspector()
+            public ModelPropertyInspector(bool sendKorrys)
             {
                 ImageFiles = String.Join("|", ReadImageDirectory());
+                if (sendKorrys)
+                    KorryFiles = String.Join("|", ReadImageDirectory(@"korry\"));
 
                 Array values = Enum.GetValues(typeof(ActionSwitchType));
                 for (int i = 0; i < values.Length; i++)
@@ -42,7 +45,7 @@ namespace PilotsDeck
             public string FontNames { get; set; } = "";
             public string FontStyles { get; set; } = "";
 
-            public ModelPropertyInspectorFonts() : base()
+            public ModelPropertyInspectorFonts(bool sendKorrys = false) : base(sendKorrys)
             {
                 try
                 {
@@ -73,13 +76,14 @@ namespace PilotsDeck
             }
         }
 
-        public static string[] ReadImageDirectory()
+        public static string[] ReadImageDirectory(string postfix = "")
         {
             try
             {
-                string[] images = Directory.GetFiles(@"Images\");
+                string[] images = Directory.GetFiles(@"Images\" + postfix);
                 for (int i=0; i < images.Length; i++)
                     images[i] = images[i].Replace("\\", "/");
+  
                 return images;
             }
             catch

@@ -6,6 +6,7 @@ var websocket = null,
 	actionInfo = {},
 	ImageFiles = "",
 	ActionTypes = "",
+	KorryFiles = "",
 	GaugeOrientations = "",
 	FontNames = "",
 	FontStyles = "",
@@ -15,7 +16,8 @@ function fillImageSelectBox(values, elementID, configured) {
 	values = values.split('|');
 	for (i = 0; i < values.length; i++) {
 		var option = document.createElement("option");
-		option.text = values[i].split('/')[1].split('.')[0];
+		var idxFilename = values[i].split('/').length - 1;
+		option.text = values[i].split('/')[idxFilename].split('.')[0];
 		option.value = values[i];
 		if (values[i] == configured)
 			option.selected = true;
@@ -175,6 +177,14 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 					}
 					else {
 						ImageFiles = jsonObj.payload.ImageFiles;
+					}
+				}
+				if (jsonObj.payload && jsonObj.payload.KorryFiles && jsonObj.payload.KorryFiles != "") {
+					if (!KorryFiles || KorryFiles == "") {
+						KorryFiles = jsonObj.payload.KorryFiles;
+					}
+					else {
+						KorryFiles = jsonObj.payload.KorryFiles;
 					}
 				}
 				if (jsonObj.payload && jsonObj.payload.FontNames && jsonObj.payload.FontNames != "") {
