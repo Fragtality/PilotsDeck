@@ -227,6 +227,8 @@ namespace PilotsDeck
                                 watchLoading.Stop();
                                 watchLoading.Reset();
                                 appIsStarting = false;
+                                Log.Logger.Debug($"ActionController: appStartDelay expired, Processing normally.");
+                                lastProcessState = false;
                                 //Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
                             }
                         }
@@ -376,19 +378,19 @@ namespace PilotsDeck
             }
         }
 
-        public bool RunAction(string context, bool longPress)
+        public bool OnButtonDown(string context)
         {
             try
             {
-                if (!ipcManager.IsReady || !ipcManager.IsConnected)
+                if (!ipcManager.IsConnected)
                 {
-                    Log.Logger.Error($"RunAction: IPC not ready {context}");
+                    Log.Logger.Error($"RunAction: IPC not connected {context}");
                     return false;
                 }
 
                 if (currentActions.ContainsKey(context))
                 {
-                    return (currentActions[context] as IHandlerSwitch).Action(ipcManager, longPress);
+                    return (currentActions[context] as IHandlerSwitch).OnButtonDown(ipcManager, tickCounter);
                 }
                 else
                 {
@@ -402,6 +404,60 @@ namespace PilotsDeck
                 return false;
             }
         }
+
+        public bool OnButtonUp(string context)
+        {
+            try
+            {
+                if (!ipcManager.IsConnected)
+                {
+                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    return false;
+                }
+
+                if (currentActions.ContainsKey(context))
+                {
+                    return (currentActions[context] as IHandlerSwitch).OnButtonUp(ipcManager, tickCounter);
+                }
+                else
+                {
+                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    return false;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                return false;
+            }
+        }
+
+        //public bool RunAction(string context, bool longPress)
+        //{
+        //    try
+        //    {
+        //        if (!ipcManager.IsConnected)
+        //        {
+        //            Log.Logger.Error($"RunAction: IPC not connected {context}");
+        //            return false;
+        //        }
+
+        //        if (currentActions.ContainsKey(context))
+        //        {
+        //            return (currentActions[context] as IHandlerSwitch).Action(ipcManager, longPress);
+        //        }
+        //        else
+        //        {
+        //            Log.Logger.Error($"RunAction: Could not find Context {context}");
+        //            return false;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+        //        return false;
+        //    }
+        //}
 
         public void SetTitleParameters(string context, string title, StreamDeckEventPayload.TitleParameters titleParameters)
         {

@@ -101,10 +101,19 @@ namespace PilotsDeck
             return currentValues;
         }
 
-        public override bool Action(IPCManager ipcManager, bool longPress)
+        //public override bool Action(IPCManager ipcManager, bool longPress)
+        //{
+        //    LastSwitchState = "";
+        //    bool result = base.Action(ipcManager, longPress);
+        //    if (result)
+        //        wasPushed = true;
+
+        //    return result;
+        //}
+
+        public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            LastSwitchState = "";
-            bool result = base.Action(ipcManager, longPress);
+            bool result = base.OnButtonUp(ipcManager, tick);
             if (result)
                 wasPushed = true;
 

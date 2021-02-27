@@ -11,6 +11,7 @@ namespace PilotsDeck
         public override string ActionID { get { return $"\"{Title}\" [HandlerSwitch] Write: {Address} | LongWrite: {BaseSettings.HasLongPress} - {BaseSettings.AddressActionLong}"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
 
+        public virtual long tickDown { get; protected set; }
         protected virtual string LastSwitchState { get; set; }
         protected virtual string LastSwitchStateLong { get; set; }
 
@@ -35,28 +36,90 @@ namespace PilotsDeck
             }
         }
 
-        public virtual bool Action(IPCManager ipcManager, bool longPress)
+        public virtual bool OnButtonDown(IPCManager ipcManager, long tick)
         {
-            string newValue = ToggleValue(LastSwitchState, BaseSettings.OffState, BaseSettings.OnState);
-            bool result;
+            tickDown = tick;
+            return RunButtonDown(ipcManager, BaseSettings);
+        }
 
-            if (longPress && BaseSettings.HasLongPress)
-            {
-                newValue = ToggleValue(LastSwitchStateLong, BaseSettings.OffStateLong, BaseSettings.OnStateLong);
-                result = RunAction(ipcManager, BaseSettings.AddressActionLong, (ActionSwitchType)BaseSettings.ActionTypeLong, newValue);
-                if (result)
-                    LastSwitchStateLong = newValue;
-            }
+        public static bool RunButtonDown(IPCManager ipcManager, ModelSwitch switchSettings)
+        {
+            if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
+                return VjoyClearSet(ipcManager, switchSettings.AddressAction, false);
+            else if (IPCTools.IsWriteAddress(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType))
+                return true;
             else
-            {
-                result = RunAction(ipcManager, BaseSettings.AddressAction, (ActionSwitchType)BaseSettings.ActionType, newValue);
-                if (result)
-                    LastSwitchState = newValue;
+                return false;
+        }
 
+        public virtual bool OnButtonUp(IPCManager ipcManager, long tick)
+        {
+            bool result = RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, LastSwitchState, LastSwitchStateLong, BaseSettings, out string[] newValues);
+            LastSwitchState = newValues[0];
+            LastSwitchStateLong = newValues[1];
+            tickDown = 0;
+
+            return result;
+        }
+
+        public static bool RunButtonUp(IPCManager ipcManager, bool longPress, string lastState, string lastStateLong, ModelSwitch switchSettings, out string[] newValues)
+        {
+            bool result = false;
+            newValues = new string[2];
+            newValues[0] = lastState;
+            newValues[1] = lastStateLong;
+
+            if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
+            {
+                result = VjoyClearSet(ipcManager, switchSettings.AddressAction, true);
+            }
+            else if (!longPress)
+            {
+                string newValue = ToggleValue(lastState, switchSettings.OffState, switchSettings.OnState);
+                result = RunAction(ipcManager, switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue);
+                if (result)
+                    newValues[0] = newValue;
+            }
+            else if (longPress && switchSettings.HasLongPress)
+            {
+                if (IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong) && IPCTools.IsVjoyToggle(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
+                {
+                    result = VjoyToggle(ipcManager, switchSettings.AddressActionLong);
+                }
+                else if (IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong) && !IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
+                {
+                    string newValue = ToggleValue(lastStateLong, switchSettings.OffStateLong, switchSettings.OnStateLong);
+                    result = RunAction(ipcManager, switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue);
+                    if (result)
+                        newValues[1] = newValue;
+                }
             }
 
             return result;
         }
+
+        //public virtual bool Action(IPCManager ipcManager, bool longPress)
+        //{
+        //    string newValue = ToggleValue(LastSwitchState, BaseSettings.OffState, BaseSettings.OnState);
+        //    bool result;
+
+        //    if (longPress && BaseSettings.HasLongPress)
+        //    {
+        //        newValue = ToggleValue(LastSwitchStateLong, BaseSettings.OffStateLong, BaseSettings.OnStateLong);
+        //        result = RunAction(ipcManager, BaseSettings.AddressActionLong, (ActionSwitchType)BaseSettings.ActionTypeLong, newValue);
+        //        if (result)
+        //            LastSwitchStateLong = newValue;
+        //    }
+        //    else
+        //    {
+        //        result = RunAction(ipcManager, BaseSettings.AddressAction, (ActionSwitchType)BaseSettings.ActionType, newValue);
+        //        if (result)
+        //            LastSwitchState = newValue;
+
+        //    }
+
+        //    return result;
+        //}
 
         public static string ToggleValue(string lastValue, string offState, string onState)
         {
@@ -86,6 +149,11 @@ namespace PilotsDeck
                         return SendControls(ipcManager, Address);
                     case ActionSwitchType.OFFSET:
                         return WriteOffset(ipcManager, Address, newValue);
+                    case ActionSwitchType.VJOY:
+                        if (IPCTools.IsVjoyToggle(Address, (int)actionType))
+                            return VjoyToggle(ipcManager, Address);
+                        else
+                            return false;
                     default:
                         return false;
                 }
@@ -94,6 +162,19 @@ namespace PilotsDeck
                 Log.Logger.Error($"HandlerBase:RunAction not connected or Address not passed {Address}");
 
             return false;
+        }
+
+        public static bool VjoyToggle(IPCManager ipcManager, string address)
+        {
+            return ipcManager.SendVjoy(address, 0);
+        }
+
+        public static bool VjoyClearSet(IPCManager ipcManager, string address, bool clear)
+        {
+            if (clear)
+                return ipcManager.SendVjoy(address, 2);
+            else
+                return ipcManager.SendVjoy(address, 1);
         }
 
         public static bool RunScript(IPCManager ipcManager, string address)

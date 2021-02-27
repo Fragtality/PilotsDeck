@@ -18,5 +18,23 @@
         {
 
         }
+
+        public ModelSwitch GetSwitchSettings()
+        {
+            ModelSwitch settings = new ModelSwitch()
+            {
+                AddressAction = AddressAction,
+                ActionType = ActionType,
+                OnState = OnState,
+                OffState = OffState,
+                HasLongPress = HasLongPress,
+                AddressActionLong = AddressActionLong,
+                ActionTypeLong = ActionTypeLong,
+                OnStateLong = OnStateLong,
+                OffStateLong = OffStateLong
+            };
+
+            return settings;
+        }
     }
 }

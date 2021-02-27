@@ -106,8 +106,14 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regOffset;
 	else if (type == 5) //offset | lvar
 		document.getElementById(field).pattern = `${regOffset}|${regLvar}`;
+	else if (type == 6) //vjoy
+		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else
 		document.getElementById(field).pattern = "";
+}
+
+function isLongPressAllowed(actionType, address) {
+	return actionType != 6 || (actionType == 6 && address.includes(":t"));
 }
 
 function toggleOnOffState(actionType, onField, offField) {
@@ -131,6 +137,10 @@ function toggleOnOffState(actionType, onField, offField) {
 	else if (actionType == 4) { //offset
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
+	}
+	else if (actionType == 6) { //vjoy
+		toggleConfigItem(false, onField);
+		toggleConfigItem(false, offField);
 	}
 	else {
 		toggleConfigItem(false, onField);

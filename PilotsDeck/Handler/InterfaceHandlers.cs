@@ -46,6 +46,10 @@
 
     public interface IHandlerSwitch : IHandler
     {
-        bool Action(IPCManager ipcManager, bool longPress);
+        //bool Action(IPCManager ipcManager, bool longPress);
+        long tickDown { get; }
+
+        bool OnButtonDown(IPCManager ipcManager, long tick);
+        bool OnButtonUp(IPCManager ipcManager, long tick);
     }
 }

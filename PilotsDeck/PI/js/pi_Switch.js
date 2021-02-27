@@ -30,14 +30,16 @@ function updateForm() {
 	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
 	//On/Off States
+	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
 	toggleOnOffState(settingsModel.ActionType, 'OnState', 'OffState');
-	if (settingsModel.HasLongPress)
+	if (settingsModel.HasLongPress && longAllowed)
 		toggleOnOffState(settingsModel.ActionTypeLong, 'OnStateLong', 'OffStateLong');
 	else
 		toggleOnOffState(-1, 'OnStateLong', 'OffStateLong');
-
+	
 	//LongPress
-	toggleConfigItem(settingsModel.HasLongPress, 'ActionTypeLong');
-	toggleConfigItem(settingsModel.HasLongPress, 'AddressActionLong');
+	toggleConfigItem(longAllowed, 'HasLongPress');
+	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
+	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 
 }

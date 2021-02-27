@@ -219,6 +219,27 @@ namespace PilotsDeck
                 return Process(group);
         }
 
+        public bool SendVjoy(string address, byte action)
+        {
+            try
+            {
+                string[] parts = address.Split(':');
+                byte[] offValue = new byte[4];
+
+                offValue[3] = 0;
+                offValue[2] = action;
+                offValue[1] = Convert.ToByte(parts[0]); //joy
+                offValue[0] = Convert.ToByte(parts[1]); //btn
+
+                return WriteOffset("0x29F0:4:i", BitConverter.ToUInt32(offValue,0).ToString());
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCManager: Exception while sending Virtual Joystick <{address}> to FSUIPC");
+                return false;
+            }
+        }
+
         public bool WriteOffset(string address, string value)
         {
             bool result = false;

@@ -6,7 +6,9 @@
         SCRIPT,
         CONTROL,
         LVAR,
-        OFFSET
+        OFFSET,
+        //5 is offset+lvar in PI
+        VJOY = 6
     }
 
     public class ModelSwitch : ModelBase
