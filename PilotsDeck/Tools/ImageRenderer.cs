@@ -14,12 +14,10 @@ namespace PilotsDeck
         public int StartAngle { get; set; } = 135;
         public int SweepAngle { get; set; } = 180;
 
-        public RectangleF GetRectangle(int buttonSize = -1)
+        public RectangleF GetRectangle(int buttonSize, int sizeScalar)
         {
-            if (buttonSize == -1)
-                buttonSize = ImageRenderer.buttonSize;
-            int org = ((buttonSize - Radius) / 2) + Offset; // btn - <R> / 2 => x/y
-            return new RectangleF(org, org, Radius, Radius);
+            int org = ((buttonSize - Radius * sizeScalar) / 2) + Offset; // btn - <R> / 2 => x/y
+            return new RectangleF(org, org, Radius * sizeScalar, Radius * sizeScalar);
         }
     }
 
@@ -29,8 +27,11 @@ namespace PilotsDeck
         protected Bitmap background;
         protected Graphics render;
 
-        public static readonly int buttonSize = 72;
-        protected static int buttonSizeH = buttonSize/2;
+        //public static readonly int buttonSize = 144;
+        //protected static int buttonSizeH = buttonSize/2;
+        public static int buttonSize = 72;
+        protected int buttonSizeH;
+        protected int sizeScalar;
 
         protected StringFormat stringFormat = new StringFormat
         {
@@ -49,6 +50,10 @@ namespace PilotsDeck
             render.InterpolationMode = InterpolationMode.HighQualityBicubic;
             render.PixelOffsetMode = PixelOffsetMode.HighQuality;
             render.CompositingQuality = CompositingQuality.HighQuality;
+
+            buttonSize = background.Width;
+            buttonSizeH = buttonSize / 2;
+            sizeScalar = buttonSize / 72;
         }
 
         public void DrawImage(Image image, Rectangle drawRectangle)
@@ -79,16 +84,16 @@ namespace PilotsDeck
 
         public void DrawArc(Arc drawArc, Color drawColor)
         {
-            RectangleF drawRect = drawArc.GetRectangle(buttonSize);
+            RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             
-            Pen pen = new Pen(drawColor, drawArc.Width);
+            Pen pen = new Pen(drawColor, drawArc.Width * sizeScalar);
             render.DrawArc(pen, drawRect, drawArc.StartAngle, drawArc.SweepAngle);
             pen.Dispose();
         }
 
         public void DrawArcIndicator(Arc drawArc, Color drawColor, float size, float value, float minimum, float maximum, bool bottom = false)
         {
-            RectangleF drawRect = drawArc.GetRectangle(buttonSize);
+            RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             float angle = (NormalizedRatio(value, minimum, maximum) * drawArc.SweepAngle) + drawArc.StartAngle;
             
             size /= 2;
@@ -109,7 +114,7 @@ namespace PilotsDeck
 
         public void DrawArcCenterLine(Arc drawArc, Color drawColor, int size)
         {
-            RectangleF drawRect = drawArc.GetRectangle(buttonSize);
+            RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             float orgIndX = drawRect.X + drawRect.Width;
             float orgIndY = (drawRect.Y + drawRect.Width / 2);
             float angle = (drawArc.SweepAngle / 2) + drawArc.StartAngle;
@@ -126,7 +131,7 @@ namespace PilotsDeck
             if (maximum == 0.0f)
                 return;
 
-            RectangleF drawRect = drawArc.GetRectangle(buttonSize);
+            RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             float rangeAngleStart;
             float rangeAngleSweep;
             float fix = 1.0f;

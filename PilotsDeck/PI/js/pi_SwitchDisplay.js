@@ -8,6 +8,11 @@ var settingsModel = {
     IndicationValue: "0",
 	AddressAction: "",
 	ActionType: 0,
+	HasLongPress: false,
+	AddressActionLong: "",
+	ActionTypeLong: 0,
+	OnStateLong: "",
+	OffStateLong: "",
 	OnImage: "Images/KorryOnBlueTop.png",
 	OnState: "",
 	OffImage: "Images/KorryOffWhiteBottom.png",
@@ -25,15 +30,29 @@ function fillSelectBoxes() {
 	}
 	if (ActionTypes && ActionTypes != "") {
 		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
+		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
 	}
 }
 
 function updateForm() {
 	//ACTION TYPE pattern
 	setPattern('AddressAction', settingsModel.ActionType);
+	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
 	//INDICATION
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationValueAny');
 	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationValueAny, 'IndicationValue');
+
+	//On/Off States
+	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
+	if (settingsModel.HasLongPress && longAllowed)
+		toggleOnOffState(settingsModel.ActionTypeLong, 'OnStateLong', 'OffStateLong');
+	else
+		toggleOnOffState(-1, 'OnStateLong', 'OffStateLong');
+
+	//LongPress
+	toggleConfigItem(longAllowed, 'HasLongPress');
+	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
+	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 }

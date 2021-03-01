@@ -52,28 +52,5 @@
 
             return result;
         }
-
-        //public virtual bool Action(IPCManager ipcManager, bool longPress)
-        //{
-        //    string newValue = HandlerSwitch.ToggleValue(LastSwitchState, SwitchSettings.OffState, SwitchSettings.OnState);
-        //    bool result;
-
-        //    if (longPress && SwitchSettings.HasLongPress)
-        //    {
-        //        newValue = HandlerSwitch.ToggleValue(LastSwitchStateLong, SwitchSettings.OffStateLong, SwitchSettings.OnStateLong);
-        //        result = HandlerSwitch.RunAction(ipcManager, SwitchSettings.AddressActionLong, (ActionSwitchType)SwitchSettings.ActionTypeLong, newValue);
-        //        if (result)
-        //            LastSwitchStateLong = newValue;
-        //    }
-        //    else
-        //    {
-        //        result = HandlerSwitch.RunAction(ipcManager, SwitchSettings.AddressAction, (ActionSwitchType)SwitchSettings.ActionType, newValue);
-        //        if (result)
-        //            LastSwitchState = newValue;
-
-        //    }
-
-        //    return result;
-        //}
     }
 }

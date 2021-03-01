@@ -44,8 +44,9 @@ namespace PilotsDeck
 
         protected virtual void RenderDefaultImage(ImageManager imgManager)
         {
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage));
-            
+            //ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage));
+            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(@"Images\Blank@2x.png"));
+
             if (GaugeSettings.DrawArc)
             {
                 render.DrawArc(GaugeSettings.GetArc(), ColorTranslator.FromHtml(GaugeSettings.GaugeColor));

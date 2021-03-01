@@ -155,8 +155,20 @@
       "DontAutoSwitchWhenInstalled": true
     },
     {
+      "Name": "Profiles/PilotsDeck - DefaultXL",
+      "DeviceType": 2,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
+      "Name": "Profiles/PilotsDeck - Whiskey",
+      "DeviceType": 2,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
       "Name": "Profiles/PilotsDeck - X-Ray",
-      "DeviceType": 0,
+      "DeviceType": 2,
       "ReadOnly": false,
       "DontAutoSwitchWhenInstalled": true
     },
@@ -178,7 +190,11 @@
   },
   "ApplicationsToMonitor": {
     "windows": [
-      "Prepar3D.exe"
+      "Prepar3D.exe",
+      "fsx.exe",
+      "FlightSimulator.exe",
+      "X-Plane.exe",
+      "fs9.exe"
     ]
   },
   "OS": [

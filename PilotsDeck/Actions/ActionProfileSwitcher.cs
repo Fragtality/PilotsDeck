@@ -12,31 +12,60 @@ namespace PilotsDeck
         public override async Task OnWillAppear(StreamDeckEventPayload args)
         {
             await base.OnWillAppear(args);
-
-            SetActionImage(args.context, SettingsModel.EnableSwitching);
-            SettingsModel.ProfileMappings = new List<ModelProfileSwitcher.Profile>();
-            SettingsModel.MappingsJson = "";
+            
+            Plugin.ActionController.RegisterProfileSwitcher(args.context);
+            
+            SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
             await Manager.SetSettingsAsync(args.context, SettingsModel);
+
+            SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
 
             Log.Logger.Debug($"ActionProfileSwitcher:OnWillAppear {args.context}");
         }
 
-        private void SetActionImage(string context, bool switchState)
+        public override Task OnWillDisappear(StreamDeckEventPayload args)
+        {
+            base.OnWillDisappear(args);
+
+            Plugin.ActionController.DeregisterProfileSwitcher(args.context);
+
+            Log.Logger.Debug($"ActionProfileSwitcher:OnWillDisappear {args.context}");
+            return Task.CompletedTask;
+        }
+
+        public static void SetActionImage(ConnectionManager manager, string context, bool switchState)
         {
             if (switchState)
-                Manager.SetImageAsync(context, @"Images\category\StreamDeck_BtnOn.png");
+                manager.SetImageAsync(context, @"Images\category\StreamDeck_BtnOn.png");
             else
-                Manager.SetImageAsync(context, @"Images\category\StreamDeck_BtnOff.png");
+                manager.SetImageAsync(context, @"Images\category\StreamDeck_BtnOff.png");
+        }
+
+        public override Task OnKeyUp(StreamDeckEventPayload args)
+        {
+            base.OnKeyUp(args);
+
+            SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
+            SettingsModel.EnableSwitching = !SettingsModel.EnableSwitching;
+            Plugin.ActionController.UpdateGlobalSettings(SettingsModel);
+            Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
+
+            SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
+
+            Log.Logger.Debug($"ActionProfileSwitcher:OnKeyUp {args.context}");
+            return Task.CompletedTask;
         }
 
         public override Task OnDidReceiveSettings(StreamDeckEventPayload args)
         {
             base.OnDidReceiveSettings(args);
 
-            SetActionImage(args.context, SettingsModel.EnableSwitching);
+            SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
 
-            Manager.SetGlobalSettingsAsync(Manager.PluginUUID, SettingsModel);
-            Manager.GetGlobalSettingsAsync(Manager.PluginUUID);
+            Plugin.ActionController.UpdateGlobalSettings(SettingsModel);
+            Plugin.ActionController.LoadProfiles();
+            SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
+            Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
 
             Log.Logger.Debug($"ActionProfileSwitcher:OnDidReceiveSettings {args.context}");
             return Task.CompletedTask;
@@ -46,13 +75,10 @@ namespace PilotsDeck
         {
             base.OnPropertyInspectorDidAppear(args);
 
-            SetActionImage(args.context, Plugin.ActionController.GlobalProfileSettings.EnableSwitching);
-            Plugin.ActionController.LoadProfiles();
+            SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
+            Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
 
             Log.Logger.Debug($"ActionProfileSwitcher:OnPropertyInspectorDidAppear {args.context}");
-            Plugin.ActionController.GlobalProfileSettings.ExportToJson();
-            Manager.SetSettingsAsync(args.context, Plugin.ActionController.GlobalProfileSettings);
-
             return Task.CompletedTask;
         }
     }

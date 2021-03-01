@@ -222,6 +222,10 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 					}
 				}
 				fillSelectBoxes();
+				if (jsonObj.payload && jsonObj.payload.MappingsJson != null) {
+					refreshSettings(jsonObj.payload);
+					updateForm();
+                }
 				break;
 			case "didReceiveSettings":
 				refreshSettings(jsonObj.payload.settings.settingsModel);

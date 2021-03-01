@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using StreamDeckLib;
@@ -38,7 +39,9 @@ namespace PilotsDeck
         private bool redrawAlways = AppSettings.redrawAlways;
 
         public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
-        private List<string> manifestProfiles;
+        private List<string> profileSwitcherActions = new List<string>();
+        private List<string> switchedDecks = new List<string>();
+        private List<StreamDeckProfile> manifestProfiles;
         private IPCValueOffset loadedFSProfile;
         private string lastFSProfile = null;
         private IPCValueOffset loadedAircraft;
@@ -49,7 +52,7 @@ namespace PilotsDeck
             currentActions = new Dictionary<string, IHandler>();
             ipcManager = new IPCManager(AppSettings.groupStringRead);
             imgManager = new ImageManager();
-            manifestProfiles = new List<string>();
+            manifestProfiles = new List<StreamDeckProfile>();
         }
 
         public void Init()
@@ -67,8 +70,10 @@ namespace PilotsDeck
                 foreach (var profile in manifest.Profiles)
                 {
                     string name = profile?.Name;
-                    if (!string.IsNullOrEmpty(name))
-                        manifestProfiles.Add(name);
+                    if (!string.IsNullOrEmpty(name) && profile?.DeviceType != null)
+                    {
+                        manifestProfiles.Add(new StreamDeckProfile() { Name = profile.Name, Type = profile.DeviceType });
+                    }
                 }
             }
             Log.Logger.Information($"Loaded {manifestProfiles.Count} StreamDeck Profiles from Manifest.");
@@ -119,15 +124,19 @@ namespace PilotsDeck
         protected void OnDidReceiveGlobalSettings(StreamDeckEventPayload args)
         {
             StreamDeckEventPayload.SetModelProperties(args, GlobalProfileSettings);
-            GlobalProfileSettings.UpdateSettings(manifestProfiles);
+            GlobalProfileSettings.UpdateSettings(manifestProfiles, DeckManager.Info.devices);
             DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
+
+            foreach (var switcher in profileSwitcherActions)
+                ActionProfileSwitcher.SetActionImage(DeckManager, switcher, GlobalProfileSettings.EnableSwitching);
 
             //For Test/Debugging - clear GlobalSettings
             //GlobalProfileSettings = new ModelProfileSwitcher();
-            //GlobalProfileSettings.ExportToJson();
+            //GlobalProfileSettings.UpdateSettings(manifestProfiles, DeckManager.Info.devices);
             //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
+            //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, null);
 
-            Log.Logger.Information($"ActionController:OnDidReceiveGlobalSettings - Switching => {GlobalProfileSettings.EnableSwitching} | Default: {GlobalProfileSettings.UseDefault} | Profiles => {GlobalProfileSettings?.ProfileMappings?.Count}");
+            Log.Logger.Information($"ActionController:OnDidReceiveGlobalSettings - Switching => {GlobalProfileSettings.EnableSwitching} | DeviceMappings => {GlobalProfileSettings?.DeviceMappings?.Count} | Installed => {GlobalProfileSettings.ProfilesInstalled}");
         }
 
         protected void OnApplicationDidLaunch(StreamDeckEventPayload args)
@@ -148,6 +157,91 @@ namespace PilotsDeck
 
             if (args.payload.application == Application)
                 IsApplicationOpen = false;
+        }
+
+        public void RegisterProfileSwitcher(string context)
+        {
+            if (!profileSwitcherActions.Contains(context))
+            {
+                profileSwitcherActions.Add(context);
+                Log.Logger.Debug($"ActionController:RegisterProfileSwitcher ProfileSwitcher registered [{context}]");
+            }
+            else
+                Log.Logger.Error($"ActionController:RegisterProfileSwitcher ProfileSwitcher already registered! [{context}]");
+        }
+
+        public void DeregisterProfileSwitcher(string context)
+        {
+            if (profileSwitcherActions.Contains(context))
+            {
+                profileSwitcherActions.Remove(context);
+                Log.Logger.Debug($"ActionController:DeregisterProfileSwitcher ProfileSwitcher deregistered [{context}]");
+            }
+            else
+                Log.Logger.Error($"ActionController:DeregisterProfileSwitcher ProfileSwitcher not registered! [{context}]");
+        }
+
+        protected void SwitchProfiles()
+        {
+            foreach (var deviceMapping in GlobalProfileSettings.DeviceMappings)
+            {
+                string switchTo = "";
+
+                if (string.IsNullOrEmpty(loadedFSProfile.Value) && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
+                    switchTo = deviceMapping.DefaultProfile;
+                else if (deviceMapping.Profiles != null && deviceMapping.Profiles.Count() > 0)
+                {
+                    foreach (var profile in deviceMapping.Profiles)
+                    {
+                        if (ModelProfileSwitcher.IsInProfile(profile.Mappings, loadedFSProfile.Value))
+                        {
+                            switchTo = profile.Name;
+                            break;
+                        }
+                    }
+
+                    if (switchTo == "" && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
+                        switchTo = deviceMapping.DefaultProfile;
+                }
+
+                if (switchTo != "")
+                {
+                    _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deviceMapping.ID, switchTo);
+                    if (!switchedDecks.Contains(deviceMapping.ID))
+                        switchedDecks.Add(deviceMapping.ID);
+                    Log.Logger.Information($"ActionController: FSUIPC Profile [{loadedFSProfile.Value}] active for Aircraft [{loadedAircraft.Value}]-> switching to [{switchTo}] on StreamDeck [{deviceMapping.Name}]");
+                }
+            }
+
+            lastFSProfile = loadedFSProfile.Value;
+            lastAircraft = loadedAircraft.Value;
+        }
+
+        public void LoadProfiles()
+        {
+            if (!GlobalProfileSettings.ProfilesInstalled)
+            {
+                var deckTypes = new int[] { (int)StreamDeckType.StreamDeck, (int)StreamDeckType.StreamDeckXL, (int)StreamDeckType.StreamDeckMini, (int)StreamDeckType.StreamDeckMobile };
+                foreach (int deckType in deckTypes)
+                {
+                    if (manifestProfiles.Where(p => p.Type == deckType).Count() > 0)
+                    {
+                        var decks = DeckManager.Info.devices.Where(d => d.type == deckType);
+                        foreach (var deck in decks)
+                            DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck.id, "Profiles/install");
+                    }
+
+                }
+
+                GlobalProfileSettings.ProfilesInstalled = true;
+                DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
+            }
+        }
+
+        public void UpdateGlobalSettings(ModelProfileSwitcher settings)
+        {
+            GlobalProfileSettings.CopySettings(settings);
+            DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
         }
 
         public void Run(CancellationToken token)
@@ -174,7 +268,8 @@ namespace PilotsDeck
                     CallOnAll(handler => handler.SetDefault());
                     redrawRequested = true;
                     if (GlobalProfileSettings.EnableSwitching && GlobalProfileSettings.ProfilesInstalled)
-                        _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, null);
+                        foreach (var deck in switchedDecks)
+                            _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, null);
                 }
             }
             else                        //P3D open
@@ -188,7 +283,7 @@ namespace PilotsDeck
                     redrawRequested = true;
                     ipcManager.Connect();
                 }
-                
+
                 if (!ipcManager.IsConnected && (tickCounter % waitTicks == 0 || tickCounter == firstTick)) //still open not connected, check retry connection every 30s when not connected (every <150> Ticks * <200>ms)
                 {
                     ipcManager.Connect();
@@ -285,47 +380,6 @@ namespace PilotsDeck
                 if (appAlreadyRunning && tickCounter > waitTicks)
                     appAlreadyRunning = false;
             }
-        }
-
-        protected void SwitchProfiles()
-        {
-            string switchTo = "";
-
-            if (string.IsNullOrEmpty(loadedFSProfile.Value) && GlobalProfileSettings.UseDefault && !string.IsNullOrEmpty(GlobalProfileSettings.DefaultProfile))
-                switchTo = GlobalProfileSettings.DefaultProfile;
-            else if (GlobalProfileSettings?.ProfileMappings != null)
-            {
-                foreach (var profile in GlobalProfileSettings.ProfileMappings)
-                {
-                    if (ModelProfileSwitcher.IsInProfile(profile.Mappings, loadedFSProfile.Value))
-                    {
-                        switchTo = profile.Name;
-                        break;
-                    }    
-                }
-
-                if (switchTo == "" && GlobalProfileSettings.UseDefault && !string.IsNullOrEmpty(GlobalProfileSettings.DefaultProfile))
-                    switchTo = GlobalProfileSettings.DefaultProfile;
-            }
-
-            if (switchTo != "")
-            {
-                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, switchTo);
-                Log.Logger.Information($"ActionController: FSUIPC Profile [{loadedFSProfile.Value}] active for Aircraft [{loadedAircraft.Value}]-> switching to [{switchTo}]");
-            }
-            
-            lastFSProfile = loadedFSProfile.Value;
-            lastAircraft = loadedAircraft.Value;
-        }
-
-        public void LoadProfiles()
-        {
-            if (!GlobalProfileSettings.ProfilesInstalled)
-            {
-                _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, DeckManager.FirstDeviceID, AppSettings.deckDefaultProfile);
-            }
-            GlobalProfileSettings.ProfilesInstalled = true;
-            DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
         }
 
         protected void RefreshActions(CancellationToken token, bool forceUpdate = false)
@@ -431,33 +485,6 @@ namespace PilotsDeck
                 return false;
             }
         }
-
-        //public bool RunAction(string context, bool longPress)
-        //{
-        //    try
-        //    {
-        //        if (!ipcManager.IsConnected)
-        //        {
-        //            Log.Logger.Error($"RunAction: IPC not connected {context}");
-        //            return false;
-        //        }
-
-        //        if (currentActions.ContainsKey(context))
-        //        {
-        //            return (currentActions[context] as IHandlerSwitch).Action(ipcManager, longPress);
-        //        }
-        //        else
-        //        {
-        //            Log.Logger.Error($"RunAction: Could not find Context {context}");
-        //            return false;
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
-        //        return false;
-        //    }
-        //}
 
         public void SetTitleParameters(string context, string title, StreamDeckEventPayload.TitleParameters titleParameters)
         {

@@ -98,29 +98,6 @@ namespace PilotsDeck
             return result;
         }
 
-        //public virtual bool Action(IPCManager ipcManager, bool longPress)
-        //{
-        //    string newValue = ToggleValue(LastSwitchState, BaseSettings.OffState, BaseSettings.OnState);
-        //    bool result;
-
-        //    if (longPress && BaseSettings.HasLongPress)
-        //    {
-        //        newValue = ToggleValue(LastSwitchStateLong, BaseSettings.OffStateLong, BaseSettings.OnStateLong);
-        //        result = RunAction(ipcManager, BaseSettings.AddressActionLong, (ActionSwitchType)BaseSettings.ActionTypeLong, newValue);
-        //        if (result)
-        //            LastSwitchStateLong = newValue;
-        //    }
-        //    else
-        //    {
-        //        result = RunAction(ipcManager, BaseSettings.AddressAction, (ActionSwitchType)BaseSettings.ActionType, newValue);
-        //        if (result)
-        //            LastSwitchState = newValue;
-
-        //    }
-
-        //    return result;
-        //}
-
         public static string ToggleValue(string lastValue, string offState, string onState)
         {
             string newValue;

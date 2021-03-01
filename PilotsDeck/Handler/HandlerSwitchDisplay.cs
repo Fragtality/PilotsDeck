@@ -72,13 +72,6 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
-        //public override bool Action(IPCManager ipcManager, bool longPress)
-        //{
-        //    LastSwitchState = CurrentValue;
-        //    LastSwitchStateLong = CurrentValue;
-        //    return base.Action(ipcManager, longPress);
-        //}
-
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
             LastSwitchState = CurrentValue;
