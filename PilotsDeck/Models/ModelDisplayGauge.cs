@@ -21,17 +21,17 @@ namespace PilotsDeck
         public virtual string GaugeColor { get; set; } = "#006400";
         
         public virtual bool DrawArc { get; set; } = false;
-        public virtual int StartAngle { get; set; } = 135;
-        public virtual int SweepAngle { get; set; } = 180;
-        public virtual int Offset { get; set; } = 0;        
+        public virtual float StartAngle { get; set; } = 135;
+        public virtual float SweepAngle { get; set; } = 180;
+        public virtual string Offset { get; set; } = "0; 0";        
 
         public virtual string IndicatorColor { get; set; } = "#c7c7c7";
-        public virtual int IndicatorSize { get; set; } = 10;
+        public virtual float IndicatorSize { get; set; } = 10;
         public virtual bool IndicatorFlip { get; set; } = false;
 
         public virtual bool CenterLine { get; set; } = false;
         public virtual string CenterLineColor { get; set; } = "#ffffff";
-        public virtual int CenterLineThickness { get; set; } = 2;
+        public virtual float CenterLineThickness { get; set; } = 2;
 
         public virtual bool DrawWarnRange { get; set; } = false;
         public virtual bool SymmRange { get; set; } = false;
@@ -64,7 +64,7 @@ namespace PilotsDeck
             }
             else
             {
-                GaugeSize = "42; 8";
+                GaugeSize = "48; 6";
                 RectCoord = "16; 27; 60; 21";
             }
         }
@@ -122,29 +122,42 @@ namespace PilotsDeck
                 return false;
         }
 
-        public RectangleF GetRectangleBar(int size = -1)
-        {
-            if (size == -1)
-                size = ImageRenderer.buttonSize;
-            //RectangleF drawRect = new RectangleF(12, 30, 48, 12); //X= 36 - <W>/2 (64 ~ 4) //Y= 36 - <H>/2 (8 ~ 32)
-            float[] barsize = GetNumValues(GaugeSize, 64, 8);
+        //public RectangleF GetRectangleBar(int size)
+        //{
+        //    //if (size == -1)
+        //    //    size = ImageRenderer.buttonSize;
+        //    //RectangleF drawRect = new RectangleF(12, 30, 48, 12); //X= 36 - <W>/2 (64 ~ 4) //Y= 36 - <H>/2 (8 ~ 32)
+        //    float[] barsize = GetNumValues(GaugeSize, 64, 8);
 
-            return new RectangleF(size/2 - barsize[0]/2, size/2 - barsize[1] / 2, barsize[0], barsize[1]);
-        }
+        //    return new RectangleF(size/2 - barsize[0]/2, size/2 - barsize[1] / 2, barsize[0], barsize[1]);
+        //}
 
         public Arc GetArc()
         {
             float[] arcsize = GetNumValues(GaugeSize, 48, 6);
+            float[] offset = GetNumValues(Offset, 0, 0);
             Arc arc = new Arc
             {
-                Radius = (int)arcsize[0],
-                Width = (int)arcsize[1],
-                Offset = Offset,
+                Radius = arcsize[0],
+                Width = arcsize[1],
+                Offset = new PointF(offset[0], offset[1]),
                 StartAngle = StartAngle,
                 SweepAngle = SweepAngle
             };
 
             return arc;
+        }
+
+        public Bar GetBar()
+        {
+            float[] barsize = GetNumValues(GaugeSize, 58, 10);
+            Bar bar = new Bar
+            {
+                Width = barsize[0],
+                Height = barsize[1]
+            };
+
+            return bar;
         }
 
         public Color[] GetColorRange()

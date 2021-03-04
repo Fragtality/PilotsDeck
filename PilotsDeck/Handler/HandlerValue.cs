@@ -11,7 +11,7 @@ namespace PilotsDeck
         public virtual bool IsChanged { get; protected set; } = false;
 
 
-        public HandlerValue(string context, ModelDisplay settings) : base(context, settings)
+        public HandlerValue(string context, ModelDisplay settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             
         }

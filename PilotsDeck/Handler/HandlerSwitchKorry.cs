@@ -20,7 +20,7 @@
         protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValues[0]) && (!string.IsNullOrEmpty(CurrentValues[1]) || KorrySettings.UseOnlyTopAddr); } }
 
 
-        public HandlerSwitchKorry(string context, ModelSwitchKorry settings) : base(context, settings)
+        public HandlerSwitchKorry(string context, ModelSwitchKorry settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
             LastSwitchState = settings.OffState;
@@ -68,12 +68,12 @@
 
         protected virtual void RenderDefaultImage(ImageManager imgManager)
         {
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(KorrySettings.DefaultImage));
+            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(KorrySettings.DefaultImage, DeckType));
 
             if (!string.IsNullOrEmpty(KorrySettings.TopImage))
-                render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage), KorrySettings.GetRectangleTop());
+                render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage, DeckType), KorrySettings.GetRectangleTop());
             if (!string.IsNullOrEmpty(KorrySettings.BotImage))
-                render.DrawImage(imgManager.GetImageObject(KorrySettings.BotImage), KorrySettings.GetRectangleBot());
+                render.DrawImage(imgManager.GetImageObject(KorrySettings.BotImage, DeckType), KorrySettings.GetRectangleBot());
 
             DefaultImageRender = render.RenderImage64();
             render.Dispose();
@@ -94,17 +94,17 @@
             if (!IsChanged && !ForceUpdate)
                 return;
 
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(DefaultImage));
+            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(DefaultImage, DeckType));
 
             if (((CurrentValues[0] == KorrySettings.TopState && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(CurrentValues[0]))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
-                render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage), KorrySettings.GetRectangleTop());
+                render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage, DeckType), KorrySettings.GetRectangleTop());
 
             string testValue = CurrentValues[1];
             if (KorrySettings.UseOnlyTopAddr)
                 testValue = CurrentValues[0];
 
             if (((testValue == KorrySettings.BotState && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(testValue))) && !string.IsNullOrEmpty(KorrySettings.BotImage))
-                render.DrawImage(imgManager.GetImageObject(KorrySettings.BotImage), KorrySettings.GetRectangleBot());
+                render.DrawImage(imgManager.GetImageObject(KorrySettings.BotImage, DeckType), KorrySettings.GetRectangleBot());
 
             DrawImage = render.RenderImage64();
             IsRawImage = true;

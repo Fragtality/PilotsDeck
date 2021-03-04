@@ -18,7 +18,7 @@ namespace PilotsDeck
         protected string lastText = "";
         protected bool DrawBox = true;
 
-        public HandlerDisplayText(string context, ModelDisplayText settings) : base(context, settings)
+        public HandlerDisplayText(string context, ModelDisplayText settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
             DrawBox = settings.DrawBox;
@@ -29,7 +29,7 @@ namespace PilotsDeck
             base.Register(imgManager, ipcManager);
 
             if (TextSettings.HasIndication)
-                imgManager.AddImage(TextSettings.IndicationImage);
+                imgManager.AddImage(TextSettings.IndicationImage, DeckType);
 
             if (TextSettings.DrawBox)
                 RenderImages(imgManager);
@@ -40,7 +40,7 @@ namespace PilotsDeck
             base.Deregister(imgManager, ipcManager);
 
             if (TextSettings.HasIndication)
-                imgManager.RemoveImage(TextSettings.IndicationImage);
+                imgManager.RemoveImage(TextSettings.IndicationImage, DeckType);
         }
 
         public override void Update(ImageManager imgManager, IPCManager ipcManager)
@@ -61,12 +61,12 @@ namespace PilotsDeck
         {
             if (TextSettings.DrawBox)
             {
-                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(TextSettings.DefaultImage));
+                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(TextSettings.DefaultImage, DeckType));
                 render.DrawBox(ColorTranslator.FromHtml(TextSettings.BoxColor), TextSettings.BoxSize, TextSettings.GetRectangleBox());
                 DefaultImageRender = render.RenderImage64();
                 render.Dispose();
 
-                render = new ImageRenderer(imgManager.GetImageObject(TextSettings.ErrorImage));
+                render = new ImageRenderer(imgManager.GetImageObject(TextSettings.ErrorImage, DeckType));
                 render.DrawBox(ColorTranslator.FromHtml("#d70000"), TextSettings.BoxSize, TextSettings.GetRectangleBox());
                 ErrorImageRender = render.RenderImage64();
                 render.Dispose();
@@ -148,7 +148,7 @@ namespace PilotsDeck
 
             if (text != lastText || ForceUpdate)
             {
-                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background));
+                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background, DeckType));
                 if (TextSettings.DrawBox)
                     render.DrawBox(boxColor, TextSettings.BoxSize, TextSettings.GetRectangleBox());
 

@@ -20,7 +20,7 @@ namespace PilotsDeck
         protected static readonly int ticksActive = 16;
         protected bool wasPushed = false;
 
-        public HandlerDisplayRadio(string context, ModelDisplayRadio settings) : base(context, settings)
+        public HandlerDisplayRadio(string context, ModelDisplayRadio settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
             LastSwitchState = settings.OffState;
@@ -159,7 +159,7 @@ namespace PilotsDeck
                 else
                     colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
 
-                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background));
+                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background, DeckType));
                 render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
                 render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 

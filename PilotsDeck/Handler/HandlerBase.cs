@@ -6,6 +6,7 @@
 
         public virtual string ActionID { get { return Title; } }
         public string Context { get; protected set; }
+        public virtual StreamDeckType DeckType { get; protected set; }
 
         public abstract string Address { get; }
 
@@ -25,10 +26,11 @@
 
         protected virtual StreamDeckTools.StreamDeckTitleParameters TitleParameters { get; set; }
 
-        public HandlerBase(string context, ModelBase settings)
+        public HandlerBase(string context, ModelBase settings, StreamDeckType deckType)
         {
             Context = context;
             CommonSettings = settings;
+            DeckType = deckType;
             DrawImage = DefaultImage;
         }
 
@@ -36,8 +38,8 @@
         {
             SetInitialization();
             
-            imgManager.AddImage(DefaultImage);
-            imgManager.AddImage(ErrorImage);
+            imgManager.AddImage(DefaultImage, DeckType);
+            imgManager.AddImage(ErrorImage, DeckType);
             
             if (this is IHandlerValue)
                 (this as IHandlerValue).RegisterAddress(ipcManager);
@@ -45,8 +47,8 @@
 
         public virtual void Deregister(ImageManager imgManager, IPCManager ipcManager)
         {
-            imgManager.RemoveImage(DefaultImage);
-            imgManager.RemoveImage(ErrorImage);
+            imgManager.RemoveImage(DefaultImage, DeckType);
+            imgManager.RemoveImage(ErrorImage, DeckType);
 
             if (this is IHandlerValue)
                 (this as IHandlerValue).DeregisterAddress(ipcManager);

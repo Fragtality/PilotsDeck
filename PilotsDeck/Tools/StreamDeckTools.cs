@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Drawing;
 using System.Drawing.Text;
 using StreamDeckLib.Messages;
@@ -18,9 +19,9 @@ namespace PilotsDeck
 
             public ModelPropertyInspector(bool sendKorrys)
             {
-                ImageFiles = String.Join("|", ReadImageDirectory());
+                ImageFiles = String.Join("|", ReadImageDirectory().Where(f => !f.Contains(AppSettings.hqImageSuffix)));
                 if (sendKorrys)
-                    KorryFiles = String.Join("|", ReadImageDirectory(@"korry\"));
+                    KorryFiles = String.Join("|", ReadImageDirectory(@"korry\").Where(f => !f.Contains(AppSettings.hqImageSuffix)));
 
                 Array values = Enum.GetValues(typeof(ActionSwitchType));
                 for (int i = 0; i < values.Length; i++)
@@ -76,11 +77,11 @@ namespace PilotsDeck
             }
         }
 
-        public static string[] ReadImageDirectory(string postfix = "")
+        public static string[] ReadImageDirectory(string dirPostfix = "")
         {
             try
             {
-                string[] images = Directory.GetFiles(@"Images\" + postfix);
+                string[] images = Directory.GetFiles(@"Images\" + dirPostfix);
                 for (int i=0; i < images.Length; i++)
                     images[i] = images[i].Replace("\\", "/");
   
@@ -94,20 +95,20 @@ namespace PilotsDeck
             return new string[0];
         }
 
-        public static string ReadImageBase64(string imageLocation)
-        {
-            return Convert.ToBase64String(File.ReadAllBytes(imageLocation), Base64FormattingOptions.None);
-        }
+        //public static string ReadImageBase64(string imageLocation)
+        //{
+        //    return Convert.ToBase64String(File.ReadAllBytes(imageLocation), Base64FormattingOptions.None);
+        //}
 
-        public static string ToImageBase64(byte[] image)
-        {
-            return Convert.ToBase64String(image, Base64FormattingOptions.None);
-        }
+        //public static string ToImageBase64(byte[] image)
+        //{
+        //    return Convert.ToBase64String(image, Base64FormattingOptions.None);
+        //}
 
-        public static byte[] ReadImageBytes(string image)
-        {
-            return File.ReadAllBytes(image);
-        }
+        //public static byte[] ReadImageBytes(string image)
+        //{
+        //    return File.ReadAllBytes(image);
+        //}
 
         public class StreamDeckTitleParameters
         {

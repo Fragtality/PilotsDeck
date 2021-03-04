@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 
@@ -8,16 +9,53 @@ namespace PilotsDeck
 {
     public class Arc
     {
-        public int Radius { get; set; } = 48;
-        public int Width { get; set; } = 6;
-        public int Offset { get; set; } = 0;
-        public int StartAngle { get; set; } = 135;
-        public int SweepAngle { get; set; } = 180;
+        public float Radius { get; set; } = 48;
+        public float Width { get; set; } = 6;
+        public PointF Offset { get; set; } = new PointF(0, 0);
+        public float StartAngle { get; set; } = 135;
+        public float SweepAngle { get; set; } = 180;
 
-        public RectangleF GetRectangle(int buttonSize, int sizeScalar)
+        public RectangleF GetRectangle(float buttonSize, float sizeScalar)
         {
-            int org = ((buttonSize - Radius * sizeScalar) / 2) + Offset; // btn - <R> / 2 => x/y
-            return new RectangleF(org, org, Radius * sizeScalar, Radius * sizeScalar);
+            float org = ((buttonSize - Radius * sizeScalar) / 2.0f); // btn - <R> / 2 => x/y
+            return new RectangleF(org + Offset.X, org + Offset.Y, Radius * sizeScalar, Radius * sizeScalar);
+        }
+        
+        //public PointF GetOffset()
+        //{
+        //    PointF result = new PointF();
+
+        //    var parts = Offset.Split(';');
+        //    if (parts != null && parts.Length == 2)
+        //    {
+        //        if (int.TryParse(parts[0], out int x))
+        //            result.X = x;
+        //        else
+        //            result.X = 0;
+
+        //        if (int.TryParse(parts[1], out int y))
+        //            result.Y = y;
+        //        else
+        //            result.Y = 0;
+        //    }
+        //    else
+        //    {
+        //        result.X = 0;
+        //        result.Y = 0;
+        //    }
+
+        //    return result;
+        //}
+    }
+
+    public class Bar
+    {
+        public float Width { get; set; } = 58;
+        public float Height { get; set; } = 10;
+
+        public RectangleF GetRectangle(float buttonSize, float sizeScalar)
+        {
+            return new RectangleF((buttonSize / 2.0f) - (Width * sizeScalar / 2.0f), (buttonSize / 2.0f) - (Height * sizeScalar / 2.0f), Width * sizeScalar, Height * sizeScalar);
         }
     }
 
@@ -29,9 +67,9 @@ namespace PilotsDeck
 
         //public static readonly int buttonSize = 144;
         //protected static int buttonSizeH = buttonSize/2;
-        public static int buttonSize = 72;
-        protected int buttonSizeH;
-        protected int sizeScalar;
+        protected int buttonSize = 72;
+        protected float buttonSizeH;
+        protected float sizeScalar;
 
         protected StringFormat stringFormat = new StringFormat
         {
@@ -46,40 +84,56 @@ namespace PilotsDeck
             background = new Bitmap(imageRef);
             render = Graphics.FromImage(background);
 
-            render.SmoothingMode = SmoothingMode.HighQuality;
+            render.SmoothingMode = SmoothingMode.AntiAlias;
             render.InterpolationMode = InterpolationMode.HighQualityBicubic;
             render.PixelOffsetMode = PixelOffsetMode.HighQuality;
             render.CompositingQuality = CompositingQuality.HighQuality;
+            render.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+            render.PageUnit = GraphicsUnit.Pixel;
 
             buttonSize = background.Width;
             buttonSizeH = buttonSize / 2;
-            sizeScalar = buttonSize / 72;
+            sizeScalar = (float)buttonSize / 72.0f;
         }
 
-        public void DrawImage(Image image, Rectangle drawRectangle)
+        public RectangleF ScaleRectangle(RectangleF rect)
         {
-            render.DrawImage(image, drawRectangle.X, drawRectangle.Y, drawRectangle.Width, drawRectangle.Height);
+            return new RectangleF(rect.X * sizeScalar, rect.Y * sizeScalar, rect.Width * sizeScalar, rect.Height * sizeScalar);
+        }
+
+        public Font ScaleFont(Font font)
+        {
+            return new Font(font.Name, font.Size * sizeScalar, font.Style);
+        }
+
+        public void DrawImage(Image image, RectangleF drawRectangle)
+        {
+            render.DrawImage(image, ScaleRectangle(drawRectangle));
         }
 
         public void DrawText(string text, Font drawFont, Color drawColor, RectangleF drawRectangle)
         {
             SolidBrush drawBrush = new SolidBrush(drawColor);
-            render.DrawString(text, drawFont, drawBrush, drawRectangle, stringFormat);
+            render.DrawString(text, ScaleFont(drawFont), drawBrush, ScaleRectangle(drawRectangle), stringFormat);
             drawBrush.Dispose();
         }
 
-        public void DrawBox(Color drawColor, int lineSize, RectangleF drawRectangle)
+        public void DrawBox(Color drawColor, float lineSize, RectangleF drawRectangle)
         {
-            Pen pen = new Pen(drawColor, lineSize);
-            render.DrawRectangle(pen, drawRectangle.X, drawRectangle.Y, drawRectangle.Width, drawRectangle.Height);
+            Pen pen = new Pen(drawColor, lineSize * sizeScalar);
+            RectangleF rect = ScaleRectangle(drawRectangle);
+            render.DrawRectangle(pen, rect.X, rect.Y, rect.Width, rect.Height);
             pen.Dispose();
         }
 
-        public void Rotate(float angle, float offset = 0)
+        public void Rotate(float angle, PointF offset)
         {
-            render.TranslateTransform(buttonSizeH + offset, buttonSizeH + offset);
+            //render.TranslateTransform(buttonSizeH + offset.X * sizeScalar, buttonSizeH + offset.Y * sizeScalar);
+            //render.RotateTransform(angle);
+            //render.TranslateTransform(-(buttonSizeH + offset.X * sizeScalar), -(buttonSizeH + offset.Y * sizeScalar));
+            render.TranslateTransform(buttonSizeH + offset.X , buttonSizeH + offset.Y );
             render.RotateTransform(angle);
-            render.TranslateTransform(-(buttonSizeH + offset), -(buttonSizeH + offset));
+            render.TranslateTransform(-(buttonSizeH + offset.X ), -(buttonSizeH + offset.Y ));
         }
 
         public void DrawArc(Arc drawArc, Color drawColor)
@@ -96,9 +150,9 @@ namespace PilotsDeck
             RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             float angle = (NormalizedRatio(value, minimum, maximum) * drawArc.SweepAngle) + drawArc.StartAngle;
             
-            size /= 2;
+            size = (size * sizeScalar) / 2.0f;
             float orgIndX = drawRect.X + drawRect.Width + (bottom ? -size : size);
-            float orgIndY = drawRect.Y + drawRect.Width / 2;
+            float orgIndY = drawRect.Y + drawRect.Width / 2.0f;
             float top = bottom ? -size : size;
             
             PointF[] triangle = {   new PointF(orgIndX - top, orgIndY),
@@ -112,16 +166,16 @@ namespace PilotsDeck
             brush.Dispose();
         }
 
-        public void DrawArcCenterLine(Arc drawArc, Color drawColor, int size)
+        public void DrawArcCenterLine(Arc drawArc, Color drawColor, float size)
         {
             RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             float orgIndX = drawRect.X + drawRect.Width;
-            float orgIndY = (drawRect.Y + drawRect.Width / 2);
-            float angle = (drawArc.SweepAngle / 2) + drawArc.StartAngle;
+            float orgIndY = (drawRect.Y + drawRect.Width / 2.0f);
+            float angle = (drawArc.SweepAngle / 2.0f) + drawArc.StartAngle;
 
-            Pen pen = new Pen(drawColor, size);
+            Pen pen = new Pen(drawColor, size * sizeScalar);
             Rotate(angle, drawArc.Offset);
-            render.DrawLine(pen, orgIndX - drawArc.Width * 0.5f, orgIndY, orgIndX + drawArc.Width * 0.5f, orgIndY); ;
+            render.DrawLine(pen, orgIndX - (drawArc.Width * sizeScalar * 0.5f), orgIndY, orgIndX + (drawArc.Width * sizeScalar * 0.5f), orgIndY); ;
             Rotate(-angle, drawArc.Offset);
             pen.Dispose();
         }
@@ -140,7 +194,7 @@ namespace PilotsDeck
                 rangeAngleStart = NormalizedRatio(ranges[i][0], minimum, maximum) * drawArc.SweepAngle;
                 rangeAngleSweep = NormalizedDiffRatio(ranges[i][1], ranges[i][0], minimum, maximum) * drawArc.SweepAngle;   
 
-                Pen pen = new Pen(colors[i], drawArc.Width);
+                Pen pen = new Pen(colors[i], drawArc.Width * sizeScalar);
                 render.DrawArc(pen, drawRect, drawArc.StartAngle + rangeAngleStart - fix, rangeAngleSweep + fix);
 
                 if (symm)
@@ -153,29 +207,31 @@ namespace PilotsDeck
             }
         }
 
-        public void DrawBar(Color mainColor, RectangleF drawParams)
+        public void DrawBar(Color mainColor, Bar drawBar)
         {
             SolidBrush brush = new SolidBrush(mainColor);
-            render.FillRectangle(brush, drawParams);
+            render.FillRectangle(brush, drawBar.GetRectangle(buttonSize, sizeScalar));
 
             brush.Dispose();
         }
 
-        public void DrawBarCenterLine(RectangleF drawParams, Color centerColor, int centerSize)
+        public void DrawBarCenterLine(Bar drawBar, Color centerColor, float centerSize)
         {
-            Pen pen = new Pen(centerColor, centerSize);
+            Pen pen = new Pen(centerColor, centerSize * sizeScalar);
+            RectangleF drawParams = drawBar.GetRectangle(buttonSize, sizeScalar);
             float off = (drawParams.Width / 2.0f);//+ 0.5f;
             render.DrawLine(pen, drawParams.X + off, drawParams.Y, drawParams.X + off, drawParams.Y + drawParams.Height);
 
             pen.Dispose();
         }
 
-        public void DrawBarIndicator(RectangleF drawParams, Color drawColor, float size, float value, float minimum, float maximum, bool bottom = false)
+        public void DrawBarIndicator(Bar drawBar, Color drawColor, float size, float value, float minimum, float maximum, bool bottom = false)
         {
             if (maximum == 0.0f)
                 return;
 
-            size /= 2.0f;
+            size = (size * sizeScalar) / 2.0f;
+            RectangleF drawParams = drawBar.GetRectangle(buttonSize, sizeScalar);
             float indX = (drawParams.X + (NormalizedRatio(value, minimum, maximum) * drawParams.Width));
             float indY = (bottom ? drawParams.Y + drawParams.Height : drawParams.Y);
             float top = (bottom ? size * -1.0f : size);
@@ -186,12 +242,13 @@ namespace PilotsDeck
             brush.Dispose();
         }
 
-        public void DrawBarRanges(RectangleF drawParams, Color[] colors, float[][] ranges, float minimum, float maximum, bool symm = false)
+        public void DrawBarRanges(Bar drawBar, Color[] colors, float[][] ranges, float minimum, float maximum, bool symm = false)
         {
             if (maximum == 0.0f)
                 return;
 
             float barW;
+            RectangleF drawParams = drawBar.GetRectangle(buttonSize, sizeScalar);
             float fix = 0.5f;
             for (int i = 0; i < ranges.Length; i++)
             {

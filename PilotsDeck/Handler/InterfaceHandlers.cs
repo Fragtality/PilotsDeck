@@ -4,6 +4,7 @@
     {
         string ActionID { get; }
         string Context { get; }
+        StreamDeckType DeckType { get; }
         
         string Address { get; }
 

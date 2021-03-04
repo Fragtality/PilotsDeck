@@ -16,7 +16,7 @@ namespace PilotsDeck
         protected virtual string LastSwitchStateLong { get; set; }
 
 
-        public HandlerSwitch(string context, ModelSwitch settings) : base(context, settings)
+        public HandlerSwitch(string context, ModelSwitch settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
             LastSwitchState = settings.OffState;

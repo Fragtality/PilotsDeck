@@ -12,7 +12,7 @@ namespace PilotsDeck
         {
             await base.OnWillAppear(args);
 
-            Plugin.ActionController.RegisterAction(args.context, new HandlerDisplayText(args.context, SettingsModel));
+            Plugin.ActionController.RegisterAction(args.context, new HandlerDisplayText(args.context, SettingsModel, Plugin.ActionController.GetDeckTypeById(args.device)));
 
             Log.Logger.Debug($"ActionDisplayText:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
         }

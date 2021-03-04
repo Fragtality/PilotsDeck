@@ -11,8 +11,8 @@ namespace PilotsDeck
         public static readonly string deckDefaultProfile = "Profiles/PilotsDeck - Default";
         public static readonly string deckDefaultProfileXL = "Profiles/PilotsDeck - DefaultXL";
 
-        public static readonly string applicationName = Convert.ToString(ConfigurationManager.AppSettings["applicationName"]);
         public static readonly string waitImage = @"Images/Wait.png";
+        public static readonly string hqImageSuffix = "@2x";
 
         public static readonly int pollInterval = Convert.ToInt32(ConfigurationManager.AppSettings["pollInterval"]);
         public static readonly int waitTicks = Convert.ToInt32(ConfigurationManager.AppSettings["waitTicks"]);

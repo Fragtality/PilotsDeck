@@ -13,7 +13,7 @@
         protected virtual string LastSwitchStateLong { get; set; }
 
 
-        public HandlerDisplaySwitch(string context, ModelDisplaySwitch settings) : base(context, settings)
+        public HandlerDisplaySwitch(string context, ModelDisplaySwitch settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
             LastSwitchState = settings.OffState;

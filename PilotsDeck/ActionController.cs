@@ -21,7 +21,6 @@ namespace PilotsDeck
         public ConnectionManager DeckManager { get; set; }
         public int Timing { get { return AppSettings.waitTicks; } }
         public bool IsApplicationOpen { get; set; }
-        public string Application { get; } = AppSettings.applicationName;
 
         public long Ticks { get { return tickCounter; } }
         private long tickCounter = 0;
@@ -103,6 +102,15 @@ namespace PilotsDeck
             }
         }
 
+        public StreamDeckType GetDeckTypeById(string device)
+        {
+            var deckInfo = DeckManager.Info.devices.Where(d => d.id == device);
+            if (deckInfo.Count() > 0)
+                return (StreamDeckType)deckInfo.First().type;
+            else
+                return StreamDeckType.StreamDeck;
+        }
+
         public void OnGlobalEvent(StreamDeckEventPayload args)
         {
             switch (args.Event)
@@ -143,20 +151,16 @@ namespace PilotsDeck
         {
             Log.Logger.Debug($"ActionController:OnApplicationDidLaunchAsync {args.payload.application}");
 
-            if (args.payload.application == Application)
-            {
-                IsApplicationOpen = true;
-                appAlreadyRunning = tickCounter < firstTick;
-                appIsStarting = true;
-            }
+            IsApplicationOpen = true;
+            appAlreadyRunning = tickCounter < firstTick;
+            appIsStarting = true;
         }
 
         protected void OnApplicationDidTerminate(StreamDeckEventPayload args)
         {
             Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
 
-            if (args.payload.application == Application)
-                IsApplicationOpen = false;
+            IsApplicationOpen = false;
         }
 
         public void RegisterProfileSwitcher(string context)
@@ -418,7 +422,7 @@ namespace PilotsDeck
                         if (action.Value.IsRawImage)
                             _ = DeckManager.SetImageRawAsync(action.Key, action.Value.DrawImage);
                         else 
-                            _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageBase64(action.Value.DrawImage));
+                            _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageBase64(action.Value.DrawImage, action.Value.DeckType));
                     }
 
                     action.Value.ResetDrawState();
@@ -531,7 +535,7 @@ namespace PilotsDeck
                     SetActionState(currentActions[context]);                        
 
                     if (!currentActions[context].IsRawImage)
-                        imgManager.UpdateImage(currentActions[context].DrawImage);
+                        imgManager.UpdateImage(currentActions[context].DrawImage, currentActions[context].DeckType);
 
                     redrawRequested = true;
                 }

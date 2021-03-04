@@ -14,7 +14,7 @@ namespace PilotsDeck
 
         protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue) && !string.IsNullOrEmpty(CurrentValue2); } }
 
-        public HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings) : base(context, settings)
+        public HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
         }
@@ -80,7 +80,7 @@ namespace PilotsDeck
 
             float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
-            render.DrawBarIndicator(GaugeSettings.GetRectangleBar(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
+            render.DrawBarIndicator(GaugeSettings.GetBar(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
         }
 
         protected override void DrawArc(string value, ImageRenderer render)

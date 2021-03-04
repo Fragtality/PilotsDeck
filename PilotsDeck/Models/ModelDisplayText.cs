@@ -90,7 +90,7 @@ namespace PilotsDeck
 			{
 				int parses = 0;
 				for (int i = 0; i < parts.Length; i++)
-					if (int.TryParse(parts[i], out _))
+					if (float.TryParse(parts[i], out _))
 						parses++;
 
 				if (parses == parts.Length)

@@ -18,7 +18,7 @@ namespace PilotsDeck
         protected override bool CanRedraw { get { return CurrentValue != null; } }
 
 
-        public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings) : base(context, settings)
+        public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
         }
@@ -27,20 +27,20 @@ namespace PilotsDeck
         {
             base.Register(imgManager, ipcManager);
 
-            imgManager.AddImage(DisplaySettings.OnImage);
-            imgManager.AddImage(DisplaySettings.OffImage);
+            imgManager.AddImage(DisplaySettings.OnImage, DeckType);
+            imgManager.AddImage(DisplaySettings.OffImage, DeckType);
             if (DisplaySettings.HasIndication)
-                imgManager.AddImage(DisplaySettings.IndicationImage);
+                imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
         }
 
         public override void Deregister(ImageManager imgManager, IPCManager ipcManager)
         {
             base.Deregister(imgManager, ipcManager);
 
-            imgManager.RemoveImage(DisplaySettings.OnImage);
-            imgManager.RemoveImage(DisplaySettings.OffImage);
+            imgManager.RemoveImage(DisplaySettings.OnImage, DeckType);
+            imgManager.RemoveImage(DisplaySettings.OffImage, DeckType);
             if (DisplaySettings.HasIndication)
-                imgManager.RemoveImage(DisplaySettings.IndicationImage);
+                imgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
         }
 
         public virtual void RefreshValue(IPCManager ipcManager)

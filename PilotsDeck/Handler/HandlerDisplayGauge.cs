@@ -16,7 +16,7 @@ namespace PilotsDeck
         protected string lastText = "";
         protected bool IsArc = false;
 
-        public HandlerDisplayGauge(string context, ModelDisplayGauge settings) : base(context, settings)
+        public HandlerDisplayGauge(string context, ModelDisplayGauge settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
             IsArc = settings.DrawArc;
@@ -44,8 +44,7 @@ namespace PilotsDeck
 
         protected virtual void RenderDefaultImage(ImageManager imgManager)
         {
-            //ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage));
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(@"Images\Blank@2x.png"));
+            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
 
             if (GaugeSettings.DrawArc)
             {
@@ -53,8 +52,8 @@ namespace PilotsDeck
             }
             else
             {
-                render.Rotate(GaugeSettings.BarOrientation);
-                render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), GaugeSettings.GetRectangleBar());
+                render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
+                render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), GaugeSettings.GetBar());
             }
             
             DefaultImageRender = render.RenderImage64();
@@ -84,7 +83,7 @@ namespace PilotsDeck
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage));
+            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
 
             if (GaugeSettings.DrawArc)
             {
@@ -108,20 +107,20 @@ namespace PilotsDeck
 
         protected virtual void DrawBar(string value, ImageRenderer render)
         {
-            RectangleF drawRect = GaugeSettings.GetRectangleBar();
+            Bar drawBar = GaugeSettings.GetBar();
             float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            render.Rotate(GaugeSettings.BarOrientation);
-            render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), drawRect);
+            render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
+            render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), drawBar);
 
             if (GaugeSettings.DrawWarnRange)
-                render.DrawBarRanges(drawRect, GaugeSettings.GetColorRange(), GaugeSettings.GetWarnRange(), min, max, GaugeSettings.SymmRange);
+                render.DrawBarRanges(drawBar, GaugeSettings.GetColorRange(), GaugeSettings.GetWarnRange(), min, max, GaugeSettings.SymmRange);
 
             if (GaugeSettings.CenterLine)
-                render.DrawBarCenterLine(drawRect, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), GaugeSettings.CenterLineThickness);
+                render.DrawBarCenterLine(drawBar, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), GaugeSettings.CenterLineThickness);
 
-            render.DrawBarIndicator(drawRect, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
+            render.DrawBarIndicator(drawBar, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
         }
 
         protected virtual void DrawArc(string value, ImageRenderer render)
@@ -148,7 +147,7 @@ namespace PilotsDeck
                 value = GaugeSettings.RoundValue(value);
 
                 if (GaugeSettings.BarOrientation == (int)GaugeOrientation.LEFT && !GaugeSettings.DrawArc)
-                    render.Rotate(180);
+                    render.Rotate(180, new PointF(0, 0));
 
                 GaugeSettings.GetFontParameters(TitleParameters, value, out Font drawFont, out Color drawColor);
                 render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangleF(GaugeSettings.RectCoord));
