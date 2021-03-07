@@ -27,7 +27,7 @@ The Sims and their FSUIPC Version/Variant are:
 - FSUIPC5 - Prepar3D Version 4
 - **FSUIPC6** - Prepar3D Version 4 and 5
 - FSUIPC7 - Microsoft Flight Simulator 2020
-- XPUIPC - XPlane
+- XPUIPC - XPlane<br/>
 If you let me know what works and which Features work in which Sim (other then P3D v4/5), I'll add it to the Readme! :wink:
 <br/><br/>
 ## Plugin Installation
@@ -112,7 +112,7 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
 #### Images
 All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.<br/>
 The Images for the Korry Button are in the \Images\korry Subdirectory.<br/>
-The only Images you should not delete are "Wait.png" and "Wait@2x.png", they are hard-coded in the Manifest-File and used as fallback!<br/>
+The only Images you should not delete are "Wait.png" and "Wait@<!-- -->2x.png", they are hard-coded in the Manifest-File and used as fallback!<br/>
 The StreamDeck XL with its higher Button Resolution is also supported, all Images have "@2x" Version for that. The right Image for the specific Deck is automatically loaded (and all Coordinates/Positions are based on 72x72) - so Actions can easily be transferred between different Deck-Types without the need to change the Action's Settings!
 * **Default Image / Background Normal**: The Image to be shown (or drawn to) when the Action is in their normal/working State or P3D is not loaded.
 * **Error Image**: The Image to be shown when FSUIPC disconnects or the Value could not be read.
