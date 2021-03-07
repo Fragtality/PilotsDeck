@@ -31,7 +31,6 @@ namespace PilotsDeck
         }
         public abstract bool IsChanged { get; }
 
-        public abstract string ScaledValue(double scalar);
         public abstract dynamic RawValue();
         protected abstract string Read();        
     }

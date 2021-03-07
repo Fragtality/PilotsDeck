@@ -20,6 +20,17 @@ namespace PilotsDeck
         public static readonly int appStartDelay = Convert.ToInt32(ConfigurationManager.AppSettings["appStartDelay"]);
 
         public static readonly string stringReplace = Convert.ToString(ConfigurationManager.AppSettings["stringReplace"]);
+        public static readonly bool forceDecimalPoint = Convert.ToBoolean(ConfigurationManager.AppSettings["forceDecimalPoint"]);
+        public static NumberFormatInfo numberFormat
+        {
+            get
+            {
+                if (forceDecimalPoint)
+                    return new CultureInfo("en-US").NumberFormat;
+                else
+                    return new CultureInfo("de-DE").NumberFormat;
+            }
+        }
 
         public static string fontDefault { get; private set; } = Convert.ToString(ConfigurationManager.AppSettings["fontDefault_en"]);
         public static string fontBold { get; private set; } = Convert.ToString(ConfigurationManager.AppSettings["fontBold_en"]);

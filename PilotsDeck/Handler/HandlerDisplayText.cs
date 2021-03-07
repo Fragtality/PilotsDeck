@@ -62,12 +62,12 @@ namespace PilotsDeck
             if (TextSettings.DrawBox)
             {
                 ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(TextSettings.DefaultImage, DeckType));
-                render.DrawBox(ColorTranslator.FromHtml(TextSettings.BoxColor), TextSettings.BoxSize, TextSettings.GetRectangleBox());
+                render.DrawBox(ColorTranslator.FromHtml(TextSettings.BoxColor), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
                 DefaultImageRender = render.RenderImage64();
                 render.Dispose();
 
                 render = new ImageRenderer(imgManager.GetImageObject(TextSettings.ErrorImage, DeckType));
-                render.DrawBox(ColorTranslator.FromHtml("#d70000"), TextSettings.BoxSize, TextSettings.GetRectangleBox());
+                render.DrawBox(ColorTranslator.FromHtml("#d70000"), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
                 ErrorImageRender = render.RenderImage64();
                 render.Dispose();
             }
@@ -150,7 +150,7 @@ namespace PilotsDeck
             {
                 ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background, DeckType));
                 if (TextSettings.DrawBox)
-                    render.DrawBox(boxColor, TextSettings.BoxSize, TextSettings.GetRectangleBox());
+                    render.DrawBox(boxColor, ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
 
                 if (text != "")
                     render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());

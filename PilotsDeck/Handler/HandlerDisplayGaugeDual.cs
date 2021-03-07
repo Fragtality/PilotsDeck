@@ -78,9 +78,9 @@ namespace PilotsDeck
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
-            float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
-            render.DrawBarIndicator(GaugeSettings.GetBar(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
+            float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
+            float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
+            render.DrawBarIndicator(GaugeSettings.GetBar(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
         }
 
         protected override void DrawArc(string value, ImageRenderer render)
@@ -92,10 +92,10 @@ namespace PilotsDeck
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
-            float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
+            float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
+            float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            render.DrawArcIndicator(GaugeSettings.GetArc(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
+            render.DrawArcIndicator(GaugeSettings.GetArc(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
         }
 
         protected override void DrawText(string value, ImageRenderer render)

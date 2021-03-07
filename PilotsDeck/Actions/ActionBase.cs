@@ -9,15 +9,6 @@ namespace PilotsDeck
     {
         protected long ticksDown = 0;
 
-        //public StreamDeckType GetDeckType(string deviceId)
-        //{
-        //    var device = Manager.GetDeviceById(deviceId);
-        //    if (device != null)
-        //        return (StreamDeckType)device.type;
-        //    else
-        //        return StreamDeckType.StreamDeck;
-        //}
-
         public override async Task OnWillDisappear(StreamDeckEventPayload args)
         {
             await base.OnWillDisappear(args);

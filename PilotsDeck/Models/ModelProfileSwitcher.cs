@@ -21,6 +21,18 @@ namespace PilotsDeck
         public string Name { get; set; }
         public string Mappings { get; set; } = "";
         public int Type { get; set; }
+
+        public StreamDeckProfile()
+        {
+
+        }
+
+        public StreamDeckProfile(string name, int type, string mappings)
+        {
+            Name = name;
+            Type = type;
+            Mappings = mappings;
+        }
     }
 
     public class DeviceMapping
@@ -35,6 +47,13 @@ namespace PilotsDeck
         public DeviceMapping()
         {
 
+        }
+
+        public DeviceMapping(string id, string name, int type)
+        {
+            ID = id;
+            Name = name;
+            Type = type;
         }
 
         public DeviceMapping(List<StreamDeckProfile> profileList)
@@ -74,19 +93,34 @@ namespace PilotsDeck
 
             foreach (var device in connectedDevices)
             {
-                var deviceProfiles = manifestProfiles.Where(p => p.Type == device.type);
-                if (deviceProfiles.Count() > 0)
+                var profilesForDevice = manifestProfiles.Where(p => p.Type == device.type);
+                if (profilesForDevice.Count() > 0) //only save mappings if deckType is in use
                 {
                     DeviceMapping deviceMapping;
-                    var existingMappings = DeviceMappings.Where(d => d.ID == device.id);
-                    if (existingMappings.Count() > 0)
-                        deviceMapping = existingMappings.First();
-                    else
-                        deviceMapping = new DeviceMapping(deviceProfiles.ToList());
+                    var existingDevice = DeviceMappings.Where(d => d.ID == device.id);
+                    if (existingDevice.Count() > 0) //device is not new, use existing data
+                    {
+                        deviceMapping = existingDevice.First();
+                        var newProfileList = new List<StreamDeckProfile>();
+                        foreach (var oldProfile in deviceMapping.Profiles) //copy over oldProfiles, but only if they are still listed in manifest
+                        {
+                            if (manifestProfiles.Where(p => p.Name == oldProfile.Name).Count() > 0)
+                                newProfileList.Add(oldProfile);
+                        }
+                        foreach (var newProfile in profilesForDevice) //add new profiles from manifest (if they not already known)
+                        {
+                            if (deviceMapping.Profiles.Where(p => p.Name == newProfile.Name).Count() == 0)
+                                newProfileList.Add(newProfile);
+                        }
+                        deviceMapping.Profiles = newProfileList;
+                    }
+                    else //device is new, create new data
+                    {
+                        deviceMapping = new DeviceMapping(device.id, device.name, device.type);
+                        foreach (var profile in profilesForDevice)
+                            deviceMapping.Profiles.Add(profile);
+                    }
 
-                    deviceMapping.ID = device.id;
-                    deviceMapping.Name = device.name;
-                    deviceMapping.Type = device.type;
                     newMappings.Add(deviceMapping);
                 }
             }

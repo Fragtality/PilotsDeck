@@ -187,7 +187,7 @@ namespace PilotsDeck
             if (Settings.FontInherit && TitleParameters != null)
                 return new Font(TitleParameters.FontName, TitleParameters.FontSize, style);
             else
-                return new Font(Settings.FontName, Settings.FontSize, style);
+                return new Font(Settings.FontName, ModelDisplayText.GetNumValue(Settings.FontSize, 10), style);
         }
     }
 }

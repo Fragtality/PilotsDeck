@@ -105,7 +105,7 @@ namespace PilotsDeck
                 newValue = onState;
             else
                 newValue = offState;
-            Log.Logger.Debug($"Value toggled {lastValue} -> {newValue}");
+            Log.Logger.Debug($"HandlerSwitch: Value toggled {lastValue} -> {newValue}");
             return newValue;
         }
 
@@ -113,7 +113,7 @@ namespace PilotsDeck
         {
             if (ipcManager.IsConnected && IPCTools.IsWriteAddress(Address, actionType))
             {
-                Log.Logger.Debug($"HandlerBase:RunAction Writing to {Address}");
+                Log.Logger.Debug($"HandlerSwitch:RunAction Writing to {Address}");
                 switch (actionType)
                 {
                     case ActionSwitchType.MACRO:
@@ -188,7 +188,7 @@ namespace PilotsDeck
             if (newValue?.Length < 1)
                 return result;
 
-            double value = Convert.ToDouble(newValue);
+            double value = Convert.ToDouble(newValue, new RealInvariantFormat(newValue));
 
             string[] vars = address.Replace("L:", "").Split(':');
             if (vars.Length > 1)

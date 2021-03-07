@@ -22,11 +22,11 @@
         </div>
         <div class="sdpi-item" id="Config_Scalar">
             <div class="sdpi-item-label" id="lblScalar">Scalar</div>
-            <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
         <div class="sdpi-item" id="Config_Format">
             <div class="sdpi-item-label">Format</div>
-            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^:.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
+            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^(:)?.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
         </div>
 
         <div class="sdpi-heading">Special Value Indication</div>
@@ -55,7 +55,7 @@
         </div>
         <div class="sdpi-item" id="Config_IndicationValue">
             <div class="sdpi-item-label" id="lblIndicationValue">Value</div>
-            <input id="IndicationValue" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" placeholder="Value for Indication (rounded) to show" />
+            <input id="IndicationValue" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value for Indication (scaled & rounded) to show" />
         </div>
 
         <div class="sdpi-heading">Background</div>
@@ -74,7 +74,7 @@
         </div>
         <div class="sdpi-item" id="Config_BoxSize">
             <div class="sdpi-item-label" id="lblBoxSize">Thickness</div>
-            <input id="BoxSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Thickness in px" />
+            <input id="BoxSize" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Thickness in px" />
         </div>
         <div class="sdpi-item" id="Config_BoxColor">
             <div class="sdpi-item-label" id="lblBoxColor">Color</div>
@@ -82,7 +82,7 @@
         </div>
         <div class="sdpi-item" id="Config_BoxRect">
             <div class="sdpi-item-label" id="lblBoxRect">Size &amp; Position</div>
-            <input id="BoxRect" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            <input id="BoxRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
 
         <div class="sdpi-heading">Font Settings</div>
@@ -97,7 +97,7 @@
         </div>
         <div class="sdpi-item" id="Config_FontSize">
             <div class="sdpi-item-label" id="lblFontSize">Size</div>
-            <input id="FontSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
+            <input id="FontSize" class="sdpi-item-value" type="text" pattern="[+]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
         </div>
         <div class="sdpi-item" id="Config_FontColor">
             <div class="sdpi-item-label" id="lblFontColor">Color</div>
@@ -111,7 +111,7 @@
         <div class="sdpi-heading">Tweak Position</div>
         <div class="sdpi-item" id="Config_RectCoord">
             <div class="sdpi-item-label" id="lblRectCoord">Draw Rectangle</div>
-            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
     </div>
     <script src="js/pi_Common.js"></script>

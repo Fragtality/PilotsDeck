@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Drawing;
 
 namespace PilotsDeck
@@ -6,7 +7,7 @@ namespace PilotsDeck
     public class ModelDisplayText : ModelDisplay
     {
 		public virtual bool DrawBox { get; set; } = true;
-		public virtual int BoxSize { get; set; } = 2;
+		public virtual string BoxSize { get; set; } = "2";
 		public virtual string BoxColor { get; set; } = "#ffffff";
 		public virtual string BoxRect { get; set; } = "9; 21; 54; 44";
 
@@ -19,7 +20,7 @@ namespace PilotsDeck
 
 		public virtual bool FontInherit { get; set; } = true;
 		public virtual string FontName { get; set; } = "Arial";
-		public virtual int FontSize { get; set; } = 10;
+		public virtual string FontSize { get; set; } = "10";
 		public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
 		public virtual string FontColor { get; set; } = "#ffffff";
 		public virtual string RectCoord { get; set; } = "-1; 0; 0; 0";
@@ -40,7 +41,7 @@ namespace PilotsDeck
             }
 			else
             {
-				drawFont = new Font(FontName, FontSize, (FontStyle)FontStyle);
+				drawFont = new Font(FontName, GetNumValue(FontSize, 10), (FontStyle)FontStyle);
 				drawColor = ColorTranslator.FromHtml(FontColor);
 			}
         }
@@ -67,7 +68,7 @@ namespace PilotsDeck
 			{
 				RectangleF box = GetRectangleF(BoxRect);
 				RectangleF text = GetRectangleF(RectCoord);
-				float size = (float)Math.Round(BoxSize / 2.0d, 0, MidpointRounding.ToEven);
+				float size = (float)Math.Round(GetNumValue(BoxSize, 2) / 2.0d, 0, MidpointRounding.ToEven);
 				text.X = text.X + box.X + size;
 				text.Y = text.Y + box.Y + size;
 				text.Width = text.Width + box.Width - size * 2.0f;
@@ -75,6 +76,14 @@ namespace PilotsDeck
 
 				return text;
 			}
+		}
+
+		public static float GetNumValue(string valString, float def)
+		{
+			if (!float.TryParse(valString, NumberStyles.Number, new RealInvariantFormat(valString), out float result))
+				result = def;
+
+			return result;
 		}
 
 		public static Rectangle GetRectangle(string rect)
@@ -90,11 +99,11 @@ namespace PilotsDeck
 			{
 				int parses = 0;
 				for (int i = 0; i < parts.Length; i++)
-					if (float.TryParse(parts[i], out _))
+					if (float.TryParse(parts[i], NumberStyles.Number, new RealInvariantFormat(parts[i]), out _))
 						parses++;
 
 				if (parses == parts.Length)
-					return new RectangleF(Convert.ToSingle(parts[0]), Convert.ToSingle(parts[1]), Convert.ToSingle(parts[2]), Convert.ToSingle(parts[3]));
+					return new RectangleF(Convert.ToSingle(parts[0], new RealInvariantFormat(parts[0])), Convert.ToSingle(parts[1], new RealInvariantFormat(parts[1])), Convert.ToSingle(parts[2], new RealInvariantFormat(parts[2])), Convert.ToSingle(parts[3], new RealInvariantFormat(parts[3])));
 				else
 					return new RectangleF(11, 23, 48, 40); //-1 -1 -2 0 from actual
 			}

@@ -95,21 +95,6 @@ namespace PilotsDeck
             return new string[0];
         }
 
-        //public static string ReadImageBase64(string imageLocation)
-        //{
-        //    return Convert.ToBase64String(File.ReadAllBytes(imageLocation), Base64FormattingOptions.None);
-        //}
-
-        //public static string ToImageBase64(byte[] image)
-        //{
-        //    return Convert.ToBase64String(image, Base64FormattingOptions.None);
-        //}
-
-        //public static byte[] ReadImageBytes(string image)
-        //{
-        //    return File.ReadAllBytes(image);
-        //}
-
         public class StreamDeckTitleParameters
         {
             public string FontName { get; set; }

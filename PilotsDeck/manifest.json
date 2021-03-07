@@ -121,7 +121,7 @@
       "UUID": "com.extension.pilotsdeck.action.display.gauge.dual"
     },
     {
-      "Icon": "Images/category/category",
+      "Icon": "Images/category/ActionProfileSwitcher",
       "Name": "Profile Switcher",
       "States": [
         {

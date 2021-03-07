@@ -3,10 +3,9 @@ var settingsModel = {
 	EnableSwitching: false,
 	ProfilesInstalled: false,
 	MappingsJson: ""
-},
-	installationRequested = 0;
-
-//var installationRequested = false;
+};
+installationRequested = false;
+firstUpdate = true;
 
 // Fill Select Boxes for Actions here
 function fillSelectBoxes() {
@@ -15,16 +14,22 @@ function fillSelectBoxes() {
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
-	installationRequested++;
-	if (!settingsModel.ProfilesInstalled && installationRequested == 2) {
-		var checkbox = document.getElementById('ProfilesInstalled');
-		const evt = new Event('change');
-		checkbox.dispatchEvent(evt);
-		installationRequested = true;
-    }
+	if (firstUpdate)
+		firstUpdate = false;
+	else {
+		if (!settingsModel.ProfilesInstalled && !installationRequested) {
+			settingsModel.ProfilesInstalled = true;
+			sendToPlugin("com.extension.pilotsdeck.action.profile.switcher", null);
+			installationRequested = true;
+		}
+		else if (settingsModel.ProfilesInstalled) {
+			installationRequested = false;
+		}
+	}
 
 	if (!settingsModel.MappingsJson)
 		return;
+
 	var deviceMappings = JSON.parse(settingsModel.MappingsJson);
 	var divProfiles = document.getElementById('divWrapper');
 
@@ -41,20 +46,21 @@ function updateForm() {
 
 				//USE DEFAULT
 				var divUseDefaultConf = document.createElement('div');
+				divUseDefaultConf.setAttribute("class", "sdpi-item");
 				divUseDefaultConf.id = "Config_UseDefault_" + d;
 				divUseDefaultConf.setAttribute("type", "checkbox");
-				divUseDefaultConf.setAttribute("class", "sdpi-item");
+				
 
 				var divUseDefaultLabel = document.createElement('div');
-				divUseDefaultLabel.id = "lblUseDefault_" + d;
 				divUseDefaultLabel.setAttribute("class", "spdi-item-label");
+				divUseDefaultLabel.id = "lblUseDefault_" + d;
 				divUseDefaultLabel.innerText = "Use Default";
 				divUseDefaultConf.appendChild(divUseDefaultLabel);
 
 				var divUseDefaultInput = document.createElement('input');
+				divUseDefaultInput.setAttribute("class", "spdi-item-value");
 				divUseDefaultInput.id = "UseDefault_" + d;
 				divUseDefaultInput.setAttribute("type", "checkbox");
-				divUseDefaultInput.setAttribute("class", "spdi-item-value");
 				divUseDefaultInput.checked = deviceMappings[d].UseDefault;
 				divUseDefaultInput.setAttribute("onchange", "setJsonDeviceSettings(event.target.checked, 'UseDefault', " + d + ")");
 				divUseDefaultConf.appendChild(divUseDefaultInput);
@@ -68,19 +74,20 @@ function updateForm() {
 
 				//DEFAULT PROFILE
 				var divDefaultProfileConf = document.createElement('div');
-				divDefaultProfileConf.id = "Config_DefaultProfile_" + d;
 				divDefaultProfileConf.setAttribute("class", "spdi-item");
+				divDefaultProfileConf.id = "Config_DefaultProfile_" + d;
+				
 
 				var divDefaultProfileLabel = document.createElement('div');
-				divDefaultProfileLabel.id = "lblDefaultProfile_" + d;
 				divDefaultProfileLabel.setAttribute("class", "spdi-item-label");
+				divDefaultProfileLabel.id = "lblDefaultProfile_" + d;
 				divDefaultProfileLabel.innerText = "Default Name";
 				divDefaultProfileConf.appendChild(divDefaultProfileLabel);
 				
 				var divDefaultProfileInput = document.createElement('input');
+				divDefaultProfileInput.setAttribute("class", "spdi-item-value");
 				divDefaultProfileInput.id = "DefaultProfile_" + d;
 				divDefaultProfileInput.setAttribute("type", "text");
-				divDefaultProfileInput.setAttribute("class", "spdi-item-value");
 				divDefaultProfileInput.value = deviceMappings[d].DefaultProfile;
 				divDefaultProfileInput.setAttribute("onchange", "setJsonDeviceSettings(event.target.value, 'DefaultProfile', " + d + ")");
 				divDefaultProfileConf.appendChild(divDefaultProfileInput);

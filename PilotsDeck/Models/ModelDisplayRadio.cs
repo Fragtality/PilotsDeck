@@ -7,7 +7,7 @@
 
         public virtual bool StbyHasDiffFormat { get; set; } = false;
         public virtual bool DecodeBCDStby { get; set; } = false;
-        public virtual double ScalarStby { get; set; } = 1.0f;
+        public virtual string ScalarStby { get; set; } = "1";
         public virtual string FormatStby { get; set; } = "";
 
         public virtual string FontColorStby { get; set; } = "#e0e0e0";
@@ -17,7 +17,7 @@
         public ModelDisplayRadio() : base()
         {
             DefaultImage = @"Images/Arrow.png";
-            ErrorImage = @"Images/SwitchError.png";
+            ErrorImage = @"Images/Error.png";
             IndicationImage = @"Images/ArrowBright.png";
             DrawBox = false;
         }

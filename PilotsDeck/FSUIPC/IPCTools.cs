@@ -60,19 +60,5 @@ namespace PilotsDeck
         {
             return type == (int)ActionSwitchType.VJOY && rxVjoy.IsMatch(address) && address.ToLowerInvariant().Contains(":t");
         }
-
-        //public static bool GetVjoyValues(string address, out byte joy, out byte btn)
-        //{
-        //    string[] parts = address.Split(':');
-
-        //    if (byte.TryParse(parts[0], out joy) && byte.TryParse(parts[1], out btn))
-        //        return true;
-        //    else
-        //    {
-        //        joy = 64;
-        //        btn = 0;
-        //        return false;
-        //    }
-        //}
     }
 }

@@ -15,11 +15,6 @@ namespace PilotsDeck
 
         public override bool IsChanged { get { return isChanged; } }
 
-        public override string ScaledValue(double scalar)
-        {
-            return (currentValue * scalar).ToString();
-        }
-
         public override void Process()
         {
             try

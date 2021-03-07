@@ -108,11 +108,7 @@ namespace PilotsDeck
 
     public class ImageManager : IDisposable
     {
-        //private Dictionary<string, byte[]> cachedImageFiles = new Dictionary<string, byte[]>(); //filename -> base64
-        //private Dictionary<string, int> currentRegistrations = new Dictionary<string, int>(); //filename -> count
         private Dictionary<string, ImageDefinition> cachedImages = new Dictionary<string, ImageDefinition>(); //realname -> obj
-
-        //private static readonly string suffixXL = AppSettings.hqImageSuffix;
 
         public ImageManager()
         {
@@ -210,23 +206,6 @@ namespace PilotsDeck
                 Log.Logger.Error($"ImageManager: Exception during UpdateImage! {image}");
             }
         }
-        //public ImageManager(string[] imageFiles)
-        //{
-        //    try
-        //    {
-        //        foreach (var image in imageFiles)
-        //            cachedImageFiles.Add(image, StreamDeckTools.ReadImageBytes(image));
-        //    }
-        //    catch
-        //    {
-        //        Log.Logger.Error("ImageManager: Exception while loading ImageFiles");
-        //    }
-        //}
-
-        //public bool IsCached(string image)
-        //{
-        //    return cachedImageFiles.ContainsKey(image);
-        //}
 
         public string GetImageBase64(string image, StreamDeckType deckType)
         {
@@ -283,142 +262,5 @@ namespace PilotsDeck
         {
             cachedImages.Clear();
         }
-
-        //public static string GetImageNameByDeck(string image, StreamDeckType deckType)
-        //{
-        //    if (image.Contains(suffixXL) && deckType != StreamDeckType.StreamDeckXL)
-        //        image = image.Replace(suffixXL, "");
-
-        //    switch (deckType)
-        //    {
-        //        case StreamDeckType.StreamDeckXL:
-        //            if (!image.Contains(suffixXL))
-        //            {
-        //                int idx = image.IndexOf(".png");
-        //                image = image.Insert(idx, suffixXL);
-        //            }
-        //            break;
-        //        default:
-        //            break;
-        //    }
-
-        //    return image;
-        //}
-
-        //public byte[] GetImageBytes(string image, StreamDeckType deckType)
-        //{
-        //    image = GetImageNameByDeck(image, deckType);
-
-        //    if (!cachedImageFiles.ContainsKey(image))
-        //    {
-        //        if (AddImage(image, deckType))
-        //        {
-        //            Log.Logger.Debug($"ImageManager: Cached new Image {image} for deckType {deckType}");
-        //            return cachedImageFiles[image];
-        //        }
-        //        return cachedImageFiles.Values.First();
-        //    }
-        //    else if (image.Length > 0)
-        //        return cachedImageFiles[image];
-        //    else
-        //        return cachedImageFiles.Values.First();
-        //}
-
-        //public static byte[] ReadImageBytes(string image)
-        //{
-        //    return File.ReadAllBytes(image);
-        //}
-
-        //protected byte[] LoadImage(string image)
-        //{
-        //    if (File.Exists(image))
-        //        return File.ReadAllBytes(image);
-        //    else if (image.Contains(suffixXL) && File.Exists(image.Replace(suffixXL, "")))
-        //        return File.ReadAllBytes(image.Replace(suffixXL, ""));
-        //    else
-        //        throw new FileNotFoundException();
-        //}
-
-
-
-        //public bool AddImage(string image, StreamDeckType deckType)
-        //{
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(image))
-        //        {
-        //            Log.Logger.Error($"AddImage: Empty image string!");
-        //        }
-
-        //        image = GetImageNameByDeck(image, deckType);
-        //        if (!cachedImageFiles.ContainsKey(GetImageNameByDeck(image, deckType)))
-        //        {
-        //            cachedImageFiles.Add(image, LoadImage(image));
-        //            currentRegistrations.Add(image, 1);
-        //        }
-        //        else
-        //            currentRegistrations[image]++;
-
-        //        return true;
-        //    }
-        //    catch
-        //    {
-        //        Log.Logger.Error($"AddImage: Exception while loading Image {image} for deckType {deckType}");
-        //        return false;
-        //    }
-        //}
-
-        //public void UpdateImage(string image, StreamDeckType deckType)
-        //{
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(image))
-        //        {
-        //            Log.Logger.Error($"UpdateImage: Empty image string!");
-        //        }
-
-        //        image = GetImageNameByDeck(image, deckType);
-        //        if (cachedImageFiles.ContainsKey(image))
-        //            cachedImageFiles[image] = LoadImage(image);
-        //    }
-        //    catch
-        //    {
-        //        Log.Logger.Error($"UpdateImage: Exception while loading Image {image} for deckType {deckType}");
-        //    }
-        //}
-
-        //public void RemoveImage(string image, StreamDeckType deckType)
-        //{
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(image))
-        //        {
-        //            Log.Logger.Error($"RemoveImage: Empty image string!");
-        //        }
-
-        //        image = GetImageNameByDeck(image, deckType);
-        //        if (cachedImageFiles.ContainsKey(image))
-        //        {
-        //            if (currentRegistrations[image] == 1)
-        //            {
-        //                currentRegistrations.Remove(image);
-        //                cachedImageFiles.Remove(image);
-
-        //                Log.Logger.Debug($"RemoveImage: Image removed from cache [{image}] for deckType {deckType}");
-        //            }
-        //            else
-        //            {
-        //                currentRegistrations[image]--;
-        //                Log.Logger.Debug($"RemoveImage: Registration removed from image [{image}] - Registrations open: {currentRegistrations[image]}");
-        //            }
-        //        }
-        //        else
-        //            Log.Logger.Error($"RemoveImage: Image was not found {image}");
-        //    }
-        //    catch
-        //    {
-        //        Log.Logger.Error($"RemoveImage: Exception while loading Image {image}");
-        //    }
-        //}
     }
 }

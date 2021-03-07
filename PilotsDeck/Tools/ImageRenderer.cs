@@ -20,32 +20,6 @@ namespace PilotsDeck
             float org = ((buttonSize - Radius * sizeScalar) / 2.0f); // btn - <R> / 2 => x/y
             return new RectangleF(org + Offset.X, org + Offset.Y, Radius * sizeScalar, Radius * sizeScalar);
         }
-        
-        //public PointF GetOffset()
-        //{
-        //    PointF result = new PointF();
-
-        //    var parts = Offset.Split(';');
-        //    if (parts != null && parts.Length == 2)
-        //    {
-        //        if (int.TryParse(parts[0], out int x))
-        //            result.X = x;
-        //        else
-        //            result.X = 0;
-
-        //        if (int.TryParse(parts[1], out int y))
-        //            result.Y = y;
-        //        else
-        //            result.Y = 0;
-        //    }
-        //    else
-        //    {
-        //        result.X = 0;
-        //        result.Y = 0;
-        //    }
-
-        //    return result;
-        //}
     }
 
     public class Bar
@@ -65,8 +39,6 @@ namespace PilotsDeck
         protected Bitmap background;
         protected Graphics render;
 
-        //public static readonly int buttonSize = 144;
-        //protected static int buttonSizeH = buttonSize/2;
         protected int buttonSize = 72;
         protected float buttonSizeH;
         protected float sizeScalar;
@@ -128,9 +100,6 @@ namespace PilotsDeck
 
         public void Rotate(float angle, PointF offset)
         {
-            //render.TranslateTransform(buttonSizeH + offset.X * sizeScalar, buttonSizeH + offset.Y * sizeScalar);
-            //render.RotateTransform(angle);
-            //render.TranslateTransform(-(buttonSizeH + offset.X * sizeScalar), -(buttonSizeH + offset.Y * sizeScalar));
             render.TranslateTransform(buttonSizeH + offset.X , buttonSizeH + offset.Y );
             render.RotateTransform(angle);
             render.TranslateTransform(-(buttonSizeH + offset.X ), -(buttonSizeH + offset.Y ));

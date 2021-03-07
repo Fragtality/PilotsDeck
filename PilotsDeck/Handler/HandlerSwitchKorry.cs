@@ -1,4 +1,6 @@
-﻿namespace PilotsDeck
+﻿using System.Globalization;
+
+namespace PilotsDeck
 {
     public class HandlerSwitchKorry : HandlerSwitch, IHandlerValue
     {
@@ -118,7 +120,7 @@
 
             if (!string.IsNullOrEmpty(value))
             {
-                if (float.TryParse(value, out float num))
+                if (float.TryParse(value, NumberStyles.Number, new RealInvariantFormat(value), out float num))
                 {
                     if (num != 0.0f)
                         result = true;

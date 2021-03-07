@@ -108,8 +108,8 @@ namespace PilotsDeck
         protected virtual void DrawBar(string value, ImageRenderer render)
         {
             Bar drawBar = GaugeSettings.GetBar();
-            float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
-            float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
+            float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
+            float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
             render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
             render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), drawBar);
@@ -118,16 +118,16 @@ namespace PilotsDeck
                 render.DrawBarRanges(drawBar, GaugeSettings.GetColorRange(), GaugeSettings.GetWarnRange(), min, max, GaugeSettings.SymmRange);
 
             if (GaugeSettings.CenterLine)
-                render.DrawBarCenterLine(drawBar, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), GaugeSettings.CenterLineThickness);
+                render.DrawBarCenterLine(drawBar, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), ModelDisplayText.GetNumValue(GaugeSettings.CenterLineThickness, 2));
 
-            render.DrawBarIndicator(drawBar, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
+            render.DrawBarIndicator(drawBar, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
         }
 
         protected virtual void DrawArc(string value, ImageRenderer render)
         {
             Arc drawArc = GaugeSettings.GetArc();
-            float min = ModelDisplayGauge.GetNumValue(GaugeSettings.MinimumValue, 0);
-            float max = ModelDisplayGauge.GetNumValue(GaugeSettings.MaximumValue, 100);
+            float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
+            float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
             
             render.DrawArc(drawArc, ColorTranslator.FromHtml(GaugeSettings.GaugeColor));
 
@@ -135,9 +135,9 @@ namespace PilotsDeck
                 render.DrawArcRanges(drawArc, GaugeSettings.GetColorRange(), GaugeSettings.GetWarnRange(), min, max, GaugeSettings.SymmRange);
             
             if (GaugeSettings.CenterLine)
-                render.DrawArcCenterLine(drawArc, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), GaugeSettings.CenterLineThickness);
+                render.DrawArcCenterLine(drawArc, ColorTranslator.FromHtml(GaugeSettings.CenterLineColor), ModelDisplayText.GetNumValue(GaugeSettings.CenterLineThickness, 2));
 
-            render.DrawArcIndicator(drawArc, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), GaugeSettings.IndicatorSize, ModelDisplayGauge.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
+            render.DrawArcIndicator(drawArc, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
         }
 
         protected virtual void DrawText(string value, ImageRenderer render)

@@ -46,6 +46,7 @@ namespace PilotsDeck
         private IPCValueOffset loadedAircraft;
         private string lastAircraft = "none";
 
+
         public ActionController()
         {
             currentActions = new Dictionary<string, IHandler>();
@@ -71,7 +72,7 @@ namespace PilotsDeck
                     string name = profile?.Name;
                     if (!string.IsNullOrEmpty(name) && profile?.DeviceType != null)
                     {
-                        manifestProfiles.Add(new StreamDeckProfile() { Name = profile.Name, Type = profile.DeviceType });
+                        manifestProfiles.Add(new StreamDeckProfile(name, (int)profile.DeviceType, "") );
                     }
                 }
             }
@@ -135,8 +136,7 @@ namespace PilotsDeck
             GlobalProfileSettings.UpdateSettings(manifestProfiles, DeckManager.Info.devices);
             DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
 
-            foreach (var switcher in profileSwitcherActions)
-                ActionProfileSwitcher.SetActionImage(DeckManager, switcher, GlobalProfileSettings.EnableSwitching);
+            UpdateProfileSwitchers();
 
             //For Test/Debugging - clear GlobalSettings
             //GlobalProfileSettings = new ModelProfileSwitcher();
@@ -161,6 +161,12 @@ namespace PilotsDeck
             Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
 
             IsApplicationOpen = false;
+        }
+
+        public void UpdateProfileSwitchers()
+        {
+            foreach (var switcher in profileSwitcherActions)
+                ActionProfileSwitcher.SetActionImage(DeckManager, switcher, GlobalProfileSettings.EnableSwitching);
         }
 
         public void RegisterProfileSwitcher(string context)
@@ -210,10 +216,10 @@ namespace PilotsDeck
 
                 if (switchTo != "")
                 {
+                    Log.Logger.Information($"ActionController: FSUIPC Profile [{loadedFSProfile.Value}] active for Aircraft [{loadedAircraft.Value}]-> switching to [{switchTo}] on StreamDeck [{deviceMapping.Name}]");
                     _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deviceMapping.ID, switchTo);
                     if (!switchedDecks.Contains(deviceMapping.ID))
                         switchedDecks.Add(deviceMapping.ID);
-                    Log.Logger.Information($"ActionController: FSUIPC Profile [{loadedFSProfile.Value}] active for Aircraft [{loadedAircraft.Value}]-> switching to [{switchTo}] on StreamDeck [{deviceMapping.Name}]");
                 }
             }
 
@@ -226,16 +232,27 @@ namespace PilotsDeck
             if (!GlobalProfileSettings.ProfilesInstalled)
             {
                 var deckTypes = new int[] { (int)StreamDeckType.StreamDeck, (int)StreamDeckType.StreamDeckXL, (int)StreamDeckType.StreamDeckMini, (int)StreamDeckType.StreamDeckMobile };
+                List<string> decksToInstall = new List<string>();
                 foreach (int deckType in deckTypes)
                 {
                     if (manifestProfiles.Where(p => p.Type == deckType).Count() > 0)
                     {
                         var decks = DeckManager.Info.devices.Where(d => d.type == deckType);
                         foreach (var deck in decks)
-                            DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck.id, "Profiles/install");
+                        {
+                            decksToInstall.Add(deck.id);
+                        }
                     }
 
                 }
+
+                foreach (var deck in decksToInstall)
+                {
+                    Log.Logger.Information($"ActionController: Profile install on deck {deck}");
+                    DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, "Profiles/install");
+                }
+
+                decksToInstall.Clear();
 
                 GlobalProfileSettings.ProfilesInstalled = true;
                 DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
@@ -259,7 +276,7 @@ namespace PilotsDeck
             if (tickCounter < firstTick) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 20 Ticks => 20 * <200> = 4s )
                 return;
 
-            if (!IsApplicationOpen)     //P3D closed          ????or the first tick || tickCounter == firstTick
+            if (!IsApplicationOpen)     //P3D closed
             {
                 if (lastAppState)       //P3D changed to closed
                 {
@@ -273,7 +290,10 @@ namespace PilotsDeck
                     redrawRequested = true;
                     if (GlobalProfileSettings.EnableSwitching && GlobalProfileSettings.ProfilesInstalled)
                         foreach (var deck in switchedDecks)
+                        {
+                            Log.Logger.Information($"ActionController: Switching back profile on Deck {deck}");
                             _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, null);
+                        }
                 }
             }
             else                        //P3D open

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Drawing;
 
 namespace PilotsDeck
@@ -21,17 +22,17 @@ namespace PilotsDeck
         public virtual string GaugeColor { get; set; } = "#006400";
         
         public virtual bool DrawArc { get; set; } = false;
-        public virtual float StartAngle { get; set; } = 135;
-        public virtual float SweepAngle { get; set; } = 180;
+        public virtual string StartAngle { get; set; } = "135";
+        public virtual string SweepAngle { get; set; } = "180";
         public virtual string Offset { get; set; } = "0; 0";        
 
         public virtual string IndicatorColor { get; set; } = "#c7c7c7";
-        public virtual float IndicatorSize { get; set; } = 10;
+        public virtual string IndicatorSize { get; set; } = "10";
         public virtual bool IndicatorFlip { get; set; } = false;
 
         public virtual bool CenterLine { get; set; } = false;
         public virtual string CenterLineColor { get; set; } = "#ffffff";
-        public virtual float CenterLineThickness { get; set; } = 2;
+        public virtual string CenterLineThickness { get; set; } = "2";
 
         public virtual bool DrawWarnRange { get; set; } = false;
         public virtual bool SymmRange { get; set; } = false;
@@ -44,7 +45,7 @@ namespace PilotsDeck
         public virtual bool UseWarnColors { get; set; } = true;
         public virtual bool FontInherit { get; set; } = true;
         public virtual string FontName { get; set; } = "Arial";
-        public virtual int FontSize { get; set; } = 10;
+        public virtual string FontSize { get; set; } = "10";
         public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
         public virtual string FontColor { get; set; } = "#ffffff";
         public virtual string RectCoord { get; set; } = "7; 45; 60; 21";
@@ -78,7 +79,7 @@ namespace PilotsDeck
             }
             else
             {
-                drawFont = new Font(FontName, FontSize, (FontStyle)FontStyle);
+                drawFont = new Font(FontName, ModelDisplayText.GetNumValue(FontSize, 10), (FontStyle)FontStyle);
                 drawColor = ColorTranslator.FromHtml(FontColor);
             }
 
@@ -89,18 +90,18 @@ namespace PilotsDeck
                 else if (ValueWithinRange(value, CriticalRange))
                     drawColor = ColorTranslator.FromHtml(CriticalColor);
 
-                if (SymmRange && float.TryParse(MinimumValue, out float minimumTotal) && float.TryParse(MaximumValue, out float maximumTotal))
+                if (SymmRange && float.TryParse(MinimumValue, NumberStyles.Number, new RealInvariantFormat(MinimumValue), out float minimumTotal) && float.TryParse(MaximumValue, NumberStyles.Number, new RealInvariantFormat(MinimumValue),  out float maximumTotal))
                 {
                     float[][] ranges = GetWarnRange();
 
-                    string rangeStr = Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[1][1], minimumTotal));
-                    rangeStr += ";" + Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[1][0], minimumTotal));
+                    string rangeStr = Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[1][1], minimumTotal), CultureInfo.InvariantCulture.NumberFormat);
+                    rangeStr += ";" + Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[1][0], minimumTotal), CultureInfo.InvariantCulture.NumberFormat);
                     if (ValueWithinRange(value, rangeStr))
                         drawColor = ColorTranslator.FromHtml(WarnColor);
                     else
                     {
-                        rangeStr = Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[0][1], minimumTotal));
-                        rangeStr += ";" + Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[0][0], minimumTotal));
+                        rangeStr = Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[0][1], minimumTotal), CultureInfo.InvariantCulture.NumberFormat);
+                        rangeStr += ";" + Convert.ToString(ImageRenderer.NormalizedValue(maximumTotal, minimumTotal) - ImageRenderer.NormalizedValue(ranges[0][0], minimumTotal), CultureInfo.InvariantCulture.NumberFormat);
                         if (ValueWithinRange(value, rangeStr))
                             drawColor = ColorTranslator.FromHtml(CriticalColor);
                     }
@@ -111,7 +112,7 @@ namespace PilotsDeck
         public static bool ValueWithinRange(string value, string range)
         {
             float[] rangeNum = GetNumValues(range, 0, 100);
-            if (float.TryParse(value, out float valueNum))
+            if (float.TryParse(value, NumberStyles.Number, new RealInvariantFormat(value), out float valueNum))
             {
                 if (rangeNum[0] <= valueNum && valueNum <= rangeNum[1])
                     return true;
@@ -122,16 +123,6 @@ namespace PilotsDeck
                 return false;
         }
 
-        //public RectangleF GetRectangleBar(int size)
-        //{
-        //    //if (size == -1)
-        //    //    size = ImageRenderer.buttonSize;
-        //    //RectangleF drawRect = new RectangleF(12, 30, 48, 12); //X= 36 - <W>/2 (64 ~ 4) //Y= 36 - <H>/2 (8 ~ 32)
-        //    float[] barsize = GetNumValues(GaugeSize, 64, 8);
-
-        //    return new RectangleF(size/2 - barsize[0]/2, size/2 - barsize[1] / 2, barsize[0], barsize[1]);
-        //}
-
         public Arc GetArc()
         {
             float[] arcsize = GetNumValues(GaugeSize, 48, 6);
@@ -141,8 +132,8 @@ namespace PilotsDeck
                 Radius = arcsize[0],
                 Width = arcsize[1],
                 Offset = new PointF(offset[0], offset[1]),
-                StartAngle = StartAngle,
-                SweepAngle = SweepAngle
+                StartAngle = ModelDisplayText.GetNumValue(StartAngle, 135),
+                SweepAngle = ModelDisplayText.GetNumValue(SweepAngle, 180)
             };
 
             return arc;
@@ -174,7 +165,7 @@ namespace PilotsDeck
         {
             string[] parts = valString.Trim().Split(';');
 
-            if (parts.Length != 2 || !float.TryParse(parts[0], out float a) || !float.TryParse(parts[1], out float b))
+            if (parts.Length != 2 || !float.TryParse(parts[0], NumberStyles.Number, new RealInvariantFormat(parts[0]), out float a) || !float.TryParse(parts[1], NumberStyles.Number, new RealInvariantFormat(parts[1]), out float b))
             {
                 a = defA;
                 b = defB;
@@ -182,14 +173,5 @@ namespace PilotsDeck
 
             return new float[] { a, b };
         }
-
-        public static float GetNumValue(string valString, float def)
-        {
-            if (!float.TryParse(valString, out float result))
-                result = def;
-
-            return result;
-        }
-
     }
 }

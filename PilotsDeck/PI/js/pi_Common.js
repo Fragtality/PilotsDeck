@@ -237,6 +237,22 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 	};
 }
 
+const sendToPlugin = (action, payload) => {
+	if (websocket && websocket.readyState == 1) {
+		var json = {
+			"event": "sendToPlugin",
+			"action": action,
+			"context": uuid,
+			"payload": {
+				"settings": {
+					"settingsModel": payload
+				}
+			}
+		};
+		websocket.send(JSON.stringify(json));
+    }
+}
+
 const setSettings = (value, param) => {
 	if (websocket) {
 		settingsModel[param] = value;
@@ -247,7 +263,7 @@ const setSettings = (value, param) => {
 				"settingsModel": settingsModel
 			}
 		};
-	websocket.send(JSON.stringify(json));
+		websocket.send(JSON.stringify(json));
 	}
 	updateForm();
 };

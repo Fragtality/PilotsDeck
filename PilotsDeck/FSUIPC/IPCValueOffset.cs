@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Serilog;
 using FSUIPC;
 
@@ -113,7 +114,15 @@ namespace PilotsDeck
             {
                 var result = ReadNumber();
                 if (result != null)
-                    return Convert.ToString(result);
+                {
+                    string num = Convert.ToString(result, CultureInfo.InvariantCulture.NumberFormat);
+
+                    int idxE = num.IndexOf("E");
+                    if (idxE < 0)
+                        return num;
+                    else
+                        return string.Format("{0:F1}", result);
+                }
                 else
                     return null;
             }
@@ -125,26 +134,6 @@ namespace PilotsDeck
                 return ReadOffsetString();
             else //should be float or int
                 return ReadNumber();
-        }
-
-        public override string ScaledValue(double scalar)
-        {
-            if (!IsString)
-            {
-                var result = ReadNumber();
-                if (result != null)
-                    return Convert.ToString(result * scalar);
-                else
-                    return null;
-            }
-            else
-            {
-                var str = ReadOffsetString();
-                if (double.TryParse(str, out double num))
-                    return Convert.ToString(num * scalar);
-                else
-                    return str;
-            }
         }
 
         protected string ReadOffsetString()
@@ -241,9 +230,9 @@ namespace PilotsDeck
                     switch (Size)
                     {
                         case 4:
-                            return Convert.ToSingle(newValue);
+                            return Convert.ToSingle(newValue, new RealInvariantFormat(newValue));
                         case 8:
-                            return Convert.ToDouble(newValue);
+                            return Convert.ToDouble(newValue, new RealInvariantFormat(newValue));
                         default:
                             return newValue;
                     }

@@ -50,7 +50,7 @@ namespace PilotsDeck
             Plugin.ActionController.UpdateGlobalSettings(SettingsModel);
             Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
 
-            SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
+            Plugin.ActionController.UpdateProfileSwitchers();
 
             Log.Logger.Debug($"ActionProfileSwitcher:OnKeyUp {args.context}");
             return Task.CompletedTask;
@@ -63,9 +63,11 @@ namespace PilotsDeck
             SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
 
             Plugin.ActionController.UpdateGlobalSettings(SettingsModel);
-            Plugin.ActionController.LoadProfiles();
+            //Plugin.ActionController.LoadProfiles();
             SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
             Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
+
+            Plugin.ActionController.UpdateProfileSwitchers();
 
             Log.Logger.Debug($"ActionProfileSwitcher:OnDidReceiveSettings {args.context}");
             return Task.CompletedTask;
@@ -79,6 +81,18 @@ namespace PilotsDeck
             Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
 
             Log.Logger.Debug($"ActionProfileSwitcher:OnPropertyInspectorDidAppear {args.context}");
+            return Task.CompletedTask;
+        }
+
+        public override Task OnSendToPlugin(StreamDeckEventPayload args)
+        {
+            base.OnSendToPlugin(args);
+
+            Plugin.ActionController.LoadProfiles();
+            SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
+            Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
+
+            Log.Logger.Debug($"ActionProfileSwitcher:OnSendToPlugin {args.context}");
             return Task.CompletedTask;
         }
     }

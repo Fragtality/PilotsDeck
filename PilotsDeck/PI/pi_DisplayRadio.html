@@ -15,7 +15,7 @@
         </div>
         <div class="sdpi-item" id="Config_AddressAction">
             <div class="sdpi-item-label">Action Address</div>
-            <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar or Offset" />
+            <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar, Offset or vJoy" />
         </div>
         <div class="sdpi-item" id="Config_OffState">
             <div class="sdpi-item-label" id="lblOffState">Toggle Value</div>
@@ -40,11 +40,11 @@
         </div>
         <div class="sdpi-item" id="Config_Scalar">
             <div class="sdpi-item-label" id="lblScalar">Scalar</div>
-            <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
         <div class="sdpi-item" id="Config_Format">
             <div class="sdpi-item-label">Format</div>
-            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^:.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
+            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^(:)?.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_StbyHasDiffFormat">
             <div class="sdpi-item-label" id="lblStbyHasDiffFormat">Different Format</div>
@@ -77,7 +77,7 @@
         </div>
         <div class="sdpi-item" id="Config_FontSize">
             <div class="sdpi-item-label" id="lblFontSize">Size</div>
-            <input id="FontSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
+            <input id="FontSize" class="sdpi-item-value" type="text" pattern="[+]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
         </div>
         <div class="sdpi-item" id="Config_FontColor">
             <div class="sdpi-item-label" id="lblFontColor">Color Active</div>
@@ -105,11 +105,11 @@
         <div class="sdpi-heading">Tweak Position</div>
         <div class="sdpi-item" id="Config_RectCoord">
             <div class="sdpi-item-label" id="lblRectCoord">Rectangle Active</div>
-            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
         <div class="sdpi-item" id="Config_RectCoordStby">
             <div class="sdpi-item-label" id="lblRectCoordStby">Rect. Standby</div>
-            <input id="RectCoordStby" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            <input id="RectCoordStby" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
     </div>
     <script src="js/pi_Common.js"></script>

@@ -22,21 +22,21 @@
         </div>
         <div class="sdpi-item" id="Config_Scalar">
             <div class="sdpi-item-label" id="lblScalar">Scalar</div>
-            <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
         <div class="sdpi-item" id="Config_MinimumValue">
             <div class="sdpi-item-label" id="lblMinimumValue">Minimum</div>
-            <input id="MinimumValue" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            <input id="MinimumValue" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
         <div class="sdpi-item" id="Config_MaximumValue">
             <div class="sdpi-item-label" id="lblMaximumValue">Maximum</div>
-            <input id="MaximumValue" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            <input id="MaximumValue" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
         </div>
 
         <div class="sdpi-heading">Gauge Settings</div>
         <div class="sdpi-item" id="Config_GaugeSize">
             <div class="sdpi-item-label" id="lblGaugeSize">Size</div>
-            <input id="GaugeSize" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
+            <input id="GaugeSize" class="sdpi-item-value" type="text" pattern="[ ]*[+]?[0-9]+([,.][0-9]+)?[ ]*; [ ]*[+]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
         </div>
         <div class="sdpi-item" id="Config_GaugeColor">
             <div class="sdpi-item-label" id="lblGaugeColor">Bar Color</div>
@@ -54,15 +54,15 @@
         </div>
         <div class="sdpi-item" id="Config_StartAngle">
             <div class="sdpi-item-label" id="lblStartAngle">Start Angle</div>
-            <input id="StartAngle" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Start at Angle (in Degree)" />
+            <input id="StartAngle" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Start at Angle (in Degree)" />
         </div>
         <div class="sdpi-item" id="Config_SweepAngle">
             <div class="sdpi-item-label" id="lblSweepAngle">Sweep Angle</div>
-            <input id="SweepAngle" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="&quot;Size&quot; of the Arc (in Degree)" />
+            <input id="SweepAngle" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="&quot;Size&quot; of the Arc (in Degree)" />
         </div>
         <div class="sdpi-item" id="Config_Offset">
             <div class="sdpi-item-label" id="lblOffset">Offset Arc</div>
-            <input id="Offset" class="sdpi-item-value" type="text" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Move Arc diagonally" />
+            <input id="Offset" class="sdpi-item-value" type="text" required pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" placeholder="Move Arc diagonally" />
         </div>
 
         <div class="sdpi-heading">Indicator Settings</div>
@@ -72,7 +72,7 @@
         </div>
         <div class="sdpi-item" id="Config_IndicatorSize">
             <div class="sdpi-item-label" id="lblIndicatorSize">Indicator Size</div>
-            <input id="IndicatorSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Triangle Size in px" />
+            <input id="IndicatorSize" class="sdpi-item-value" type="text" pattern="[ ]*[+]?[0-9]+([,.][0-9]+)?[ ]*" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Triangle Size in px" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_IndicatorFlip">
             <div class="sdpi-item-label" id="lblIndicatorFlip">Flip</div>
@@ -92,7 +92,7 @@
         </div>
         <div class="sdpi-item" id="Config_CenterLineThickness">
             <div class="sdpi-item-label" id="lblCenterLineThickness">Line Size</div>
-            <input id="CenterLineThickness" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Line Size in px" />
+            <input id="CenterLineThickness" class="sdpi-item-value" type="text" pattern="[ ]*[+]?[0-9]+([,.][0-9]+)?[ ]*" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Line Size in px" />
         </div>
 
         <div class="sdpi-heading">Warning Range</div>
@@ -112,7 +112,7 @@
         </div>
         <div class="sdpi-item" id="Config_CriticalRange">
             <div class="sdpi-item-label" id="lblCriticalRange">Critical Range</div>
-            <input id="CriticalRange" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="from; to" />
+            <input id="CriticalRange" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="from; to" />
         </div>
         <div class="sdpi-item" id="Config_WarnColor">
             <div class="sdpi-item-label" id="lblWarnColor">Line Color</div>
@@ -120,7 +120,7 @@
         </div>
         <div class="sdpi-item" id="Config_WarnRange">
             <div class="sdpi-item-label" id="lblWarnRange">Warn Range</div>
-            <input id="WarnRange" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="from; to" />
+            <input id="WarnRange" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="from; to" />
         </div>
 
         <div class="sdpi-heading">Text Settings</div>
@@ -131,7 +131,7 @@
         </div>
         <div class="sdpi-item" id="Config_Format">
             <div class="sdpi-item-label" id="lblFormat">Format</div>
-            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^:.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
+            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^(:)?.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_UseWarnColors">
             <div class="sdpi-item-label" id="lblUseWarnColors">Range Colors</div>
@@ -149,7 +149,7 @@
         </div>
         <div class="sdpi-item" id="Config_FontSize">
             <div class="sdpi-item-label" id="lblFontSize">Size</div>
-            <input id="FontSize" class="sdpi-item-value" type="number" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
+            <input id="FontSize" class="sdpi-item-value" type="text" pattern="[+]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Font Size" />
         </div>
         <div class="sdpi-item" id="Config_FontColor">
             <div class="sdpi-item-label" id="lblFontColor">Color</div>
@@ -161,7 +161,7 @@
         </div>
         <div class="sdpi-item" id="Config_RectCoord">
             <div class="sdpi-item-label" id="lblRectCoord">Draw Rectangle</div>
-            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+;[ ]*[0-9]+[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
 
         <div class="sdpi-heading">Background</div>
