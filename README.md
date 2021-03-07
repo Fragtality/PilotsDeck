@@ -1,32 +1,41 @@
 # Pilot's Deck
-Directly control and view Prepar3D&#x00AE; from your StreamDeck&#x00AE; via FSUIPC!
+Directly control the FlightSim from your StreamDeck&#x00AE; via FSUIPC!
 ![Example01](img/Example01.png)
 <br/><br/>
 ## Introduction
 As the Title suggests, this is a Plugin for Elegato's StreamDeck for the FlightSimmers out there in need of just more Buttons! :wink:<br/>
 It is build arround FSUIPC, so if something in the Sim can be triggered via Macros, Scripts, Luas, Lvars or Offsets - it can also be triggered via this Plugin from your StreamDeck! It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
-The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best four your Aircraft(s).<br/><br/>
+The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best four your Aircraft(s)!<br/><br/>
 The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want (as Text or Graphical Representation). It uses the full Potential the StreamDeck has to offer for FlightSimmers: it is also a *Display* Device, not *just* Buttons!<br/>
-The Plugin can also switch between StreamDeck Profiles when the Aircraft (Model) and FSUIPC Profile change.<br/>
-Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).
+The Plugin can also switch between StreamDeck Profiles (on multiple Decks) when the Aircraft (Model) and FSUIPC Profile change.<br/>
+Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).<br/><br/>
+As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant. It is developed on Prepar3D&#x00AE;, so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
-Uhm ... I'd say Prepar3D, FSUIPC and StreamDeck (Software) installed would be a bloody good Start :laughing:<br/>
-It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff!<br/>
+Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed and working would be a bloody good Start :laughing:<br/>
+It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff! Should work with older Windows-Versions too, if the correct .NET Framework Version is installed.<br/>
 You can check your installed Framework Version with Powershell:
 ```powershell
 (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release -ge 528040
 (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Version
 ```
 The first Command should show "True", the second something with "4.8.x".<br/>
-The Plugin only reacts when "Prepar3D.exe" is loaded, so FSX would require a Change of the [Plugin Settings](README.md#plugin-settings). It may work with FSX, older Versions of P3D and FSUIPC and maybe even other FlightSims (MSFS, XP). There is no Sim-Specific Library involved, only FSUIPC (in form of the .NET Client). Try it and let me know if and what works! :slightly_smiling_face:
+The Connection to FSUIPC / the happens automaticallly when the StreamDeck Software (with the Plugin installed) runs. The Plugin's Manifest-File includes the Executables of all relevant Sims, so that it is informed by the StreamDeck Software when a Simulator starts (only then it tries to connect). The Executable-Names can be altered in the [Plugin Settings](README.md#plugin-settings).<br/>
+The Sims and their FSUIPC Version/Variant are:
+- FSUIPC3 - Microsoft Flight Simulator 2004
+- FSUIPC4 - Microsoft FSX, FSX Steam Edition, Prepar3d 1.4 to 3.4
+- FSUIPC5 - Prepar3D Version 4
+- **FSUIPC6** - Prepar3D Version 4 and 5
+- FSUIPC7 - Microsoft Flight Simulator 2020
+- XPUIPC - XPlane
+If you let me know what works and which Features work in which Sim (other then P3D v4/5), I'll add it to the Readme! :wink:
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
 Just put the Contents of the Zip in your Plugin-Folder under<br/>
   > **%appdata%\Elgato\StreamDeck\Plugins**
 
-Optional: If you need/want to read Values generated by Lua-Scripts, you have to add the [PilotsDeck.lua](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) Script from the Plugin's *\lua* Subfolder to your FSUIPC Installation as an Autostart Script. More Instructions can be found in that File.
+Optional: If you need/want to read Values generated by Lua-Scripts, you have to add the [PilotsDeck.lua](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) Script from the Plugin's *\lua* Subfolder to your FSUIPC Installation as an Autostart Script. More Instructions can be found in that File. (If your Sim supports Lua)
 <br/><br/><br/>
 ## Overview of included Actions
 As of now, there are 8-9 Actions:<br/>
@@ -38,19 +47,19 @@ As of now, there are 8-9 Actions:<br/>
 * ![ActionRadio](PilotsDeck/Images/category/ActionRadio.png) **COM Radio** - It is more or less a "Display Value Button" with two Values instead of one. Read the Radios from anywhere you want (BCD encoded or Integer) and swap the Frequencies by any Way you want.
 * ![ActionGaugeBar](PilotsDeck/Images/category/ActionGaugeBar.png) **Display Gauge** - If you want a graphical Representation of a Value, let's say for your Engines N1 Value, Trim, Control Surface Deflection, Fuel Level ... this Action is for you! It can either be a Bar or an Arc. With Text or without.
 * ![ActionGaugeBarDual](PilotsDeck/Images/category/ActionGaugeBarDual.png) **Display Gauge Dual** - New! Now with two Indicators instead of one! So you can have your Left/Right, Engine 1/Engine 2 or whatever in one Display.
-* ![ActionProfileSwitcher](PilotsDeck/Images/category/category.png) **Profile Switcher** - This is more an Interface than an Action to configure the Profile Switching, it is only needed for Configuration and Profile Installation.
+* ![ActionProfileSwitcher](PilotsDeck/Images/category/category.png) **Profile Switcher** - This is more an Interface than an Action to configure the Profile Switching, it is only needed for Configuration and Profile Installation. Whey you press it's StreamDeck Button the Profile Switching is enabled/disabled.
 <br/><br/>
 ## Action Configuration
 Now we're getting to the "Fun" part! :flushed:<br/>
-The Actions behave like any other Actions on the StreamDeck. All the Action's Settings are stored in the StreamDeck Profiles (and therefore are saved when you Backup/Export Profiles). They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like normal. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
+The Actions behave like any other Actions on the StreamDeck. All the Action's Settings are stored in the StreamDeck Profiles (and therefore are also saved when you Backup/Export Profiles). They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like any other Action. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
 All Configuration is done via the Property Inspector. Some Input-Fields combine multiple Fiels/Inputs in one string, so let's start with the common Syntax:<br/>
 ### Common Syntax & Fields & Behavior
-Plain Numeric Values are separated by "**;**". E.g. an Size or Range Definition like "0; 10"<br/>
+Plain Numeric Values are separated by "**;**". E.g. an Size or Range Definition like "0; 10". All numeric Input-Fields support Float-Values and support both Decimal-Characters ("**,**" or "**.**") regardless of System Setting. The Output is forced to have a Decimal-Point regardless of System Setting (I'm not aware of any "localized" Cockpits :laughing:), but you can change that in the [Plugin Settings](README.md#plugin-settings).<br/>
 Addresses, Format and Profiles are separated by "**:**".<br/>
-Address Fields and some other Fields are using Syntax Checking on the Input. So if an Exclamation Mark is shown in the Input Field, it could be wrong. The Property Inspector matches not all Cases and in any Case the Input will be saved. The "real" Syntax Checking is done when a Button is pressed and then will only allow valid Syntax. Mind the Difference between "Syntax" and "Semantics": The Plugin can check if the Input is correct to specifiy e.g. a Macro via FSUIPC, but it can't check if that Macrofile or Macro exists :wink:<br/>
+Address Fields and some other Fields are using Syntax Checking on the Input. So if an Exclamation Mark is shown in the Input Field, it is likely wrong (or just missing). The Property Inspector matches not all Cases and in any Case the Input will be saved. The "real" Syntax Checking is done when a Button is pressed and then will only allow valid Syntax. Mind the Difference between "Syntax" and "Semantics": The Plugin can check if the Input is correct to specifiy e.g. a Macro via FSUIPC, but it can't check if that Macrofile or Macro exists :wink:<br/>
 If a Button Press could not be executed for whatever Reason (P3D closed, not ready, Syntax incorecct, Action not configured ...), the Plugin will show the StreamDeck Alert-Symbol (yellow Triangle with an Exclamation Mark).<br/>
 If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or while loading, all Actions will show a "..." Background.<br/>
-#### Address Fields
+#### Address Fields (Action Types)
 * **Offset**
   \[ (0x)Hex-Address:Size(:Type:Signedness) ] (Read / Command)
   - *Hex-Address*: As seen in FSUIPC's Offsets Status Document (first column). A 4-digit Hex-Number. It can be prefixed with 0x and can be written in upper- or lower-case (the PI will only check mark upper-case, but lower-case does work).
@@ -80,7 +89,15 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear or Toggle) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle work as described in FSUIPC's Documentation.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/>
   *Examples*:
   - *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")
-  - *"LuaToggle:FSL_CMD:21"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")<br/>
+  - *"LuaToggle:FSL_CMD:21"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
+* **vJoy**
+  \[ Joystick:Button(:t) ] (Command)
+  - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
+  - *Button*: The Number of the Button on that Joystick (Button 0 - 31).
+  - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/>
+  *Examples*:
+  - *"64:4"* (the StreamDeck Button is recognized as Joystick 64, Button 4 in the Sim)
+  - *"72:2:t"* (the StreamDeck Button is recognized as Joystick 72, Button 2 in the Sim and will be toggled on KeyUp)<br/>
 #### DecodeBCD / Scale / Format
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
@@ -93,7 +110,10 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *2:1%s* Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!
   - *%s ft* Add "ft" after the Value<br/>
 #### Images
-All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.
+All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.<br/>
+The Images for the Korry Button are in the \Images\korry Subdirectory.<br/>
+The only Images you should not delete are "Wait.png" and "Wait@2x.png", they are hard-coded in the Manifest-File and used as fallback!<br/>
+The StreamDeck XL with its higher Button Resolution is also supported, all Images have "@2x" Version for that. The right Image for the specific Deck is automatically loaded (and all Coordinates/Positions are based on 72x72) - so Actions can easily be transferred between different Deck-Types without the need to change the Action's Settings!
 * **Default Image / Background Normal**: The Image to be shown (or drawn to) when the Action is in their normal/working State or P3D is not loaded.
 * **Error Image**: The Image to be shown when FSUIPC disconnects or the Value could not be read.
 * **Special Value / State**: If the Value / Switch has an Special 2nd or 3rd State, you can indicate that by the Image specified. For Example if the Baro is on STD/1013, the PACK is on "Fault", the APU is "Avail", ...<br/>
@@ -118,14 +138,15 @@ Since Display Value is explained above and a simple Button has nothing much to c
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lvar), multiple Requests will be send to the Sim in fast Sequence.
 * **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these Values when pushed ("keyUp") and sends it to the Sim. It will always start in the "Off" State (sends "On" on next Push) and will reset to "Off" when you change the Settings.<br/>Remember that this Button doesn't read the current State, it has it's own State tracking. If you switch something "Off" by other means while this Button is "On", this Button will still write the "Off" Value on next push. <br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
-* **Long Press**: When enabled, the Button can execute a completely different Command when pressed for longer than 600ms (with the default [Plugin Settings](README.md#plugin-settings). This second Command Settings' work exactly like described before. Note that the internal Mechanic is based on "keyUp": regardless of how long you press the Button, it will only execute when released!
+* **Long Press**: When enabled, the Button can execute a completely different Command when pressed for longer than 600ms (with the default [Plugin Settings](README.md#plugin-settings). This second Command Settings' work exactly like described before. Note that the internal Mechanic is based on "keyUp": regardless of how long you press the Button, it will only execute when released!<br/>
+For that Reason this Long Press Option is not offered when the first Command is a non-toggleable vJoy Address! A non-toggleable vJoy is "down" (set) as soon as the StreamDeck Button is pressed and "up" (clear) as soon as the StreamDeck Button is released. A toggelable vJoy though behaves like the other Action (evaluated on "keyUp") and can therefore have a second Command on with the Long Press Option.
 <br/><br/>
 ### Dynamic Button
 ![ActionSwitchDisplay](img/DynamicButtonKorry.png)![ActionSwitchDisplay](img/DynamicButtonGear.png)![ActionSwitchDisplay](img/DynamicButtonLight.png)<br/>
 Action Type and Address work exactly like described above.<br/>
 * **Address** (Control Status Value): Here you specify where the current State (Value) of a Switch in the Sim can be read. Since there are only two Ways to read something from the Sim via FSUIPC, it is either an Offset or a (single) Lvar.<br/>The Syntax works as described [before](README.md#address-fields). The "third" Way, reading a Lua Value is described [below](README.md#lua-values).
 * **On / Off State**: When the Value matches On or Off, the respective Image is displayed.<br/>
-For Offset and Lvar Actions: Since the Button knows the real current State of a Switch in the Sim, it will send the correct toggled Value to the Sim when pushed. If current Value is neither On nor Off, the Off Value will be send.<br/>The Assumption is that Action Address and Address are the same Offset or Lvar, but if you have the Use-Case that they have to be different, you can configure it that way! Just mind that the same On/Off Values will be used for both reading and writing.
+For Offset and Lvar Actions: Since the Button knows the real current State of a Switch in the Sim, it will send the correct toggled Value to the Sim when pushed. If current Value is neither On nor Off, the Off Value will be send. If the Long Press Option is configured (and is also a Offset/Lvar Action), their On/Off States are also evaluated against the Control Status Value!<br/>The Assumption is that Action Address and Address are the same Offset or Lvar, but if you have the Use-Case that they have to be different, you can configure it that way! Just mind that the same On/Off Values will be used for both reading and writing.
 * **Special State**: For Switches which have something "in between" or other than the On/Off States, this Special State can be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches to the current Value. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
 <br/><br/>
 ### Korry Button
@@ -155,7 +176,7 @@ This Action can display a Value on a Bar or an Arc. The graphics are rendered on
   - *Orientation* (Bar): Define if this Bar is horizontal or vertical and if the Values are increasing right/left or up/down. An Arc does not need (and ignores) that - it is a Circle, it has all directions. :smile:
   - *Start Angle* (Arc): The Angle at wich the Arc starts. 0° is at right center.
   - *Sweep Angle* (Arc): This Angle defines how "big" or "long" the Arc is from the *Start Angle*. For positive angles the Indicator moves clock-wise, for negative counterclock-wise.
-  - *Offset* (Arc): You can diagonally move the Arc (and Text) from the top-left corner by that Value.
+  - *Offset* (Arc): You can adjust the Arc's Position with this Field as "x; y" Offset from the top-left Corner (0, 0).
  * **Indicator Settings** Define the Color and Size of the Triangle that indicates the current Value in the Sim. You can *Flip* it to draw it on the "other side".
  * **Center Line** Draw a Line at the Center (50%) in the specified *Color* and *Size*
  * **Warning Range**: If there should be "dangerous" or "critical" area on the Bar/Arc, you can define it here.
@@ -170,18 +191,18 @@ The most notabel Difference: with a Bar, both Values can be displayed as Text. W
 <br/><br/>
 ### Profile Switcher
 ![ActionProfileSwitcher](img/ProfileSwitcher.png)<br/>
-With this Action the Profile Switching is configured. If you want to use that (disabled by default), drag this Action somewhere on your StreamDeck. Upon first use, as soon as you select this Action and the Property Inspector appears, you will be asked if you want to install preconfigured Profiles (sometimes this Dialog pops up two times - you only have to acknowledge one, cancel the other one). This is *required* for the Switching to work! The StreamDeck API only allows to switch Profiles which came preconfigured with a Plugin and internally keeps Track of that (meaning, the StreamDeck *knows* if a Profile came frome a User or from a Plugin). You only have to install the Profiles if you want to use the Switching capabilities.<br/>
-For that Reason the Plugin conveniently includes 4 StreamDeck Profiles (Default, X-Ray, Yankee, Zulu) that you can map to any FSUIPC Profiles. You don't have to use them, that is also customizable, but that requires a change in the Plugin Settings (they have to be "published" to StreamDeck upon Plugin Start and have to be installed by the Plugin)<br/>
+With this Action the Profile Switching is configured. If you want to use that (disabled by default), drag this Action somewhere on your StreamDeck. Upon first use, as soon as you select this Action and the Property Inspector appears, you will be asked if you want to install preconfigured Profiles. The Software should ask once per every connected StreamDeck, but the API has the Tendency to pop-up one additional Dialog sometimes. Only accept the first x Dialogs (or delete the "Copy" Profiles afterwards).<br/>This is *required* for the Switching to work! The StreamDeck API only allows to switch Profiles which came preconfigured with a Plugin and internally keeps Track of that (meaning, the StreamDeck *knows* if a Profile came frome a User or from a Plugin). You only have to install the Profiles if you want to use the Switching capabilities.<br/>
+For that Reason the Plugin conveniently includes 3 StreamDeck Profiles for the "normal" StreamDeck (Default, Yankee, Zulu) and 3 Profiles for the XL StreamDeck (DefaultXL, Whiskey, X-Ray) that you can map to any FSUIPC Profiles. You don't have to use them (that is also customizable), you can use your own Profiles or add additional Profiles. But that requires a change in the Plugin Settings (they have to be "published" to StreamDeck upon Plugin Start and have to be installed by the Plugin/StreamDeck Software).<br/>
 The Plugin will switch to a Profile as soon FSUIPC is ready (somewhere while P3D loads). It attempts to switch back to the previous used Profile, but that only works if you don't use Folders (did not switch between them within the Profile) - again for API Reasons.<br/>
 * **Enabled** When this is checked, this Feature is activated. You don not have to keep this Action anywhere on your StreamDeck after Configuration (it is a Global Setting).
-* **Profiles Installed** You can reset the Installed flag (uncheck), if you wish. The next Time the Property Inspector (for this Action) is openend, the Profiles will be installed again. Profiles that already exist will *not* be overwritten - StreamDeck will add a "xyz copy" Profile.
-* **Use Default** For unknown FSUIPC Profiles (or Aircrafts which do not have a FSUIPC Profile), the Plugin will switch to the Profile configured by *Name* if this Option is checked. If unchecked, only mapped FSUIPC Profiles will be switched. Default is obviously the bundled Default Profile :wink:
-* **Profile Mappings** Here you can map your FSUIPC Profiles to the different StreamDeck Profiles. Use the FSUIPC Profile's Name exactly as it is configured in FSUIPC. Multiple FSUIPC Profiles can be mapped to the same StreamDeck Profile, their Names are separated by "**:**".
+* **Profiles Installed** You can reset the Installed flag (uncheck), if you wish. You will immediately be asked if you want to install the preconfigured Profiles (=all Profiles which where listed in the Manifest-File when the StreamDeck Software loaded the Plugin). Profiles that already exist will *not* be overwritten - StreamDeck will add a "xyz copy" Profile.
+* **Use Default** (per Deck) For unknown FSUIPC Profiles (or Aircrafts which do not have a FSUIPC Profile), the Plugin will switch to the Profile configured by *Name* if this Option is checked. If unchecked, only mapped FSUIPC Profiles will be switched. Default is obviously the bundled Default Profile :wink:
+* **Profile Mappings** (per Deck) Here you can map your FSUIPC Profiles to the different StreamDeck Profiles. Use the FSUIPC Profile's Name exactly as it is configured in FSUIPC. Multiple FSUIPC Profiles can be mapped to the same StreamDeck Profile, their Names are separated by "**:**".
 #### Customization
 If you want to use your own Names or need more Profiles, you can customize that. But because of the described Limitation of the StreamDeck API, you have to fiddle with the Plugin's [Manifest](README.md#manifestjson) File directly (so the Plugin can install it).<br/>
 * First create a new empty Profile in your StreamDeck and export it (or an existing one, does not need to be empty). Name it any way you want, non-alpha-numeric Characters are also allowed, but rename the File afterwards if these Characters are more "special" then Space, Minus or Underscore (it has no Influence on the displayed Name).
 * Copy the .streamDeckProfile File in the Plugin's Directory, preferably in the \Profiles Subdirectory.
-* Alter the Manifest File. Add your StreamDeck Profile(s) *File*-Name (without Extension) to the List in the same way as the included ones. You can, of course, get completely rid of the included StreamDeck Profiles if you wish and just use your own. Remember the Default Profile is configurable, so you can even replace/remove that!
+* Alter the Manifest File. Add your StreamDeck Profile(s) *File*-Name (without Extension) to the List in the same way as the included ones and specifiy the correct Deck-Type. You can, of course, get completely rid of the included StreamDeck Profiles if you wish and just use your own. Remember the Default Profile is configurable, so you can even replace/remove that!
 * Restart the StreamDeck Application, use the Profile Switcher Action to reset the Installed State of the Profiles. Now the Profiles which are configured in the Manifest will be installed. The old ones will not (and can not) be removed automatically (if they were installed before), you have to delete them manually.
 * You can use the added Profiles now like the included ones. If everything went well, they should be listed in StreamDeck and in the Profile Switcher Action to map FSUIPC Profiles to it. That's the best I can offer, I'm glad it works at all - as per StreamDeck SDK it shouldn't work because the preconfigured Profiles are writeable :laughing:
 <br/><br/>
@@ -234,20 +255,20 @@ The second is the [manifest.json](README.md#manifestjson) which is specific for 
 Generally take care when editing them, the XML/JSON Syntax must be the correct for the Application/Plugin to start at all. Backups FTW! :laughing:<br/>
 ### PilotsDeck.exe.config
 These are the available Settings and their Default:
-* **applicationName**="Prepar3D.exe"	- The Executable to "listen to". The Plugin is informed by StreamDeck as soon as this Executable runs and only then tries to establish a FSUIPC Connection. Must also be changed in the [Manifest](README.md#manifestjson)!
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
 * **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
-* **appStartDelay**="30"		- When P3D is started, it will throttle the Process Calls to FSUIPC to every 10s (based on Ticks) in the first X seconds after FSUIPC successfully processed. Depending on how fast/slow P3D and the selected Aircraft are loading this could be too long/short. This only applies to when the Plugin (StreamDeck Software) was already running, if the Plugin is started when P3D was already running, it will directly connect and process.
+* **appStartDelay**="30"		- When P3D (or any other Sim) is started, it will throttle the Process Calls to FSUIPC to every 10s (based on Ticks) in the first X seconds after FSUIPC successfully processed. Depending on how fast/slow P3D and the selected Aircraft are loading this could be too long/short. This only applies to when the Plugin (StreamDeck Software) was already running, if the Plugin is started when P3D was already running, it will directly connect and process.
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
-* **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.<br/><br/>
+* **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.
+* **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".<br/><br/>
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
 * **fontItalic_XX**="Italic"<br/><br/>
 ### manifest.json
 There are only two Use-Cases to fiddle in that file, so these are the interesting Parts:
-* **ApplicationsToMonitor**: Change this (and *applicationName* in the above File) to alter the Executable the Plugin reacts upon.
+* **ApplicationsToMonitor**: Change this to alter the Executable the Plugin reacts upon.
 * **Profiles**: Like described under [Profile Switcher](README.md#customization) - here you add or change the StreamDeck Profiles. If the .streamDeckProfile File is in the \Profiles Subdirectory, you must prefix the Name with "*Profiles/*". Mind the JSON-Syntax: the last Entry must not have a "**,**" at the End, but all others have to be separated by that.
 <br/><br/>
 ## Examples
