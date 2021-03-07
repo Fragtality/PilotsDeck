@@ -27,8 +27,8 @@ The Sims and their FSUIPC Version/Variant are:
 - FSUIPC5 - Prepar3D Version 4
 - **FSUIPC6** - Prepar3D Version 4 and 5
 - FSUIPC7 - Microsoft Flight Simulator 2020
-- XPUIPC - XPlane<br/>
-If you let me know what works and which Features work in which Sim (other then P3D v4/5), I'll add it to the Readme! :wink:
+- XPUIPC - X-Plane<br/><br/>
+If you let me know what works and which Features work in which Sim (other than P3D v4/5), I'll add it to the Readme! :wink:
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
