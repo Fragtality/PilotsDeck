@@ -92,8 +92,8 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")
   - *"LuaToggle:FSL_CMD:21"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
 * **vJoy**
+  \[ Joystick:Button(:t) ] (Command)<br/>
 :grey_exclamation: This Action is not related to the vJoy Device-Driver or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
-  \[ Joystick:Button(:t) ] (Command)
   - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
   - *Button*: The Number of the Button on that Joystick (Button 0 - 31).
   - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/>
