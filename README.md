@@ -29,7 +29,7 @@ The Sims and their FSUIPC Version/Variant are:
 - FSUIPC7 - Microsoft Flight Simulator 2020
 - XPUIPC - X-Plane<br/><br/>
 If you let me know what works and which Features work in which Sim (other than P3D v4/5), I'll add it to the Readme! :wink:<br/>
-:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports!
+:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so for FSUIPC a registered Version is recommended (but not neccessary)!
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
