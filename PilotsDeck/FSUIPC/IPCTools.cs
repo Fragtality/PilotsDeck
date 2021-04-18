@@ -13,7 +13,8 @@ namespace PilotsDeck
         //public static Regex rxLvar = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}(:(L:){{0,1}}{validName})*$", RegexOptions.Compiled);
         public static Regex rxLvarRead = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
         public static Regex rxLvarWrite = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}(:(L:){{0,1}}{validName})*$", RegexOptions.Compiled);
-        public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        //public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static Regex rxVjoy = new Regex(@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 

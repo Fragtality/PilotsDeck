@@ -9,7 +9,8 @@ namespace PilotsDeck
     {
         INTEGER,
         FLOAT,
-        STRING
+        STRING,
+        BIT
     }
 
     public class OffsetParam
@@ -18,13 +19,15 @@ namespace PilotsDeck
         public int Length { get; }
         public OffsetType Type { get; }
         public bool Signed { get; }
+        public int BitNum { get; }
 
-        public OffsetParam(int _address, int _length, OffsetType _type = OffsetType.INTEGER, bool _signed = false)
+        public OffsetParam(int _address, int _length, OffsetType _type = OffsetType.INTEGER, bool _signed = false, int _bit = 0)
         {
             Address = _address;
             Length = _length;
             Type = _type;
             Signed = _signed;
+            BitNum = _bit;
         }
 
         public OffsetParam(string paramString)
@@ -43,15 +46,25 @@ namespace PilotsDeck
                     case "f":
                         Type = OffsetType.FLOAT;
                         break;
+                    case "b":
+                        Type = OffsetType.BIT;
+                        BitNum = 0;
+                        break;
                     default:
                         Type = OffsetType.INTEGER;
+                        Signed = false;
                         break;
                 }
 
-                if (parameters.Length > 3 && parameters[3].ToLower() == "s")
-                    Signed = true;
-                else
-                    Signed = false;
+                if (parameters.Length > 3)
+                {
+                    if (Type == OffsetType.INTEGER && parameters[3].ToLower() == "s")
+                        Signed = true;
+
+                    if (Type == OffsetType.BIT && int.TryParse(parameters[3], out int bitnum))
+                        BitNum = bitnum;
+                }
+
             }
             else
             {
@@ -68,6 +81,7 @@ namespace PilotsDeck
         public bool IsSigned { get { return Param.Signed; } }
         public bool IsString { get { return Param.Type == OffsetType.STRING; } }
         public bool IsFloat { get { return Param.Type == OffsetType.FLOAT; } }
+        public bool IsBit { get { return Param.Type == OffsetType.BIT; } }
 
         public IPCValueOffset(string address, string group, OffsetAction action = OffsetAction.Read) : base(address)
         {
@@ -110,7 +124,7 @@ namespace PilotsDeck
         {
             if (IsString)
                 return ReadOffsetString();
-            else //should be float or int
+            else //should be float, int or bit
             {
                 var result = ReadNumber();
                 if (result != null)
@@ -132,7 +146,7 @@ namespace PilotsDeck
         {
             if (IsString)
                 return ReadOffsetString();
-            else //should be float or int
+            else //should be float, int or bit
                 return ReadNumber();
         }
 
@@ -153,7 +167,9 @@ namespace PilotsDeck
         {
             if (IsFloat)
                 return ReadOffsetFloat();
-            else //integer (should be checked before)
+            else if (IsBit)
+                return Convert.ToInt32(offset.GetValue<FsBitArray>()[Param.BitNum]);
+            else //integer (string should be checked before)
                 return ReadOffsetInt();
         }
 
@@ -217,8 +233,21 @@ namespace PilotsDeck
 
         public void Write(string newValue, string group)
         {
-            offset.SetValue(CastValue(newValue));
-            FSUIPCConnection.Process(group);
+            if (IsBit && int.TryParse(newValue, out int result))
+            {
+                offset.ActionAtNextProcess = OffsetAction.Read;
+                FSUIPCConnection.Process(group);
+                FsBitArray bitArray = offset.GetValue<FsBitArray>();
+                bitArray[Param.BitNum] = Convert.ToBoolean(result);
+                offset.SetValue(bitArray);
+                offset.ActionAtNextProcess = OffsetAction.Write;
+                FSUIPCConnection.Process(group);
+            }
+            else
+            {
+                offset.SetValue(CastValue(newValue));
+                FSUIPCConnection.Process(group);
+            }
         }
 
         protected dynamic CastValue(string newValue)
