@@ -64,16 +64,18 @@ If a Button Press could not be executed for whatever Reason (P3D closed, not rea
 If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or while loading, all Actions will show a "..." Background.<br/>
 #### Address Fields (Action Types)
 * **Offset**
-  \[ (0x)Hex-Address:Size(:Type:Signedness) ] (Read / Command)
+  \[ (0x)Hex-Address:Size(:Type:Signedness|BitNum) ] (Read / Command)
   - *Hex-Address*: As seen in FSUIPC's Offsets Status Document (first column). A 4-digit Hex-Number. It can be prefixed with 0x and can be written in upper- or lower-case (the PI will only check mark upper-case, but lower-case does work).
   - *Size*: The Size of this Offset in Bytes (same Document, second column). A 1-digit Number.
-  - *Type*: Specify if the Offset is Integer "**i**", Float/Double "**f**" or String "**s**". Defaults to ":i" for Integers if not specified.
-  - *Signedness*: Specify if the Offset is Signed "**s**" or Unsigned "**u**". Defaults to ":u" for Unsigned if not specified.<br/><br/>
+  - *Type*: Specify if the Offset is an Integer "**i**", Float/Double "**f**", Bit "**b**" or String "**s**". Defaults to ":i" for Integers if not specified.
+  - *Signedness*: Specify if the Offset is Signed "**s**" or Unsigned "**u**". Defaults to ":u" for Unsigned if not specified and only relevant for Integers.
+  - *BitNum*: Only for Offset-Type Bit, the Number/Index of the Bit to read from or write to. Use 0 or 1 for the On/Off/Special Value Fields.<br/><br/>
 *Examples*:
   - *2118:8:f* for "Turbine Engine 2 corrected N1" (8 byte double/float64)
   - *034E:2* for "COM1 frequency in BCD" (2 byte integer)
   - *3544:4:i:s* for "standby alitmeter in feet" (4 byte signed integer)
   - *0x0ec6:2:i* for "Pressure QNH"
+  - *0x0D0C:2:b:2* to toggle Landing Lights
 * **Lvar**
   \[ (L:)Name | (L:)Name((:L):Name)* ] (Read / Command)
   - *Name*: The Lvar's Name with or without the preceding "L:". For Switches you can bind multiple Lvars to it, every Lvar is separated by ":". Multiple Lvars only make sense if they react same for a same value (e.g. both Pack Switches, both reacting as "On" for "10")<br/>
