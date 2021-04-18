@@ -9,7 +9,7 @@ The Plugin is designed to be highly flexible and customizable, so it won't give 
 The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want (as Text or Graphical Representation). It uses the full Potential the StreamDeck has to offer for FlightSimmers: it is also a *Display* Device, not *just* Buttons!<br/>
 The Plugin can also switch between StreamDeck Profiles (on multiple Decks) when the Aircraft (Model) and FSUIPC Profile change.<br/>
 Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).<br/><br/>
-As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant. It is developed on Prepar3D&#x00AE;, so this Readme describes the Features which work there.
+As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE;, so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
 Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed and working would be a bloody good Start :laughing:<br/>
@@ -28,7 +28,8 @@ The Sims and their FSUIPC Version/Variant are:
 - **FSUIPC6** - Prepar3D Version 4 and 5
 - FSUIPC7 - Microsoft Flight Simulator 2020
 - XPUIPC - X-Plane<br/><br/>
-If you let me know what works and which Features work in which Sim (other than P3D v4/5), I'll add it to the Readme! :wink:
+If you let me know what works and which Features work in which Sim (other than P3D v4/5), I'll add it to the Readme! :wink:<br/>
+:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports!
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
@@ -91,6 +92,7 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")
   - *"LuaToggle:FSL_CMD:21"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
 * **vJoy**
+:grey_exclamation: This Action is not related to the vJoy Device-Driver or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
   \[ Joystick:Button(:t) ] (Command)
   - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
   - *Button*: The Number of the Button on that Joystick (Button 0 - 31).
