@@ -75,7 +75,7 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *034E:2* for "COM1 frequency in BCD" (2 byte integer)
   - *3544:4:i:s* for "standby alitmeter in feet" (4 byte signed integer)
   - *0x0ec6:2:i* for "Pressure QNH"
-  - *0x0D0C:2:b:2* to toggle Landing Lights
+  - *0x0D0C:2\:b:2* to toggle Landing Lights
 * **Lvar**
   \[ (L:)Name | (L:)Name((:L):Name)* ] (Read / Command)
   - *Name*: The Lvar's Name with or without the preceding "L:". For Switches you can bind multiple Lvars to it, every Lvar is separated by ":". Multiple Lvars only make sense if they react same for a same value (e.g. both Pack Switches, both reacting as "On" for "10")<br/>
