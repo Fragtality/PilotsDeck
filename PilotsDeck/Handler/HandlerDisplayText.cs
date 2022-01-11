@@ -2,19 +2,19 @@
 
 namespace PilotsDeck
 {
-    public class HandlerDisplayText : HandlerValue
+    public class HandlerDisplayText : HandlerBase
     {
         public virtual ModelDisplayText TextSettings { get { return Settings; } }
-        public ModelDisplayText Settings { get; protected set; }
+        public override IModelSwitch SwitchSettings => throw new System.NotImplementedException();
+        public virtual ModelDisplayText Settings { get; protected set; }
 
-        public override string Address { get { return TextSettings.Address; } }
         public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayText] Read: {TextSettings.Address}"; } }
+        public override string Address { get { return TextSettings.Address; } }
 
         public override bool UseFont { get { return true; } }
         public virtual string DefaultImageRender { get; set; }
         public virtual string ErrorImageRender { get; set; }
 
-        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue); } }
         protected string lastText = "";
         protected bool DrawBox = true;
 
@@ -22,6 +22,16 @@ namespace PilotsDeck
         {
             Settings = settings;
             DrawBox = settings.DrawBox;
+        }
+
+        public override bool OnButtonDown(IPCManager ipcManager, long tick)
+        {
+            return false;
+        }
+
+        public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        {
+            return true;
         }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
@@ -33,19 +43,23 @@ namespace PilotsDeck
 
             if (TextSettings.DrawBox)
                 RenderImages(imgManager);
+
+            ValueManager.RegisterValue(ID.ControlState, Address);
         }
 
-        public override void Deregister(ImageManager imgManager, IPCManager ipcManager)
+        public override void Deregister(ImageManager imgManager)
         {
-            base.Deregister(imgManager, ipcManager);
+            base.Deregister(imgManager);
 
             if (TextSettings.HasIndication)
                 imgManager.RemoveImage(TextSettings.IndicationImage, DeckType);
+
+            ValueManager.DeregisterValue(ID.ControlState);
         }
 
-        public override void Update(ImageManager imgManager, IPCManager ipcManager)
+        public override void Update(ImageManager imgManager)
         {
-            base.Update(imgManager, ipcManager);
+            base.Update(imgManager);
             RenderImages(imgManager);
             NeedRedraw = true;
 
@@ -55,6 +69,8 @@ namespace PilotsDeck
                 DrawBox = TextSettings.DrawBox;
                 UpdateSettingsModel = true;
             }
+
+            ValueManager.UpdateValueAddress(ID.ControlState, Address);
         }
 
         protected virtual void RenderImages(ImageManager imgManager)
@@ -114,10 +130,10 @@ namespace PilotsDeck
 
         protected override void Redraw(ImageManager imgManager)
         {
-            if (!IsChanged && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
                 return;
 
-            string value = CurrentValue;
+            string value = ValueManager[ID.ControlState];
             if (Settings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
 
@@ -145,6 +161,8 @@ namespace PilotsDeck
             }
             else
                 text = TextSettings.FormatValue(value);
+
+            text = TextSettings.GetValueMapped(text);
 
             if (text != lastText || ForceUpdate)
             {

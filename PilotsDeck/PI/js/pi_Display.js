@@ -6,6 +6,7 @@ var settingsModel = {
 	DecodeBCD: false,
 	Scalar: "1",
 	Format: "",
+	ValueMappings: "",
 	DrawBox: true,
 	BoxSize: "2",
 	BoxColor: "#ffffff",

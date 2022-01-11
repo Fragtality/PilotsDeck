@@ -1,5 +1,8 @@
 ﻿using StreamDeckLib;
+using System;
+using Serilog;
 using System.Threading.Tasks;
+
 #if DEBUG
 using System.Diagnostics;
 using System.Threading;
@@ -20,14 +23,25 @@ namespace PilotsDeck
                 Debugger.Launch();
             }
 #endif
-            using (var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args))
+            try
             {
-                ActionController.Init();
-                await ConnectionManager.Initialize(args, config.LoggerFactory, ActionController)
-                                                         .RegisterAllActions(typeof(Plugin).Assembly)
-                                                         .StartAsync();
+                using (var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args))
+                {
+                    ActionController.Init();
+                    await ConnectionManager.Initialize(args, config.LoggerFactory, ActionController)
+                                                                .RegisterAllActions(typeof(Plugin).Assembly)
+                                                                .StartAsync();
+                }
             }
-
+            catch (Exception e)
+            {
+                Log.Logger.Fatal("---------------------------------------------------------------------------");
+                Log.Logger.Fatal("PLUGIN CRASHED");
+                Log.Logger.Fatal(e.Source);
+                Log.Logger.Fatal(e.Message);
+                Log.Logger.Fatal(e.StackTrace);
+                throw e;
+            }
         }
 
     }

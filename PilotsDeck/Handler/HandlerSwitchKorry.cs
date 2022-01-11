@@ -2,7 +2,7 @@
 
 namespace PilotsDeck
 {
-    public class HandlerSwitchKorry : HandlerSwitch, IHandlerValue
+    public class HandlerSwitchKorry : HandlerSwitchDisplay
     {
         public override ModelSwitch BaseSettings { get { return Settings; } }
         public virtual ModelSwitchKorry KorrySettings { get { return Settings; } }
@@ -11,22 +11,13 @@ namespace PilotsDeck
         public virtual string DefaultImageRender { get; set; }
 
         public override string ActionID { get { return $"\"{Title}\" [HandlerSwitchKorry] ReadTop: {KorrySettings.AddressTop} | ReadBot: {KorrySettings.AddressBot} | Write: {BaseSettings.AddressAction}"; } }
-
-        public virtual string CurrentValue { get { return CurrentValues[0]; } }
-        protected string[] CurrentValues { get; set; } = new string[2];
-        protected virtual string[] CurrentAddress { get; set; } = new string[2];
-        public string LastAddress { get { return CurrentAddress[0]; } }
-
-        public virtual bool IsChanged { get; protected set; } = false;
-
-        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValues[0]) && (!string.IsNullOrEmpty(CurrentValues[1]) || KorrySettings.UseOnlyTopAddr); } }
+        public override string Address { get { return KorrySettings.AddressTop; } }
 
 
         public HandlerSwitchKorry(string context, ModelSwitchKorry settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
-            LastSwitchState = settings.OffState;
-            LastSwitchStateLong = settings.OffStateLong;
+            KorrySettings.Address = KorrySettings.AddressTop;
         }
 
         protected override bool InitializationTest()
@@ -34,38 +25,33 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(KorrySettings.AddressTop) && !string.IsNullOrEmpty(BaseSettings.AddressAction) && (!string.IsNullOrEmpty(KorrySettings.AddressBot) || KorrySettings.UseOnlyTopAddr);
         }
 
-        public virtual void RegisterAddress(IPCManager ipcManager)
-        {
-            CurrentAddress = HandlerDisplayRadio.RegisterAddress(ipcManager, KorrySettings.AddressTop, KorrySettings.AddressBot, CurrentAddress);
-        }
-
-        public virtual void UpdateAddress(IPCManager ipcManager)
-        {
-            CurrentAddress = HandlerDisplayRadio.UpdateAddress(ipcManager, KorrySettings.AddressTop, KorrySettings.AddressBot, CurrentAddress);
-        }
-
-        public virtual void DeregisterAddress(IPCManager ipcManager)
-        {
-            HandlerDisplayRadio.DeregisterAddress(ipcManager, KorrySettings.AddressTop, KorrySettings.AddressBot, CurrentAddress, ActionID);
-        }
-
-        public virtual void RefreshValue(IPCManager ipcManager)
-        {
-            CurrentValues = HandlerDisplayRadio.RefreshValue(ipcManager, KorrySettings.AddressTop, KorrySettings.AddressBot, CurrentValues, out bool isChanged);
-            IsChanged = isChanged;
-        }
-
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
             base.Register(imgManager, ipcManager);
             RenderDefaultImage(imgManager);
+
+            ValueManager.RegisterValue(ID.Bot, KorrySettings.AddressBot); 
         }
 
-        public override void Update(ImageManager imgManager, IPCManager ipcManager)
+        public override void Deregister(ImageManager imgManager)
         {
-            base.Update(imgManager, ipcManager);
+            base.Deregister(imgManager);
+
+            ValueManager.DeregisterValue(ID.Bot); 
+        }
+
+        public override void Update(ImageManager imgManager)
+        {
+            base.Update(imgManager);
             RenderDefaultImage(imgManager);
             NeedRedraw = true;
+
+            ValueManager.UpdateValueAddress(ID.Bot, KorrySettings.AddressBot);
+        }
+
+        public override void UpdateActionSettings()
+        {
+            KorrySettings.Address = KorrySettings.AddressTop;
         }
 
         protected virtual void RenderDefaultImage(ImageManager imgManager)
@@ -93,17 +79,20 @@ namespace PilotsDeck
 
         protected override void Redraw(ImageManager imgManager)
         {
-            if (!IsChanged && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bot)  && !ForceUpdate)
                 return;
 
             ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(DefaultImage, DeckType));
 
-            if (((CurrentValues[0] == KorrySettings.TopState && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(CurrentValues[0]))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
+            string top = ValueManager[ID.Top];
+            string bot = ValueManager[ID.Bot];
+
+            if (((top == KorrySettings.TopState && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(top))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
                 render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage, DeckType), KorrySettings.GetRectangleTop());
 
-            string testValue = CurrentValues[1];
+            string testValue = bot;
             if (KorrySettings.UseOnlyTopAddr)
-                testValue = CurrentValues[0];
+                testValue = top;
 
             if (((testValue == KorrySettings.BotState && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(testValue))) && !string.IsNullOrEmpty(KorrySettings.BotImage))
                 render.DrawImage(imgManager.GetImageObject(KorrySettings.BotImage, DeckType), KorrySettings.GetRectangleBot());

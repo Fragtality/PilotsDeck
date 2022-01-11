@@ -137,6 +137,10 @@
             <div class="sdpi-item-label" id="lblFormat">Format</div>
             <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^(:)?.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
         </div>
+        <div class="sdpi-item" id="Config_ValueMappings">
+            <div class="sdpi-item-label">Mappings</div>
+            <input id="ValueMappings" class="sdpi-item-value" type="text" pattern="([0-9]{1,}(,|\.)?[0-9]{1,}(<|>){1}=[^:]{1,}:?){1}|([0-9]{1,}(,|\.)?[0-9]{1,}=[^:]{1,}:?){1,}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
+        </div>
         <div type="checkbox" class="sdpi-item" id="Config_UseWarnColors">
             <div class="sdpi-item-label" id="lblUseWarnColors">Range Colors</div>
             <input class="sdpi-item-value" id="UseWarnColors" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">

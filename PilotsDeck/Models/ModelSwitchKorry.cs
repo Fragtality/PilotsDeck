@@ -2,11 +2,12 @@
 
 namespace PilotsDeck
 {
-    public class ModelSwitchKorry : ModelSwitch
+    public class ModelSwitchKorry : ModelSwitchDisplay
     {
         public virtual string AddressTop { get; set; } = "";
         public virtual string AddressBot { get; set; } = "";
         public virtual bool UseOnlyTopAddr { get; set; } = false;
+        public override bool SwitchOnCurrentValue { get; set; } = false;
 
         public virtual string TopState { get; set; } = "";
         public virtual bool ShowTopNonZero { get; set; } = false;

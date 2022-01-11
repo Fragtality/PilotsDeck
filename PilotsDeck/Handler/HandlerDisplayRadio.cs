@@ -7,14 +7,11 @@ namespace PilotsDeck
     public class HandlerDisplayRadio : HandlerDisplaySwitch
     {
         public override ModelDisplayText TextSettings { get { return Settings; } }
-        public override ModelDisplaySwitch SwitchSettings { get { return Settings; } }
+        public override IModelSwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplayRadio Settings { get; protected set; }
 
         public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayRadio] Read1: {Settings.AddressRadioActiv} | Read2: {Settings.AddressRadioStandby} | Write: {SwitchSettings.AddressAction}"; } }
-
-        protected new string[] CurrentValue { get; set; } = new string[2];
-        protected virtual string[] CurrentAddress { get; set; } = new string[2];
-        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue[0]) && !string.IsNullOrEmpty(CurrentValue[1]); } }
+        public override string Address { get { return Settings.AddressRadioActiv; } }
 
         protected int ticksIndication = 0;
         protected static readonly int ticksActive = 16;
@@ -23,8 +20,6 @@ namespace PilotsDeck
         public HandlerDisplayRadio(string context, ModelDisplayRadio settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
-            LastSwitchState = settings.OffState;
-            LastSwitchStateLong = settings.OffStateLong;
         }
 
         protected override bool InitializationTest()
@@ -32,73 +27,25 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(SwitchSettings.AddressAction) && !string.IsNullOrEmpty(Settings.AddressRadioActiv) && !string.IsNullOrEmpty(Settings.AddressRadioStandby);
         }
 
-        public override void RegisterAddress(IPCManager ipcManager)
+        public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
-            CurrentAddress = RegisterAddress(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentAddress);
+            base.Register(imgManager, ipcManager);
+
+            ValueManager.RegisterValue(ID.Standby, Settings.AddressRadioStandby);
         }
 
-        public static string[] RegisterAddress(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentAddresses)
+        public override void Deregister(ImageManager imgManager)
         {
-            ipcManager.RegisterAddress(firstAddress, AppSettings.groupStringRead);
-            ipcManager.RegisterAddress(secondAddress, AppSettings.groupStringRead);
-            currentAddresses[0] = firstAddress;
-            currentAddresses[1] = secondAddress;
+            base.Deregister(imgManager);
 
-            return currentAddresses;
+            ValueManager.DeregisterValue(ID.Standby);
         }
 
-        public override void UpdateAddress(IPCManager ipcManager)
+        public override void Update(ImageManager imgManager)
         {
-            CurrentAddress = UpdateAddress(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentAddress);
-        }
+            base.Update(imgManager);
 
-        public static string[] UpdateAddress(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentAddresses)
-        {
-            currentAddresses[0] = UpdateAddress(ipcManager, currentAddresses[0], firstAddress);
-            currentAddresses[1] = UpdateAddress(ipcManager, currentAddresses[1], secondAddress);
-
-            return currentAddresses;
-        }
-
-        public override void DeregisterAddress(IPCManager ipcManager)
-        {
-            DeregisterAddress(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentAddress, ActionID);
-        }
-
-        public static void DeregisterAddress(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentAddresses, string actionID)
-        {
-            ipcManager.DeregisterValue(firstAddress);
-            ipcManager.DeregisterValue(secondAddress);
-
-            if (firstAddress != currentAddresses[0])
-                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {actionID} [ {firstAddress} != {currentAddresses[0]} ] ");
-            if (secondAddress != currentAddresses[1])
-                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {actionID} [ {secondAddress} != {currentAddresses[1]} ] ");
-        }
-
-        public override void RefreshValue(IPCManager ipcManager)
-        {
-            CurrentValue = RefreshValue(ipcManager, Settings.AddressRadioActiv, Settings.AddressRadioStandby, CurrentValue, out bool isChanged);
-            IsChanged = isChanged;
-        }
-
-        public static string[] RefreshValue(IPCManager ipcManager, string firstAddress, string secondAddress, string[] currentValues, out bool isChanged)
-        {
-            int results = 0;
-            if (RefreshValue(ipcManager, firstAddress, out string currentValue))
-                results++;
-            currentValues[0] = currentValue;
-
-            if (RefreshValue(ipcManager, secondAddress, out currentValue))
-                results++;
-            currentValues[1] = currentValue;
-
-            if (results > 0)
-                isChanged = true;
-            else
-                isChanged = false;
-
-            return currentValues;
+            ValueManager.DeregisterValue(ID.Standby);
         }
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
@@ -112,17 +59,17 @@ namespace PilotsDeck
 
         protected override void Redraw(ImageManager imgManager)
         {
-            if (!IsChanged && !ForceUpdate && !wasPushed)
+            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !ForceUpdate && !wasPushed)
                 return;
 
-            string valueAct = CurrentValue[0];
+            string valueAct = ValueManager[ID.Active];
             if (Settings.DecodeBCD)
                 valueAct = ModelDisplay.ConvertFromBCD(valueAct);
             valueAct = Settings.ScaleValue(valueAct);
             valueAct = Settings.RoundValue(valueAct);
             valueAct = Settings.FormatValue(valueAct);
 
-            string valueStb = CurrentValue[1];
+            string valueStb = ValueManager[ID.Standby];
             if (Settings.DecodeBCD && !Settings.StbyHasDiffFormat || Settings.StbyHasDiffFormat && Settings.DecodeBCDStby)
                 valueStb = ModelDisplay.ConvertFromBCD(valueStb);
             valueStb = ModelDisplay.ScaleValue(valueStb, Settings.StbyHasDiffFormat ? Settings.ScalarStby : Settings.Scalar);

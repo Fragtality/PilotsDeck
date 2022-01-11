@@ -2,18 +2,16 @@
 
 namespace PilotsDeck
 {
-    public class HandlerDisplayGauge : HandlerValue
+    public class HandlerDisplayGauge : HandlerDisplayText
     {
         public virtual ModelDisplayGauge GaugeSettings { get { return Settings; } }
-        public ModelDisplayGauge Settings { get; protected set; }
+        public override IModelSwitch SwitchSettings => throw new System.NotImplementedException();
+        public new ModelDisplayGauge Settings { get; protected set; }
 
         public override string Address { get { return GaugeSettings.Address; } }
         public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayGauge] Read: {Address}"; } }
         public override bool UseFont { get { return true; } }
-        public virtual string DefaultImageRender { get; set; }
 
-        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue); } }
-        protected string lastText = "";
         protected bool IsArc = false;
 
         public HandlerDisplayGauge(string context, ModelDisplayGauge settings, StreamDeckType deckType) : base(context, settings, deckType)
@@ -22,15 +20,25 @@ namespace PilotsDeck
             IsArc = settings.DrawArc;
         }
 
+        public override bool OnButtonDown(IPCManager ipcManager, long tick)
+        {
+            return false;
+        }
+
+        public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        {
+            return false;
+        }
+
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
             base.Register(imgManager, ipcManager);
             RenderDefaultImage(imgManager);
         }
 
-        public override void Update(ImageManager imgManager, IPCManager ipcManager)
+        public override void Update(ImageManager imgManager)
         {
-            base.Update(imgManager, ipcManager);
+            base.Update(imgManager);
             RenderDefaultImage(imgManager);
             NeedRedraw = true;
 
@@ -72,13 +80,13 @@ namespace PilotsDeck
 
         protected override void Redraw(ImageManager imgManager)
         {
-            if (!IsChanged && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
                 return;
 
             //Stopwatch sw = new Stopwatch();
             //sw.Start();
             
-            string value = CurrentValue;
+            string value = ValueManager[ID.ControlState];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -150,7 +158,9 @@ namespace PilotsDeck
                     render.Rotate(180, new PointF(0, 0));
 
                 GaugeSettings.GetFontParameters(TitleParameters, value, out Font drawFont, out Color drawColor);
-                render.DrawText(ModelDisplay.FormatValue(value, GaugeSettings.Format), drawFont, drawColor, ModelDisplayText.GetRectangleF(GaugeSettings.RectCoord));
+                string text = ModelDisplay.FormatValue(value, GaugeSettings.Format);
+                text = GaugeSettings.GetValueMapped(text);
+                render.DrawText(text, drawFont, drawColor, ModelDisplayText.GetRectangleF(GaugeSettings.RectCoord));
             }
         }
     }

@@ -91,16 +91,16 @@ function toggleConfigItem(value, name) {
 
 function setPattern(field, type) {
 	var regName = "[a-zA-Z0-9\x2D\x5F]+";
-	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}(:(L:){0,1}${regName})*$`;
-	//var regOffset = "((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}";
+	//var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}(:(L:){0,1}${regName})*$`;
+	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
 	var regOffset = "((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}";
 	
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
 	else if (type == 1) //script
-		document.getElementById(field).pattern = `^Lua(Set|Clear|Toggle)?:${regName}(:[0-9]+)?$`;
+		document.getElementById(field).pattern = `^Lua(Set|Clear|Toggle)?:${regName}(:[0-9]{1,3})*$`;
 	else if (type == 2) //control
-		document.getElementById(field).pattern = "^[0-9]+(:[0-9]+)*$";
+		document.getElementById(field).pattern = "^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$";    //"^[0-9]+(:[0-9]+)*$";
 	else if (type == 3)  //lvar
 		document.getElementById(field).pattern = regLvar;
 	else if (type == 4)  //offset
@@ -117,7 +117,16 @@ function isLongPressAllowed(actionType, address) {
 	return actionType != 6 || (actionType == 6 && address.includes(":t"));
 }
 
-function toggleOnOffState(actionType, onField, offField) {
+function toggleControlDelay(settingsModel) {
+	var delayField = "UseControlDelay";
+
+	if (settingsModel.ActionType == 2 || (settingsModel.HasLongPress && settingsModel.ActionTypeLong == 2))
+		toggleConfigItem(true, delayField);
+	else
+		toggleConfigItem(false, delayField);
+}
+
+function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 	//On/Off States
 	if (actionType == 0) { //macro
 		toggleConfigItem(false, onField);
@@ -131,11 +140,11 @@ function toggleOnOffState(actionType, onField, offField) {
 		toggleConfigItem(false, onField);
 		toggleConfigItem(false, offField);
 	}
-	else if (actionType == 3) { //lvar
+	else if (actionType == 3 && !switchCurrent) { //lvar
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
-	else if (actionType == 4) { //offset
+	else if (actionType == 4 && !switchCurrent) { //offset
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}

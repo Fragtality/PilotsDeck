@@ -12,7 +12,7 @@ namespace PilotsDeck
         RIGHT = 0
     }
 
-    public class ModelDisplayGauge : ModelDisplay
+    public class ModelDisplayGauge : ModelDisplayText
     {
         public virtual string MinimumValue { get; set; } = "0";
         public string MaximumValue { get; set; } = "100";
@@ -43,12 +43,12 @@ namespace PilotsDeck
 
         public virtual bool ShowText { get; set; } = true;
         public virtual bool UseWarnColors { get; set; } = true;
-        public virtual bool FontInherit { get; set; } = true;
-        public virtual string FontName { get; set; } = "Arial";
-        public virtual string FontSize { get; set; } = "10";
-        public virtual int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
-        public virtual string FontColor { get; set; } = "#ffffff";
-        public virtual string RectCoord { get; set; } = "7; 45; 60; 21";
+        public override bool FontInherit { get; set; } = true;
+        public override string FontName { get; set; } = "Arial";
+        public override string FontSize { get; set; } = "10";
+        public override int FontStyle { get; set; } = (int)System.Drawing.FontStyle.Regular;
+        public override string FontColor { get; set; } = "#ffffff";
+        public override string RectCoord { get; set; } = "7; 45; 60; 21";
 
         public ModelDisplayGauge()
         {

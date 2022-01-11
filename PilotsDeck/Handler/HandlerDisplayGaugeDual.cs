@@ -9,10 +9,6 @@ namespace PilotsDeck
         public new ModelDisplayGaugeDual Settings { get; protected set; }
 
         public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayGaugeDual] Read1: {Address} | Read2: {Settings.Address2}"; } }
-        public virtual string CurrentValue2 { get; protected set; } = null;
-        public virtual string LastAddress2 { get; protected set; }
-
-        protected override bool CanRedraw { get { return !string.IsNullOrEmpty(CurrentValue) && !string.IsNullOrEmpty(CurrentValue2); } }
 
         public HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
@@ -24,45 +20,66 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(GaugeSettings.Address) && !string.IsNullOrEmpty(Settings.Address2);
         }
 
-        public override void RegisterAddress(IPCManager ipcManager)
+        public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
-            base.RegisterAddress(ipcManager);
+            base.Register(imgManager, ipcManager);
 
-            ipcManager.RegisterAddress(Settings.Address2, AppSettings.groupStringRead);
-            LastAddress2 = Settings.Address2;
+            ValueManager.RegisterValue(ID.Second, Settings.Address2);
         }
 
-        public override void UpdateAddress(IPCManager ipcManager)
+        public override void Deregister(ImageManager imgManager)
         {
-            base.UpdateAddress(ipcManager);
+            base.Deregister(imgManager);
 
-            LastAddress2 = UpdateAddress(ipcManager, LastAddress2, Settings.Address2);
+            ValueManager.DeregisterValue(ID.Second);
         }
 
-        public override void DeregisterAddress(IPCManager ipcManager)
+        public override void Update(ImageManager imgManager)
         {
-            base.DeregisterAddress(ipcManager);
+            base.Update(imgManager);
 
-            ipcManager.DeregisterValue(Settings.Address2);
-            if (Settings.Address2 != LastAddress2)
-                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.Address2} != {LastAddress2} ] ");
+            ValueManager.UpdateValueAddress(ID.Second, Settings.Address2);
         }
 
-        public override void RefreshValue(IPCManager ipcManager)
-        {
-            int results = 0;
-            
-            if (RefreshValue(ipcManager, Address, out string currentValue))
-                results++;
-            CurrentValue = currentValue;
+        //public override void RegisterAddress(IPCManager ipcManager)
+        //{
+        //    base.RegisterAddress(ipcManager);
 
-            if (RefreshValue(ipcManager, Settings.Address2, out currentValue))
-                results++;
-            CurrentValue2 = currentValue;
+        //    ipcManager.RegisterAddress(Settings.Address2, AppSettings.groupStringRead);
+        //    LastAddress2 = Settings.Address2;
+        //}
 
-            if (results > 0)
-                IsChanged = true;
-        }
+        //public override void UpdateAddress(IPCManager ipcManager)
+        //{
+        //    base.UpdateAddress(ipcManager);
+
+        //    LastAddress2 = UpdateAddress(ipcManager, LastAddress2, Settings.Address2);
+        //}
+
+        //public override void DeregisterAddress(IPCManager ipcManager)
+        //{
+        //    base.DeregisterAddress(ipcManager);
+
+        //    ipcManager.DeregisterValue(Settings.Address2);
+        //    if (Settings.Address2 != LastAddress2)
+        //        Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.Address2} != {LastAddress2} ] ");
+        //}
+
+        //public override void RefreshValue(IPCManager ipcManager)
+        //{
+        //    int results = 0;
+
+        //    if (RefreshValue(ipcManager, Address, out string currentValue))
+        //        results++;
+        //    CurrentValue = currentValue;
+
+        //    if (RefreshValue(ipcManager, Settings.Address2, out currentValue))
+        //        results++;
+        //    CurrentValue2 = currentValue;
+
+        //    if (results > 0)
+        //        IsChanged = true;
+        //}
 
         protected override void DrawBar(string value, ImageRenderer render)
         {
@@ -73,7 +90,7 @@ namespace PilotsDeck
 
             base.DrawBar(value, render);
 
-            value = CurrentValue2;
+            value = ValueManager[ID.Second];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -87,7 +104,7 @@ namespace PilotsDeck
         {
             base.DrawArc(value, render);
 
-            value = CurrentValue2;
+            value = ValueManager[ID.Second];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -104,7 +121,7 @@ namespace PilotsDeck
 
             if (!GaugeSettings.DrawArc)
             {
-                value = CurrentValue2;
+                value = ValueManager[ID.Second];
                 if (GaugeSettings.DecodeBCD)
                     value = ModelDisplay.ConvertFromBCD(value);
                 value = GaugeSettings.ScaleValue(value);

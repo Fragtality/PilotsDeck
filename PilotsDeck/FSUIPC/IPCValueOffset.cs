@@ -245,8 +245,10 @@ namespace PilotsDeck
             }
             else
             {
+                offset.ActionAtNextProcess = OffsetAction.Write;
                 offset.SetValue(CastValue(newValue));
                 FSUIPCConnection.Process(group);
+                offset.ActionAtNextProcess = OffsetAction.Read;
             }
         }
 

@@ -20,36 +20,21 @@
         bool UpdateSettingsModel { get; set; }
         bool IsInitialized { get; }
 
+        bool HasAction { get; }
+        long tickDown { get; }
+
+        bool OnButtonDown(IPCManager ipcManager, long tick);
+        bool OnButtonUp(IPCManager ipcManager, long tick);
+
         void Register(ImageManager imgManager, IPCManager ipcManager);
-        void Deregister(ImageManager imgManager, IPCManager ipcManager);
+        void Deregister(ImageManager imgManager);
 
         void SetError();
         void SetDefault();
         void SetWait();
         void ResetDrawState();
-        void Refresh(ImageManager imgManager, IPCManager ipcManager);
-        void Update(ImageManager imgManager, IPCManager ipcManager);
+        void Refresh(ImageManager imgManager);
+        void Update(ImageManager imgManager);
         void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
-    }
-
-    public interface IHandlerValue : IHandler
-    {
-        string CurrentValue { get; }
-        string LastAddress { get; }
-        bool IsChanged { get; }
-        
-        void RefreshValue(IPCManager ipcManager);
-
-        void RegisterAddress(IPCManager ipcManager);
-        void UpdateAddress(IPCManager ipcManager);
-        void DeregisterAddress(IPCManager ipcManager);
-    }
-
-    public interface IHandlerSwitch : IHandler
-    {
-        long tickDown { get; }
-
-        bool OnButtonDown(IPCManager ipcManager, long tick);
-        bool OnButtonUp(IPCManager ipcManager, long tick);
     }
 }

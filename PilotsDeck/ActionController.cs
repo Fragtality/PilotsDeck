@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Linq;
@@ -356,7 +357,10 @@ namespace PilotsDeck
                         //else
                         //    Log.Logger.Verbose("PROC - Processed OK");
 
-                        RefreshActions(token, !lastProcessState);   //toggles process change
+                        if (tickCounter % (waitTicks / 3) == 0) //every 10s force redraw
+                            RefreshActions(token, true);  
+                        else
+                            RefreshActions(token, !lastProcessState);   //toggles process change
                         lastProcessState = true;
                         if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
                             SwitchProfiles();
@@ -385,7 +389,7 @@ namespace PilotsDeck
             if (redrawRequested)
                 RedrawAll(token);
 
-            if (redrawAlways)
+            if (redrawAlways || (tickCounter % (waitTicks / 2) == 0 && IsApplicationOpen && !appIsStarting))
             {
                 RefreshActions(token, true);
                 RedrawAll(token);
@@ -397,7 +401,7 @@ namespace PilotsDeck
                 averageTime += watchRefresh.Elapsed.TotalMilliseconds;
                 if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
                 {
-                    Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}");
+                    Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}. Redraw was forced.");
                     averageTime = 0;
                 }
 
@@ -417,7 +421,7 @@ namespace PilotsDeck
                     action.ForceUpdate = forceUpdate;
                 
                 if (action.IsInitialized || redrawAlways)
-                    action.Refresh(imgManager, ipcManager);
+                    action.Refresh(imgManager);
             }
         }
 
@@ -468,7 +472,7 @@ namespace PilotsDeck
 
                 if (currentActions.ContainsKey(context))
                 {
-                    return (currentActions[context] as IHandlerSwitch).OnButtonDown(ipcManager, tickCounter);
+                    return currentActions[context].OnButtonDown(ipcManager, tickCounter);
                 }
                 else
                 {
@@ -495,7 +499,7 @@ namespace PilotsDeck
 
                 if (currentActions.ContainsKey(context))
                 {
-                    return (currentActions[context] as IHandlerSwitch).OnButtonUp(ipcManager, tickCounter);
+                    return currentActions[context].OnButtonUp(ipcManager, tickCounter);
                 }
                 else
                 {
@@ -551,7 +555,7 @@ namespace PilotsDeck
             {
                 if (currentActions.ContainsKey(context))
                 {
-                    currentActions[context].Update(imgManager, ipcManager);
+                    currentActions[context].Update(imgManager);
                     SetActionState(currentActions[context]);                        
 
                     if (!currentActions[context].IsRawImage)
@@ -599,7 +603,7 @@ namespace PilotsDeck
             { 
                 if (currentActions.ContainsKey(context))
                 {
-                    currentActions[context].Deregister(imgManager, ipcManager);
+                    currentActions[context].Deregister(imgManager);
 
                     currentActions.Remove(context);
                 }
