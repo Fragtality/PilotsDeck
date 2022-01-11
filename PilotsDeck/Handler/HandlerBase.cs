@@ -2,13 +2,15 @@
 {
     public abstract class HandlerBase : IHandler
     {
-        public ModelBase CommonSettings { get; protected set; }      
+        public ModelBase CommonSettings { get; protected set; }
+        public abstract IModelSwitch SwitchSettings { get; }
 
         public virtual string ActionID { get { return Title; } }
         public string Context { get; protected set; }
         public virtual StreamDeckType DeckType { get; protected set; }
 
         public abstract string Address { get; }
+        protected virtual AddressValueManager ValueManager { get; set; } = new AddressValueManager();
 
         public string DrawImage { get; protected set; } = "";
         public bool IsRawImage { get; protected set; } = false;
@@ -20,9 +22,11 @@
         public bool ForceUpdate { get; set; } = false;
         public bool NeedRedraw { get; set; } = false;
         public virtual bool UpdateSettingsModel { get; set; } = false;
-        protected virtual bool CanRedraw { get { return true; } }
+        protected virtual bool CanRedraw { get { return !string.IsNullOrEmpty(Address); } }
         public virtual bool IsInitialized { get; set; }
-        
+
+        public virtual bool HasAction { get; protected set; } = false;
+        public virtual long tickDown { get; protected set; }
 
         protected virtual StreamDeckTools.StreamDeckTitleParameters TitleParameters { get; set; }
 
@@ -34,24 +38,81 @@
             DrawImage = DefaultImage;
         }
 
+        public abstract bool OnButtonUp(IPCManager ipcManager, long tick);
+
+        public abstract bool OnButtonDown(IPCManager ipcManager, long tick);
+
         public virtual void Register(ImageManager imgManager, IPCManager ipcManager)
         {
             SetInitialization();
+            ValueManager.RegisterManager(ipcManager);
             
             imgManager.AddImage(DefaultImage, DeckType);
             imgManager.AddImage(ErrorImage, DeckType);
-            
-            if (this is IHandlerValue)
-                (this as IHandlerValue).RegisterAddress(ipcManager);
         }
 
-        public virtual void Deregister(ImageManager imgManager, IPCManager ipcManager)
+        public virtual void Deregister(ImageManager imgManager)
         {
             imgManager.RemoveImage(DefaultImage, DeckType);
             imgManager.RemoveImage(ErrorImage, DeckType);
+        }
 
-            if (this is IHandlerValue)
-                (this as IHandlerValue).DeregisterAddress(ipcManager);
+
+        public virtual void Update(ImageManager imgManager)
+        {
+            SetInitialization();
+
+            if (HasAction)
+                UpdateActionSettings();
+
+            if (HasAction)
+                UpdateActionValues();
+
+            ForceUpdate = true;
+        }
+
+        public virtual void UpdateActionSettings()
+        {
+
+        }
+
+        public virtual void UpdateActionValues()
+        {
+            if (!SwitchSettings.SwitchOnCurrentValue && IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
+            {
+                if (!ValueManager.ContainsValue(ID.SwitchState))
+                    ValueManager.RegisterValue(ID.SwitchState, SwitchSettings.AddressAction);
+                else
+                    ValueManager.UpdateValueAddress(ID.SwitchState, SwitchSettings.AddressAction);
+
+                ValueManager.RemoveVariable(ID.SwitchState);
+            }
+            else
+            {
+                if (ValueManager.ContainsValue(ID.SwitchState))
+                    ValueManager.DeregisterValue(ID.SwitchState);
+
+                if (!ValueManager.ContainsVariable(ID.ControlState) && InitializationTest()) // SWITCH ONLY
+                    ValueManager.SetVariable(ID.SwitchState, SwitchSettings.SwitchOffState);
+            }
+
+            if (IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
+            {
+                if (!ValueManager.ContainsValue(ID.SwitchStateLong) && SwitchSettings.HasLongPress)
+                    ValueManager.RegisterValue(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
+                else if (ValueManager.ContainsValue(ID.SwitchStateLong))
+                    ValueManager.DeregisterValue(ID.SwitchStateLong);
+
+                ValueManager.RemoveVariable(ID.SwitchStateLong);
+            }
+            else
+            {
+                if (ValueManager.ContainsValue(ID.SwitchStateLong))
+                    ValueManager.DeregisterValue(ID.SwitchStateLong);
+
+                if (!ValueManager.ContainsVariable(ID.ControlState) && SwitchSettings.HasLongPress)
+                    ValueManager.SetVariable(ID.SwitchStateLong, SwitchSettings.SwitchOffStateLong);
+            }
         }
 
         public virtual void SetError()
@@ -97,11 +158,8 @@
             ForceUpdate = false;
         }
 
-        public virtual void Refresh(ImageManager imgManager, IPCManager ipcManager)
+        public virtual void Refresh(ImageManager imgManager)
         {
-            if (this is IHandlerValue)
-                (this as IHandlerValue).RefreshValue(ipcManager);
-            
             if (!CanRedraw)
                 SetError();
             else
@@ -131,21 +189,16 @@
                 IsInitialized = false;
         }
 
-        public virtual void Update(ImageManager imgManager, IPCManager ipcManager)
-        {
-            SetInitialization();
-
-            if (this is IHandlerValue)
-                (this as IHandlerValue).UpdateAddress(ipcManager);
-
-            ForceUpdate = true;
-        }
-
         public virtual void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters)
         {
             Title = title;
             TitleParameters = titleParameters;
             ForceUpdate = true;
+        }
+
+        public static bool IsActionReadable(int type)
+        {
+            return type == (int)ActionSwitchType.LVAR || type == (int)ActionSwitchType.OFFSET;
         }
     }
 }

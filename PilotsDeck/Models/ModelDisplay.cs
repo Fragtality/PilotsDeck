@@ -81,6 +81,12 @@ namespace PilotsDeck
 
         public RealInvariantFormat(string value)
         {
+            if (value == null)
+            {
+                formatInfo = new CultureInfo("en-US").NumberFormat;
+                return;
+            }
+
             int lastPoint = value.LastIndexOf('.');
             int lastComma = value.LastIndexOf(',');
             if (lastComma > lastPoint)

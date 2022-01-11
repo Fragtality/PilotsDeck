@@ -153,7 +153,7 @@ namespace PilotsDeck
             return value;
         }
 
-        public void DeregisterValue(string address)
+        public void DeregisterAddress(string address)
         {
             try
             { 
@@ -166,20 +166,20 @@ namespace PilotsDeck
                         currentValues[address].Dispose();
                         currentValues.Remove(address);
 
-                        Log.Logger.Debug($"DeregisterValue: Removed Address {address}");
+                        Log.Logger.Debug($"DeregisterAddress: Removed Address {address}");
                     }
                     else
                     {
                         currentRegistrations[address]--;
-                        Log.Logger.Debug($"DeregisterValue: Deregistered Address {address}, Registrations open: {currentRegistrations[address]}");
+                        Log.Logger.Debug($"DeregisterAddress: Deregistered Address {address}, Registrations open: {currentRegistrations[address]}");
                     }
                 }
-                else
-                    Log.Logger.Error($"DeregisterValue: Could not find Address {address}");
+                else if (IsConnected)
+                    Log.Logger.Error($"DeregisterAddress: Could not find Address {address}");
             }
             catch
             {
-                Log.Logger.Error($"RegisterValue: Exception while deregistering Address {address}");
+                Log.Logger.Error($"DeregisterAddress: Exception while deregistering Address {address}");
             }
         }
 
@@ -246,11 +246,18 @@ namespace PilotsDeck
             IPCValueOffset offset = null;
             try
             {
-                offset = new IPCValueOffset(address, AppSettings.groupStringWrite, OffsetAction.Write);
-                offset.Write(value, AppSettings.groupStringWrite);
-                offset.Dispose();
-                offset = null;
-                result = true;
+                if (!currentValues.ContainsKey(address))
+                {
+                    offset = new IPCValueOffset(address, AppSettings.groupStringWrite, OffsetAction.Write);
+                    offset.Write(value, AppSettings.groupStringWrite);
+                    offset.Dispose();
+                    offset = null;
+                    result = true;
+                }
+                else
+                {
+                    (currentValues[address] as IPCValueOffset).Write(value, AppSettings.groupStringWrite);
+                }
             }
             catch
             {
@@ -300,31 +307,87 @@ namespace PilotsDeck
             return true;
         }
 
-        public bool RunScript(string name)
+        protected bool RunSingleScript(string name, int flag)
         {
             try
             {
-                string[] parts = name.Split(':');
                 Offset param = null;
-                if (parts.Length > 2 && int.TryParse(parts[2], out int result))
+                if (flag != -1)
                 {
                     param = new Offset(0x0D6C, 4);
-                    param.SetValue(result);
+                    param.SetValue(flag);
                     FSUIPCConnection.Process();
                 }
 
                 Offset request = new Offset(0x0D70, 128);
-                request.SetValue(parts[0] + ":" + parts[1]);
+                request.SetValue(name);
 
                 FSUIPCConnection.Process();
                 request.Disconnect();
                 request = null;
-                if (parts.Length > 2)
+                if (flag != -1)
                 {
                     param.Disconnect();
                     param = null;
                 }
             }
+            catch
+            {
+                Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool RunScript(string name)
+        {
+            try
+            {
+                string[] parts = name.Split(':');
+                if (parts.Length == 3 && int.TryParse(parts[2], out int result))    //Script with flag
+                    return RunSingleScript(parts[0] + ":" + parts[1], result);
+                if (parts.Length == 2)                                              //Script
+                    return RunSingleScript(parts[0] + ":" + parts[1], -1);          //Script with mulitple flags
+                if (parts.Length >= 3)                          
+                {
+                    for (int i = 2; i < parts.Length; i++)
+                    {
+                        if (int.TryParse(parts[i], out result))
+                        {
+                            if (!RunSingleScript(parts[0] + ":" + parts[1], result))
+                                return false;
+                        }
+                        else
+                        {
+                            Log.Logger.Error($"IPCManager: Exception while Executing Script: {name} - flag could not be parsed");
+                            return false;
+                        }
+                        System.Threading.Thread.Sleep(25);
+                    }
+                }
+            }
+
+            //        Offset param = null;
+            //    if (parts.Length == 3 && int.TryParse(parts[2], out int result))
+            //    {
+            //        param = new Offset(0x0D6C, 4);
+            //        param.SetValue(result);
+            //        FSUIPCConnection.Process();
+            //    }
+
+            //    Offset request = new Offset(0x0D70, 128);
+            //    request.SetValue(parts[0] + ":" + parts[1]);
+
+            //    FSUIPCConnection.Process();
+            //    request.Disconnect();
+            //    request = null;
+            //    if (parts.Length > 2)
+            //    {
+            //        param.Disconnect();
+            //        param = null;
+            //    }
+            //}
             catch
             {
                 Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");

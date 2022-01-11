@@ -6,7 +6,15 @@ var settingsModel = {
 	AddressRadioStandby: "",
 	AddressAction: "",
 	ActionType: 0,
-	OffState: "",
+	SwitchOnState: "",
+	SwitchOffState: "",
+	SwitchOnCurrentValue: false,
+	UseControlDelay: false,
+	HasLongPress: false,
+	AddressActionLong: "",
+	ActionTypeLong: 0,
+	SwitchOnStateLong: "",
+	SwitchOffStateLong: "",
 	DecodeBCD: false,
 	Scalar: "1",
 	Format: "",
@@ -36,6 +44,7 @@ function fillSelectBoxes() {
 	}
 	if (ActionTypes && ActionTypes != "") {
 		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
+		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
 	}
 }
 
@@ -47,24 +56,20 @@ function updateForm() {
 	setPattern('AddressAction', settingsModel.ActionType);
 
 	//On/Off States
-	if (settingsModel.ActionType == 0) { //macro
-		toggleConfigItem(false, 'OffState');
-	}
-	else if (settingsModel.ActionType == 1) { //script
-		toggleConfigItem(false, 'OffState');
-	}
-	else if (settingsModel.ActionType == 2) { //control
-		toggleConfigItem(false, 'OffState');
-	}
-	else if (settingsModel.ActionType == 3)  { //lvar
-		toggleConfigItem(true, 'OffState');
-	}
-	else if (settingsModel.ActionType == 4)  { //offset
-		toggleConfigItem(true, 'OffState');
-	}
-	else {
-		toggleConfigItem(false, 'OffState');
-	}
+	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
+	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', false);
+	if (settingsModel.HasLongPress && longAllowed)
+		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
+	else
+		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
+
+	toggleControlDelay(settingsModel);
+
+
+	//LongPress
+	toggleConfigItem(longAllowed, 'HasLongPress');
+	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
+	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 
 	//FONT
 	toggleConfigItem(!settingsModel.FontInherit, 'FontName');

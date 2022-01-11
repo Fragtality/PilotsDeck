@@ -2,7 +2,7 @@
 
 namespace PilotsDeck
 {
-    public class HandlerSwitchDisplay : HandlerSwitch, IHandlerValue
+    public class HandlerSwitchDisplay : HandlerSwitch
     {
         public override ModelSwitch BaseSettings { get { return Settings; } }
         public virtual ModelSwitchDisplay DisplaySettings { get { return Settings; } }
@@ -11,12 +11,6 @@ namespace PilotsDeck
 
         public override string ActionID { get { return $"\"{Title}\" [HandlerSwitchDisplay] Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
         public override string Address { get { return DisplaySettings.Address; } }
-
-        public virtual string CurrentValue { get; protected set; } = null;
-        public virtual string LastAddress { get; protected set; }
-        public virtual bool IsChanged { get; protected set; } = false;
-        protected override bool CanRedraw { get { return CurrentValue != null; } }
-
 
         public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
@@ -31,40 +25,36 @@ namespace PilotsDeck
             imgManager.AddImage(DisplaySettings.OffImage, DeckType);
             if (DisplaySettings.HasIndication)
                 imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
+
+            ValueManager.RegisterValue(ID.ControlState, DisplaySettings.Address);
         }
 
-        public override void Deregister(ImageManager imgManager, IPCManager ipcManager)
+        public override void Deregister(ImageManager imgManager)
         {
-            base.Deregister(imgManager, ipcManager);
+            base.Deregister(imgManager);
 
             imgManager.RemoveImage(DisplaySettings.OnImage, DeckType);
             imgManager.RemoveImage(DisplaySettings.OffImage, DeckType);
             if (DisplaySettings.HasIndication)
                 imgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
+
+            ValueManager.DeregisterValue(ID.ControlState);
         }
 
-        public virtual void RefreshValue(IPCManager ipcManager)
+        public override void Update(ImageManager imgManager)
         {
-            IsChanged = HandlerValue.RefreshValue(ipcManager, Address, out string currentValue);
-            CurrentValue = currentValue;
+            base.Update(imgManager);
+
+            ValueManager.UpdateValueAddress(ID.ControlState, Address);
         }
 
-        public virtual void RegisterAddress(IPCManager ipcManager)
+        public override void UpdateActionSettings()
         {
-            ipcManager.RegisterAddress(Address, AppSettings.groupStringRead);
-            LastAddress = Address;
-        }
-
-        public virtual void UpdateAddress(IPCManager ipcManager)
-        {
-            LastAddress = HandlerValue.UpdateAddress(ipcManager, LastAddress, Address);
-        }
-
-        public virtual void DeregisterAddress(IPCManager ipcManager)
-        {
-            ipcManager.DeregisterValue(Address);
-            if (Address != LastAddress)
-                Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Address} != {LastAddress} ] ");
+            if (BaseSettings.SwitchOnCurrentValue)
+            {
+                BaseSettings.SwitchOnState = DisplaySettings.OnState;
+                BaseSettings.SwitchOffState = DisplaySettings.OffState;
+            }
         }
 
         protected override bool InitializationTest()
@@ -74,28 +64,30 @@ namespace PilotsDeck
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            LastSwitchState = CurrentValue;
-            LastSwitchStateLong = CurrentValue;
+            if (BaseSettings.SwitchOnCurrentValue)
+                ValueManager.SetVariable(ID.SwitchState, ValueManager[ID.ControlState]);
 
             return base.OnButtonUp(ipcManager, tick);
         }
 
         protected override void Redraw(ImageManager imgManager)
         {
-            if (!IsChanged && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
                 return;
-            string lastImage = DrawImage;
 
-            if (Settings.OnState == CurrentValue || Settings.OffState == CurrentValue)
+            string lastImage = DrawImage;
+            string currentValue = ValueManager[ID.ControlState];
+
+            if (Settings.OnState == currentValue || Settings.OffState == currentValue)
             {
-                if (Settings.OnState == CurrentValue)
+                if (Settings.OnState == currentValue)
                     DrawImage = Settings.OnImage;
                 else
                     DrawImage = Settings.OffImage;
             }
             else if (Settings.HasIndication)
             {
-                if (Settings.IndicationValueAny || Settings.IndicationValue == CurrentValue)
+                if (Settings.IndicationValueAny || Settings.IndicationValue == currentValue)
                     DrawImage = Settings.IndicationImage;
                 else
                     DrawImage = Settings.ErrorImage;

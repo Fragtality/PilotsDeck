@@ -218,7 +218,7 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"ImageManager: Could not find Image for Base64 Encode. {imageDef}");
+                    Log.Logger.Debug($"ImageManager: Could not find cached Image for GetImageBase64, added new Defintion. {imageDef}");
                     AddImage(imageDef);
                     return cachedImages[imageDef.FileNameReal].GetImageBase64();
                 }

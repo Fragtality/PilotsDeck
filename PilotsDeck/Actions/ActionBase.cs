@@ -46,7 +46,7 @@ namespace PilotsDeck
         {
             Log.Logger.Debug($"ActionBase:OnKeyDown {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
 
-            if (Plugin.ActionController[args.context] is IHandlerSwitch)
+            if (Plugin.ActionController[args.context].HasAction)
             {
                 if (!Plugin.ActionController.OnButtonDown(args.context))
                 {
@@ -62,7 +62,7 @@ namespace PilotsDeck
         {
             Log.Logger.Debug($"ActionBase:OnKeyUp {args.context} | {Plugin.ActionController[args.context]?.ActionID} | Ticks: {Plugin.ActionController.Ticks - ticksDown}");
 
-            if (Plugin.ActionController[args.context] is IHandlerSwitch)
+            if (Plugin.ActionController[args.context].HasAction)
             {
                 if (!Plugin.ActionController.OnButtonUp(args.context))
                 {

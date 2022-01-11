@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Drawing;
 
@@ -17,6 +19,7 @@ namespace PilotsDeck
 		public virtual string IndicationColor { get; set; } = "#ffcc00";
 		public virtual string IndicationImage { get; set; } = @"Images/Empty.png";
 		public virtual string IndicationValue { get; set; } = "0";
+		public virtual string ValueMappings { get; set; } = "";
 
 		public virtual bool FontInherit { get; set; } = true;
 		public virtual string FontName { get; set; } = "Arial";
@@ -30,7 +33,60 @@ namespace PilotsDeck
 		{
 			DefaultImage = @"Images/Empty.png";
 			ErrorImage = @"Images/Error.png";
-		}		
+		}
+
+		public string GetValueMapped(string text)
+		{
+			if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains("="))
+			{
+				var dict = GetValueMap();
+				if (HasComparison() && dict.Count > 0)
+                {
+					var comparison = dict.First();
+
+					bool greater = comparison.Key.Contains(">");
+					string key = comparison.Key.Replace(">", "").Replace("<", "");
+					float val = GetNumValue(text, 0.0f);
+					float limit = GetNumValue(key, 0.0f);
+					
+					if (greater)
+						if (limit >= val)
+							text = comparison.Value;
+					
+					if (!greater)
+						if (limit <= val)
+							text = comparison.Value;
+				}
+				else if (dict.ContainsKey(text))
+                {
+					text = dict[text];
+                }
+			}
+
+			return text;
+		}
+
+		protected virtual Dictionary<string, string> GetValueMap()
+        {
+			var dict = new Dictionary<string, string>();
+
+			string[] parts = ValueMappings.Split(':');
+
+			string[] pair;
+			foreach (var p in parts)
+            {
+				pair = p.Split('=');
+				if (pair.Length == 2 && !dict.ContainsKey(pair[0]))
+					dict.Add(pair[0], pair[1]);
+            }
+
+			return dict;
+        }
+
+		public virtual bool HasComparison()
+        {
+			return !string.IsNullOrEmpty(ValueMappings) && (ValueMappings.Contains("<=") || ValueMappings.Contains(">="));
+        }
 
 		public virtual void GetFontParameters(StreamDeckTools.StreamDeckTitleParameters titleParameters, out Font drawFont, out Color drawColor)
         {

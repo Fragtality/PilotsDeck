@@ -4,13 +4,15 @@ var settingsModel = {
 		ErrorImage: "Images/SwitchError.png",
 		AddressAction: "",
 		ActionType: 0,
-		OnState: "",
-		OffState: "",
+		SwitchOnState: "",
+		SwitchOffState: "",
+		UseControlDelay: false,
+		SwitchOnCurrentValue: false,
 		HasLongPress: false,
         AddressActionLong: "",
         ActionTypeLong: 0,
-        OnStateLong: "",
-        OffStateLong: ""
+        SwitchOnStateLong: "",
+        SwitchOffStateLong: ""
   };
 
 function fillSelectBoxes() {
@@ -29,13 +31,17 @@ function updateForm() {
 	setPattern('AddressAction', settingsModel.ActionType);
 	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
-	//On/Off States
+	//On/Off States & SwitchOnCurrent
 	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-	toggleOnOffState(settingsModel.ActionType, 'OnState', 'OffState');
+	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
 	if (settingsModel.HasLongPress && longAllowed)
-		toggleOnOffState(settingsModel.ActionTypeLong, 'OnStateLong', 'OffStateLong');
+		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', settingsModel.SwitchOnCurrentValue);
 	else
-		toggleOnOffState(-1, 'OnStateLong', 'OffStateLong');
+		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
+	toggleConfigItem(false, 'SwitchOnCurrentValue');
+
+	toggleControlDelay(settingsModel);
+
 	
 	//LongPress
 	toggleConfigItem(longAllowed, 'HasLongPress');

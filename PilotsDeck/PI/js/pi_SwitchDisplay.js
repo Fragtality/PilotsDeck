@@ -8,15 +8,19 @@ var settingsModel = {
     IndicationValue: "0",
 	AddressAction: "",
 	ActionType: 0,
+	SwitchOnState: "",
+	SwitchOffState: "",
+	UseControlDelay: false,
 	HasLongPress: false,
 	AddressActionLong: "",
 	ActionTypeLong: 0,
-	OnStateLong: "",
-	OffStateLong: "",
+	SwitchOnStateLong: "",
+	SwitchOffStateLong: "",
 	OnImage: "Images/KorryOnBlueTop.png",
 	OnState: "",
 	OffImage: "Images/KorryOffWhiteBottom.png",
 	OffState: "",
+	SwitchOnCurrentValue: true,
 	IndicationValueAny: false
   };
 
@@ -39,17 +43,25 @@ function updateForm() {
 	setPattern('AddressAction', settingsModel.ActionType);
 	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
+	//On/Off States & SwitchOnCurrent
+	if (settingsModel.ActionType != 3 && settingsModel.ActionType != 4)
+		toggleConfigItem(false, 'SwitchOnCurrentValue');
+	else
+		toggleConfigItem(true, 'SwitchOnCurrentValue');
+
+	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
+	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
+	if (settingsModel.HasLongPress && longAllowed)
+		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
+	else
+		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
+
+	toggleControlDelay(settingsModel);
+
 	//INDICATION
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationValueAny');
 	toggleConfigItem(settingsModel.HasIndication && !settingsModel.IndicationValueAny, 'IndicationValue');
-
-	//On/Off States
-	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-	if (settingsModel.HasLongPress && longAllowed)
-		toggleOnOffState(settingsModel.ActionTypeLong, 'OnStateLong', 'OffStateLong');
-	else
-		toggleOnOffState(-1, 'OnStateLong', 'OffStateLong');
 
 	//LongPress
 	toggleConfigItem(longAllowed, 'HasLongPress');
