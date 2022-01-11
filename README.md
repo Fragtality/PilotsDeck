@@ -77,24 +77,25 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *0x0ec6:2:i* for "Pressure QNH"
   - ```0x0D0C:2:b:2``` to toggle Landing Lights
 * **Lvar**
-  \[ (L:)Name | (L:)Name((:L):Name)* ] (Read / Command)
-  - *Name*: The Lvar's Name with or without the preceding "L:". For Switches you can bind multiple Lvars to it, every Lvar is separated by ":". Multiple Lvars only make sense if they react same for a same value (e.g. both Pack Switches, both reacting as "On" for "10")<br/>
-  Example: *"VC_OVHD_AC_Pack_1_Button:VC_OVHD_AC_Pack_2_Button"*
+  \[ (L:)Name ] (Read / Command)
+  - *Name*: The Lvar's Name with or without the preceding "L:". When used as Action/Command, the Values for On and Off can be configured in respective Fields.<br/>
+  Example: *"VC_OVHD_AC_Pack_1_Button"*
 * **Control**
-  \[ Control(:Parameter)* ] (Command)
-  - The known "FS Controls". First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at one)<br/>
-  Example: *"66587:72497:72507"* (Send Control 66587 with Parameter 72497 and then Control 66587 with Parameter 72507)
+  \[ Control=Paramater(:Parameter)*(:Control=Paramater(:Parameter)*)* ] (Command)
+  - The known "FS Controls". First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at once or move both at once)<br/>
+  Example: *"66587=72497:72507"* (Send Control 66587 with Parameter 72497 and then Control 66587 with Parameter 72507)
 * **Macro**
   \[ File\:Macro(:Macro)* ] (Command)
   - *File*: The FSUIPC Macro File Name without Extension
   - *Macro*: The Macro's Name within that File. You can specify multiple Macros within one File (e.g. both Packs-Controls on one Button)<br/>
   Example: *"FSLA3XX_MAIN:ACPACK1:ACPACK2"* (Run Macro ACPACK1 from Macro-File FSLA3XX_MAIN and then ACPACK2 from the same File)
 * **Script**
-  \[ Lua|LuaToggle|LuaSet|LuaClear:File(:flag) ] (Command)
-  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear or Toggle) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle work as described in FSUIPC's Documentation.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/>
+  \[ Lua|LuaToggle|LuaSet|LuaClear:File(:flag)* ] (Command)
+  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear or Toggle) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle work as described in FSUIPC's Documentation. You can specifiy multiple Flags, the Plugin will call the Script / Lua Control multiple times, each time with a different Parameter. Useful to Set/Clear/Toggle multiple Flags at once.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/>
   *Examples*:
   - *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")
   - *"LuaToggle:FSL_CMD:21"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
+  - *"LuaToggle:FSL_CMD:21:22"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua" and the toggle Flag 22)
 * **vJoy**
   \[ Joystick:Button(:t) ] (Command)<br/>
 :grey_exclamation: This Action is not related to the vJoy Device-Driver or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
@@ -104,12 +105,13 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   *Examples*:
   - *"64:4"* (the StreamDeck Button is recognized as Joystick 64, Button 4 in the Sim)
   - *"72:2:t"* (the StreamDeck Button is recognized as Joystick 72, Button 2 in the Sim and will be toggled on KeyUp)<br/>
-#### DecodeBCD / Scale / Format
+#### DecodeBCD / Scale / Format / Mappings
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
 * **Format**: Round the Value and/or add Text to it \[ Digits:Text %s Text ]
   - *Digits*: The Value is rounded to that fixed Number of Digits after the decimal Point (can be zero for an Integer). If not specified, the Value is not rounded at all.
   - *Text*: The Value is embedded at the "*%s*" in the Text you specify here. E.g. to add Units to the Value like "%s kg" or "%s %". Or put something in front of it. Every "%s" will be replaced by the Value.
+* **Mappings**: You can map specific Values to specific Texts. For example 0 will show as "OFF" and 10 will show as "ON" (Syntax: 0=OFF:10=ON). A simple Comparison is also allowed, for Example if 1 is greater-or-equal the current Value show the Text "XX" (Syntax: 1>=XX). You can either have multiple Mappings or one Comparison but not both!
 * **Order**: DecodeBCD -> Scale -> Round -> Format. If the Value is to be matched (On/Off/Special State e.g.) it is done after Round and before Format.
 * **Examples**
   - *1*     One Digit after the Decimal Point, the current Value of 20.522534 will be displayed as 20.5 for Example. Match for zero would be "0.0".
@@ -265,6 +267,7 @@ These are the available Settings and their Default:
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
 * **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
 * **appStartDelay**="30"		- When P3D (or any other Sim) is started, it will throttle the Process Calls to FSUIPC to every 10s (based on Ticks) in the first X seconds after FSUIPC successfully processed. Depending on how fast/slow P3D and the selected Aircraft are loading this could be too long/short. This only applies to when the Plugin (StreamDeck Software) was already running, if the Plugin is started when P3D was already running, it will directly connect and process.
+* **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim.
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.
 * **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".<br/><br/>
