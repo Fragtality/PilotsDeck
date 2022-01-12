@@ -139,7 +139,7 @@
         </div>
         <div class="sdpi-item" id="Config_ValueMappings">
             <div class="sdpi-item-label">Mappings</div>
-            <input id="ValueMappings" class="sdpi-item-value" type="text" pattern="([0-9]{1,}(,|\.)?[0-9]{1,}(<|>){1}=[^:]{1,}:?){1}|([0-9]{1,}(,|\.)?[0-9]{1,}=[^:]{1,}:?){1,}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
+            <input id="ValueMappings" class="sdpi-item-value" type="text" pattern="^[0-9]+((,|\.)[0-9]+)?(<|>)=[^:^=]+$|^[0-9]+((,|\.)[0-9]+)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?=[^:^=]+)*$" onchange="setSettings(event.target.value, event.target.id)" placeholder="Map Number Value to Text" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_UseWarnColors">
             <div class="sdpi-item-label" id="lblUseWarnColors">Range Colors</div>
