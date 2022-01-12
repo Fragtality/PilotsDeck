@@ -10,6 +10,7 @@ Releases/
 desktop.ini
 RegisterPluginAndStartStreamDeck.ps1
 Release.ps1
+RELEASE ORDER.txt
 
 # User-specific files
 *.rsuser
