@@ -367,27 +367,6 @@ namespace PilotsDeck
                     }
                 }
             }
-
-            //        Offset param = null;
-            //    if (parts.Length == 3 && int.TryParse(parts[2], out int result))
-            //    {
-            //        param = new Offset(0x0D6C, 4);
-            //        param.SetValue(result);
-            //        FSUIPCConnection.Process();
-            //    }
-
-            //    Offset request = new Offset(0x0D70, 128);
-            //    request.SetValue(parts[0] + ":" + parts[1]);
-
-            //    FSUIPCConnection.Process();
-            //    request.Disconnect();
-            //    request = null;
-            //    if (parts.Length > 2)
-            //    {
-            //        param.Disconnect();
-            //        param = null;
-            //    }
-            //}
             catch
             {
                 Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
@@ -408,7 +387,7 @@ namespace PilotsDeck
             try
             {
                 FSUIPCConnection.SendControlToFS(control, param);
-                    result = true;
+                result = true;
             }
             catch
             {

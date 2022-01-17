@@ -19,7 +19,7 @@ namespace PilotsDeck
         public static string ScaleValue(string strValue, string strScalar)
         {
             if (strScalar != "1" && double.TryParse(strValue, NumberStyles.Number, new RealInvariantFormat(strValue), out double value) && double.TryParse(strScalar, NumberStyles.Number, new RealInvariantFormat(strScalar), out double scalar))
-                return string.Format(AppSettings.numberFormat, "{0:F}", value * scalar);
+                return string.Format(AppSettings.numberFormat, "{0:G}", value * scalar);
             else
                 return strValue;
         }

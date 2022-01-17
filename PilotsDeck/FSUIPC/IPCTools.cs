@@ -12,11 +12,9 @@ namespace PilotsDeck
         static string validName = @"[a-zA-Z0-9\x2D\x5F]+";
         public static Regex rxMacro = new Regex($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
         public static Regex rxScript= new Regex($"^(Lua(Set|Clear|Toggle)?:){{1}}{validName}(:[0-9]{{1,3}})*$", RegexOptions.Compiled);
-        public static Regex rxControlOld = new Regex(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);     //TODO NEXT VERSIONS: Use for Sequence of single Controls (with no Params)
+        public static Regex rxControlSeq = new Regex(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         public static Regex rxControl = new Regex(@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
         public static Regex rxLvar = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
-        //public static Regex rxLvarRead = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
-        //public static Regex rxLvarWrite = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}(:(L:){{0,1}}{validName})*$", RegexOptions.Compiled);
         public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static Regex rxVjoy = new Regex(@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -43,7 +41,7 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return rxScript.IsMatch(address);
                 case ActionSwitchType.CONTROL:
-                    return rxControl.IsMatch(address) || rxControlOld.IsMatch(address);
+                    return rxControl.IsMatch(address) || rxControlSeq.IsMatch(address);
                 case ActionSwitchType.LVAR:
                     return rxLvar.IsMatch(address);
                 case ActionSwitchType.OFFSET:
@@ -148,30 +146,13 @@ namespace PilotsDeck
             address.Replace("L:", "");
             result = ipcManager.WriteLvar(address, value);
 
-            //string[] vars = address.Replace("L:", "").Split(':');
-            //if (vars.Length > 1)
-            //{
-            //    int fails = 0;
-            //    for (int i = 0; i < vars.Length; i++)
-            //    {
-            //        if (!ipcManager.WriteLvar(vars[i], value))
-            //            fails++;
-            //    }
-            //    if (fails == 0)
-            //        result = true;
-            //}
-            //else
-            //{
-            //    result = ipcManager.WriteLvar(address, value);
-            //}
-
             return result;
         }
 
         public static bool SendControls(IPCManager ipcManager, string address, bool useControlDelay)
         {
-            if (!address.Contains("=") && address.Contains(":") && rxControlOld.IsMatch(address))
-                return SendControlsOld(ipcManager, address, useControlDelay);
+            if (!address.Contains("=") && address.Contains(":") && rxControlSeq.IsMatch(address))
+                return SendControlsSeq(ipcManager, address, useControlDelay);
             else if (!address.Contains("=") && !address.Contains(":"))
                 return ipcManager.SendControl(address);
 
@@ -223,36 +204,25 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool SendControlsOld(IPCManager ipcManager, string address, bool useControlDelay)
+        public static bool SendControlsSeq(IPCManager ipcManager, string address, bool useControlDelay)
         {
-            bool result = false;
+            int fails = 0;
 
-            string[] args = address.Split(':');
-            if (args.Length == 2)
-                result = ipcManager.SendControl(args[0], args[1]);
-            else if (args.Length == 1)
-                result = ipcManager.SendControl(args[0]);
-            else if (args.Length > 2)
+            string codeControl;
+            while (address.Length > 0)
             {
-                string control = args[0];
-                int fails = 0;
-                for (int i = 0; i < args.Length; i++)
+                codeControl = GetNextTokenMove(ref address, ":");
+
+                if (codeControl != null)
                 {
-                    if (!ipcManager.SendControl(control, args[i]))
+                    if (!ipcManager.SendControl(codeControl))
                         fails++;
-                    if (useControlDelay)
+                    if (PeekNextDelim(address, ":") && useControlDelay)
                         Thread.Sleep(AppSettings.controlDelay);
                 }
-                if (fails == 0)
-                    result = true;
-            }
-            else
-            {
-                Log.Logger.Error($"IPCTools: Could not resolve Control-Address: {address}");
-                return false;
             }
 
-            return result;
+            return fails == 0;
         }
 
         public static bool WriteOffset(IPCManager ipcManager, string address, string newValue)

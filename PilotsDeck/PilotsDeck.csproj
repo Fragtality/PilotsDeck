@@ -364,6 +364,10 @@
     <None Include="Release.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\A-GearLocked%402x.png" />
+    <Content Include="Images\A-GearLocked.png" />
+    <Content Include="Images\A-GearTransit%402x.png" />
+    <Content Include="Images\A-GearTransit.png" />
     <Content Include="Images\Arrow%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -560,6 +564,8 @@
     <Content Include="Images\korry\A-DECEL.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\korry\A-DOWN%402x.png" />
+    <Content Include="Images\korry\A-DOWN.png" />
     <Content Include="Images\korry\A-FAULT%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -574,6 +580,8 @@
     <Content Include="Images\korry\A-HOT.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\korry\A-MAN%402x.png" />
+    <Content Include="Images\korry\A-MAN.png" />
     <Content Include="Images\korry\A-OFF-White%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -598,6 +606,8 @@
     <Content Include="Images\korry\A-OPEN.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\korry\A-UNLK%402x.png" />
+    <Content Include="Images\korry\A-UNLK.png" />
     <Content Include="Images\korry\A-WARN.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -627,6 +637,8 @@
     <Content Include="Images\korry\INOP.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\LightDot%402x.png" />
+    <Content Include="Images\LightDot.png" />
     <Content Include="Images\LightOff%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
