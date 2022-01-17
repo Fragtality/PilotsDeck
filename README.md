@@ -70,41 +70,51 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
   - *Type*: Specify if the Offset is an Integer "**i**", Float/Double "**f**", Bit "**b**" or String "**s**". Defaults to ":i" for Integers if not specified.
   - *Signedness*: Specify if the Offset is Signed "**s**" or Unsigned "**u**". Defaults to ":u" for Unsigned if not specified and only relevant for Integers.
   - *BitNum*: Only for Offset-Type Bit, the Number/Index of the Bit to read from or write to. Use 0 or 1 for the On/Off/Special Value Fields.<br/><br/>
-*Examples*:
-  - *2118:8:f* for "Turbine Engine 2 corrected N1" (8 byte double/float64)
-  - *034E:2* for "COM1 frequency in BCD" (2 byte integer)
-  - *3544:4:i:s* for "standby alitmeter in feet" (4 byte signed integer)
-  - *0x0ec6:2:i* for "Pressure QNH"
+Examples:
+  - ```2118:8:f``` for "Turbine Engine 2 corrected N1" (8 byte double/float64)
+  - ```034E:2``` for "COM1 frequency in BCD" (2 byte integer)
+  - ```3544:4:i:s``` for "standby alitmeter in feet" (4 byte signed integer)
+  - ```0x0ec6:2:i``` for "Pressure QNH"
   - ```0x0D0C:2:b:2``` to toggle Landing Lights
+  <br/>
 * **Lvar**
   \[ (L:)Name ] (Read / Command)
-  - *Name*: The Lvar's Name with or without the preceding "L:". When used as Action/Command, the Values for On and Off can be configured in respective Fields.<br/>
-  Example: *"VC_OVHD_AC_Pack_1_Button"*
+  - Name*: The Lvar's Name with or without the preceding "L:". When used as Action/Command, the Values for On and Off can be configured in respective Fields.<br/><br/>
+  Example:
+  - ```VC_OVHD_AC_Pack_1_Button```
+  <br/>
 * **Control**
-  \[ Control=Paramater(:Parameter)*(:Control=Paramater(:Parameter)*)* ] (Command)
-  - The known "FS Controls". First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at once or move both at once)<br/>
-  Example: *"66587=72497:72507"* (Send Control 66587 with Parameter 72497 and then Control 66587 with Parameter 72507)
+  \[ Control=Paramater(:Parameter)*(:Control=Paramater(:Parameter)*)* ] (Command)<br>
+  \[ Control(:Control)* ]
+  - The known "FS Controls" - FSUIPC provides a List of the available Standard/P3D Controls available. First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at once or move both at once). A Sequence of Controls only (no Parameters) is also possible.<br/><br/>
+  Examples:
+  - ```66587=72497:72507``` (Send Control 66587 with Parameter 72497 and then Control 66587 with Parameter 72507)
+  - ```66168:65567``` (Send Control 66168 and then send Control 65567)
+  <br/>
 * **Macro**
   \[ File\:Macro(:Macro)* ] (Command)
   - *File*: The FSUIPC Macro File Name without Extension
-  - *Macro*: The Macro's Name within that File. You can specify multiple Macros within one File (e.g. both Packs-Controls on one Button)<br/>
-  Example: *"FSLA3XX_MAIN:ACPACK1:ACPACK2"* (Run Macro ACPACK1 from Macro-File FSLA3XX_MAIN and then ACPACK2 from the same File)
+  - *Macro*: The Macro's Name within that File. You can specify multiple Macros within one File (e.g. both Packs-Controls on one Button)<br/><br/>
+  Example:
+  - ```FSLA3XX_MAIN:ACPACK1:ACPACK2``` (Run Macro ACPACK1 from Macro-File FSLA3XX_MAIN and then ACPACK2 from the same File)
+  <br/>
 * **Script**
   \[ Lua|LuaToggle|LuaSet|LuaClear:File(:flag)* ] (Command)
-  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear or Toggle) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle work as described in FSUIPC's Documentation. You can specifiy multiple Flags, the Plugin will call the Script / Lua Control multiple times, each time with a different Parameter. Useful to Set/Clear/Toggle multiple Flags at once.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/>
-  *Examples*:
-  - *"Lua:Baro_Toggle"* (run Lua-Script "Baro_Toggle.lua")
-  - *"LuaToggle:FSL_CMD:21"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
-  - *"LuaToggle:FSL_CMD:21:22"* (toggle Flag 21 for Lua-Script "FSL_CMD.lua" and the toggle Flag 22)
+  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear or Toggle) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle work as described in FSUIPC's Documentation. You can specifiy multiple Flags, the Plugin will call the Script / Lua Control multiple times, each time with a different Parameter. Useful to Set/Clear/Toggle multiple Flags at once.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/><br/>
+  Examples:
+  - ```Lua:Baro_Toggle``` (run Lua-Script "Baro_Toggle.lua")
+  - ```LuaToggle:FSL_CMD:21``` (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
+  - ```LuaToggle:FSL_CMD:21:22``` (toggle Flag 21 for Lua-Script "FSL_CMD.lua" and the toggle Flag 22)
+  <br/>
 * **vJoy**
   \[ Joystick:Button(:t) ] (Command)<br/>
 :grey_exclamation: This Action is not related to the vJoy Device-Driver or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
   - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
   - *Button*: The Number of the Button on that Joystick (Button 0 - 31).
-  - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/>
-  *Examples*:
-  - *"64:4"* (the StreamDeck Button is recognized as Joystick 64, Button 4 in the Sim)
-  - *"72:2:t"* (the StreamDeck Button is recognized as Joystick 72, Button 2 in the Sim and will be toggled on KeyUp)<br/>
+  - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/><br/>
+  Examples:
+  - ```64:4``` (the StreamDeck Button is recognized as Joystick 64, Button 4 in the Sim)
+  - ```72:2:t``` (the StreamDeck Button is recognized as Joystick 72, Button 2 in the Sim and will be toggled on KeyUp)<br/><br/>
 #### DecodeBCD / Scale / Format / Mappings
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
@@ -114,9 +124,9 @@ If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or w
 * **Mappings**: You can map specific Values to specific Texts. For example 0 will show as "OFF" and 10 will show as "ON" (Syntax: 0=OFF:10=ON). A simple Comparison is also allowed, for Example if 1 is greater-or-equal the current Value show the Text "XX" (Syntax: 1>=XX). You can either have multiple Mappings or one Comparison but not both!
 * **Order**: DecodeBCD -> Scale -> Round -> Format -> Map. If the Value is to be matched (On/Off/Special State e.g.) it is done after Round and before Format.
 * **Examples**
-  - *1*     One Digit after the Decimal Point, the current Value of 20.522534 will be displayed as 20.5 for Example. Match for zero would be "0.0".
-  - *2:1%s* Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!
-  - *%s ft* Add "ft" after the Value<br/>
+  - ```1```     One Digit after the Decimal Point, the current Value of 20.522534 will be displayed as 20.5 for Example. Match for zero would be "0.0".
+  - ```2:1%s``` Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!
+  - ```%s ft``` Add "ft" after the Value<br/>
 #### Images
 All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.<br/>
 The Images for the Korry Button are in the \Images\korry Subdirectory.<br/>
@@ -221,41 +231,64 @@ You can!! Strictly speaking it is just one Script, it returns nothing, is not ru
 The [Lua-Script](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) which is provided in the \lua Subfolder is called by FSUIPC every 250ms as soon as it is started (given that you installed/configured it like described in that File). In that File (only) you can add your own Code to do that Control / State checking logic and generate a Value. Then you can write these Values to the "General Use" Range 66C0-66FF (64 bytes) via one of the ipc.writeXX Functions provided by FSUIPC (given that this Range is not used by an P3D Addon/Application!). Where you put them (in that Range) and in which Type (int/float/string/...) is up to you. You have to keep track of these and allocate these Addresses all by yourself! And then you read these Addresses via any Plugin Action like any other Offset. Yeah ... it is more a "mechanic" than a "Feature", but let's ignore that :shushing_face:<br/>
 A small (hopefully helpful) Quick Reference is in the provided Script. Let's view my Script as an Example:<br/>
 ```lua
+local PLDFSL = nil
+
 function Pilotsdeck_Poll ()
-	readLDG()
-	readTCAS()
-	readPACK()
+	local aircraft = ipc.readSTR(0x3500,24)
+	if string.find(aircraft, "A320") or string.find(aircraft, "A321") or string.find(aircraft, "A319") then
+		if ticks < 12 then
+			ticks = ticks + 1
+			return
+		elseif ticks == 12 then
+			PLDFSL = require "PLDFSL"
+			ticks = ticks + 1
+		end
+		
+		FSLReadLDG()
+		FSLReadPACK()
+		FSLUpdateButtonLt()
+	end	
 end
 
 event.timer(250, "Pilotsdeck_Poll")
 
-function readLDG()
-	local FSL = require "FSL2Lua"
-	FSL:setPilot(1)
-	local pos = FSL.OVHD_EXTLT_Land_L_Switch:getPosn()
-	if FSL.OVHD_EXTLT_Land_L_Switch:getPosn() ~= FSL.OVHD_EXTLT_Land_R_Switch:getPosn() then
+function FSLReadLDG()
+	local pos = PLDFSL.OVHD_EXTLT_Land_L_Switch:state()
+	if PLDFSL.OVHD_EXTLT_Land_L_Switch:value() ~= PLDFSL.OVHD_EXTLT_Land_R_Switch:value() then
 		pos = "FAUL"
 	end
 	ipc.writeSTR(0x66C0, pos, 4)
 end
 
-function readTCAS()
-	local FSL = require "FSL2Lua"
-	FSL:setPilot(1)
-	ipc.writeSTR(0x66C5, FSL.PED_ATCXPDR_MODE_Switch:getPosn(), 4)
+function FSLReadTCAS()
+	ipc.writeSTR(0x66C5, PLDFSL.PED_ATCXPDR_MODE_Switch:state(), 4)
 end
 
-function readPACK()
+function FSLReadPACK()
 	local pack1 = ipc.readLvar("VC_OVHD_AC_Pack_1_Button")
 	local pack2 = ipc.readLvar("VC_OVHD_AC_Pack_2_Button")
 	ipc.writeUB(0x66CA, pack1+pack2)
 end
+
+function FSLUpdateButtonLt()
+	if ipc.readLvar("VC_GSLD_CP_EFIS_FD_Brt_Lt") ~= 0 or ipc.readLvar("VC_GSLD_CP_EFIS_FD_Dim_Lt") ~= 0 then
+		ipc.writeUB(0x5500,1)
+	else
+		ipc.writeUB(0x5500,0)
+	end
+	
+	if ipc.readLvar("VC_GSLD_CP_EFIS_LS_Brt_Lt") ~= 0 or ipc.readLvar("VC_GSLD_CP_EFIS_LS_Dim_Lt") ~= 0 then
+		ipc.writeUB(0x5501,1)
+	else
+		ipc.writeUB(0x5501,0)
+	end
+end
 ```
-(Note to FSLabs Users: if you do use FSL2Lua, it would be wise to load it globally in that Script and not in every Function)<br/>
+(Note to FSLabs Users: you can find a complete working Example wit predefined StreadmDeck Profiles and a Lua Library in the Downloads Section)<br/>
 Within the Plugin I then use
-- "66C5:4:s" to read the TCAS State and display & toggle it with a "Display Value with Button" Action (toggling via Lua-Script). Displayed with a nice quick-google-searched LCD Font.
+- "66C5:4:s" to read the TCAS State and display & toggle it with a "Display Value with Button" Action (toggling via Lua-Script). Displayed with a nice quick-google-searched LCD Font. This Example is now more or less obsolete, since you can do the same with new Mappings Feature without writing any Lua-Code.
 - "66C0:4:s" to read the Position/State of both Landing Lights in a "Dynamic Button" and display the appropiate Images for the three States On, Off and Retracted (via Special State). One Button which sends "Up" for both Landing Lights, one to send "Down" for both Landing Lights via FSControls. (If both Landing Lights positions differ, the Action will show the Error Image which is configured for "Fault". Since the current Value does not match the On, Off or Special State, the Plugin "assumes" a Read-Error. So there is some kind of fourth State to display :wink:)
-- "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle the Packs via two Macro Calls.
+- "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle both Packs via two Macro Calls at once.
 <br/><br/>
 ## Plugin Settings
 There are two Files where Settings can be altered (both can be found in the Plugin's directory):<br/>
