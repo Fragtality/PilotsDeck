@@ -16,6 +16,12 @@
             Settings = settings;
         }
 
+        public override void Register(ImageManager imgManager, IPCManager ipcManager)
+        {
+            SwitchSettings.SwitchOnCurrentValue = false;
+            base.Register(imgManager, ipcManager);
+        }
+
         protected override bool InitializationTest()
         {
             return !string.IsNullOrEmpty(Address) && !string.IsNullOrEmpty(SwitchSettings.AddressAction);
@@ -29,9 +35,9 @@
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings, out string[] newValues);
-            ValueManager[ID.SwitchState] = newValues[0];
-            ValueManager[ID.SwitchStateLong] = newValues[1];
+            bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings/*, out string[] newValues*/);
+            //ValueManager[ID.SwitchState] = newValues[0];
+            //ValueManager[ID.SwitchStateLong] = newValues[1];
             tickDown = 0;
 
             return result;

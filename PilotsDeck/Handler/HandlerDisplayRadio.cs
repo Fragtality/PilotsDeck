@@ -45,7 +45,7 @@ namespace PilotsDeck
         {
             base.Update(imgManager);
 
-            ValueManager.DeregisterValue(ID.Standby);
+            ValueManager.UpdateValueAddress(ID.Standby, Settings.AddressRadioStandby);
         }
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)

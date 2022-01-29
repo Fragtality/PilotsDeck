@@ -54,6 +54,7 @@ function updateForm() {
 	setPattern('AddressRadioActiv', 5);
 	setPattern('AddressRadioStandby', 5);
 	setPattern('AddressAction', settingsModel.ActionType);
+	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
 	//On/Off States
 	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);

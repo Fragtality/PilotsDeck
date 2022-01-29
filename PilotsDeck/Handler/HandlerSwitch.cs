@@ -20,47 +20,53 @@ namespace PilotsDeck
             Settings = settings;
         }
 
-        public override void Register(ImageManager imgManager, IPCManager ipcManager)
-        {
-            base.Register(imgManager, ipcManager);
+        //public override void Register(ImageManager imgManager, IPCManager ipcManager)
+        //{
+        //    base.Register(imgManager, ipcManager);
+        //    RegisterAction();
+        //}
 
-            if (HasAction)
-                RegisterAction();
-        }
+        //public virtual void RegisterAction()
+        //{
+        //    if (!BaseSettings.SwitchOnCurrentValue && IsActionReadable(BaseSettings.ActionType) && IPCTools.IsReadAddress(BaseSettings.AddressAction))
+        //    {
+        //        ValueManager.RegisterValue(ID.SwitchState, BaseSettings.AddressAction);
+        //    }
 
-        public virtual void RegisterAction()
-        {
-            if (!BaseSettings.SwitchOnCurrentValue && IsActionReadable(BaseSettings.ActionType) && IPCTools.IsReadAddress(BaseSettings.AddressAction))
-                ValueManager.RegisterValue(ID.SwitchState, BaseSettings.AddressAction);
-            else if (!BaseSettings.SwitchOnCurrentValue)
-                ValueManager.SetVariable(ID.SwitchState, BaseSettings.SwitchOffState);
+        //    if (BaseSettings.HasLongPress && IsActionReadable(BaseSettings.ActionTypeLong) && IPCTools.IsReadAddress(BaseSettings.AddressActionLong))
+        //    {
+        //        ValueManager.RegisterValue(ID.SwitchStateLong, BaseSettings.AddressActionLong);
+        //    }
+        //    //if (BaseSettings.SwitchOnCurrentValue && IsActionReadable(BaseSettings.ActionType) && IPCTools.IsReadAddress(BaseSettings.AddressAction))
+        //    //    ValueManager.RegisterValue(ID.SwitchState, BaseSettings.AddressAction);
+        //    //else if (!BaseSettings.SwitchOnCurrentValue)
+        //    //    ValueManager.SetVariable(ID.SwitchState, BaseSettings.SwitchOffState);
 
-            if (BaseSettings.HasLongPress && !BaseSettings.SwitchOnCurrentValue && IsActionReadable(BaseSettings.ActionTypeLong) && IPCTools.IsReadAddress(BaseSettings.AddressActionLong))
-                ValueManager.RegisterValue(ID.SwitchStateLong, BaseSettings.AddressActionLong);
-            else if (BaseSettings.HasLongPress && !BaseSettings.SwitchOnCurrentValue)
-                ValueManager.SetVariable(ID.SwitchStateLong, BaseSettings.SwitchOffStateLong);
-        }
+        //    //if (BaseSettings.HasLongPress && !BaseSettings.SwitchOnCurrentValue && IsActionReadable(BaseSettings.ActionTypeLong) && IPCTools.IsReadAddress(BaseSettings.AddressActionLong))
+        //    //    ValueManager.RegisterValue(ID.SwitchStateLong, BaseSettings.AddressActionLong);
+        //    //else if (BaseSettings.HasLongPress && !BaseSettings.SwitchOnCurrentValue)
+        //    //    ValueManager.SetVariable(ID.SwitchStateLong, BaseSettings.SwitchOffStateLong);
+        //}
 
-        public override void Deregister(ImageManager imgManager)
-        {
-            base.Deregister(imgManager);
+        //public override void Deregister(ImageManager imgManager)
+        //{
+        //    base.Deregister(imgManager);
 
-            if (HasAction)
-                DeregisterAction();
-        }
+        //    DeregisterAction();
+        //}
 
-        public virtual void DeregisterAction()
-        {
-            if (ValueManager.ContainsValue(ID.SwitchState))
-                ValueManager.DeregisterValue(ID.SwitchState);
-            if (ValueManager.ContainsVariable(ID.SwitchState))
-                ValueManager.RemoveVariable(ID.SwitchState);
+        //public virtual void DeregisterAction()
+        //{
+        //    if (ValueManager.ContainsValue(ID.SwitchState))
+        //        ValueManager.DeregisterValue(ID.SwitchState);
+        //    //if (ValueManager.ContainsVariable(ID.SwitchState))
+        //    //    ValueManager.RemoveVariable(ID.SwitchState);
 
-            if (ValueManager.ContainsValue(ID.SwitchStateLong))
-                ValueManager.DeregisterValue(ID.SwitchStateLong);
-            if (ValueManager.ContainsVariable(ID.SwitchStateLong))
-                ValueManager.RemoveVariable(ID.SwitchStateLong);
-        }
+        //    if (ValueManager.ContainsValue(ID.SwitchStateLong))
+        //        ValueManager.DeregisterValue(ID.SwitchStateLong);
+        //    //if (ValueManager.ContainsVariable(ID.SwitchStateLong))
+        //    //    ValueManager.RemoveVariable(ID.SwitchStateLong);
+        //}
 
         public override bool OnButtonDown(IPCManager ipcManager, long tick)
         {
@@ -80,20 +86,20 @@ namespace PilotsDeck
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings, out string[] newValues);
-            ValueManager[ID.SwitchState] = newValues[0];
-            ValueManager[ID.SwitchStateLong] = newValues[1];
+            bool result = RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings/*, out string[] newValues*/);
+            //ValueManager[ID.SwitchState] = newValues[0];
+            //ValueManager[ID.SwitchStateLong] = newValues[1];
             tickDown = 0;
 
             return result;
         }
 
-        public static bool RunButtonUp(IPCManager ipcManager, bool longPress, string lastState, string lastStateLong, IModelSwitch switchSettings, out string[] newValues)
+        public static bool RunButtonUp(IPCManager ipcManager, bool longPress, string lastState, string lastStateLong, IModelSwitch switchSettings/*, out string[] newValues*/)
         {
             bool result = false;
-            newValues = new string[2];
-            newValues[0] = lastState;
-            newValues[1] = lastStateLong;
+            //newValues = new string[2];
+            //newValues[0] = lastState;
+            //newValues[1] = lastStateLong;
 
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
             {
@@ -101,10 +107,12 @@ namespace PilotsDeck
             }
             else if (!longPress)
             {
-                string newValue = ToggleValue(lastState, switchSettings.SwitchOffState, switchSettings.SwitchOnState);
+                string newValue = "";
+                if (IsActionReadable(switchSettings.ActionType))
+                    newValue = ToggleValue(lastState, switchSettings.SwitchOffState, switchSettings.SwitchOnState);
                 result = IPCTools.RunAction(ipcManager, switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue, switchSettings.UseControlDelay);
-                if (result)
-                    newValues[0] = newValue;
+                //if (result)
+                //    newValues[0] = newValue;
             }
             else if (longPress && switchSettings.HasLongPress)
             {
@@ -114,10 +122,12 @@ namespace PilotsDeck
                 }
                 else if (IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong) && !IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
                 {
-                    string newValue = ToggleValue(lastStateLong, switchSettings.SwitchOffStateLong, switchSettings.SwitchOnStateLong);
+                    string newValue = "";
+                    if (IsActionReadable(switchSettings.ActionTypeLong))
+                        newValue = ToggleValue(lastStateLong, switchSettings.SwitchOffStateLong, switchSettings.SwitchOnStateLong);
                     result = IPCTools.RunAction(ipcManager, switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue, switchSettings.UseControlDelay);
-                    if (result)
-                        newValues[1] = newValue;
+                    //if (result)
+                    //    newValues[1] = newValue;
                 }
             }
 

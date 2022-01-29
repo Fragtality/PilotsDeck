@@ -27,6 +27,7 @@ namespace PilotsDeck
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
+            BaseSettings.SwitchOnCurrentValue = false;
             base.Register(imgManager, ipcManager);
             RenderDefaultImage(imgManager);
 

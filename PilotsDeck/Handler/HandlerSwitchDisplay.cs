@@ -27,6 +27,11 @@ namespace PilotsDeck
                 imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
 
             ValueManager.RegisterValue(ID.ControlState, DisplaySettings.Address);
+            if (BaseSettings.SwitchOnCurrentValue)
+            {
+                BaseSettings.SwitchOffState = DisplaySettings.OffState;
+                BaseSettings.SwitchOnState = DisplaySettings.OnState;
+            }
         }
 
         public override void Deregister(ImageManager imgManager)
@@ -62,13 +67,13 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
-        public override bool OnButtonUp(IPCManager ipcManager, long tick)
-        {
-            if (BaseSettings.SwitchOnCurrentValue)
-                ValueManager.SetVariable(ID.SwitchState, ValueManager[ID.ControlState]);
+        //public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        //{
+        //    if (!BaseSettings.SwitchOnCurrentValue)
+        //        ValueManager.SetVariable(ID.SwitchState, ValueManager[ID.ControlState]);
 
-            return base.OnButtonUp(ipcManager, tick);
-        }
+        //    return base.OnButtonUp(ipcManager, tick);
+        //}
 
         protected override void Redraw(ImageManager imgManager)
         {

@@ -246,22 +246,22 @@ namespace PilotsDeck
             IPCValueOffset offset = null;
             try
             {
-                if (!currentValues.ContainsKey(address))
-                {
+                //if (!currentValues.ContainsKey(address))
+                //{
                     offset = new IPCValueOffset(address, AppSettings.groupStringWrite, OffsetAction.Write);
                     offset.Write(value, AppSettings.groupStringWrite);
                     offset.Dispose();
                     offset = null;
                     result = true;
-                }
-                else
-                {
-                    (currentValues[address] as IPCValueOffset).Write(value, AppSettings.groupStringWrite);
-                }
+                //}
+                //else
+                //{
+                //    (currentValues[address] as IPCValueOffset).Write(value, AppSettings.groupStringWrite);
+                //}
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"IPCManager: Exception while writing Offset <{address}> (size:{offset?.Size}/float:{offset?.IsFloat}/string:{offset?.IsString}/signed:{offset?.IsSigned}) to FSUIPC");
+                Log.Logger.Error($"IPCManager: Exception while writing Offset <{address}> (size:{offset?.Size}/float:{offset?.IsFloat}/string:{offset?.IsString}/signed:{offset?.IsSigned}) to FSUIPC! {ex.Message} - {ex.StackTrace}");
                 if (offset != null)
                 {
                     offset.Dispose();

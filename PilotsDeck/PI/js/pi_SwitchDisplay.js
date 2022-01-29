@@ -40,6 +40,7 @@ function fillSelectBoxes() {
 
 function updateForm() {
 	//ACTION TYPE pattern
+	setPattern('Address', 5);
 	setPattern('AddressAction', settingsModel.ActionType);
 	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 

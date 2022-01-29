@@ -46,27 +46,50 @@
         {
             SetInitialization();
             ValueManager.RegisterManager(ipcManager);
-            
+
             imgManager.AddImage(DefaultImage, DeckType);
             imgManager.AddImage(ErrorImage, DeckType);
+
+            if (HasAction)
+                RegisterAction();
+        }
+
+        public virtual void RegisterAction()
+        {
+            if (IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
+                ValueManager.RegisterValue(ID.SwitchState, SwitchSettings.AddressAction);
+
+            if (SwitchSettings.HasLongPress && IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
+                ValueManager.RegisterValue(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
         }
 
         public virtual void Deregister(ImageManager imgManager)
         {
             imgManager.RemoveImage(DefaultImage, DeckType);
             imgManager.RemoveImage(ErrorImage, DeckType);
+
+            if (HasAction)
+                DeregisterAction();
         }
 
+        public virtual void DeregisterAction()
+        {
+            if (ValueManager.ContainsValue(ID.SwitchState))
+                ValueManager.DeregisterValue(ID.SwitchState);
+
+            if (ValueManager.ContainsValue(ID.SwitchStateLong))
+                ValueManager.DeregisterValue(ID.SwitchStateLong);
+        }
 
         public virtual void Update(ImageManager imgManager)
         {
             SetInitialization();
 
             if (HasAction)
+            {
                 UpdateActionSettings();
-
-            if (HasAction)
                 UpdateActionValues();
+            }
 
             ForceUpdate = true;
         }
@@ -78,41 +101,47 @@
 
         public virtual void UpdateActionValues()
         {
-            if (!SwitchSettings.SwitchOnCurrentValue && IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
-            {
-                if (!ValueManager.ContainsValue(ID.SwitchState))
-                    ValueManager.RegisterValue(ID.SwitchState, SwitchSettings.AddressAction);
-                else
-                    ValueManager.UpdateValueAddress(ID.SwitchState, SwitchSettings.AddressAction);
+            if (IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
+                ValueManager.UpdateValueAddress(ID.SwitchState, SwitchSettings.AddressAction);
 
-                ValueManager.RemoveVariable(ID.SwitchState);
-            }
-            else
-            {
-                if (ValueManager.ContainsValue(ID.SwitchState))
-                    ValueManager.DeregisterValue(ID.SwitchState);
+            if (SwitchSettings.HasLongPress && IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
+                ValueManager.UpdateValueAddress(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
 
-                if (!ValueManager.ContainsVariable(ID.ControlState) && InitializationTest()) // SWITCH ONLY
-                    ValueManager.SetVariable(ID.SwitchState, SwitchSettings.SwitchOffState);
-            }
+            //if (SwitchSettings.SwitchOnCurrentValue && IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
+            //{
+            //    if (!ValueManager.ContainsValue(ID.SwitchState))
+            //        ValueManager.RegisterValue(ID.SwitchState, SwitchSettings.AddressAction);
+            //    else
+            //        ValueManager.UpdateValueAddress(ID.SwitchState, SwitchSettings.AddressAction);
 
-            if (IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
-            {
-                if (!ValueManager.ContainsValue(ID.SwitchStateLong) && SwitchSettings.HasLongPress)
-                    ValueManager.RegisterValue(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
-                else if (ValueManager.ContainsValue(ID.SwitchStateLong))
-                    ValueManager.DeregisterValue(ID.SwitchStateLong);
+            //    ValueManager.RemoveVariable(ID.SwitchState);
+            //}
+            //else
+            //{
+            //    if (ValueManager.ContainsValue(ID.SwitchState))
+            //        ValueManager.DeregisterValue(ID.SwitchState);
 
-                ValueManager.RemoveVariable(ID.SwitchStateLong);
-            }
-            else
-            {
-                if (ValueManager.ContainsValue(ID.SwitchStateLong))
-                    ValueManager.DeregisterValue(ID.SwitchStateLong);
+            //    if (!ValueManager.ContainsVariable(ID.ControlState) && InitializationTest()) // SWITCH ONLY
+            //        ValueManager.SetVariable(ID.SwitchState, SwitchSettings.SwitchOffState);
+            //}
 
-                if (!ValueManager.ContainsVariable(ID.ControlState) && SwitchSettings.HasLongPress)
-                    ValueManager.SetVariable(ID.SwitchStateLong, SwitchSettings.SwitchOffStateLong);
-            }
+            //if (IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
+            //{
+            //    if (!ValueManager.ContainsValue(ID.SwitchStateLong) && SwitchSettings.HasLongPress)
+            //        ValueManager.RegisterValue(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
+            //    else if (ValueManager.ContainsValue(ID.SwitchStateLong))
+            //        ValueManager.DeregisterValue(ID.SwitchStateLong);
+
+            //    ValueManager.RemoveVariable(ID.SwitchStateLong);
+            //}
+            //else
+            //{
+            //    if (ValueManager.ContainsValue(ID.SwitchStateLong))
+            //        ValueManager.DeregisterValue(ID.SwitchStateLong);
+
+            //    if (!ValueManager.ContainsVariable(ID.ControlState) && SwitchSettings.HasLongPress)
+            //        ValueManager.SetVariable(ID.SwitchStateLong, SwitchSettings.SwitchOffStateLong);
+            //}
         }
 
         public virtual void SetError()
