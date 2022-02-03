@@ -76,6 +76,8 @@ namespace PilotsDeck
                 default:
                     if (image.Contains(AppSettings.hqImageSuffix))
                         imageReal = image.Replace(AppSettings.hqImageSuffix, "");
+                    if (!File.Exists(imageReal))
+                        imageReal = AppSettings.waitImage;
                     break;
             }
 

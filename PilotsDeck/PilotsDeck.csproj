@@ -364,10 +364,18 @@
     <None Include="Release.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\A-GearLocked%402x.png" />
-    <Content Include="Images\A-GearLocked.png" />
-    <Content Include="Images\A-GearTransit%402x.png" />
-    <Content Include="Images\A-GearTransit.png" />
+    <Content Include="Images\A-GearLocked%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\A-GearLocked.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\A-GearTransit%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\A-GearTransit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Arrow%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -386,22 +394,54 @@
     <Content Include="Images\Avail.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\BKorryAvailWhiteBot%402x.png" />
-    <Content Include="Images\BKorryAvailWhiteBot.png" />
-    <Content Include="Images\BKorryFaultOrangeBot%402x.png" />
-    <Content Include="Images\BKorryFaultOrangeBot.png" />
-    <Content Include="Images\BKorryOffOrangeBot%402x.png" />
-    <Content Include="Images\BKorryOffOrangeBot.png" />
-    <Content Include="Images\BKorryOnWhiteTop%402x.png" />
-    <Content Include="Images\BKorryOnWhiteTop.png" />
-    <Content Include="Images\BSwitchAutoWhite%402x.png" />
-    <Content Include="Images\BSwitchAutoWhite.png" />
-    <Content Include="Images\BSwitchOffOrange%402x.png" />
-    <Content Include="Images\BSwitchOffOrange.png" />
-    <Content Include="Images\BSwitchOnBatWhite%402x.png" />
-    <Content Include="Images\BSwitchOnBatWhite.png" />
-    <Content Include="Images\BSwitchOnWhite%402x.png" />
-    <Content Include="Images\BSwitchOnWhite.png" />
+    <Content Include="Images\BKorryAvailWhiteBot%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryAvailWhiteBot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryFaultOrangeBot%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryFaultOrangeBot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryOffOrangeBot%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryOffOrangeBot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryOnWhiteTop%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BKorryOnWhiteTop.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchAutoWhite%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchAutoWhite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchOffOrange%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchOffOrange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchOnBatWhite%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchOnBatWhite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchOnWhite%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BSwitchOnWhite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\category\ActionDisplay%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -486,8 +526,12 @@
     <Content Include="Images\Fault.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Frame%402x.png" />
-    <Content Include="Images\Frame.png" />
+    <Content Include="Images\Frame%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Frame.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Gear%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -512,8 +556,12 @@
     <Content Include="Images\INOP.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\KorryOffAmberBottom%402x.png" />
-    <Content Include="Images\KorryOffAmberBottom.png" />
+    <Content Include="Images\KorryOffAmberBottom%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\KorryOffAmberBottom.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\KorryOffWhiteBottom%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -532,8 +580,12 @@
     <Content Include="Images\KorryOnBlueTop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\KorryOnGreenBot%402x.png" />
-    <Content Include="Images\KorryOnGreenBot.png" />
+    <Content Include="Images\KorryOnGreenBot%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\KorryOnGreenBot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\KorryOnOpen%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -564,24 +616,36 @@
     <Content Include="Images\korry\A-DECEL.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\korry\A-DOWN%402x.png" />
-    <Content Include="Images\korry\A-DOWN.png" />
+    <Content Include="Images\korry\A-DOWN%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-DOWN.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\korry\A-FAULT%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\korry\A-FAULT.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\korry\A-FWD%402x.png" />
-    <Content Include="Images\korry\A-FWD.png" />
+    <Content Include="Images\korry\A-FWD%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-FWD.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\korry\A-HOT%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\korry\A-HOT.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\korry\A-MAN%402x.png" />
-    <Content Include="Images\korry\A-MAN.png" />
+    <Content Include="Images\korry\A-MAN%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-MAN.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\korry\A-OFF-White%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -606,39 +670,87 @@
     <Content Include="Images\korry\A-OPEN.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\korry\A-UNLK%402x.png" />
-    <Content Include="Images\korry\A-UNLK.png" />
+    <Content Include="Images\korry\A-UNLK%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\A-UNLK.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\korry\A-WARN.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\korry\B-AUTO-White%402x.png" />
-    <Content Include="Images\korry\B-AUTO-White.png" />
-    <Content Include="Images\korry\B-AVAIL-White%402x.png" />
-    <Content Include="Images\korry\B-AVAIL-White.png" />
-    <Content Include="Images\korry\B-FAULT-Orange%402x.png" />
-    <Content Include="Images\korry\B-FAULT-Orange.png" />
-    <Content Include="Images\korry\B-INOP-Orange%402x.png" />
-    <Content Include="Images\korry\B-INOP-Orange.png" />
-    <Content Include="Images\korry\B-LIGHT-White%402x.png" />
-    <Content Include="Images\korry\B-LIGHT-White.png" />
-    <Content Include="Images\korry\B-OFF-Orange%402x.png" />
-    <Content Include="Images\korry\B-OFF-Orange.png" />
-    <Content Include="Images\korry\B-ON-White%402x.png" />
-    <Content Include="Images\korry\B-ON-White.png" />
-    <Content Include="Images\korry\B-ONBAT-White%402x.png" />
-    <Content Include="Images\korry\B-ONBAT-White.png" />
-    <Content Include="Images\korry\B-PRESS-Orange%402x.png" />
-    <Content Include="Images\korry\B-PRESS-Orange.png" />
-    <Content Include="Images\korry\B-VALVE-Orange%402x.png" />
-    <Content Include="Images\korry\B-VALVE-Orange.png" />
+    <Content Include="Images\korry\B-AUTO-White%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-AUTO-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-AVAIL-White%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-AVAIL-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-FAULT-Orange%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-FAULT-Orange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-INOP-Orange%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-INOP-Orange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-LIGHT-White%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-LIGHT-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-OFF-Orange%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-OFF-Orange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-ON-White%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-ON-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-ONBAT-White%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-ONBAT-White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-PRESS-Orange%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-PRESS-Orange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-VALVE-Orange%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\korry\B-VALVE-Orange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\korry\INOP%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\korry\INOP.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\LightDot%402x.png" />
-    <Content Include="Images\LightDot.png" />
+    <Content Include="Images\LightDot%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LightDot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\LightOff%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -687,8 +799,12 @@
     <Content Include="Images\SwitchError.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\SwitchFrameWhite%402x.png" />
-    <Content Include="Images\SwitchFrameWhite.png" />
+    <Content Include="Images\SwitchFrameWhite%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SwitchFrameWhite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\SwitchGreenOff%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -707,10 +823,18 @@
     <Content Include="Images\SwitchINOP.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\SwitchWarnBar%402x.png" />
-    <Content Include="Images\SwitchWarnBar.png" />
-    <Content Include="Images\SwitchYellowOn%402x.png" />
-    <Content Include="Images\SwitchYellowOn.png" />
+    <Content Include="Images\SwitchWarnBar%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SwitchWarnBar.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SwitchYellowOn%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SwitchYellowOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\TestCenter%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -729,8 +853,12 @@
     <Content Include="Images\ValueFault.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\View%402x.png" />
-    <Content Include="Images\View.png" />
+    <Content Include="Images\View%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\View.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Wait%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
