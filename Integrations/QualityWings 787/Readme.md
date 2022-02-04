@@ -14,6 +14,7 @@ Mix and match as you like :relaxed:<br/>
 
 # Installation
 - Update to at least PilotsDeck 0.6.3
+- Make sure the QualityWings Fonts are available System-Wide. The Profiles / the Actions are configured to use these Fonts to add more "Style" :wink:
 - Just double-click on the Profiles to add them to your StreamDeck Software
 - Place the Files from the FSUIPC6 Folder in your FSUIPC6 Addon-Folder (the Folder where your FSUIPC6.ini is located)
 - Either start the Scripts (Auto + Sync) manually ...
