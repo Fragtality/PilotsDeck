@@ -4,7 +4,7 @@ My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementa
 - **PilotsDeck_QW787-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS, MCP, CDU and MIP/Pedestal
 - **PilotsDeck_QW787-SD:** SD (15 Buttons) Profile with GSX Integration (see QualityWings2GSX), MCP, Radio and Transponder
 
-Since not everyone has a XL Deck, I made a third Profile ("PilotsDeck_QW787-Lib") which contains the Contents of the XL Profile so that they are visble on the SD.<br/>
+Since not everyone has a XL Deck, I made the third Profile **PilotsDeck_QW787-Lib** which contains the Contents of the XL Profile so that they are visble on the SD.<br/>
 Mix and match as you like :relaxed:<br/>
 
 ![Index-XL](../../img/QW_IndexXL.jpg)<br/>
