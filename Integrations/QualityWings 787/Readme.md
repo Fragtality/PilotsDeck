@@ -44,6 +44,7 @@ The File in this Repository is configured for "PilotsDeck only" Usage - so *qwIn
 ## QW787_SYNC
 This Script is essential for some Buttons / Displays from the Profiles to show their State / Value. On top of that it can do some Automations. When used with QualityWings2GSX/GSX_AUTO it is an essential Part of the GSX Integration.
 The File in this Repository is configured for "PilotsDeck only" Usage - only *syncPilotsDeck* is set.
+The Script uses the Offset-Range 0x5400 to 0x5445 (PMDG CDU0 / Project Magenta). If you use these already, you have to edit the Script and the Actions to other Offsets.
 - *syncPilotsDeck*: The essential Setting for these StreamDeck Profiles to display something meaningfull on the MCP (Displays + Buttons) and Baro Actions :wink:
 - *syncCabin*: Turn the Cabin Lights on/off with the Overhead Cab/Util Button
 - *syncBrake*: If you have have a Joystick/Input Device like the TCA, the Parking Brake will be synced to that Buttons State. Configure both brake-Variables accordingly.
