@@ -9,8 +9,9 @@ local syncBrake = false				--Sync the Parking Brake to the State of the Joystick
 local brakeJoystick = 1				--The Joystick Number as known to FSUIPC
 local brakeButton = 19				--The Button Number as known to FSUIPC
 local syncFD = false				--Sync the FO's FD to the Captains
-local syncChocksAndPower = false	--Automatically set/remove Chocks and External Power according to the Jetway Operating State from GSX (When Jetway connected -> Chocks set / Ext Power available). Only Works when syncGSX is also true.
+
 local syncGSX = false				--Sync to Ground-Service Animations/Handling - open/close doors according to the Services currently performed by GSX. The GSX_AUTO Script QualityWings2GSX need to be running for that!
+local syncChocksAndPower = false	--Automatically set/remove Chocks and External Power according to the Jetway Operating State from GSX (When Jetway connected -> Chocks set / Ext Power available). Only Works when syncGSX is also true.
 local operateJetways = false		--Operate the Jetway(s) automatically when arriving/departing (syncGSX has to be enabled)
 
 -- 04E0-0537	88		Project Magenta
