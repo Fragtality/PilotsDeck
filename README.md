@@ -1,9 +1,7 @@
 # Pilot's Deck
 Directly control the FlightSim from your StreamDeck&#x00AE; via FSUIPC!
-![Example01XL](img/Example01XL.jpg)
-![Example-Overhead](img/QW_ExampleOverhead.jpg)<br/>
-![Example-MCP](img/QW_ExampleMCP.jpg)<br/><br/>
-![Index-SD](img/QW_IndexSD.jpg)<br/>
+![Example01XL](img/Example01XL.jpg)<br/>
+More Screenshots can be found under [Examples](README.md#Examples).
 
 <br/><br/>
 ## Introduction
@@ -330,7 +328,14 @@ Need your Lights, usual Korrys and Buttons at Hand? Make yourself a Folder and p
 "Dynamic Buttons" for the Lights and Korrys (using Controls, Macros, Scripts), a "Simple Button" for the TO Conf (Macro), and two "Display Value with Button" with Lua-Scripts. The Values for TCAS/PWS are generated in the PilotsDeck.lua and are then read-out via Offset.<br/><br/>
 Display the current GSX De/Boarding Status, Radio-Control, FCU/AP and Transponder all in one small Deck:
 ![Example03SD](img/Example03SD.jpg)<br>
-The GSX Status are just "Display Values" for the corresponding GSX Lvars. Some "Simple Buttons" to change the Frequency (with Long Press for increase/decrease fast). 4 Subfolders full Buttons for GSX Menu, FCU and AP interaction and the Transponder complete with Keypad. The Radio is obvious ;)
+The GSX Status are just "Display Values" for the corresponding GSX Lvars. Some "Simple Buttons" to change the Frequency (with Long Press for increase/decrease fast). 4 Subfolders full Buttons for GSX Menu, FCU and AP interaction and the Transponder complete with Keypad. The Radio is obvious :wink:<br/><br/>
+The essential Overhead Buttons for 787.
+![Example-Overhead](img/QW_ExampleOverhead.jpg)<br/><br/>
+
+The Master Control Panel on your StreamDeck:
+![Example-MCP](img/QW_ExampleMCP.jpg)<br/>
+
+
 <br/><br/>
 ## Troubleshooting
 If you encounter the Issue that although the Plugin and its Actions are displayed in the StreamDeck Software but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic.
