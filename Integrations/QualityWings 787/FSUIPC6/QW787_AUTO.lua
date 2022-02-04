@@ -2,7 +2,7 @@
 
 -----------------------------------------
 -- $$ CONFIG
-local qwSyncP2Axpdr = false		--Sync Off/Active Transponder state to P2A, requires F20 as Hotkey to be set (XPDR Mode Hot Key)
+local qwSyncP2Axpdr = false		--Sync Transponder state to P2A, requires F20 as Hotkey to be set
 local qwInitAItoggle = false	--Toggle AI traffic off/on in Init Function, requires ctrl+x as Hotkey to be set (Traffic Density Toggle)
 local qwInitBaroHPA = false		--Set Baro to hPa during in Init Function
 local qwInitGSX = false			--Do GSX Intialization (Reposition, Connect/Power, Door L1) - GSX_AUTO and QW787_SYNC Scripts need to be running
