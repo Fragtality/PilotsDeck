@@ -52,4 +52,5 @@ The File in this Repository is configured for "PilotsDeck only" Usage - only *sy
 - *syncChocksAndPower*: Set or Remove External Power available and Chocks when Jetway/GPU is connected or removed. *syncGSX* has to be true for that. Can be temporarily overidden when Tow Power is ON.
 - *operateJetways*: Automatically remove or call Jetway/GPU.
 
-# Customization
+# Troubleshooting
+For Reasons unknown, some Combination of QW + GSX + FSUIPC Auto Scripts + RAAS Pro can trigger the 787 being loaded with all Indication Lights on (the Switch is permanently in On/Test Position). The Plane is working normally, so let the Init-Script take care of that or move the Switch manually.
