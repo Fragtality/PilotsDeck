@@ -34,6 +34,10 @@ If you don't have a FSUIPC Profile for the QW787, start them as "Global" Scripts
 
 # Configuration
 Both Scripts have several Options which can be either set to "true" or "false". They are located directly at the Beginning.
+## Profiles
+When you use the Scripts as provided and made the QW Fonts available System-wide you don't need to change anything here - they should work right away.<br/>
+Only the View Buttons might need Attention, if you want to keep/use them: I modified the Views/Cameras in my Aircraft.cfg, so the Actions don't switch to the labeled View with the Default Aircraft.cfg. You have to change the Control-Sequences accordingly. I've added my Aircraft.cfg here as a Reference, if interested.
+
 ## QW787_AUTO
 This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:QW787_AUTO:*NUM*" in PilotsDeck. Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work.
 The File in this Repository is configured for "PilotsDeck only" Usage - so *qwInitGSX* and all other Options are disabled.
