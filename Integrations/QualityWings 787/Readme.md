@@ -58,5 +58,29 @@ The Script uses the Offset-Range 0x5400 to 0x5445 (PMDG CDU0 / Project Magenta).
 - *syncChocksAndPower*: Set or Remove External Power available and Chocks when Jetway/GPU is connected or removed. *syncGSX* has to be true for that. Can be temporarily overidden when Tow Power is ON.
 - *operateJetways*: Automatically remove or call Jetway/GPU.
 
+# Usage
+I hope/think most Buttons are self-explanatory, but the most confusing can be the MCP/AP. Always keep in Mind these Profiles where designed by a (virtual) "Bus-Driver" who only knews two Modes 😆<br/>
+
+**MCP**
+
+- All Plus/Minus Buttons belong to the respective Display - So the Plus/Minus above the Speed Display will increase/decrease the Speed, and so on.<br/>
+- All Plus/Minus Buttons have an "increase/decrease Fast" configured as Long Press
+- Speed-Window @ SD: Short for IAS<>MACH Display toggle, Long to toggle between VNAV and FLCH
+- Speed-Window @ XL: Short for IAS<>MACH Display toggle, no Long Press
+- Heading-Window @ SD: Short to toggle between HDG SEL and HDG HOLD, Long to toggle between HDG SEL/HOLD and LNAV
+- Heading-Window @ XL: Short for HDG SEL, Long for HDG<>TRK Toggle
+- VS-Window @ SD & XL: Short to activate VS Mode, Long to toggle between VS<>FPA Display
+- Alt-Window @ SD: Short for Push ("Alt Intervention"? when in VNAV or else FLCH, Long to toggle between Auto/1000. The Display will insert a Space-Sign in the Altitude to indicate Auto/100 Mode.
+- Alt-Window @ XL: Short for Push (always), Long to toggle between Auto/1000.
+- A/T ARM L & R: Have a white Frame when armed
+- "Unlabeled Button": This is the AP Disengage Bar - disenaged will show yellow/black Markings 😉
+
+**Overhead**
+
+- Left/Center/Right Hydraulic Pumps: Short for OFF to AUTO, then Short will toggle between AUTO/ON (On is not displayed, will still show "Auto"). Long for AUTO to OFF (must be in Auto for this)
+- Auto-Brake: Only allows Toggle between RTO and OFF while on Ground. In the Air it goes Off->1->2->3->4->Max->Disarm/Off.
+- XPDR: Short to toggle between XPDR<>TARA, Long to toggle between XPDR<>STBY
+ 
+
 # Troubleshooting
 For Reasons unknown, some Combination of QW + GSX + FSUIPC Auto Scripts + RAAS Pro can trigger the 787 being loaded with all Indication Lights on (the Switch is permanently in On/Test Position). The Plane is working normally, so let the Init-Script take care of that or move the Switch manually.
