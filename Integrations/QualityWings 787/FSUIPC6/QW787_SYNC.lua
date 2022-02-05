@@ -76,17 +76,37 @@ function QWsyncButtons()
 	end
 end
 
+local QW_DOOR_L1_OP = false
+local QW_DOOR_L2_OP = false
+local QW_DOOR_L4_OP = false
 local QW_DOOR_R2_OP = false
 local QW_DOOR_R4_OP = false
-local QW_DOOR_L4_OP = false
+local QW_CARGO_FWD_OP = false
 local QW_CARGO_AFT_OP = false
 
-function QWwriteDoor(lvar)
-	if ipc.readLvar(lvar) == 1 then
+function QWtoggleDoor(lvar, close)
+	if close ~= nil or ipc.readLvar(lvar) == 1 then
 		ipc.writeLvar(lvar, 0)
 	else
 		ipc.writeLvar(lvar, 1)
 	end
+end
+
+function QWoperateDoor(triggerVar, doorVar, opstate, controlParam)
+	local trigger = ipc.readLvar(triggerVar)
+	if trigger == 1 and not opstate then
+		ipc.log("QW787_SYNC: Trigger for Door " .. doorVar .. " detected - operating Door.")
+		opstate = true
+		if controlParam ~= nil then
+			ipc.control(66389, controlParam)
+		end
+		QWtoggleDoor(doorVar)
+	elseif trigger == 0 and opstate then
+		ipc.log("QW787_SYNC: Resetting operating State for " .. doorVar)
+		opstate = false
+	end
+
+	return opstate
 end
 
 local QW_CARGO_TICKS = 0
@@ -102,63 +122,45 @@ function QWsyncGSX()
 		if ipc.readLvar("GSX_AUTO_CONNECTED") == 1 then
 			ipc.writeLvar("EXT_POWER_AVAIL", 1)
 			ipc.writeLvar("QW_WheelChocks",1)
+			ipc.log("QW787_SYNC: ExtPwr/Chocks are set.")
 		else
 			ipc.writeLvar("EXT_POWER_AVAIL", 0)
 			ipc.writeLvar("QW_WheelChocks",0)
+			ipc.log("QW787_SYNC: ExtPwr/Chocks are removed.")
 		end
 	end
 
 	local GSX_BOARD_STATE = ipc.readLvar("FSDT_GSX_BOARDING_STATE")
 	local GSX_DEBOARD_STATE = ipc.readLvar("FSDT_GSX_DEBOARDING_STATE")
 
-	-- PAX/CARGO	Open for (De)Boarding
+	-- PAX/CARGO	Open for (De)Boarding when requested by GSX
 	if GSX_BOARD_STATE >= 4 or GSX_DEBOARD_STATE >= 4 then
-		if ipc.readLvar("FSDT_GSX_AIRCRAFT_EXIT_1_TOGGLE") == 1 and ipc.readLvar("DoorL1") == 0 then
-			ipc.control(66389, 1) -- L1
-			QWwriteDoor("DoorL1")
-		end
+		QW_DOOR_L1_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_EXIT_1_TOGGLE", "DoorL1", QW_DOOR_L1_OP, 1)
 
-		if ipc.readLvar("FSDT_GSX_AIRCRAFT_EXIT_2_TOGGLE") == 1 and ipc.readLvar("DoorL2") == 0 then
-			ipc.control(66389, 2) -- L2
-			QWwriteDoor("DoorL2")
-		end
+		QW_DOOR_L2_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_EXIT_2_TOGGLE", "DoorL2", QW_DOOR_L2_OP, 2)
 
-		local GSX_TOGGLE_L4 = ipc.readLvar("FSDT_GSX_AIRCRAFT_EXIT_4_TOGGLE")
-		if GSX_TOGGLE_L4 == 1 and not QW_DOOR_L4_OP then
-			QW_DOOR_L4_OP = true
-			QWwriteDoor("DoorL4")
-		elseif GSX_TOGGLE_L4 == 0 and QW_DOOR_L4_OP then
-			QW_DOOR_L4_OP = false
-		end
+		QW_DOOR_L4_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_EXIT_4_TOGGLE", "DoorL4", QW_DOOR_L4_OP)
 
-		if ipc.readLvar("FSDT_GSX_AIRCRAFT_CARGO_1_TOGGLE") == 1 and ipc.readLvar("QW_CargoDoor_Fwd") == 0 then
-			ipc.control(66389, 4) -- CARGO FWD
-			QWwriteDoor("QW_CargoDoor_Fwd")
-		end
+		QW_CARGO_FWD_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_CARGO_1_TOGGLE", "QW_CargoDoor_Fwd", QW_CARGO_FWD_OP, 4)
 
-		local GSX_TOGGLE_AFT = ipc.readLvar("FSDT_GSX_AIRCRAFT_CARGO_2_TOGGLE")
-		if GSX_TOGGLE_AFT == 1 and not QW_CARGO_AFT_OP then
-			QWwriteDoor("QW_CargoDoor_Aft")
-			QW_CARGO_AFT_OP = true
-		elseif GSX_TOGGLE_AFT == 0 and QW_CARGO_AFT_OP then
-			QW_CARGO_AFT_OP = false
-		end
+		QW_CARGO_AFT_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_CARGO_2_TOGGLE", "QW_CargoDoor_Aft", QW_CARGO_AFT_OP)
 	end
 
 	-- PAX		Close after Boarding
 	if GSX_BOARD_STATE == 6 and GSX_DEBOARD_STATE ~= 5 then
+		ipc.log("QW787_SYNC: Close Pax Doors afer Boarding.")
 		if ipc.readLvar("DoorL1") == 1 then
 			ipc.control(66389, 1) -- L1
-			QWwriteDoor("DoorL1")
+			QWtoggleDoor("DoorL1", true)
 		end
 
 		if ipc.readLvar("DoorL2") == 1  then
 			ipc.control(66389, 2) -- L2
-			QWwriteDoor("DoorL2")
+			QWtoggleDoor("DoorL2", true)
 		end
 
 		if ipc.readLvar("DoorL4") == 1 then
-			QWwriteDoor("DoorL4")
+			QWtoggleDoor("DoorL4", true)
 		end
 	end
 
@@ -169,13 +171,14 @@ function QWsyncGSX()
 		end
 	end
 	if QW_CARGO_TICKS == 55 then
+		ipc.log("QW787_SYNC: Close Cargo Doors afer (Un)Loading.")
 		if ipc.readLvar("QW_CargoDoor_Fwd") == 1 then
 			ipc.control(66389, 4) -- CARGO FWD
-			QWwriteDoor("QW_CargoDoor_Fwd")
+			QWtoggleDoor("QW_CargoDoor_Fwd")
 		end
 
 		if ipc.readLvar("QW_CargoDoor_Aft") == 1 then
-			QWwriteDoor("QW_CargoDoor_Aft")
+			QWtoggleDoor("QW_CargoDoor_Aft")
 		end
 		QW_CARGO_TICKS = 0
 	elseif QW_CARGO_TICKS >= 1 then
@@ -199,23 +202,11 @@ function QWsyncGSX()
 		ipc.writeLvar("QW_CargoLight_aft", 0)
 	end
 
-	-- SERVICE		Open/Close for Catering
+	-- SERVICE		Open/Close for Catering as requested by GSX
 	if ipc.readLvar("FSDT_GSX_CATERING_STATE") >= 4 then
-		local GSX_TOGGLE_R2 = ipc.readLvar("FSDT_GSX_AIRCRAFT_SERVICE_1_TOGGLE")
-		if GSX_TOGGLE_R2 == 1 and not QW_DOOR_R2_OP then
-			QWwriteDoor("DoorR2")
-			QW_DOOR_R2_OP = true
-		elseif GSX_TOGGLE_R2 == 0 and QW_DOOR_R2_OP then
-			QW_DOOR_R2_OP = false
-		end
+		QW_DOOR_R2_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_SERVICE_1_TOGGLE", "DoorR2", QW_DOOR_R2_OP)
 
-		local GSX_TOGGLE_R4 = ipc.readLvar("FSDT_GSX_AIRCRAFT_SERVICE_2_TOGGLE")
-		if GSX_TOGGLE_R4 == 1 and not QW_DOOR_R4_OP then
-			QWwriteDoor("DoorR4")
-			QW_DOOR_R4_OP = true
-		elseif GSX_TOGGLE_R4 == 0 and QW_DOOR_R4_OP then
-			QW_DOOR_R4_OP = false
-		end
+		QW_DOOR_R4_OP = QWoperateDoor("FSDT_GSX_AIRCRAFT_SERVICE_2_TOGGLE", "DoorR4", QW_DOOR_R4_OP)
 	end
 
 	-- JETWAYS
@@ -228,7 +219,7 @@ function QWsyncGSX()
 	-- when in Push State, Beacon ON, Park Brake SET and Ext Pwr OFF -> toggle Jetways
 	if cycle_state == 3 and not QW_GSX_JETWAYS_REQUESTED and beacon ~= 0 and connected and ipc.readUW(0x0BC8) == 32767 and ipc.readLvar("QW_OH_FWDEXTPWR_LEFT_Button") == 0 then
 		QW_GSX_JETWAYS_REQUESTED = true
-		ipc.log("QW787_SYNC: Requesting Disconnect")
+		ipc.log("QW787_SYNC: Departing - requesting Disconnect")
 		ipc.writeLvar("GSX_AUTO_CONNECT_REQUESTED", 1)
 	elseif cycle_state ~=3 and cycle_state ~=7 and QW_GSX_JETWAYS_REQUESTED then
 		QW_GSX_JETWAYS_REQUESTED = false
@@ -237,7 +228,7 @@ function QWsyncGSX()
 	-- when in Deboard State, Engines Stopped and Beacon OFF -> toggle Jetways (if not already requested)
 	if cycle_state == 7 and not QW_GSX_JETWAYS_REQUESTED and not connected and ipc.readLvar("FSDT_VAR_EnginesStopped") == 1 and beacon == 0 then
 			QW_GSX_JETWAYS_REQUESTED = true
-			ipc.log("QW787_SYNC: Requesting GPU/Connect")
+			ipc.log("QW787_SYNC: Arriving - requesting Connect and Deboard")
 			ipc.writeLvar("GSX_AUTO_CONNECT_REQUESTED", 1)
 			ipc.writeLvar("GSX_AUTO_DEBOARD_REQUESTED", 1)
 	elseif cycle_state == 7 and QW_GSX_JETWAYS_REQUESTED and connected then
