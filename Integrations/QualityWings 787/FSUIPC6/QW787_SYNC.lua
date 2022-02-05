@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global
 
-ipc.sleep(60000) --Give the QW787 init process some time (seems to trigger Ind Lights with RAAS and Auto-Scripts?!)
+ipc.sleep(30000) --Give the QW787 init process some time (seems to trigger Ind Lights with RAAS and Auto-Scripts?!)
 
 local syncPilotsDeck = true			--Generates/Writes the Offset Values used in the StreamDeck Profiles to display Baro, MCP Displays and Lights
 
@@ -111,6 +111,7 @@ end
 
 local QW_CARGO_TICKS = 0
 local QW_GSX_JETWAYS_REQUESTED = false
+local GSX_AUTO_LAST = 0
 function QWsyncGSX()
 	if not syncGSX or ipc.readSW(0x0366) == 0 or ipc.readLvar("GSX_AUTO_SERVICE_STATE") == nil then
 		return
@@ -119,13 +120,16 @@ function QWsyncGSX()
 
 	-- EXT PWR && CHOCKS (Sync disabled with Tow Power ON)
 	if syncChocksAndPower and ipc.readLvar("QW_OH_TOWER_PWR_Button") == 0 then
-		if ipc.readLvar("GSX_AUTO_CONNECTED") == 1 then
+		local GSX_AUTO_CONNECTED = ipc.readLvar("GSX_AUTO_CONNECTED")
+		if GSX_AUTO_LAST ~= GSX_AUTO_CONNECTED and GSX_AUTO_CONNECTED == 1 then
 			ipc.writeLvar("EXT_POWER_AVAIL", 1)
 			ipc.writeLvar("QW_WheelChocks",1)
+			GSX_AUTO_LAST = GSX_AUTO_CONNECTED
 			ipc.log("QW787_SYNC: ExtPwr/Chocks are set.")
-		else
+		elseif GSX_AUTO_LAST ~= GSX_AUTO_CONNECTED and GSX_AUTO_CONNECTED == 0 then
 			ipc.writeLvar("EXT_POWER_AVAIL", 0)
 			ipc.writeLvar("QW_WheelChocks",0)
+			GSX_AUTO_LAST = GSX_AUTO_CONNECTED
 			ipc.log("QW787_SYNC: ExtPwr/Chocks are removed.")
 		end
 	end
@@ -148,18 +152,20 @@ function QWsyncGSX()
 
 	-- PAX		Close after Boarding
 	if GSX_BOARD_STATE == 6 and GSX_DEBOARD_STATE ~= 5 then
-		ipc.log("QW787_SYNC: Close Pax Doors afer Boarding.")
 		if ipc.readLvar("DoorL1") == 1 then
+			ipc.log("QW787_SYNC: Close L1 Door afer Boarding.")
 			ipc.control(66389, 1) -- L1
 			QWtoggleDoor("DoorL1", true)
 		end
 
 		if ipc.readLvar("DoorL2") == 1  then
+			ipc.log("QW787_SYNC: Close L2 Door afer Boarding.")
 			ipc.control(66389, 2) -- L2
 			QWtoggleDoor("DoorL2", true)
 		end
 
 		if ipc.readLvar("DoorL4") == 1 then
+			ipc.log("QW787_SYNC: Close L4 Door afer Boarding.")
 			QWtoggleDoor("DoorL4", true)
 		end
 	end
