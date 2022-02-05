@@ -14,7 +14,7 @@ Mix and match as you like :relaxed:<br/>
 
 # Installation
 - Update to at least PilotsDeck 0.6.3
-- Make sure the QualityWings Fonts are available System-Wide. The Profiles / the Actions are configured to use these Fonts to add more "Style" :wink:
+- Make sure the QualityWings Fonts are available System-Wide (should be the Case). The Profiles / the Actions are configured to use these Fonts to add more "Style" :wink:
 - Just double-click on the Profiles to add them to your StreamDeck Software
 - Place the Files from the FSUIPC6 Folder in your FSUIPC6 Addon-Folder (the Folder where your FSUIPC6.ini is located)
 - Either start the Scripts (Auto + Sync) manually ...
@@ -36,7 +36,7 @@ If you don't have a FSUIPC Profile for the QW787, start them as "Global" Scripts
 Both Scripts have several Options which can be either set to "true" or "false". They are located directly at the Beginning.
 ## Profiles
 When you use the Scripts as provided and made the QW Fonts available System-wide you don't need to change anything here - they should work right away.<br/>
-Only the View Buttons might need Attention, if you want to keep/use them: I modified the Views/Cameras in my Aircraft.cfg, so the Actions don't switch to the labeled View with the Default Aircraft.cfg. You have to change the Control-Sequences accordingly. I've added my Aircraft.cfg here as a Reference, if interested.
+Only the View Buttons might need Attention, if you want to keep/use them: I modified the Views/Cameras in my Aircraft.cfg, so the Actions don't switch to the labeled View with the Default Aircraft.cfg. You have to change the Control-Sequences accordingly. I've added my Aircraft.cfg (for the Dash9) here as a Reference, if interested (don' use it to override your Aircraft.cfg!).
 
 ## QW787_AUTO
 This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:QW787_AUTO:*NUM*" in PilotsDeck. Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work.
@@ -47,7 +47,7 @@ The File in this Repository is configured for "PilotsDeck only" Usage - so *qwIn
 - *qwInitGSX*: The "QW_INIT" Function will also intialize GSX (Reset at current Position, Call Jetway/GPU, Open L1 Door). Only usable with the GSX_AUTO (from QualityWings2GSX) and QW787_SYNC Scripts running!
 
 ## QW787_SYNC
-This Script is essential for some Buttons / Displays from the Profiles to show their State / Value. On top of that it can do some Automations. When used with QualityWings2GSX/GSX_AUTO it is an essential Part of the GSX Integration.
+This Script is essential for some Buttons / Displays from the Profiles to show their State / Value. On top of that it can do some Automations. When used with QualityWings2GSX/GSX_AUTO it is an essential Part of the GSX Integration. Look in the [QualityWings2GSX-Repo](https://github.com/Fragtality/QualityWings2GSX) for more Information.<br/>
 The File in this Repository is configured for "PilotsDeck only" Usage - only *syncPilotsDeck* is set.
 The Script uses the Offset-Range 0x5400 to 0x5445 (PMDG CDU0 / Project Magenta). If you use these already, you have to edit the Script and the Actions to other Offsets.
 - *syncPilotsDeck*: The essential Setting for these StreamDeck Profiles to display something meaningfull on the MCP (Displays + Buttons) and Baro Actions :wink:
@@ -83,4 +83,6 @@ I hope/think most Buttons are self-explanatory, but the most confusing can be th
  
 
 # Troubleshooting
-For Reasons unknown, some Combination of QW + GSX + FSUIPC Auto Scripts + RAAS Pro can trigger the 787 being loaded with all Indication Lights on (the Switch is permanently in On/Test Position). The Plane is working normally, so let the Init-Script take care of that or move the Switch manually.
+The QW787 is very vulnerable to "Loading Order Issues" it seems. For Reasons unknown, some Combination of QW and (GSX or FSUIPC Auto Scripts or RAAS Pro or whatever) can trigger the 787 being loaded with all Indication Lights on (the Switch is permanently in On/Test Position). The Plane is working normally, so let the Init-Script take care of that or move the Switch manually.<br/>
+I've tried to avoid it as much as I can with the Scripts sleeping the first 30 Seconds before doing anything. You might try playing with the the FSUIPC Options "InitDelay" (30-45) and "InitialStallTime" (15-20), I could at least reduce this Effect with that.<br/>
+Should I EVER find the real Root-Cause, I'll let you know and will fix or at least try to workaround that! So far FSDT and FS2Crew denied that GSX/RAAS could trigger something like that. QualityWings does not have answered yet.
