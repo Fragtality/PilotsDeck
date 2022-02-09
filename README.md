@@ -110,7 +110,8 @@ Examples:
   <br/>
 * **vJoy**
   \[ Joystick:Button(:t) ] (Command)<br/>
-:grey_exclamation: This Action is not related to the vJoy Device-Driver from njz3 or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
+:grey_exclamation: This Action is not related to the vJoy Device-Driver from njz3 or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific).<br/>
+As these Joysticks/Buttons are specific to FSUIPC, there are only usable within FSUIPC. No other Program (even the Sim itself) can detect them.
   - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
   - *Button*: The Number of the Button on that Joystick (Button 0 - 31).
   - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/><br/>
@@ -120,9 +121,10 @@ Examples:
   <br/>
 * **vJoyDrv**
  \[ Joystick:Button(:t) ] (Command)<br/>
- :grey_exclamation: This Action is related to the vJoy Device-Driver from njz3! To use it you have to install the vJoy Driver to your System and configure the Virtual Joysticks!<br/>
- PilotsDeck is compiled for vJoy Version (v2.2.1.1)[https://github.com/njz3/vJoy/releases/tag/v2.2.1.1], be sure to install/use this exact Version.<br/>
- There is no need to install the vJoy Driver if you are not planning to use this specific Action.
+ :grey_exclamation: This Action is related to the vJoy Device-Driver from njz3! To use it you have to install the vJoy Driver to your System and configure the Virtual Joysticks. Only simple Button presses are supported - Axis, POV or FFB are not supported by the Plugin.<br/>
+ PilotsDeck is compiled for vJoy Version [v2.2.1.1](https://github.com/njz3/vJoy/releases/tag/v2.2.1.1), be sure to install/use this exact Version.<br/>
+ As these Joysticks/Buttons present themself as normal "Game Controller" within Windows, they are detectable for every Program. But note: The Plugin will only trigger anything as long as the Sim is running.<br/>
+There is no need to install the vJoy Driver if you are not planning to use this specific Action.
   - *Joystick*: The Number of the virtual Joystick to use, as configured by you in vJoy (Joystick 1 - 16).
   - *Button*: The Number of the Button on that Joystick, as configured by you in vJoy (Button 1 - 128).
   - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/><br/>
