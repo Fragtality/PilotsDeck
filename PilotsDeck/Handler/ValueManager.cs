@@ -30,7 +30,6 @@ namespace PilotsDeck
     {
         //ID (Current, Last, ...) => Address = Value
         protected Dictionary<string, ValuePair> managedValues = new Dictionary<string, ValuePair>();
-        //protected Dictionary<string, string> staticValues = new Dictionary<string, string>();
         protected IPCManager ipcManager = null;
 
         public void RegisterManager(IPCManager manager)
@@ -132,14 +131,6 @@ namespace PilotsDeck
             return false;
         }
 
-        //public string GetValueManaged(string id)
-        //{
-        //    if (managedValues.ContainsKey(id))
-        //        return managedValues[id].Value.Value;
-        //    else
-        //        return null;
-        //}
-
         public bool IsChanged(string id)
         {
             if (managedValues.ContainsKey(id))
@@ -159,68 +150,10 @@ namespace PilotsDeck
             return false;
         }
 
-        //public void SetVariable(string id, string value)
-        //{
-        //    if (!string.IsNullOrEmpty(id))
-        //    {
-        //        if (!staticValues.ContainsKey(id))
-        //        {
-        //            Log.Logger.Debug($"SetVariable: Added new static Variable {id}");
-        //            staticValues.Add(id, value);
-        //        }
-        //        else
-        //        {
-        //            Log.Logger.Debug($"SetVariable: static Variable {id} was updated");
-        //            staticValues[id] = value;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Log.Logger.Error($"SetVariable: Could not set Variable - the id was empty!");
-        //    }
-        //}
-
-        //public string GetVariable(string id)
-        //{
-        //    if (!string.IsNullOrEmpty(id))
-        //    {
-        //        if (staticValues.ContainsKey(id))
-        //            return staticValues[id];
-        //        else
-        //            Log.Logger.Error($"GetVariable: Variable {id} does not exist!");
-        //    }
-        //    else
-        //    {
-        //        Log.Logger.Error($"GetVariable: Could not get Variable - the id was empty!");
-        //    }
-
-        //    Log.Logger.Debug($"GetVariable: Returning empty Value for static Variable {id}");
-        //    return "";
-        //}
-
-        //public void RemoveVariable(string id)
-        //{
-        //    if (!string.IsNullOrEmpty(id) && staticValues.ContainsKey(id))
-        //    {
-        //        staticValues.Remove(id);
-        //        Log.Logger.Debug($"RemoveVariable: Removed static Variable {id}");
-        //    }
-        //}
-
-        //public bool ContainsVariable(string id)
-        //{
-        //    if (!string.IsNullOrEmpty(id))
-        //        return staticValues.ContainsKey(id);
-        //    else
-        //        return false;
-        //}
-
         protected string GetValue(string id)
         {
             if (managedValues.ContainsKey(id))
                 return managedValues[id].Value.Value;
-            //else if (staticValues.ContainsKey(id))
-            //    return staticValues[id];
             else
             {
                 Log.Logger.Debug($"GetValue: Returning empty Value for Variable {id}");
@@ -228,16 +161,9 @@ namespace PilotsDeck
             }
         }
 
-        //protected void SetValue(string id, string value)
-        //{
-        //    if (!string.IsNullOrEmpty(id) && staticValues.ContainsKey(id))
-        //        staticValues[id] = value;
-        //}
-
         public string this[string id]
         {
             get => (!string.IsNullOrEmpty(id) ? GetValue(id) : "");
-            //set => SetValue(id, value);
         }
     }
 }

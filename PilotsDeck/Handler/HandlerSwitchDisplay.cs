@@ -67,14 +67,6 @@ namespace PilotsDeck
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
-        //public override bool OnButtonUp(IPCManager ipcManager, long tick)
-        //{
-        //    if (!BaseSettings.SwitchOnCurrentValue)
-        //        ValueManager.SetVariable(ID.SwitchState, ValueManager[ID.ControlState]);
-
-        //    return base.OnButtonUp(ipcManager, tick);
-        //}
-
         protected override void Redraw(ImageManager imgManager)
         {
             if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)

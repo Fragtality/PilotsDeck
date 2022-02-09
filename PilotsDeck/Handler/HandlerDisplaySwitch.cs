@@ -35,9 +35,7 @@
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings/*, out string[] newValues*/);
-            //ValueManager[ID.SwitchState] = newValues[0];
-            //ValueManager[ID.SwitchStateLong] = newValues[1];
+            bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings);
             tickDown = 0;
 
             return result;

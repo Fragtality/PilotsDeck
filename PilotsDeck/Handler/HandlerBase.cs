@@ -106,42 +106,6 @@
 
             if (SwitchSettings.HasLongPress && IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
                 ValueManager.UpdateValueAddress(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
-
-            //if (SwitchSettings.SwitchOnCurrentValue && IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
-            //{
-            //    if (!ValueManager.ContainsValue(ID.SwitchState))
-            //        ValueManager.RegisterValue(ID.SwitchState, SwitchSettings.AddressAction);
-            //    else
-            //        ValueManager.UpdateValueAddress(ID.SwitchState, SwitchSettings.AddressAction);
-
-            //    ValueManager.RemoveVariable(ID.SwitchState);
-            //}
-            //else
-            //{
-            //    if (ValueManager.ContainsValue(ID.SwitchState))
-            //        ValueManager.DeregisterValue(ID.SwitchState);
-
-            //    if (!ValueManager.ContainsVariable(ID.ControlState) && InitializationTest()) // SWITCH ONLY
-            //        ValueManager.SetVariable(ID.SwitchState, SwitchSettings.SwitchOffState);
-            //}
-
-            //if (IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
-            //{
-            //    if (!ValueManager.ContainsValue(ID.SwitchStateLong) && SwitchSettings.HasLongPress)
-            //        ValueManager.RegisterValue(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
-            //    else if (ValueManager.ContainsValue(ID.SwitchStateLong))
-            //        ValueManager.DeregisterValue(ID.SwitchStateLong);
-
-            //    ValueManager.RemoveVariable(ID.SwitchStateLong);
-            //}
-            //else
-            //{
-            //    if (ValueManager.ContainsValue(ID.SwitchStateLong))
-            //        ValueManager.DeregisterValue(ID.SwitchStateLong);
-
-            //    if (!ValueManager.ContainsVariable(ID.ControlState) && SwitchSettings.HasLongPress)
-            //        ValueManager.SetVariable(ID.SwitchStateLong, SwitchSettings.SwitchOffStateLong);
-            //}
         }
 
         public virtual void SetError()

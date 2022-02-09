@@ -246,18 +246,12 @@ namespace PilotsDeck
             IPCValueOffset offset = null;
             try
             {
-                //if (!currentValues.ContainsKey(address))
-                //{
-                    offset = new IPCValueOffset(address, AppSettings.groupStringWrite, OffsetAction.Write);
-                    offset.Write(value, AppSettings.groupStringWrite);
-                    offset.Dispose();
-                    offset = null;
-                    result = true;
-                //}
-                //else
-                //{
-                //    (currentValues[address] as IPCValueOffset).Write(value, AppSettings.groupStringWrite);
-                //}
+                offset = new IPCValueOffset(address, AppSettings.groupStringWrite, OffsetAction.Write);
+                offset.Write(value, AppSettings.groupStringWrite);
+                offset.Dispose();
+                offset = null;
+                result = true;
+
             }
             catch (Exception ex)
             {

@@ -41,46 +41,6 @@ namespace PilotsDeck
             ValueManager.UpdateValueAddress(ID.Second, Settings.Address2);
         }
 
-        //public override void RegisterAddress(IPCManager ipcManager)
-        //{
-        //    base.RegisterAddress(ipcManager);
-
-        //    ipcManager.RegisterAddress(Settings.Address2, AppSettings.groupStringRead);
-        //    LastAddress2 = Settings.Address2;
-        //}
-
-        //public override void UpdateAddress(IPCManager ipcManager)
-        //{
-        //    base.UpdateAddress(ipcManager);
-
-        //    LastAddress2 = UpdateAddress(ipcManager, LastAddress2, Settings.Address2);
-        //}
-
-        //public override void DeregisterAddress(IPCManager ipcManager)
-        //{
-        //    base.DeregisterAddress(ipcManager);
-
-        //    ipcManager.DeregisterValue(Settings.Address2);
-        //    if (Settings.Address2 != LastAddress2)
-        //        Log.Logger.Error($"DeregisterValue: LastAddress and Address different for {ActionID} [ {Settings.Address2} != {LastAddress2} ] ");
-        //}
-
-        //public override void RefreshValue(IPCManager ipcManager)
-        //{
-        //    int results = 0;
-
-        //    if (RefreshValue(ipcManager, Address, out string currentValue))
-        //        results++;
-        //    CurrentValue = currentValue;
-
-        //    if (RefreshValue(ipcManager, Settings.Address2, out currentValue))
-        //        results++;
-        //    CurrentValue2 = currentValue;
-
-        //    if (results > 0)
-        //        IsChanged = true;
-        //}
-
         protected override void DrawBar(string value, ImageRenderer render)
         {
             if (GaugeSettings.BarOrientation == (int)GaugeOrientation.LEFT)
