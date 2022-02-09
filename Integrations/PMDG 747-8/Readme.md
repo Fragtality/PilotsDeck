@@ -1,5 +1,5 @@
 # PMDG 747-8 Files for PilotsDeck
-Here is a User Contribution for 747 Profile - thanks Ado198 for sharing this! :thumbsup:<br/>
+Here is a User Contribution for a 747-8 Profile - thanks Ado198 for sharing this! :thumbsup:<br/>
 
 
 # Installation
