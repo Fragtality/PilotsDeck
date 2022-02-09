@@ -743,7 +743,7 @@ function EFIS_CPT_TERR ()
     
 end
 
-function EVT_YOKE_L_AP_DISC_SWITCH ()			--TCA
+function EVT_YOKE_L_AP_DISC_SWITCH ()			--Map to Yoke Button
     ipc.control(PMDGID + 1540, 1)
 end
 
@@ -836,6 +836,33 @@ function E3_E4_fuel_off ()               -- Tca
 	ipc.control(69632 + 971, 1)
 end
 
+function FUEL_PUMP_OVRD_FWD_2 ()
+if ipc.readLvar("switch_120_74X") == 0 then
+	ipc.control(PMDGID + 120, 1) else
+	ipc.control(PMDGID + 120, 0)
+	end
+end	
+
+function FUEL_PUMP_OVRD_FWD_3 ()
+if ipc.readLvar("switch_121_74X") == 0 then
+	ipc.control(PMDGID + 121, 1) else
+	ipc.control(PMDGID + 121, 0)
+	end
+end	
+
+function FUEL_PUMP_OVRD_AFT_2 ()
+if ipc.readLvar("switch_126_74X") == 0 then
+	ipc.control(PMDGID + 126, 1) else
+	ipc.control(PMDGID + 126, 0)
+	end
+end	
+
+function FUEL_PUMP_OVRD_AFT_3 ()
+if ipc.readLvar("switch_127_74X") == 0 then
+	ipc.control(PMDGID + 127, 1) else
+	ipc.control(PMDGID + 127, 0)
+	end
+end	
 
 
 
@@ -845,7 +872,6 @@ end
 -----------------------------------------
 -----------------------------------------
 -- $$ EVENT FLAGS
-
 event.flag(1, "LIGHTS_TAXI")
 event.flag(2, "LIGHTS_Outbd_L")
 event.flag(3, "LIGHTS_Outbd_R")
@@ -983,3 +1009,7 @@ event.flag(134, "E1_E2_fuel_on")
 event.flag(135, "E1_E2_fuel_off")
 event.flag(136, "E3_E4_fuel_on")
 event.flag(137, "E3_E4_fuel_off")
+event.flag(138, "FUEL_PUMP_OVRD_FWD_2")
+event.flag(139, "FUEL_PUMP_OVRD_FWD_3")
+event.flag(140, "FUEL_PUMP_OVRD_AFT_2")
+event.flag(141, "FUEL_PUMP_OVRD_AFT_3")
