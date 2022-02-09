@@ -110,13 +110,26 @@ Examples:
   <br/>
 * **vJoy**
   \[ Joystick:Button(:t) ] (Command)<br/>
-:grey_exclamation: This Action is not related to the vJoy Device-Driver or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
+:grey_exclamation: This Action is not related to the vJoy Device-Driver from njz3 or the corresponding StreamDeck-Plugin from ashupp! It uses the builtin Virtual Buttons (Virtual Joysticks) from FSUIPC (Offset 0x29F0 to be specific)!
   - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
   - *Button*: The Number of the Button on that Joystick (Button 0 - 31).
   - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/><br/>
   Examples:
   - ```64:4``` (the StreamDeck Button is recognized as Joystick 64, Button 4 in the Sim)
-  - ```72:2:t``` (the StreamDeck Button is recognized as Joystick 72, Button 2 in the Sim and will be toggled on KeyUp)<br/><br/>
+  - ```72:2:t``` (the StreamDeck Button is recognized as Joystick 72, Button 2 in the Sim and will be toggled on KeyUp)
+  <br/>
+* **vJoyDrv**
+ \[ Joystick:Button(:t) ] (Command)<br/>
+ :grey_exclamation: This Action is related to the vJoy Device-Driver from njz3! To use it you have to install the vJoy Driver to your System and configure the Virtual Joysticks!<br/>
+ PilotsDeck is compiled for vJoy Version (v2.2.1.1)[https://github.com/njz3/vJoy/releases/tag/v2.2.1.1], be sure to install/use this exact Version.<br/>
+ There is no need to install the vJoy Driver if you are not planning to use this specific Action.
+  - *Joystick*: The Number of the virtual Joystick to use, as configured by you in vJoy (Joystick 1 - 16).
+  - *Button*: The Number of the Button on that Joystick, as configured by you in vJoy (Button 1 - 128).
+  - *Toggle*: The specified Button is handled as toggleable Button, meaning a press on the StreamDeck will toggle the Buttons State and it will remain in that State. Without this Option the StreamDeck-Button handles like a Joystick-Button (down when pressed, up when released).<br/><br/>
+  Examples:
+  - ```1:2``` (the StreamDeck Button is recognized as Joystick 1, Button 2 in the Sim)
+  - ```2:3:t``` (the StreamDeck Button is recognized as Joystick 2, Button 3 in the Sim and will be toggled on KeyUp)
+<br/><br/>
 #### DecodeBCD / Scale / Format / Mappings
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.

@@ -280,6 +280,10 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="vJoyInterfaceWrap, Version=2.2.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\vJoyInterfaceWrap.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -328,6 +332,7 @@
     <Compile Include="Tools\ImageManager.cs" />
     <Compile Include="Tools\ImageRenderer.cs" />
     <Compile Include="Tools\StreamDeckTools.cs" />
+    <Compile Include="Tools\vJoyManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -928,6 +933,12 @@
     </Content>
     <Content Include="PI\pi_Switch.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vJoyInterface.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vJoyInterfaceWrap.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup />

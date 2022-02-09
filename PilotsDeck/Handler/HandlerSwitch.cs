@@ -29,7 +29,7 @@ namespace PilotsDeck
         public static bool RunButtonDown(IPCManager ipcManager, IModelSwitch switchSettings)
         {
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
-                return IPCTools.VjoyClearSet(ipcManager, switchSettings.AddressAction, false);
+                return IPCTools.VjoyClearSet(ipcManager, (ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, false);
             else if (IPCTools.IsWriteAddress(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType))
                 return true;
             else
@@ -50,7 +50,7 @@ namespace PilotsDeck
 
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
             {
-                result = IPCTools.VjoyClearSet(ipcManager, switchSettings.AddressAction, true);
+                result = IPCTools.VjoyClearSet(ipcManager, (ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, true);
             }
             else if (!longPress)
             {
@@ -63,7 +63,7 @@ namespace PilotsDeck
             {
                 if (IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong) && IPCTools.IsVjoyToggle(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
                 {
-                    result = IPCTools.VjoyToggle(ipcManager, switchSettings.AddressActionLong);
+                    result = IPCTools.VjoyToggle(ipcManager, (ActionSwitchType)switchSettings.ActionTypeLong, switchSettings.AddressActionLong);
                 }
                 else if (IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong) && !IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
                 {

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Text.RegularExpressions;
 using Serilog;
+using vJoyInterfaceWrap;
 
 namespace PilotsDeck
 {
@@ -17,6 +18,7 @@ namespace PilotsDeck
         public static Regex rxLvar = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
         public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static Regex rxVjoy = new Regex(@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex rxVjoyDrv = new Regex(@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 
         public static bool IsReadAddress(string address)
@@ -48,6 +50,8 @@ namespace PilotsDeck
                     return rxOffset.IsMatch(address);
                 case ActionSwitchType.VJOY:
                     return rxVjoy.IsMatch(address);
+                case ActionSwitchType.VJOYDRV:
+                    return rxVjoyDrv.IsMatch(address);
                 default:
                     return false;
             }
@@ -55,12 +59,14 @@ namespace PilotsDeck
 
         public static bool IsVjoyAddress(string address, int type)
         {
-            return type == (int)ActionSwitchType.VJOY && rxVjoy.IsMatch(address);
+            return (type == (int)ActionSwitchType.VJOY && rxVjoy.IsMatch(address))
+                    || (type == (int)ActionSwitchType.VJOYDRV && rxVjoyDrv.IsMatch(address));
         }
 
         public static bool IsVjoyToggle(string address, int type)
         {
-            return type == (int)ActionSwitchType.VJOY && rxVjoy.IsMatch(address) && address.ToLowerInvariant().Contains(":t");
+            return (type == (int)ActionSwitchType.VJOY && rxVjoy.IsMatch(address) && address.ToLowerInvariant().Contains(":t")) ||
+                    (type == (int)ActionSwitchType.VJOYDRV && rxVjoyDrv.IsMatch(address) && address.ToLowerInvariant().Contains(":t"));
         }
 
         public static bool RunAction(IPCManager ipcManager, string Address, ActionSwitchType actionType, string newValue, bool useControlDelay)
@@ -81,10 +87,9 @@ namespace PilotsDeck
                     case ActionSwitchType.OFFSET:
                         return WriteOffset(ipcManager, Address, newValue);
                     case ActionSwitchType.VJOY:
-                        if (IsVjoyToggle(Address, (int)actionType))
-                            return VjoyToggle(ipcManager, Address);
-                        else
-                            return false;
+                        return VjoyToggle(ipcManager, actionType, Address);
+                    case ActionSwitchType.VJOYDRV:
+                        return VjoyToggle(ipcManager, actionType, Address);
                     default:
                         return false;
                 }
@@ -95,17 +100,33 @@ namespace PilotsDeck
             return false;
         }
 
-        public static bool VjoyToggle(IPCManager ipcManager, string address)
+        public static bool VjoyToggle(IPCManager ipcManager, ActionSwitchType type, string address)
         {
-            return ipcManager.SendVjoy(address, 0);
+            if (!IsVjoyToggle(address, (int)type))
+                return false;
+
+            if (type == ActionSwitchType.VJOYDRV)
+                return vJoyManager.ToggleButton(address);
+            else
+                return ipcManager.SendVjoy(address, 0);
         }
 
-        public static bool VjoyClearSet(IPCManager ipcManager, string address, bool clear)
+        public static bool VjoyClearSet(IPCManager ipcManager, ActionSwitchType type, string address, bool clear)
         {
-            if (clear)
-                return ipcManager.SendVjoy(address, 2);
+            if (type == ActionSwitchType.VJOYDRV)
+            {
+                if (clear)
+                    return vJoyManager.ClearButton(address);
+                else
+                    return vJoyManager.SetButton(address);
+            }
             else
-                return ipcManager.SendVjoy(address, 1);
+            {
+                if (clear)
+                    return ipcManager.SendVjoy(address, 2);
+                else
+                    return ipcManager.SendVjoy(address, 1);
+            }
         }
 
         public static bool RunScript(IPCManager ipcManager, string address)

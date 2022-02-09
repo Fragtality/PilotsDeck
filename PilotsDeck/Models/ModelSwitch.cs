@@ -8,7 +8,8 @@
         LVAR,
         OFFSET,
         //5 is offset+lvar in PI
-        VJOY = 6
+        VJOY = 6, //FSUIPC vJoy
+        VJOYDRV = 7 //vJoy Driver by
     }
 
     public interface IModelSwitch

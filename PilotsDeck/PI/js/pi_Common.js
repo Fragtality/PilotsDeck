@@ -108,12 +108,14 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = `${regOffset}|${regLvar}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
+	else if (type == 7) //vjoy Drv
+		document.getElementById(field).pattern = "^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$";
 	else
 		document.getElementById(field).pattern = "";
 }
 
 function isLongPressAllowed(actionType, address) {
-	return actionType != 6 || (actionType == 6 && address.includes(":t"));
+	return (actionType != 6 || (actionType == 6 && address.includes(":t"))) && (actionType != 7 || (actionType == 7 && address.includes(":t")));
 }
 
 function toggleControlDelay(settingsModel) {
