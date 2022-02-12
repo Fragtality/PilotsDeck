@@ -25,13 +25,13 @@ function Pilotsdeck_Poll ()
 	
 end
 
-event.timer(125, "Pilotsdeck_Poll")
+event.timer(200, "Pilotsdeck_Poll")
 
 function IAS_DISPLAY ()
 	IAS=ipc.readUD(0x6599)
 	if ipc.readUB(0x659D) == 0 then
-	ipc.writeUD(0x66C5, IAS) else
-	ipc.writeUD(0x66C5, 500)
+	ipc.writeUD(0x04E0, IAS) else
+	ipc.writeUD(0x04E0, 500)
 	end
 end
 
