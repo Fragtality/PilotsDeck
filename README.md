@@ -1,7 +1,7 @@
 # Pilot's Deck
 Directly control the FlightSim from your StreamDeck&#x00AE; via FSUIPC!
 ![Example01XL](img/Example01XL.jpg)<br/>
-More Screenshots can be found under [Examples](README.md#Examples).
+More Screenshots can be found under [Examples](README.md#Examples). Working ready-to-use / Example Profiles can be found under [Integrations](Integrations/).
 
 <br/><br/>
 ## Introduction
@@ -332,6 +332,8 @@ There are only two Use-Cases to fiddle in that file, so these are the interestin
 * **Profiles**: Like described under [Profile Switcher](README.md#customization) - here you add or change the StreamDeck Profiles. If the .streamDeckProfile File is in the \Profiles Subdirectory, you must prefix the Name with "*Profiles/*". Mind the JSON-Syntax: the last Entry must not have a "**,**" at the End, but all others have to be separated by that.
 <br/><br/>
 ## Examples
+Here a Number of Example Screenshots. Under [Integrations](Integrations/) you'll find some predefined and ready-to-use Profiles which also serve as Examples. So even if you don't have these Planes, it may give you some Ideas on what and how it can be done 😉<br/><br/>
+
 Tired of aiming at the number Keys with your Mouse in the VC? Make yourself a Transponder Control on the Deck:<br/>
 ![Example02](img/Example02.png)<br/>
 All "Simple Buttons" mapped to usual Macros. And one "Display Value" to read the Offset 0x0354.<br/><br/>
