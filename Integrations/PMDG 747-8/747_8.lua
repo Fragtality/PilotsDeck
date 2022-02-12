@@ -156,24 +156,17 @@ function HYDRAULIC_1 ()
 hyd1=ipc.readLvar("switch_048_74X")
 if  hyd1 == 10 then
 	ipc.control(PMDGID + 48, 2) 
-	elseif
-	hyd1 == 20  
-	then
-	ipc.control(PMDGID + 48, 0) 
 	else
-	ipc.control(PMDGID + 48, 1)
+	ipc.control(PMDGID + 48, 1) 
+	
 	end
 end
 function HYDRAULIC_2 ()
 hyd1=ipc.readLvar("switch_049_74X")
 if  hyd1 == 10 then
 	ipc.control(PMDGID + 49, 2) 
-	elseif
-	hyd1 == 20  
-	then
-	ipc.control(PMDGID + 49, 0) 
 	else
-	ipc.control(PMDGID + 49, 1)
+	ipc.control(PMDGID + 49, 1) 
 	end
 end
 
@@ -181,12 +174,8 @@ function HYDRAULIC_3 ()
 hyd1=ipc.readLvar("switch_050_74X")
 if  hyd1 == 10 then
 	ipc.control(PMDGID + 50, 2) 
-	elseif
-	hyd1 == 20  
-	then
-	ipc.control(PMDGID + 50, 0) 
 	else
-	ipc.control(PMDGID + 50, 1)
+	ipc.control(PMDGID + 50, 1) 
 	end
 end
 
@@ -194,12 +183,8 @@ function HYDRAULIC_4 ()
 hyd1=ipc.readLvar("switch_051_74X")
 if  hyd1 == 10 then
 	ipc.control(PMDGID + 51, 2) 
-	elseif
-	hyd1 == 20  
-	then
-	ipc.control(PMDGID + 51, 0) 
 	else
-	ipc.control(PMDGID + 51, 1)
+	ipc.control(PMDGID + 51, 1) 
 	end
 end
 
@@ -583,13 +568,7 @@ function MCP_VS_SELECTOR_dec ()
     ipc.control(PMDGID + 574, 256)
 end
 
-function EFIS_CPT_RANGE_inc ()					--TCA
-	ipc.control(PMDGID  + 526,256)
-end
 
-function EFIS_CPT_RANGE_dec ()					--TCA
-	ipc.control(PMDGID  + 526,128)
-end
 
 function Autobrake_rto ()					--TCA
     ipc.control(PMDGID + 1102, 0)
@@ -743,7 +722,7 @@ function EFIS_CPT_TERR ()
     
 end
 
-function EVT_YOKE_L_AP_DISC_SWITCH ()			--Map to Yoke Button
+function EVT_YOKE_L_AP_DISC_SWITCH ()			--TCA
     ipc.control(PMDGID + 1540, 1)
 end
 
@@ -864,6 +843,130 @@ if ipc.readLvar("switch_127_74X") == 0 then
 	end
 end	
 
+function FUEL_PUMP_CNTRL ()
+if ipc.readLvar("switch_114_74X") == 0 then
+	ipc.control(PMDGID + 114, 1) else
+	ipc.control(PMDGID + 114, 0)
+	end
+end	
+
+function FUEL_PUMP_CNTRR ()
+if ipc.readLvar("switch_115_74X") == 0 then
+	ipc.control(PMDGID + 115, 1) else
+	ipc.control(PMDGID + 115, 0)
+	end
+end	
+
+function AIR_con_pack_rst ()			
+    ipc.control(PMDGID + 180, 1)
+end
+
+function HYDRAULIC_1_AUX ()
+	ipc.control(PMDGID + 48, 0)
+end
+function HYDRAULIC_2_AUX ()
+	ipc.control(PMDGID + 49, 0)
+end
+function HYDRAULIC_3_AUX ()
+	ipc.control(PMDGID + 50, 0)
+end
+function HYDRAULIC_4_AUX ()
+	ipc.control(PMDGID + 51, 0)
+end
+
+function MCP_SPEED_PUSH ()
+	ipc.control(PMDGID + 10554, 1)
+end
+
+function EFIS_CPT_RANGE_inc ()
+    acftname = ipc.readSTR("3D00", 35)
+        if string.find(acftname,"747-4",0,true) then
+            ipc.control(PMDGID  + 526,256)
+        elseif string.find(acftname,"747-8",0,true) then
+            for i = 1,5,1 do
+            ipc.control(PMDGID  + 526,256)
+            end
+        end
+	end
+    
+
+
+function EFIS_CPT_RANGE_dec ()
+    acftname = ipc.readSTR("3D00", 35)
+        if string.find(acftname,"747-4",0,true) then
+            ipc.control(PMDGID  + 526,128)
+        elseif string.find(acftname,"747-8",0,true) then
+            for i = 1,5,1 do
+            ipc.control(PMDGID  + 526,128)
+            end
+        end
+    
+end
+
+function EFIS_CPT_RADIO_BARO_toggle ()
+	if ipc.readLvar("switch_522_74X") == 0 then
+	ipc.control(PMDGID + 522, 1) else
+	ipc.control(PMDGID + 522, 0)
+	end
+end	
+
+function EFIS_CPT_RADIO_BARO_INC()
+	ipc.control(PMDGID + 521, 256) 
+	
+end	
+
+
+function EFIS_CPT_RADIO_BARO_DEC ()
+	ipc.control(PMDGID + 521, 128) 
+	
+end	
+
+function EFIS_CPT_MINIMUMS_RST ()
+	ipc.control(PMDGID + 520, 1) 
+	
+end	
+
+function EFIS_CPT_MAP_MODE_inc ()
+	ipc.control(PMDGID +524, 256)
+    
+end
+
+function EFIS_CPT_MAP_MODE_dec ()
+	ipc.control(PMDGID +524, 128)
+    
+end
+
+function EFIS_CPT_VOR_ADFVOR_R_toggle ()
+    VORADFL = ipc.readLvar("switch_528_74X")
+    if VORADFL == 100 then
+       ipc.control(PMDGID + 528,1)
+    elseif VORADFL == 50 then
+         ipc.control(PMDGID + 528,0)
+    elseif VORADFL == 0 then
+         ipc.control(PMDGID + 528,2)
+    end
+end
+
+function EFIS_CPT_VOR_ADFVOR_L_toggle ()
+    VORADFL = ipc.readLvar("switch_523_74X")
+    if VORADFL == 100 then
+       ipc.control(PMDGID + 523,1)
+    elseif VORADFL == 50 then
+         ipc.control(PMDGID + 523,0)
+    elseif VORADFL == 0 then
+         ipc.control(PMDGID + 523,2)
+    end
+end
+
+function EFIS_CPT_BARO_IN_HPA_toggle ()
+	if ipc.readLvar("switch_529_74X") ==100 then
+        ipc.control(PMDGID  + 529,0)
+	else
+        ipc.control(PMDGID  + 529,1)
+	end
+end
+
+
 
 
 
@@ -965,8 +1068,8 @@ event.flag(90, "MCP_ALT_SELECTOR_decfast")
 event.flag(91, "MCP_ALT_PUSH_SWITCH")
 event.flag(92, "MCP_VS_SELECTOR_inc")
 event.flag(93, "MCP_VS_SELECTOR_dec")
-event.flag(94, "EFIS_CPT_RANGE_inc")
-event.flag(95, "EFIS_CPT_RANGE_dec")
+event.flag(94, "EFIS_CPT_RADIO_BARO_toggle")
+event.flag(95, "EFIS_CPT_RADIO_BARO_INC")  
 event.flag(96, "Autobrake_rto")
 event.flag(97, "Autobrake_off")
 event.flag(98, "Autobrake_1")
@@ -1013,3 +1116,21 @@ event.flag(138, "FUEL_PUMP_OVRD_FWD_2")
 event.flag(139, "FUEL_PUMP_OVRD_FWD_3")
 event.flag(140, "FUEL_PUMP_OVRD_AFT_2")
 event.flag(141, "FUEL_PUMP_OVRD_AFT_3")
+event.flag(142, "FUEL_PUMP_CNTRL")
+event.flag(143, "FUEL_PUMP_CNTRR")
+event.flag(144, "AIR_con_pack_rst")
+event.flag(145, "HYDRAULIC_1_AUX")
+event.flag(146, "HYDRAULIC_2_AUX")
+event.flag(147, "HYDRAULIC_3_AUX")
+event.flag(148, "HYDRAULIC_4_AUX")
+event.flag(149, "MCP_SPEED_PUSH")
+event.flag(150, "EFIS_CPT_RANGE_inc")
+event.flag(151, "EFIS_CPT_RANGE_dec")
+event.flag(152, "EFIS_CPT_RADIO_BARO_DEC")
+event.flag(153, "EFIS_CPT_MINIMUMS_RST")
+event.flag(154, "EFIS_CPT_MAP_MODE_inc")
+event.flag(155, "EFIS_CPT_MAP_MODE_dec")
+event.flag(156, "EFIS_CPT_VOR_ADFVOR_R_toggle")
+event.flag(157, "EFIS_CPT_VOR_ADFVOR_L_toggle")
+event.flag(158, "EFIS_CPT_BARO_IN_HPA_toggle")
+
