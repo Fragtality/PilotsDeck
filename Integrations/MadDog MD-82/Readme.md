@@ -9,8 +9,8 @@ Here is a User Contribution for a MD-82 Profile - thanks Ado198 for sharing this
 - Copy the images from the images folder into the Pilotsdeck plugin directory.
 - Double click the profile to install it.
 - Run P3D to let FSUIPC register the LUA and then close P3D.
-- Open FSUIPC.ini and add the above lua files under an Auto start section, preferably under profile specific.
-<br/>
+- Open FSUIPC.ini and add the above lua files under an Auto start section, preferably under profile specific.<br/>
+
 ```
 	[Auto.Md-82] ----- change to your profile name.
 	1=Lua Md_82_ovhd
