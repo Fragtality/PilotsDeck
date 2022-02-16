@@ -8,8 +8,7 @@ Here is a User Contribution for a 747-8 Profile - thanks Ado198 for sharing this
 - Copy the DSA_GSX_AUTO.lua into your fsuipc folder.(This file was created by Fragtality and is optional but recommended.) \[Dev comment: This is an older Version of the GSX_AUTO available from QualityWings2GSX, you might want to change it to the newer Version\]
 - Copy the images from the images folder into the Pilotsdeck plugin directory.
 - Run P3D to let FSUIPC register the LUA and then close P3D.
-- Open FSUIPC.ini and add the 2 above lua files under an Auto start section, preferably under profile specific.
-- ... or add them as Auto-Scripts to your FSUIPC6.ini. Then add the following to your FSUIPC6.ini:<br/>
+- Open FSUIPC.ini and add the 2 above lua files under an Auto start section, preferably under profile specific.<br/>
 ```
 	[Auto.747] ----- change to your profile name.
 	1=Lua 747_8
