@@ -16,6 +16,7 @@ namespace PilotsDeck
         public static Regex rxControlSeq = new Regex(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         public static Regex rxControl = new Regex(@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
         public static Regex rxLvar = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
+        public static Regex rxHvar = new Regex($"^[^0-9]{{1}}((H:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
         public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static Regex rxVjoy = new Regex(@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static Regex rxVjoyDrv = new Regex(@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -46,6 +47,8 @@ namespace PilotsDeck
                     return rxControl.IsMatch(address) || rxControlSeq.IsMatch(address);
                 case ActionSwitchType.LVAR:
                     return rxLvar.IsMatch(address);
+                //case ActionSwitchType.HVAR:
+                //    return rxHvar.IsMatch(address);
                 case ActionSwitchType.OFFSET:
                     return rxOffset.IsMatch(address);
                 case ActionSwitchType.VJOY:
@@ -69,7 +72,7 @@ namespace PilotsDeck
                     (type == (int)ActionSwitchType.VJOYDRV && rxVjoyDrv.IsMatch(address) && address.ToLowerInvariant().Contains(":t"));
         }
 
-        public static bool RunAction(IPCManager ipcManager, string Address, ActionSwitchType actionType, string newValue, bool useControlDelay)
+        public static bool RunAction(IPCManager ipcManager, string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null)
         {
             if (ipcManager.IsConnected && IsWriteAddress(Address, actionType))
             {
@@ -81,9 +84,11 @@ namespace PilotsDeck
                     case ActionSwitchType.SCRIPT:
                         return RunScript(ipcManager, Address);
                     case ActionSwitchType.LVAR:
-                        return WriteLvar(ipcManager, Address, newValue);
+                        return WriteLvar(ipcManager, Address, newValue, switchSettings.UseLvarReset, offValue);
+                    //case ActionSwitchType.HVAR:
+                    //    return WriteHvar(ipcManager, Address);
                     case ActionSwitchType.CONTROL:
-                        return SendControls(ipcManager, Address, useControlDelay);
+                        return SendControls(ipcManager, Address, switchSettings.UseControlDelay);
                     case ActionSwitchType.OFFSET:
                         return WriteOffset(ipcManager, Address, newValue);
                     case ActionSwitchType.VJOY:
@@ -157,18 +162,35 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool WriteLvar(IPCManager ipcManager, string address, string newValue)
+        public static bool WriteLvar(IPCManager ipcManager, string address, string newValue, bool lvarReset, string offValue)
         {
             bool result = false;
             if (newValue?.Length < 1)
                 return result;
 
             double value = Convert.ToDouble(newValue, new RealInvariantFormat(newValue));
-            address.Replace("L:", "");
+            address = address.Replace("L:", "");
             result = ipcManager.WriteLvar(address, value);
+
+            if (!result)
+                return result;
+
+            if (lvarReset && !string.IsNullOrEmpty(offValue))
+            {
+                Thread.Sleep(AppSettings.controlDelay * 2);
+                value = Convert.ToDouble(offValue, new RealInvariantFormat(offValue));
+                result = ipcManager.WriteLvar(address, value);
+            }
 
             return result;
         }
+
+        //public static bool WriteHvar(IPCManager ipcManager, string address)
+        //{
+        //    address = address.Replace("H:", "");
+
+        //    return ipcManager.WriteHvar(address);
+        //}
 
         public static bool SendControls(IPCManager ipcManager, string address, bool useControlDelay)
         {

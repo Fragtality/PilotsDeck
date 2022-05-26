@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using FSUIPC;
 using Serilog;
+//using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
 {
@@ -13,6 +14,9 @@ namespace PilotsDeck
         private List<string> persistentValues = new List<string>();
         private static readonly string inMenuAddr = "3365:1";
         private static readonly string isPausedAddr = "0262:2";
+        private Simulator currentSim = Simulator.UNKNOWN;
+        //private MSFSVariableServices WASM = new MSFSVariableServices();
+        
 
         private IPCValueOffset inMenuValue;
         private IPCValueOffset isPausedValue;
@@ -21,7 +25,10 @@ namespace PilotsDeck
         {
             get
             {
-                return FSUIPCConnection.IsOpen;
+                //if (currentSim == Simulator.MSFS)
+                //    return FSUIPCConnection.IsOpen && WASM.IsRunning;
+                //else
+                    return FSUIPCConnection.IsOpen;
             }
         }
 
@@ -51,7 +58,12 @@ namespace PilotsDeck
             inMenuValue = RegisterAddress(inMenuAddr, group, true) as IPCValueOffset;
 
             isPausedValue = RegisterAddress(isPausedAddr, group, true) as IPCValueOffset;
-        }       
+        }
+
+        public void SetSimulator(Simulator sim)
+        {
+            currentSim = sim;
+        }
 
         public bool Connect()
         {
@@ -63,6 +75,15 @@ namespace PilotsDeck
                 {
                     Log.Logger.Information("IPCManager: FSUIPC Connected");
                 }
+
+                //if (currentSim == Simulator.MSFS)
+                //{
+                //    WASM.OnLogEntryReceived += OnVariableServiceLogEvent;
+                //    WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
+                //    WASM.Start();
+                //    if (WASM.IsRunning)
+                //        Log.Logger.Information("IPCManager: FSUIPC WASM Started");
+                //}
             }
             catch
             {
@@ -70,6 +91,11 @@ namespace PilotsDeck
             }
 
             return IsConnected;
+        }
+
+        private void OnVariableServiceLogEvent(object sender, LogEventArgs e)
+        {
+            Log.Logger.Information($"IPCManager- WASM: {e.LogEntry}");
         }
 
         public void Dispose()
@@ -95,11 +121,19 @@ namespace PilotsDeck
 
             try
             {
-                    FSUIPCConnection.Close();
+                FSUIPCConnection.Close();
 
                 if (!FSUIPCConnection.IsOpen)
                 {
                     Log.Logger.Information("IPCManager: FSUIPC Closed");
+                }
+
+                if (currentSim == Simulator.MSFS)
+                {
+                    //WASM.Stop();
+                    //WASM.OnLogEntryReceived -= OnVariableServiceLogEvent;
+                    //if (!WASM.IsRunning)
+                    //    Log.Logger.Information("IPCManager: FSUIPC WASM Stopped");
                 }
             }
             catch
@@ -132,7 +166,12 @@ namespace PilotsDeck
                     if (IPCTools.rxOffset.IsMatch(address))
                         value = new IPCValueOffset(address, group);
                     else
-                        value = new IPCValueLvar(address);
+                    {
+                        //if (currentSim == Simulator.MSFS)
+                        //    value = new IPCValueWASM(address);
+                        //else
+                            value = new IPCValueLvar(address);
+                    }
 
                     currentValues.Add(address, value);
                     currentRegistrations.Add(address, 1);
@@ -195,7 +234,11 @@ namespace PilotsDeck
                     return false;
 
                 foreach (var value in currentValues.Values) //read Lvars
+                {
+                    //value.Process(WASM);
                     value.Process();
+                }
+                    
 
                 return true;
             }
@@ -271,16 +314,54 @@ namespace PilotsDeck
             bool result = false;
             try
             {
-                FSUIPCConnection.WriteLVar(name, value);
-                result = true;
+                //if (currentSim == Simulator.MSFS)
+                //{
+                //    if (WASM.LVars.Exists(name))
+                //    {
+                //        WASM.LVars[name].SetValue(value);
+                //        result = true;
+                //    }
+                //    else
+                //        Log.Logger.Error($"IPCManager: LVar <{name}> does not exist");
+                //}
+                //else
+                //{
+                    FSUIPCConnection.WriteLVar(name, value);
+                    result = true;
+                //}
             }
             catch
             {
-                Log.Logger.Error($"IPCManager: Exception while writing LVar <{name}:{value}> to FSUIPC");
+                Log.Logger.Error($"IPCManager: Exception while writing LVar <{name}:{value}> to FSUIPC/WASM");
             }
 
             return result;
         }
+
+        //public bool WriteHvar(string name)
+        //{
+        //    bool result = false;
+
+        //    try
+        //    {
+        //        if (currentSim == Simulator.MSFS)
+        //        {
+        //            if (WASM.HVars.Exists(name))
+        //            {
+        //                WASM.HVars[name].Set();
+        //                result = true;
+        //            }
+        //            else
+        //                Log.Logger.Error($"IPCManager: HVar <{name}> does not exist");
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        Log.Logger.Error($"IPCManager: Exception while setting HVar <{name}> via WASM");
+        //    }
+
+        //    return result;
+        //}
 
         public bool RunMacro(string name)
         {

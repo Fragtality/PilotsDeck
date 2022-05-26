@@ -1,4 +1,5 @@
 ﻿using System;
+using FSUIPC;
 
 namespace PilotsDeck
 {
@@ -14,6 +15,7 @@ namespace PilotsDeck
 
         }
 
+        //public virtual void Process(MSFSVariableServices WASM)
         public virtual void Process()
         {
 

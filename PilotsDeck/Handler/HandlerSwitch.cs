@@ -55,9 +55,12 @@ namespace PilotsDeck
             else if (!longPress)
             {
                 string newValue = "";
-                if (IsActionReadable(switchSettings.ActionType))
+                if (IsActionReadable(switchSettings.ActionType) && !switchSettings.UseLvarReset)
                     newValue = ToggleValue(lastState, switchSettings.SwitchOffState, switchSettings.SwitchOnState);
-                result = IPCTools.RunAction(ipcManager, switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue, switchSettings.UseControlDelay);
+                else if (IsActionReadable(switchSettings.ActionType))
+                    newValue = switchSettings.SwitchOnState;
+
+                result = IPCTools.RunAction(ipcManager, switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue, switchSettings, switchSettings.SwitchOffState);
             }
             else if (longPress && switchSettings.HasLongPress)
             {
@@ -68,9 +71,12 @@ namespace PilotsDeck
                 else if (IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong) && !IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
                 {
                     string newValue = "";
-                    if (IsActionReadable(switchSettings.ActionTypeLong))
+                    if (IsActionReadable(switchSettings.ActionTypeLong) && !switchSettings.UseLvarReset)
                         newValue = ToggleValue(lastStateLong, switchSettings.SwitchOffStateLong, switchSettings.SwitchOnStateLong);
-                    result = IPCTools.RunAction(ipcManager, switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue, switchSettings.UseControlDelay);
+                    else if (IsActionReadable(switchSettings.ActionTypeLong))
+                        newValue = switchSettings.SwitchOnStateLong;
+
+                    result = IPCTools.RunAction(ipcManager, switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue, switchSettings, switchSettings.SwitchOffStateLong);
                 }
             }
 

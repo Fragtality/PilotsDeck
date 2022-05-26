@@ -12,7 +12,15 @@ using System.Diagnostics;
 
 namespace PilotsDeck
 {
-       
+    public enum Simulator
+    {
+        FSX,
+        P3D,
+        MSFS,
+        XP,
+        UNKNOWN
+    }
+
     public class ActionController : IActionController
     {
         private Dictionary<string, IHandler> currentActions = null;
@@ -22,6 +30,7 @@ namespace PilotsDeck
         public ConnectionManager DeckManager { get; set; }
         public int Timing { get { return AppSettings.waitTicks; } }
         public bool IsApplicationOpen { get; set; }
+        public Simulator CurrentSim { get; set; }
 
         public long Ticks { get { return tickCounter; } }
         private long tickCounter = 0;
@@ -155,6 +164,26 @@ namespace PilotsDeck
             IsApplicationOpen = true;
             appAlreadyRunning = tickCounter < firstTick;
             appIsStarting = true;
+
+            switch (args.payload.application)
+            {
+                case "Prepar3D.exe":
+                    CurrentSim = Simulator.P3D;
+                    break;
+                case "FlightSimulator.exe":
+                    CurrentSim = Simulator.MSFS;
+                    break;
+                case "X-Plane.exe":
+                    CurrentSim = Simulator.XP;
+                    break;
+                case "fsx.exe":
+                    CurrentSim = Simulator.FSX;
+                    break;
+                default:
+                    CurrentSim = Simulator.UNKNOWN;
+                    break;
+            }
+            ipcManager.SetSimulator(CurrentSim);
         }
 
         protected void OnApplicationDidTerminate(StreamDeckEventPayload args)
@@ -162,6 +191,8 @@ namespace PilotsDeck
             Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
 
             IsApplicationOpen = false;
+            CurrentSim = Simulator.UNKNOWN;
+            ipcManager.SetSimulator(CurrentSim);
         }
 
         public void UpdateProfileSwitchers()

@@ -11,6 +11,7 @@ var settingsModel = {
 	SwitchOnState: "",
 	SwitchOffState: "",
 	UseControlDelay: false,
+	UseLvarReset: false,
 	HasLongPress: false,
 	AddressActionLong: "",
 	ActionTypeLong: 0,
@@ -58,6 +59,7 @@ function updateForm() {
 		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
 
 	toggleControlDelay(settingsModel);
+	toggleLvarReset(settingsModel);
 
 	//INDICATION
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');

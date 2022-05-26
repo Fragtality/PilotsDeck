@@ -92,6 +92,7 @@ function toggleConfigItem(value, name) {
 function setPattern(field, type) {
 	var regName = "[a-zA-Z0-9\x2D\x5F]+";
 	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
+	var regHvar = `^([^0-9]{1}(H:){0,1}${regName}){1}$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	
 	if (type == 0) //macro
@@ -110,6 +111,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv
 		document.getElementById(field).pattern = "^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$";
+	else if (type == 8) //HVar
+		document.getElementById(field).pattern = regHvar;
 	else
 		document.getElementById(field).pattern = "";
 }
@@ -127,21 +130,30 @@ function toggleControlDelay(settingsModel) {
 		toggleConfigItem(false, delayField);
 }
 
+function toggleLvarReset(settingsModel) {
+	var resetField = "UseLvarReset";
+
+	if (settingsModel.ActionType == 3 || (settingsModel.HasLongPress && settingsModel.ActionTypeLong == 3))
+		toggleConfigItem(true, resetField);
+	else
+		toggleConfigItem(false, resetField);
+}
+
 function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 	//On/Off States
-	if (actionType == 0) { //macro
-		toggleConfigItem(false, onField);
-		toggleConfigItem(false, offField);
-	}
-	else if (actionType == 1) { //script
-		toggleConfigItem(false, onField);
-		toggleConfigItem(false, offField);
-	}
-	else if (actionType == 2) { //control
-		toggleConfigItem(false, onField);
-		toggleConfigItem(false, offField);
-	}
-	else if (actionType == 3 && !switchCurrent) { //lvar
+	//if (actionType == 0) { //macro
+	//	toggleConfigItem(false, onField);
+	//	toggleConfigItem(false, offField);
+	//}
+	//else if (actionType == 1) { //script
+	//	toggleConfigItem(false, onField);
+	//	toggleConfigItem(false, offField);
+	//}
+	//else if (actionType == 2) { //control
+	//	toggleConfigItem(false, onField);
+	//	toggleConfigItem(false, offField);
+	//}
+	/*else*/ if (actionType == 3 && !switchCurrent) { //lvar
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
@@ -149,10 +161,10 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
-	else if (actionType == 6) { //vjoy
-		toggleConfigItem(false, onField);
-		toggleConfigItem(false, offField);
-	}
+	//else if (actionType == 6) { //vjoy
+	//	toggleConfigItem(false, onField);
+	//	toggleConfigItem(false, offField);
+	//}
 	else {
 		toggleConfigItem(false, onField);
 		toggleConfigItem(false, offField);

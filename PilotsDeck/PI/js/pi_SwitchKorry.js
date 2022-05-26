@@ -7,6 +7,7 @@ var settingsModel = {
 		SwitchOnState: "",
 		SwitchOffState: "",
 		UseControlDelay: false,
+		UseLvarReset: false,
 		SwitchOnCurrentValue: false,
 		HasLongPress: false,
         AddressActionLong: "",
@@ -58,6 +59,7 @@ function updateForm() {
 	toggleConfigItem(false, 'SwitchOnCurrentValue');
 
 	toggleControlDelay(settingsModel);
+	toggleLvarReset(settingsModel);
 
 	//LongPress
 	toggleConfigItem(longAllowed, 'HasLongPress');

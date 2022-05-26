@@ -22,6 +22,11 @@
             <input class="sdpi-item-value" id="UseControlDelay" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
             <label for="UseControlDelay"><span></span>Wait 50ms before next Control</label>
         </div>
+        <div type="checkbox" class="sdpi-item" id="Config_UseLvarReset">
+            <div class="sdpi-item-label" id="lblUseLvarReset">Reset Value</div>
+            <input class="sdpi-item-value" id="UseLvarReset" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="UseLvarReset"><span></span>Reset Switch to Off Position</label>
+        </div>
         <div type="checkbox" class="sdpi-item" id="Config_SwitchOnCurrentValue">
             <div class="sdpi-item-label" id="lblSwitchOnCurrentValue">Use Status Value</div>
             <input class="sdpi-item-value" id="SwitchOnCurrentValue" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">

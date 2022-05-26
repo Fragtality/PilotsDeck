@@ -9,7 +9,8 @@
         OFFSET,
         //5 is offset+lvar in PI
         VJOY = 6, //FSUIPC vJoy
-        VJOYDRV = 7 //vJoy Driver by
+        VJOYDRV = 7, //vJoy Driver by
+        HVAR
     }
 
     public interface IModelSwitch
@@ -20,6 +21,7 @@
         string SwitchOffState { get; set; }
         bool SwitchOnCurrentValue { get; set; }
         bool UseControlDelay { get; set; }
+        bool UseLvarReset { get; set; }
 
         bool HasLongPress { get; set; }
         string AddressActionLong { get; set; }
@@ -33,6 +35,7 @@
         public virtual string AddressAction { get; set; } = "";
         public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
         public virtual bool UseControlDelay { get; set; } = false;
+        public virtual bool UseLvarReset { get; set; } = false;
         public virtual string SwitchOnState { get; set; } = "";
         public virtual string SwitchOffState { get; set; } = "";
 

@@ -6,6 +6,7 @@
         public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
         public override bool SwitchOnCurrentValue { get; set; } = true;
         public virtual bool UseControlDelay { get; set; } = false;
+        public virtual bool UseLvarReset { get; set; } = false;
         public virtual string SwitchOnState { get; set; } = "";
         public virtual string SwitchOffState { get; set; } = "";
 
