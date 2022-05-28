@@ -33,7 +33,7 @@ If you don't have a FSUIPC Profile for the Fenix, start them as "Global" Scripts
 # Configuration
 The Sync-Script synchronizes the FD-Buttons for both Captain and FO. If you don't want that, comment out (--) Line 4 (the call for the Function FNX_SYNC_FD)
 ## Profiles
-As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action.<br/>
+As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work.<br/>
 The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed.
 
 ## FNX320_AUTO
