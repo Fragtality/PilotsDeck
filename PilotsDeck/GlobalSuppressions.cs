@@ -5,8 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0044:Modifizierer \"readonly\" hinzufügen", Justification = "<Ausstehend>")]
-[assembly: SuppressMessage("Style", "IDE0016:throw-Ausdruck verwenden", Justification = "<Ausstehend>")]
-[assembly: SuppressMessage("Style", "IDE0034:\"default\"-Ausdruck vereinfachen", Justification = "<Ausstehend>")]
-[assembly: SuppressMessage("Style", "IDE0059:Unnötige Zuweisung eines Werts.", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.IPCManager.WriteOffset(System.String,System.String)~System.Boolean")]
-[assembly: SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<Ausstehend>")]
+[assembly: SuppressMessage("Style", "IDE0066:Switch-Anweisung in Ausdruck konvertieren")]
+[assembly: SuppressMessage("Style", "IDE1006:Benennungsstile")]
+[assembly: SuppressMessage("Usage", "CA2211:Nicht konstante Felder dürfen nicht sichtbar sein", Justification = "<Ausstehend>", Scope = "member", Target = "~F:PilotsDeck.vJoyManager.stateTable")]
+[assembly: SuppressMessage("Style", "IDE0044:Modifizierer \"readonly\" hinzufügen")]

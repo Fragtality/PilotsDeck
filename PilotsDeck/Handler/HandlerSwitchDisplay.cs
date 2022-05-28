@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-namespace PilotsDeck
+﻿namespace PilotsDeck
 {
     public class HandlerSwitchDisplay : HandlerSwitch
     {

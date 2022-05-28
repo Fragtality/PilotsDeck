@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
 using System.IO;
-using Serilog;
+using System.Linq;
 
 namespace PilotsDeck
 {
@@ -47,10 +47,8 @@ namespace PilotsDeck
 
         public Image GetImageObject()
         {
-            using (MemoryStream stream = new MemoryStream(ImageBytes))
-            {
-                return Image.FromStream(stream);
-            }
+            using MemoryStream stream = new(ImageBytes);
+            return Image.FromStream(stream);
         }
 
         public static string GetImageFileReal(string image, StreamDeckType deckType)
@@ -92,7 +90,7 @@ namespace PilotsDeck
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
-            if (!(obj is ImageDefinition objAsImage)) return false;
+            if (obj is not ImageDefinition objAsImage) return false;
             else return Equals(objAsImage);
         }
 
@@ -108,9 +106,9 @@ namespace PilotsDeck
         }
     }
 
-    public class ImageManager : IDisposable
+    public sealed class ImageManager : IDisposable
     {
-        private Dictionary<string, ImageDefinition> cachedImages = new Dictionary<string, ImageDefinition>(); //realname -> obj
+        private Dictionary<string, ImageDefinition> cachedImages = new(); //realname -> obj
 
         public ImageManager()
         {

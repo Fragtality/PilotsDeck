@@ -1,9 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Drawing;
-using System.Drawing.Text;
-using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Drawing.Text;
+using System.IO;
 
 namespace PilotsDeck
 {
@@ -43,7 +43,7 @@ namespace PilotsDeck
         protected float buttonSizeH;
         protected float sizeScalar;
 
-        protected StringFormat stringFormat = new StringFormat
+        protected StringFormat stringFormat = new()
         {
             Alignment = StringAlignment.Center,
             LineAlignment = StringAlignment.Center,
@@ -85,14 +85,14 @@ namespace PilotsDeck
 
         public void DrawText(string text, Font drawFont, Color drawColor, RectangleF drawRectangle)
         {
-            SolidBrush drawBrush = new SolidBrush(drawColor);
+            SolidBrush drawBrush = new (drawColor);
             render.DrawString(text, ScaleFont(drawFont), drawBrush, ScaleRectangle(drawRectangle), stringFormat);
             drawBrush.Dispose();
         }
 
         public void DrawBox(Color drawColor, float lineSize, RectangleF drawRectangle)
         {
-            Pen pen = new Pen(drawColor, lineSize * sizeScalar);
+            Pen pen = new(drawColor, lineSize * sizeScalar);
             RectangleF rect = ScaleRectangle(drawRectangle);
             render.DrawRectangle(pen, rect.X, rect.Y, rect.Width, rect.Height);
             pen.Dispose();
@@ -109,7 +109,7 @@ namespace PilotsDeck
         {
             RectangleF drawRect = drawArc.GetRectangle(buttonSize, sizeScalar);
             
-            Pen pen = new Pen(drawColor, drawArc.Width * sizeScalar);
+            Pen pen = new(drawColor, drawArc.Width * sizeScalar);
             render.DrawArc(pen, drawRect, drawArc.StartAngle, drawArc.SweepAngle);
             pen.Dispose();
         }
@@ -128,7 +128,7 @@ namespace PilotsDeck
                                     new PointF(orgIndX + top, orgIndY + size),
                                     new PointF(orgIndX + top, orgIndY - size) };
 
-            SolidBrush brush = new SolidBrush(drawColor);
+            SolidBrush brush = new(drawColor);
             Rotate(angle, drawArc.Offset);
             render.FillPolygon(brush, triangle);
             Rotate(-angle, drawArc.Offset);
@@ -142,7 +142,7 @@ namespace PilotsDeck
             float orgIndY = (drawRect.Y + drawRect.Width / 2.0f);
             float angle = (drawArc.SweepAngle / 2.0f) + drawArc.StartAngle;
 
-            Pen pen = new Pen(drawColor, size * sizeScalar);
+            Pen pen = new(drawColor, size * sizeScalar);
             Rotate(angle, drawArc.Offset);
             render.DrawLine(pen, orgIndX - (drawArc.Width * sizeScalar * 0.5f), orgIndY, orgIndX + (drawArc.Width * sizeScalar * 0.5f), orgIndY); ;
             Rotate(-angle, drawArc.Offset);
@@ -163,7 +163,7 @@ namespace PilotsDeck
                 rangeAngleStart = NormalizedRatio(ranges[i][0], minimum, maximum) * drawArc.SweepAngle;
                 rangeAngleSweep = NormalizedDiffRatio(ranges[i][1], ranges[i][0], minimum, maximum) * drawArc.SweepAngle;   
 
-                Pen pen = new Pen(colors[i], drawArc.Width * sizeScalar);
+                Pen pen = new(colors[i], drawArc.Width * sizeScalar);
                 render.DrawArc(pen, drawRect, drawArc.StartAngle + rangeAngleStart - fix, rangeAngleSweep + fix);
 
                 if (symm)
@@ -178,7 +178,7 @@ namespace PilotsDeck
 
         public void DrawBar(Color mainColor, Bar drawBar)
         {
-            SolidBrush brush = new SolidBrush(mainColor);
+            SolidBrush brush = new(mainColor);
             render.FillRectangle(brush, drawBar.GetRectangle(buttonSize, sizeScalar));
 
             brush.Dispose();
@@ -186,7 +186,7 @@ namespace PilotsDeck
 
         public void DrawBarCenterLine(Bar drawBar, Color centerColor, float centerSize)
         {
-            Pen pen = new Pen(centerColor, centerSize * sizeScalar);
+            Pen pen = new(centerColor, centerSize * sizeScalar);
             RectangleF drawParams = drawBar.GetRectangle(buttonSize, sizeScalar);
             float off = (drawParams.Width / 2.0f);//+ 0.5f;
             render.DrawLine(pen, drawParams.X + off, drawParams.Y, drawParams.X + off, drawParams.Y + drawParams.Height);
@@ -206,7 +206,7 @@ namespace PilotsDeck
             float top = (bottom ? size * -1.0f : size);
             PointF[] triangle = { new PointF(indX - size, indY - top), new PointF(indX + size, indY - top), new PointF(indX, indY + top) };
 
-            SolidBrush brush = new SolidBrush(drawColor);
+            SolidBrush brush = new(drawColor);
             render.FillPolygon(brush, triangle);
             brush.Dispose();
         }
@@ -223,7 +223,7 @@ namespace PilotsDeck
             {
                 barW = NormalizedDiffRatio(ranges[i][1], ranges[i][0], minimum, maximum) * drawParams.Width;
 
-                SolidBrush brush = new SolidBrush(colors[i]);
+                SolidBrush brush = new(colors[i]);
                 render.FillRectangle(brush, drawParams.X + NormalizedRatio(ranges[i][0], minimum, maximum) * drawParams.Width, drawParams.Y, barW + fix, drawParams.Height);
 
                 if (symm)
@@ -285,9 +285,7 @@ namespace PilotsDeck
         {
             if (minimum > maximum)
             {
-                float temp = minimum;
-                minimum = maximum;
-                maximum = temp;
+                (maximum, minimum) = (minimum, maximum);
             }
         }
 
@@ -295,7 +293,7 @@ namespace PilotsDeck
         {
             string image64 = "";
 
-            using (MemoryStream stream = new MemoryStream())
+            using (MemoryStream stream = new())
             {
                 background.Save(stream, ImageFormat.Png);
                 image64 = Convert.ToBase64String(stream.ToArray());
@@ -311,6 +309,7 @@ namespace PilotsDeck
             render.Dispose();
             background.Dispose();
             imageRef.Dispose();
+            GC.SuppressFinalize(this);
         }
 
 

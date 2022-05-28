@@ -1,8 +1,7 @@
-﻿using StreamDeckLib;
+﻿using Serilog;
+using StreamDeckLib;
 using StreamDeckLib.Messages;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Serilog;
 
 namespace PilotsDeck
 {

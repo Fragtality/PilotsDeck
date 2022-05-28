@@ -15,7 +15,6 @@ namespace PilotsDeck
 
         public override bool IsChanged { get { return isChanged; } }
 
-        //public override void Process(MSFSVariableServices WASM)
         public override void Process()
         {
             try

@@ -1,5 +1,4 @@
-﻿using FSUIPC;
-using Serilog;
+﻿using Serilog;
 using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
@@ -16,7 +15,6 @@ namespace PilotsDeck
 
         public override bool IsChanged { get { return isChanged; } }
 
-        //public override void Process(MSFSVariableServices WASM)
         public override void Process()
         {
             try
@@ -26,7 +24,10 @@ namespace PilotsDeck
                     double result = WASM.LVars[Address].Value;
                     isChanged = currentValue != result;
                     if (isChanged)
+                    {
                         currentValue = result;
+                        //Log.Logger.Debug($"Variable {Address} updated via WASM");
+                    }
                 }
             }
             catch

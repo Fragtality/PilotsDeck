@@ -27,16 +27,16 @@
             return !string.IsNullOrEmpty(Address) && !string.IsNullOrEmpty(SwitchSettings.AddressAction);
         }
 
-        public override bool OnButtonDown(IPCManager ipcManager, long tick)
+        public override bool OnButtonDown(long tick)
         {
-            tickDown = tick;
-            return HandlerSwitch.RunButtonDown(ipcManager, SwitchSettings);
+            TickDown = tick;
+            return HandlerSwitch.RunButtonDown(SwitchSettings);
         }
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings);
-            tickDown = 0;
+            bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings);
+            TickDown = 0;
 
             return result;
         }

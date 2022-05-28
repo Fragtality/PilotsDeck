@@ -1,5 +1,4 @@
-﻿using System;
-using Serilog;
+﻿using Serilog;
 
 namespace PilotsDeck
 {
@@ -20,16 +19,16 @@ namespace PilotsDeck
             Settings = settings;
         }
 
-        public override bool OnButtonDown(IPCManager ipcManager, long tick)
+        public override bool OnButtonDown(long tick)
         {
-            tickDown = tick;
-            return RunButtonDown(ipcManager, BaseSettings);
+            TickDown = tick;
+            return RunButtonDown(BaseSettings);
         }
 
-        public static bool RunButtonDown(IPCManager ipcManager, IModelSwitch switchSettings)
+        public static bool RunButtonDown(IModelSwitch switchSettings)
         {
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
-                return IPCTools.VjoyClearSet(ipcManager, (ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, false);
+                return IPCTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, false);
             else if (IPCTools.IsWriteAddress(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType))
                 return true;
             else
@@ -38,8 +37,8 @@ namespace PilotsDeck
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = RunButtonUp(ipcManager, (tick - tickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings);
-            tickDown = 0;
+            bool result = RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings);
+            TickDown = 0;
 
             return result;
         }
@@ -50,7 +49,7 @@ namespace PilotsDeck
 
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
             {
-                result = IPCTools.VjoyClearSet(ipcManager, (ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, true);
+                result = IPCTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, true);
             }
             else if (!longPress)
             {
@@ -66,7 +65,7 @@ namespace PilotsDeck
             {
                 if (IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong) && IPCTools.IsVjoyToggle(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
                 {
-                    result = IPCTools.VjoyToggle(ipcManager, (ActionSwitchType)switchSettings.ActionTypeLong, switchSettings.AddressActionLong);
+                    result = IPCTools.VjoyToggle((ActionSwitchType)switchSettings.ActionTypeLong, switchSettings.AddressActionLong);
                 }
                 else if (IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong) && !IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
                 {

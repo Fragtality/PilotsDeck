@@ -21,9 +21,9 @@
         bool IsInitialized { get; }
 
         bool HasAction { get; }
-        long tickDown { get; }
+        long TickDown { get; }
 
-        bool OnButtonDown(IPCManager ipcManager, long tick);
+        bool OnButtonDown(long tick);
         bool OnButtonUp(IPCManager ipcManager, long tick);
 
         void Register(ImageManager imgManager, IPCManager ipcManager);

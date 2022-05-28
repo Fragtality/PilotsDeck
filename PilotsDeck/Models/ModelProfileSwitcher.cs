@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Linq;
-using System.Collections.Generic;
 using Serilog;
 using StreamDeckLib.Messages;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PilotsDeck
 {
@@ -94,22 +94,22 @@ namespace PilotsDeck
             foreach (var device in connectedDevices)
             {
                 var profilesForDevice = manifestProfiles.Where(p => p.Type == device.type);
-                if (profilesForDevice.Count() > 0) //only save mappings if deckType is in use
+                if (profilesForDevice.Any()) //only save mappings if deckType is in use
                 {
                     DeviceMapping deviceMapping;
                     var existingDevice = DeviceMappings.Where(d => d.ID == device.id);
-                    if (existingDevice.Count() > 0) //device is not new, use existing data
+                    if (existingDevice.Any()) //device is not new, use existing data
                     {
                         deviceMapping = existingDevice.First();
                         var newProfileList = new List<StreamDeckProfile>();
                         foreach (var oldProfile in deviceMapping.Profiles) //copy over oldProfiles, but only if they are still listed in manifest
                         {
-                            if (manifestProfiles.Where(p => p.Name == oldProfile.Name).Count() > 0)
+                            if (manifestProfiles.Where(p => p.Name == oldProfile.Name).Any())
                                 newProfileList.Add(oldProfile);
                         }
                         foreach (var newProfile in profilesForDevice) //add new profiles from manifest (if they not already known)
                         {
-                            if (deviceMapping.Profiles.Where(p => p.Name == newProfile.Name).Count() == 0)
+                            if (!deviceMapping.Profiles.Where(p => p.Name == newProfile.Name).Any())
                                 newProfileList.Add(newProfile);
                         }
                         deviceMapping.Profiles = newProfileList;
@@ -138,9 +138,9 @@ namespace PilotsDeck
                 {
                     if (deviceMapping.Type == (int)StreamDeckType.StreamDeck || deviceMapping.Type == (int)StreamDeckType.StreamDeckXL)
                     {
-                        if (deviceMapping.Type == (int)StreamDeckType.StreamDeck && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfile).Count() > 0)
+                        if (deviceMapping.Type == (int)StreamDeckType.StreamDeck && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfile).Any())
                             deviceMapping.DefaultProfile = AppSettings.deckDefaultProfile;
-                        else if (deviceMapping.Type == (int)StreamDeckType.StreamDeckXL && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfileXL).Count() > 0)
+                        else if (deviceMapping.Type == (int)StreamDeckType.StreamDeckXL && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfileXL).Any())
                             deviceMapping.DefaultProfile = AppSettings.deckDefaultProfileXL;
                         else
                             deviceMapping.UseDefault = false;
@@ -150,7 +150,7 @@ namespace PilotsDeck
                 }
                 else if (deviceMapping.UseDefault)
                 {
-                    if (deviceMapping.Profiles.Where(p => p.Name == deviceMapping.DefaultProfile).Count() == 0)
+                    if (!deviceMapping.Profiles.Where(p => p.Name == deviceMapping.DefaultProfile).Any())
                         deviceMapping.UseDefault = false;
                 }
             }

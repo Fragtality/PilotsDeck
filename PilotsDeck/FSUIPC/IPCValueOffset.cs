@@ -1,7 +1,7 @@
-﻿using System;
-using System.Globalization;
+﻿using FSUIPC;
 using Serilog;
-using FSUIPC;
+using System;
+using System.Globalization;
 
 namespace PilotsDeck
 {
@@ -76,6 +76,8 @@ namespace PilotsDeck
     public class IPCValueOffset : IPCValue
     {
         private Offset offset = null;
+        private bool disposed = false;
+
         public OffsetParam Param { get; } = null;
         public int Size { get { return Param.Length;  } }
         public bool IsSigned { get { return Param.Signed; } }
@@ -94,18 +96,24 @@ namespace PilotsDeck
 
         public override void Dispose()
         {
-            base.Dispose();
-            if (offset != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (offset != null && disposing)
             {
                 if (offset.IsConnected)
                     offset.Disconnect();
                 offset = null;
             }
+            disposed = true;
         }
 
         public override void Connect()
         {
-            if (!offset.IsConnected)
+            if (!disposed && !offset.IsConnected)
                 offset.Reconnect();
         }
 

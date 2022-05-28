@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using vJoyInterfaceWrap;
 
 namespace PilotsDeck
@@ -23,7 +19,7 @@ namespace PilotsDeck
             bool result;
             GetIDs(address, out uint joyID, out uint btnID);
 
-            vJoy joystick = new vJoy();
+            vJoy joystick = new();
             result = joystick.AcquireVJD(joyID);
             if (result)
             {

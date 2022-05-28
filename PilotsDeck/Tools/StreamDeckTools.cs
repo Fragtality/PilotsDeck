@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using Serilog;
+using StreamDeckLib.Messages;
+using System;
 using System.Drawing;
 using System.Drawing.Text;
-using StreamDeckLib.Messages;
 using System.IO;
-using Serilog;
+using System.Linq;
 
 namespace PilotsDeck
 {
@@ -50,7 +50,7 @@ namespace PilotsDeck
             {
                 try
                 {
-                    InstalledFontCollection installedFontCollection = new InstalledFontCollection();
+                    InstalledFontCollection installedFontCollection = new();
                     string list = "";
                     foreach (var family in installedFontCollection.Families)
                     {
@@ -92,7 +92,7 @@ namespace PilotsDeck
                 Log.Logger.Error("ReadImageDirectory: Exception while loading ImageFiles");
             }
 
-            return new string[0];
+            return Array.Empty<string>();
         }
 
         public class StreamDeckTitleParameters
@@ -105,7 +105,7 @@ namespace PilotsDeck
 
         public static StreamDeckTitleParameters ConvertTitleParameter(StreamDeckEventPayload.TitleParameters titleParameters)
         {
-            StreamDeckTitleParameters result = new StreamDeckTitleParameters()
+            StreamDeckTitleParameters result = new()
             {
                 FontName = (titleParameters.fontFamily != "" ? titleParameters.fontFamily : "Arial"),
                 FontSize = titleParameters.fontSize,

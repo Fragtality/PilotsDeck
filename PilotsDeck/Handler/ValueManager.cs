@@ -1,9 +1,5 @@
-﻿using System;
+﻿using Serilog;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Serilog;
 
 namespace PilotsDeck
 {
@@ -29,7 +25,7 @@ namespace PilotsDeck
     public class AddressValueManager
     {
         //ID (Current, Last, ...) => Address = Value
-        protected Dictionary<string, ValuePair> managedValues = new Dictionary<string, ValuePair>();
+        protected Dictionary<string, ValuePair> managedValues = new ();
         protected IPCManager ipcManager = null;
 
         public void RegisterManager(IPCManager manager)

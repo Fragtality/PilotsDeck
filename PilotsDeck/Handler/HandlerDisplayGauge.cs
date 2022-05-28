@@ -20,7 +20,7 @@ namespace PilotsDeck
             IsArc = settings.DrawArc;
         }
 
-        public override bool OnButtonDown(IPCManager ipcManager, long tick)
+        public override bool OnButtonDown(long tick)
         {
             return false;
         }
@@ -52,7 +52,7 @@ namespace PilotsDeck
 
         protected virtual void RenderDefaultImage(ImageManager imgManager)
         {
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
+            ImageRenderer render = new (imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
 
             if (GaugeSettings.DrawArc)
             {
@@ -91,7 +91,7 @@ namespace PilotsDeck
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
+            ImageRenderer render = new (imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
 
             if (GaugeSettings.DrawArc)
             {

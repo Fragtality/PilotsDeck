@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using System.Configuration;
+using System.Globalization;
 
 namespace PilotsDeck
 {

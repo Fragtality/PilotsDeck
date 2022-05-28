@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using Serilog;
+using System;
 using System.Text.RegularExpressions;
-using Serilog;
-using vJoyInterfaceWrap;
+using System.Threading;
 
 namespace PilotsDeck
 {
@@ -10,16 +9,16 @@ namespace PilotsDeck
 
     public static class IPCTools
     {
-        static string validName = @"[a-zA-Z0-9\x2D\x5F]+";
-        public static Regex rxMacro = new Regex($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
-        public static Regex rxScript= new Regex($"^(Lua(Set|Clear|Toggle)?:){{1}}{validName}(:[0-9]{{1,3}})*$", RegexOptions.Compiled);
-        public static Regex rxControlSeq = new Regex(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
-        public static Regex rxControl = new Regex(@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
-        public static Regex rxLvar = new Regex($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
-        public static Regex rxHvar = new Regex($"^[^0-9]{{1}}((H:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
-        public static Regex rxOffset = new Regex(@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static Regex rxVjoy = new Regex(@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static Regex rxVjoyDrv = new Regex(@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly string validName = @"[a-zA-Z0-9\x2D\x5F]+";
+        public static readonly Regex rxMacro = new ($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxScript = new ($"^(Lua(Set|Clear|Toggle)?:){{1}}{validName}(:[0-9]{{1,3}})*$", RegexOptions.Compiled);
+        public static readonly Regex rxControlSeq = new (@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
+        public static readonly Regex rxControl = new (@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
+        public static readonly Regex rxLvar = new ($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxHvar = new ($"^[^0-9]{{1}}((H:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxOffset = new (@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex rxVjoy = new (@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex rxVjoyDrv = new (@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 
         public static bool IsReadAddress(string address)
@@ -47,8 +46,8 @@ namespace PilotsDeck
                     return rxControl.IsMatch(address) || rxControlSeq.IsMatch(address);
                 case ActionSwitchType.LVAR:
                     return rxLvar.IsMatch(address);
-                //case ActionSwitchType.HVAR:
-                //    return rxHvar.IsMatch(address);
+                case ActionSwitchType.HVAR:
+                    return rxHvar.IsMatch(address);
                 case ActionSwitchType.OFFSET:
                     return rxOffset.IsMatch(address);
                 case ActionSwitchType.VJOY:
@@ -80,21 +79,21 @@ namespace PilotsDeck
                 switch (actionType)
                 {
                     case ActionSwitchType.MACRO:
-                        return RunMacros(ipcManager, Address);
+                        return RunMacros(Address);
                     case ActionSwitchType.SCRIPT:
-                        return RunScript(ipcManager, Address);
+                        return RunScript(Address);
                     case ActionSwitchType.LVAR:
                         return WriteLvar(ipcManager, Address, newValue, switchSettings.UseLvarReset, offValue);
-                    //case ActionSwitchType.HVAR:
-                    //    return WriteHvar(ipcManager, Address);
+                    case ActionSwitchType.HVAR:
+                        return WriteHvar(ipcManager, Address);
                     case ActionSwitchType.CONTROL:
-                        return SendControls(ipcManager, Address, switchSettings.UseControlDelay);
+                        return SendControls(Address, switchSettings.UseControlDelay);
                     case ActionSwitchType.OFFSET:
-                        return WriteOffset(ipcManager, Address, newValue);
+                        return WriteOffset(Address, newValue);
                     case ActionSwitchType.VJOY:
-                        return VjoyToggle(ipcManager, actionType, Address);
+                        return VjoyToggle(actionType, Address);
                     case ActionSwitchType.VJOYDRV:
-                        return VjoyToggle(ipcManager, actionType, Address);
+                        return VjoyToggle(actionType, Address);
                     default:
                         return false;
                 }
@@ -105,7 +104,7 @@ namespace PilotsDeck
             return false;
         }
 
-        public static bool VjoyToggle(IPCManager ipcManager, ActionSwitchType type, string address)
+        public static bool VjoyToggle(ActionSwitchType type, string address)
         {
             if (!IsVjoyToggle(address, (int)type))
                 return false;
@@ -113,10 +112,10 @@ namespace PilotsDeck
             if (type == ActionSwitchType.VJOYDRV)
                 return vJoyManager.ToggleButton(address);
             else
-                return ipcManager.SendVjoy(address, 0);
+                return IPCManager.SendVjoy(address, 0);
         }
 
-        public static bool VjoyClearSet(IPCManager ipcManager, ActionSwitchType type, string address, bool clear)
+        public static bool VjoyClearSet(ActionSwitchType type, string address, bool clear)
         {
             if (type == ActionSwitchType.VJOYDRV)
             {
@@ -128,31 +127,31 @@ namespace PilotsDeck
             else
             {
                 if (clear)
-                    return ipcManager.SendVjoy(address, 2);
+                    return IPCManager.SendVjoy(address, 2);
                 else
-                    return ipcManager.SendVjoy(address, 1);
+                    return IPCManager.SendVjoy(address, 1);
             }
         }
 
-        public static bool RunScript(IPCManager ipcManager, string address)
+        public static bool RunScript(string address)
         {
-            return ipcManager.RunScript(address);
+            return IPCManager.RunScript(address);
         }
 
-        public static bool RunMacros(IPCManager ipcManager, string address)
+        public static bool RunMacros(string address)
         {
             bool result = false;
 
             string[] tokens = address.Split(':');
             if (tokens.Length == 2)
-                result = ipcManager.RunMacro(address);
+                result = IPCManager.RunMacro(address);
             else
             {
                 string macroFile = tokens[0];
                 int fails = 0;
                 for (int i = 1; i < tokens.Length; i++)
                 {
-                    if (!ipcManager.RunMacro(macroFile + ":" + tokens[i]))
+                    if (!IPCManager.RunMacro(macroFile + ":" + tokens[i]))
                         fails++;
                 }
                 if (fails == 0)
@@ -185,19 +184,20 @@ namespace PilotsDeck
             return result;
         }
 
-        //public static bool WriteHvar(IPCManager ipcManager, string address)
-        //{
-        //    address = address.Replace("H:", "");
-
-        //    return ipcManager.WriteHvar(address);
-        //}
-
-        public static bool SendControls(IPCManager ipcManager, string address, bool useControlDelay)
+        public static bool WriteHvar(IPCManager ipcManager, string address)
         {
-            if (!address.Contains("=") && address.Contains(":") && rxControlSeq.IsMatch(address))
-                return SendControlsSeq(ipcManager, address, useControlDelay);
-            else if (!address.Contains("=") && !address.Contains(":"))
-                return ipcManager.SendControl(address);
+            if (!address.Contains("H:"))
+                address = "H:" + address;
+
+            return ipcManager.WriteHvar(address);
+        }
+
+        public static bool SendControls(string address, bool useControlDelay)
+        {
+            if (!address.Contains('=') && address.Contains(':') && rxControlSeq.IsMatch(address))
+                return SendControlsSeq(address, useControlDelay);
+            else if (!address.Contains('=') && !address.Contains(':'))
+                return IPCManager.SendControl(address);
 
             int fails = 0;
             
@@ -208,13 +208,13 @@ namespace PilotsDeck
                 codeControl = GetNextTokenMove(ref address, "=");
 
                 if (address.Length == 0)
-                    if (!ipcManager.SendControl(codeControl))
+                    if (!IPCManager.SendControl(codeControl))
                         fails++;
                 
                 while (address.Length > 0 && !PeekNextDelim(address, "="))
                 {
                     codeParam = GetNextTokenMove(ref address, ":");
-                    if (!ipcManager.SendControl(codeControl, codeParam))
+                    if (!IPCManager.SendControl(codeControl, codeParam))
                         fails++;
                     if (useControlDelay)
                         Thread.Sleep(AppSettings.controlDelay);
@@ -235,7 +235,7 @@ namespace PilotsDeck
             int matchIndex = address.IndexOf(delim);
             if (matchIndex != -1)
             {
-                result = address.Substring(0, matchIndex);
+                result = address[..matchIndex];
                 address = address.Remove(0, matchIndex + 1);
             }
             else if (address.Length > 0)
@@ -247,7 +247,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool SendControlsSeq(IPCManager ipcManager, string address, bool useControlDelay)
+        public static bool SendControlsSeq(string address, bool useControlDelay)
         {
             int fails = 0;
 
@@ -258,7 +258,7 @@ namespace PilotsDeck
 
                 if (codeControl != null)
                 {
-                    if (!ipcManager.SendControl(codeControl))
+                    if (!IPCManager.SendControl(codeControl))
                         fails++;
                     if (PeekNextDelim(address, ":") && useControlDelay)
                         Thread.Sleep(AppSettings.controlDelay);
@@ -268,10 +268,10 @@ namespace PilotsDeck
             return fails == 0;
         }
 
-        public static bool WriteOffset(IPCManager ipcManager, string address, string newValue)
+        public static bool WriteOffset(string address, string newValue)
         {
             if (newValue != "")
-                return ipcManager.WriteOffset(address, newValue);
+                return IPCManager.WriteOffset(address, newValue);
             else
                 return false;
         }

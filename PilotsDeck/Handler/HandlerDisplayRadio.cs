@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using Serilog;
 
 namespace PilotsDeck
 {
@@ -106,7 +105,7 @@ namespace PilotsDeck
                 else
                     colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
 
-                ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(background, DeckType));
+                ImageRenderer render = new(imgManager.GetImageObject(background, DeckType));
                 render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
                 render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 

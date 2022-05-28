@@ -26,7 +26,7 @@
         public virtual bool IsInitialized { get; set; }
 
         public virtual bool HasAction { get; protected set; } = false;
-        public virtual long tickDown { get; protected set; }
+        public virtual long TickDown { get; protected set; }
 
         protected virtual StreamDeckTools.StreamDeckTitleParameters TitleParameters { get; set; }
 
@@ -40,7 +40,7 @@
 
         public abstract bool OnButtonUp(IPCManager ipcManager, long tick);
 
-        public abstract bool OnButtonDown(IPCManager ipcManager, long tick);
+        public abstract bool OnButtonDown(long tick);
 
         public virtual void Register(ImageManager imgManager, IPCManager ipcManager)
         {

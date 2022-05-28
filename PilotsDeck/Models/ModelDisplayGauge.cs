@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using System.Drawing;
+using System.Globalization;
 
 namespace PilotsDeck
 {
@@ -127,7 +127,7 @@ namespace PilotsDeck
         {
             float[] arcsize = GetNumValues(GaugeSize, 48, 6);
             float[] offset = GetNumValues(Offset, 0, 0);
-            Arc arc = new Arc
+            Arc arc = new()
             {
                 Radius = arcsize[0],
                 Width = arcsize[1],
@@ -142,7 +142,7 @@ namespace PilotsDeck
         public Bar GetBar()
         {
             float[] barsize = GetNumValues(GaugeSize, 58, 10);
-            Bar bar = new Bar
+            Bar bar = new()
             {
                 Width = barsize[0],
                 Height = barsize[1]

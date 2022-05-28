@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Drawing;
+using System.Globalization;
+using System.Linq;
 
 namespace PilotsDeck
 {
@@ -37,14 +37,14 @@ namespace PilotsDeck
 
 		public string GetValueMapped(string text)
 		{
-			if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains("="))
+			if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains('='))
 			{
 				var dict = GetValueMap();
 				if (HasComparison() && dict.Count > 0)
                 {
 					var comparison = dict.First();
 
-					bool greater = comparison.Key.Contains(">");
+					bool greater = comparison.Key.Contains('>');
 					string key = comparison.Key.Replace(">", "").Replace("<", "");
 					float val = GetNumValue(text, 0.0f);
 					float limit = GetNumValue(key, 0.0f);

@@ -1,6 +1,6 @@
-﻿using StreamDeckLib;
+﻿using Serilog;
+using StreamDeckLib;
 using System;
-using Serilog;
 using System.Threading.Tasks;
 
 #if DEBUG
@@ -25,13 +25,11 @@ namespace PilotsDeck
 #endif
             try
             {
-                using (var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args))
-                {
-                    ActionController.Init();
-                    await ConnectionManager.Initialize(args, config.LoggerFactory, ActionController)
-                                                                .RegisterAllActions(typeof(Plugin).Assembly)
-                                                                .StartAsync();
-                }
+                using var config = StreamDeckLib.Config.ConfigurationBuilder.BuildDefaultConfiguration(args);
+                ActionController.Init();
+                await ConnectionManager.Initialize(args, config.LoggerFactory, ActionController)
+                                                            .RegisterAllActions(typeof(Plugin).Assembly)
+                                                            .StartAsync();
             }
             catch (Exception e)
             {
@@ -40,7 +38,7 @@ namespace PilotsDeck
                 Log.Logger.Fatal(e.Source);
                 Log.Logger.Fatal(e.Message);
                 Log.Logger.Fatal(e.StackTrace);
-                throw e;
+                throw;
             }
         }
 

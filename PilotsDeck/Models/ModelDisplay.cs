@@ -51,8 +51,8 @@ namespace PilotsDeck
 
             if (format.Length < 1 || parts.Length < 1 || !format.Contains(replaceFrom))
                 return value;
-            else if (parts.Length >= 2 && int.TryParse(parts[0], out _) && format.Substring(parts[0].Length + 1).Contains(replaceFrom))
-                return string.Format(AppSettings.numberFormat, format.Substring(parts[0].Length + 1).Replace(replaceFrom, "{0}"), value);
+            else if (parts.Length >= 2 && int.TryParse(parts[0], out _) && format[(parts[0].Length + 1)..].Contains(replaceFrom))
+                return string.Format(AppSettings.numberFormat, format[(parts[0].Length + 1)..].Replace(replaceFrom, "{0}"), value);
             else
                 return string.Format(AppSettings.numberFormat, format.Replace(replaceFrom, "{0}"), value);
         }

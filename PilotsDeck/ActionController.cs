@@ -1,14 +1,13 @@
-﻿using System;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json.Linq;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading;
+﻿using Newtonsoft.Json.Linq;
+using Serilog;
 using StreamDeckLib;
 using StreamDeckLib.Messages;
-using Serilog;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
 
 namespace PilotsDeck
 {
@@ -42,14 +41,14 @@ namespace PilotsDeck
         private bool redrawRequested = false;
         private readonly int waitTicks = AppSettings.waitTicks;
         private readonly int firstTick = (int)(AppSettings.waitTicks / 7.5);
-        private Stopwatch watchRefresh = new Stopwatch();
-        private Stopwatch watchLoading = new Stopwatch();
+        private Stopwatch watchRefresh = new();
+        private Stopwatch watchLoading = new();
         private double averageTime = 0;
         private bool redrawAlways = AppSettings.redrawAlways;
 
         public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
-        private List<string> profileSwitcherActions = new List<string>();
-        private List<string> switchedDecks = new List<string>();
+        private List<string> profileSwitcherActions = new();
+        private List<string> switchedDecks = new();
         private List<StreamDeckProfile> manifestProfiles;
         private IPCValueOffset loadedFSProfile;
         private string lastFSProfile = null;
@@ -96,7 +95,7 @@ namespace PilotsDeck
         {
             ipcManager.Dispose();
             imgManager.Dispose();
-            
+            GC.SuppressFinalize(this);
             Log.Logger.Information("ActionController and IPCManager Disposed");
         }
 
@@ -116,7 +115,7 @@ namespace PilotsDeck
         public StreamDeckType GetDeckTypeById(string device)
         {
             var deckInfo = DeckManager.Info.devices.Where(d => d.id == device);
-            if (deckInfo.Count() > 0)
+            if (deckInfo.Any())
                 return (StreamDeckType)deckInfo.First().type;
             else
                 return StreamDeckType.StreamDeck;
@@ -231,7 +230,7 @@ namespace PilotsDeck
 
                 if (string.IsNullOrEmpty(loadedFSProfile.Value) && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
                     switchTo = deviceMapping.DefaultProfile;
-                else if (deviceMapping.Profiles != null && deviceMapping.Profiles.Count() > 0)
+                else if (deviceMapping.Profiles != null && deviceMapping.Profiles.Count > 0)
                 {
                     foreach (var profile in deviceMapping.Profiles)
                     {
@@ -264,10 +263,10 @@ namespace PilotsDeck
             if (!GlobalProfileSettings.ProfilesInstalled)
             {
                 var deckTypes = new int[] { (int)StreamDeckType.StreamDeck, (int)StreamDeckType.StreamDeckXL, (int)StreamDeckType.StreamDeckMini, (int)StreamDeckType.StreamDeckMobile };
-                List<string> decksToInstall = new List<string>();
+                List<string> decksToInstall = new();
                 foreach (int deckType in deckTypes)
                 {
-                    if (manifestProfiles.Where(p => p.Type == deckType).Count() > 0)
+                    if (manifestProfiles.Where(p => p.Type == deckType).Any())
                     {
                         var decks = DeckManager.Info.devices.Where(d => d.type == deckType);
                         foreach (var deck in decks)
@@ -355,11 +354,11 @@ namespace PilotsDeck
                     if (!lastProcessState && tickCounter % (waitTicks / 3) != 0 && tickCounter != firstTick && !appAlreadyRunning)  //throttle process calls to every 10s (150/3 * 200ms) if last was unsuccessful (but not on first)
                     {
                         lastProcessState = false;
-                        //Log.Logger.Verbose("PROC - Throttle (not proc)");
+                        Log.Logger.Verbose("PROC - Throttle (not proc)");
                     }
                     else if (!appAlreadyRunning && appIsStarting && tickCounter % (waitTicks / 3) != 0) //throttle calls while still loading (60s timer still running) to every 10s
                     {
-                        //Log.Logger.Verbose($"PROC - Throttle (starting) - Delay Elapsed: {watchLoading.Elapsed.Seconds} | Total: {watchLoading.Elapsed.TotalSeconds} | in ms {watchLoading.ElapsedMilliseconds}");
+                        Log.Logger.Verbose($"PROC - Throttle (starting) - Delay Elapsed: {watchLoading.Elapsed.Seconds} | Total: {watchLoading.Elapsed.TotalSeconds} | in ms {watchLoading.ElapsedMilliseconds}");
                     }
                     else if (ipcManager.Process(AppSettings.groupStringRead))
                     {
@@ -368,7 +367,7 @@ namespace PilotsDeck
                             if (!watchLoading.IsRunning)
                             {
                                 watchLoading.Restart();
-                                //Log.Logger.Verbose("PROC - Processed OK - Start App Delay");
+                                Log.Logger.Verbose("PROC - Processed OK - Start App Delay");
                             }
                             else
                                 Log.Logger.Debug($"ActionController: Throttled Processing, awaiting appStartDelay - elapsed: {watchLoading.Elapsed.TotalSeconds:n0}");
@@ -380,13 +379,13 @@ namespace PilotsDeck
                                 appIsStarting = false;
                                 Log.Logger.Debug($"ActionController: appStartDelay expired, Processing normally.");
                                 lastProcessState = false;
-                                //Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
+                                Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
                             }
                         }
                         else if (appAlreadyRunning && appIsStarting)
                             appIsStarting = false;
-                        //else
-                        //    Log.Logger.Verbose("PROC - Processed OK");
+                        else
+                            Log.Logger.Verbose("PROC - Processed OK");
 
                         if (tickCounter % (waitTicks / 3) == 0) //every 10s force redraw
                             RefreshActions(token, true);  
@@ -398,7 +397,7 @@ namespace PilotsDeck
                     }
                     else
                     {
-                        //Log.Logger.Verbose("PROC - Processed ERR");
+                        Log.Logger.Verbose("PROC - Processed ERR");
                         lastProcessState = false;
                     }
 
@@ -503,7 +502,7 @@ namespace PilotsDeck
 
                 if (currentActions.ContainsKey(context))
                 {
-                    return currentActions[context].OnButtonDown(ipcManager, tickCounter);
+                    return currentActions[context].OnButtonDown(tickCounter);
                 }
                 else
                 {

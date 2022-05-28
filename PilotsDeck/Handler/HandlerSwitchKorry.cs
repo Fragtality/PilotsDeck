@@ -57,7 +57,7 @@ namespace PilotsDeck
 
         protected virtual void RenderDefaultImage(ImageManager imgManager)
         {
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(KorrySettings.DefaultImage, DeckType));
+            ImageRenderer render = new (imgManager.GetImageObject(KorrySettings.DefaultImage, DeckType));
 
             if (!string.IsNullOrEmpty(KorrySettings.TopImage))
                 render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage, DeckType), KorrySettings.GetRectangleTop());
@@ -83,7 +83,7 @@ namespace PilotsDeck
             if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bot)  && !ForceUpdate)
                 return;
 
-            ImageRenderer render = new ImageRenderer(imgManager.GetImageObject(DefaultImage, DeckType));
+            ImageRenderer render = new(imgManager.GetImageObject(DefaultImage, DeckType));
 
             string top = ValueManager[ID.Top];
             string bot = ValueManager[ID.Bot];
