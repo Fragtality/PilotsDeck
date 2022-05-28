@@ -1,4 +1,4 @@
-# Feninx A320 Files for PilotsDeck
+# Fenix A320 Files for PilotsDeck
 Here you'll find a mostly working / ready to use Example I use myself for the Fenix A320. A registered Version of FSUIPC7 is required.<br/>
 My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementary/supportive Actions (e.g. showing the FCU while being in the "Flight" Folder on the XL), so there are two Profiles designed to be used together:
 - **MSFS-Fenix320-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS, MCP, CDU and MIP/Pedestal
