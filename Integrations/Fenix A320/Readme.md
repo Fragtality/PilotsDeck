@@ -1,5 +1,5 @@
 # Feninx A320 Files for PilotsDeck
-Here you'll find a working / ready to use Example I use myself for the Fenix A320. A registered Version of FSUIPC7 is required.<br/>
+Here you'll find a mostly working / ready to use Example I use myself for the Fenix A320. A registered Version of FSUIPC7 is required.<br/>
 My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementary/supportive Actions (e.g. showing the FCU while being in the "Flight" Folder on the XL), so there are two Profiles designed to be used together:
 - **MSFS-Fenix320-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS, MCP, CDU and MIP/Pedestal
 - **MSFS-Fenix320:** SD (15 Buttons) Profile FCU, Radio and Transponder
@@ -33,8 +33,8 @@ If you don't have a FSUIPC Profile for the Fenix, start them as "Global" Scripts
 # Configuration
 The Sync-Script synchronizes the FD-Buttons for both Captain and FO. If you don't want that, comment out (--) Line 4 (the call for the Function FNX_SYNC_FD)
 ## Profiles
-As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settins for every Action.<br/>
-The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button.
+As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action.<br/>
+The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed.
 
 ## FNX320_AUTO
 This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:FNX320_AUTO:*NUM*" in PilotsDeck. Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work.
