@@ -11,7 +11,7 @@ The Plugin is designed to be highly flexible and customizable, so it won't give 
 The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want (as Text or Graphical Representation). It uses the full Potential the StreamDeck has to offer for FlightSimmers: it is also a *Display* Device, not *just* Buttons!<br/>
 The Plugin can also switch between StreamDeck Profiles (on multiple Decks) when the Aircraft (Model) and FSUIPC Profile change.<br/>
 Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).<br/><br/>
-As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE;, so this Readme describes the Features which work there.
+As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE; and MSFS2020, so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
 Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed and working would be a bloody good Start :laughing:<br/>
@@ -28,9 +28,9 @@ The Sims and their FSUIPC Version/Variant are:
 - FSUIPC4 - Microsoft FSX, FSX Steam Edition, Prepar3d 1.4 to 3.4
 - FSUIPC5 - Prepar3D Version 4
 - **FSUIPC6** - Prepar3D Version 4 and 5
-- FSUIPC7 - Microsoft Flight Simulator 2020
+- **FSUIPC7** - Microsoft Flight Simulator 2020
 - XPUIPC - X-Plane<br/><br/>
-If you let me know what works and which Features work in which Sim (other than P3D v4/5), I'll add it to the Readme! :wink:<br/>
+If you let me know what works and which Features work in which Sim (other than P3D v4/5, MSFS2020), I'll add it to the Readme! :wink:<br/>
 :grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so for FSUIPC a registered Version is recommended (but not neccessary)!
 <br/><br/>
 ## Plugin Installation
@@ -173,8 +173,9 @@ Since Display Value is explained above and a simple Button has nothing much to c
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lua Flags), multiple Requests will be send to the Sim in fast Sequence.
 * **Use Delay**: If Control is selected as Action Type, you can check that to have a small Delay of 50ms between the Control-Commands send to the Sim.
+* **Reset Value**: If Lvar is selected as Action Type, you can check that to have the Lvar being reset to the Off-Value after the Button was pressed (the Plugin will set the Lvar to the On-Value for 100ms (controlDelay\*2) and then to the Off-Value). Useful for some Cockpit-Buttons which do not stay in the their pushed-Position and reflect that in their Lvar.
 * **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these based on the current Value when pushed ("keyUp") and sends it to the Sim. So if the Lvar/Offset is 1, then the Plugin will write a 0.<br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
-* **Long Press**: When enabled, the Button can execute a completely different Command when pressed for longer than 600ms (with the default [Plugin Settings](README.md#plugin-settings). This second Command Settings' work mostly like described before. For Lvar and Offset as Action Type, the toggling is always done on the current value from the Action Address (for the Long Press). The "Use Delay" option is used if enabled.<br/>
+* **Long Press**: When enabled, the Button can execute a completely different Command when pressed for longer than 600ms (with the default [Plugin Settings](README.md#plugin-settings). This second Command Settings' work mostly like described before. For Lvar and Offset as Action Type, the toggling is always done on the current value from the Action Address for the Long Press (meaning you can use two different Lvars/Offsets). The "Use Delay" and "Reset Value" option is used if enabled (they apply to both Actions)!<br/>
 Note that the internal Mechanic is based on "keyUp": regardless of how long you press the Button, it will only execute once when released! For that Reason this Long Press Option is not offered when the first Command is a non-toggleable vJoy Address! A non-toggleable vJoy is "down" (set) as soon as the StreamDeck Button is pressed and "up" (clear) as soon as the StreamDeck Button is released. A toggelable vJoy though behaves like the other Action (evaluated on "keyUp") and can therefore have a second Command on with the Long Press Option.
 <br/><br/>
 ### Dynamic Button
