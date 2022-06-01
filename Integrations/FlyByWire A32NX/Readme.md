@@ -7,7 +7,7 @@ My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementa
 Mix and match as you like :relaxed:<br/>
 
 ![ExampleFNX00](../../img/ExampleFNX00.jpg)<br/>
-![ExampleFNX01](../../img/ExampleFNX01.jpg)<br/>
+![ExampleFBW00](../../img/ExampleFBW00.jpg)<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
 
 # Installation
