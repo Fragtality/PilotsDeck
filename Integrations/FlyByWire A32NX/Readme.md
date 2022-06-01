@@ -33,7 +33,7 @@ If you don't have a FSUIPC Profile for the FlyByWire, start them as "Global" Scr
 # Configuration
 
 ## Profiles
-As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work.<br/>
+As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work. As Alternatives I'd recommend: For Text-Displays "Alte Din 1451 Mittelschrift" and for the Quartz-Displays "Digital 7".<br/>
 The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed.
 
 ## FBW320_AUTO
