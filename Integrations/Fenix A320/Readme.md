@@ -11,6 +11,7 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
 
 # Installation
+- Tested with Fenix 1.0.2.104 (01.06.22)
 - Update to at least PilotsDeck 0.6.6!
 - Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
 - Just double-click on the Profiles to add them to your StreamDeck Software
