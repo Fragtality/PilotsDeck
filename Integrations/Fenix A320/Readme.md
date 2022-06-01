@@ -15,6 +15,7 @@ Mix and match as you like :relaxed:<br/>
 - Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
 - Just double-click on the Profiles to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
+- The cameras.cfg is optional (for the Views via vJoy-Driver Buttons)! If you want to use it: %appdata%\Microsoft Flight Simulator\SimObjects\Airplanes\FNX320
 - Either start the Scripts (Auto + Sync) manually ...
 - ... or add them as Auto-Scripts to your FSUIPC7.ini. Start MSFS/FSUIPC7 once so the Files are added (if you're not familiar with adding them manually). Then add the following to your FSUIPC7.ini:<br/>
 ```
@@ -32,16 +33,33 @@ If you don't have a FSUIPC Profile for the Fenix, start them as "Global" Scripts
 
 # Configuration
 The Sync-Script synchronizes the FD-Buttons for both Captain and FO. If you don't want that, comment out (--) Line 4 (the call for the Function FNX_SYNC_FD)
+
 ## Profiles
-As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work. As Alternatives I'd recommend: For Text-Displays "Alte Din 1451 Mittelschrift" and for the Quartz-Displays "Digital 7".<br/>
-The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed. You could also build something similar with the Default StreamDeck "HotKey" Action (under System) - but this requires MSFS to have Input-Focus (the vJoy-Driver Buttons work regardless of which Application has Input-Focus - like your normal Joystick Buttons)
+As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work.<br/>As Alternatives I'd recommend: For Text-Displays "Alte Din 1451 Mittelschrift" and for the Quartz-Displays "Digital 7".<br/>
+The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed. You could also build something similar with the Default StreamDeck "HotKey" Action (under System) - but this requires MSFS to have Input-Focus (the vJoy-Driver Buttons work regardless of which Application has Input-Focus - like your normal Joystick Buttons)<br/>
+The Mapping I use:<br/>
+| vJoy Button# | Mapping in MSFS | Title in Profile |
+| --- | --- | --- | 
+| 1 | Load Custom Camera 1 | Captain |
+| 2 | Load Custom Camera 2 | Overhead |
+| 3 | Load Custom Camera 3 | Pedestal |
+| 4 | Load Custom Camera 4 | ECAM / MIP |
+| 5 | Load Custom Camera 5 | MCDU |
+| 6 | Load Custom Camera 6 | EFB |
+| 7 | Load Custom Camera 7 | Eng L (Passenger, front of Engine) |
+| 8 | Load Custom Camera 8 | Eng R (Passenger, front of Engine) |
+| 9 | Load Custom Camera 9 | Pax L (Passenger View, behind Wing) |
+| 10 | Load Custom Camera 0 | Pax R (Passenger View, behind Wing) |
+| 11 | Toggle External View | External |
+| 12 | Toggle Cockpit View | Cockpit |
 
 ## FNX320_AUTO
 This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:FNX320_AUTO:*NUM*" in PilotsDeck. Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work.
 Some Functions are not used in the Profile (like Engine Masters) - I'll use them for my Thrustmaster TCA.
 
 ## FNX320_SYNC
-This Script is essential for some Buttons / Displays from the Profiles to show their State / Value (Gear Indication, Baro, Landing Light).
+This Script is essential for some Buttons / Displays from the Profiles to show their State / Value (Gear Indication, Baro, Landing Light).<br/>
+It uses Offsets at 0x5400 and above to generate Informations for some Buttons - if these are used by some other Addon you have to change them in the Lua and the Profile.
 
 # Usage
 I hope/think most Buttons should be self-explanatory. Some Buttons use a Long-Press Actions, for Example:<br/>
