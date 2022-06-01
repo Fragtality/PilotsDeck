@@ -11,7 +11,7 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
 
 # Installation
-- Update to at least PilotsDeck 0.6.6
+- Update to at least PilotsDeck 0.6.6!
 - Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
 - Just double-click on the Profiles to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
