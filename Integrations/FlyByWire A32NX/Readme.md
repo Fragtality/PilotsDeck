@@ -11,6 +11,7 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
 
 # Installation
+- Tested with Development Release 9a56143 (30.05.22)
 - Current / latest Developing Build is required and .NET 6 Runtime required (x64 Core and Desktop).
 - Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
 - Just double-click on the Profiles to add them to your StreamDeck Software
