@@ -20,7 +20,6 @@ namespace PilotsDeck
         public static readonly Regex rxVjoy = new (@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoyDrv = new (@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-
         public static bool IsReadAddress(string address)
         {
             if (string.IsNullOrEmpty(address))
@@ -54,6 +53,8 @@ namespace PilotsDeck
                     return rxVjoy.IsMatch(address);
                 case ActionSwitchType.VJOYDRV:
                     return rxVjoyDrv.IsMatch(address);
+                case ActionSwitchType.CALCULATOR:
+                    return !string.IsNullOrWhiteSpace(address);
                 default:
                     return false;
             }
@@ -94,6 +95,8 @@ namespace PilotsDeck
                         return VjoyToggle(actionType, Address);
                     case ActionSwitchType.VJOYDRV:
                         return VjoyToggle(actionType, Address);
+                    case ActionSwitchType.CALCULATOR:
+                        return ipcManager.RunCalculatorCode(Address);
                     default:
                         return false;
                 }

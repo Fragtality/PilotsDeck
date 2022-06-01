@@ -79,6 +79,9 @@
     <None Update="FSUIPC_WAPID.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="FSUIPC_WAPID.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Images\A-GearLocked%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

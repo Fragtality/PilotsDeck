@@ -84,10 +84,12 @@ namespace PilotsDeck
 
                 if (currentSim == Simulator.MSFS)
                 {
-                    WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
-                    WASM.LogLevel = LOGLEVEL.LOG_LEVEL_DEBUG;
                     WASM.OnLogEntryReceived += OnVariableServiceLogEvent;
                     WASM.OnVariableListChanged += OnVariableServiceListChanged;
+                    WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
+                    WASM.LVARUpdateFrequency = 0;
+                    WASM.LogLevel = LOGLEVEL.LOG_LEVEL_INFO;
+
                     WASM.Start();
                     if (WASM.IsRunning)
                     {
@@ -147,9 +149,9 @@ namespace PilotsDeck
 
                 if (currentSim == Simulator.MSFS)
                 {
-                    WASM.Stop();
                     WASM.OnLogEntryReceived -= OnVariableServiceLogEvent;
                     WASM.OnVariableListChanged -= OnVariableServiceListChanged;
+                    WASM.Stop();
                     if (!WASM.IsRunning)
                         Log.Logger.Information("IPCManager: FSUIPC WASM Stopped");
                     isWASMReady = false;  
@@ -243,7 +245,7 @@ namespace PilotsDeck
 
         public bool Process(string group)
         {
-            Log.Logger.Debug("PROCESS");
+            //Log.Logger.Debug("PROCESS");
 
             try
             {
@@ -381,6 +383,26 @@ namespace PilotsDeck
             catch
             {
                 Log.Logger.Error($"IPCManager: Exception while setting HVar <{name}> via WASM");
+            }
+
+            return result;
+        }
+
+        public bool RunCalculatorCode(string code)
+        {
+            bool result = false;
+
+            try
+            {
+                if (currentSim == Simulator.MSFS)
+                {
+                    WASM.ExecuteCalculatorCode(code);
+                    result = true;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCManager: Exception while running Calculator Code <{code}> via WASM");
             }
 
             return result;

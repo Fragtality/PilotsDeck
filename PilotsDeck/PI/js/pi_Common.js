@@ -114,7 +114,7 @@ function setPattern(field, type) {
 	else if (type == 8) //HVar
 		document.getElementById(field).pattern = regHvar;
 	else
-		document.getElementById(field).pattern = "";
+		document.getElementById(field).pattern = ".*";
 }
 
 function isLongPressAllowed(actionType, address) {
