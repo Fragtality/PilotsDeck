@@ -6,7 +6,7 @@ Here is a User Contribution for a 737-700 Profile - thanks Ado198 for sharing th
 - Update to at least PilotsDeck 0.6.5
 - Copy the images to the Images Sub-folder of the Pilotsdeck plugin directory.
 - Double click on the StreamDeck Profile to install it.
-- Copy the PilotsDeck_737.lua in the FSUIPC main folder
+- Copy the PilotsDeck_737.lua in the FSUIPC main folder.
 - Locate the 737.ini file and insert the following line at the end of the file:
 ```
 	[SDK]
