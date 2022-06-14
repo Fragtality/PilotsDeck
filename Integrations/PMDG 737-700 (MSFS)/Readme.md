@@ -12,9 +12,9 @@ Here is a User Contribution for a 737-700 Profile - thanks Ado198 for sharing th
 	[SDK]
     EnableDataBroadcast=1
 ```
-The location of ini file should be in AppData\Local\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalState\packages\pmdg-aircraft737\work (MS Store) or %appdata%\Microsoft Flight Simulator\Packages\pmdg-aircraft737\work (Steam).
+The location of ini file should be in %localappdata%\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalState\packages\pmdg-aircraft737\work (MS Store) or %appdata%\Microsoft Flight Simulator\Packages\pmdg-aircraft737\work (Steam).
 - Run MSFS to let FSUIPC register the LUA and then restart MSFS (Restarting FSUIPC7 also should do the Trick).
-- Open FSUIPC7.ini and add the 2 above lua files under an Auto start section, preferably for your FSUIPC-Profile used for the 737 (if used).<br/>
+- Open FSUIPC7.ini and add the above lua File under an Auto start section, preferably for your FSUIPC-Profile used for the 737 (if exists).<br/>
 ```
 	[Auto.PMDG737] ----- change to your profile name.
 	1=Lua PilotsDeck_737
