@@ -27,4 +27,5 @@ If you don't have a specific FSUIPC-Profile for 737, it is just "\[Auto\]" to ru
 - VS display does not show negative values. This is a PMDG issue and should fix itself once PMDG correct it.
 - The cameras are configured for my liking using the Njoy driver. It's very easy to use and I recommend it. However, you can just delete them and   replace them with your own.
 - A lot of the buttons including the the displays have long presses associated so test all buttons to see what they do.
+- If some fonts look a little off it may be because of missing fonts in your system. Just customize them to your liking using the Plugin.
 - Have fun and make this profile your own by customizing to meet your needs.
