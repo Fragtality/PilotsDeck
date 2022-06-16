@@ -11,7 +11,7 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
 
 # Installation
-- Tested with Development Release 9a56143 (30.05.22)
+- Tested with A32NX Development Release 9a56143 (30.05.22)
 - Minimum Plugin-Version is 0.7.0
 - Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
 - Just double-click on the Profiles to add them to your StreamDeck Software
