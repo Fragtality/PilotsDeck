@@ -7,22 +7,30 @@ More Screenshots can be found under [Examples](README.md#Examples). Working read
 ## Introduction
 As the Title suggests, this is a Plugin for Elegato's StreamDeck for the FlightSimmers out there in need of just more Buttons! :wink:<br/>
 It is build arround FSUIPC, so if something in the Sim can be triggered via Macros, Scripts, Luas, Lvars or Offsets - it can also be triggered via this Plugin from your StreamDeck! It is for the FlightSimmer already familiar with FSUIPC looking for an interesting Device to bind their Commands.<br/>
-The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best for your Aircraft(s)!<br/><br/>
+The Plugin is designed to be highly flexible and customizable, so it won't give any nice Guidance on what Offsets, Controls, Macros, ... are, how they are used with FSUIPC and it won't give you a nice List of Controls to select from. It even does not have anything pre-configured on the "COM Radio" Action - so you can make it work which fits best for your Aircraft(s)! Kinda like a "Framework" to build your own Thing :slightly_smiling_face:<br/><br/>
 The Communication is Bi-Directional - it does not only send Commands into the Sim, it can also read & display a Controls State and can basically display any Value you want (as Text or Graphical Representation). It uses the full Potential the StreamDeck has to offer for FlightSimmers: it is also a *Display* Device, not *just* Buttons!<br/>
+The included Images do not aim to create a "photorealistic" Look of Buttons and Switches like other Plugins do. But if you preferr that, you can configure your Actions that way with your own Images!<br/>
 The Plugin can also switch between StreamDeck Profiles (on multiple Decks) when the Aircraft (Model) and FSUIPC Profile change.<br/>
 Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).<br/><br/>
 As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE; and MSFS2020, so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
-Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed and working would be a bloody good Start :laughing:<br/>
-It is compiled for .NET Framework 4.8, so if you have a more or less regulary patched Windows&#x00AE; 10 (>= 1809) and have all of the above running you're probably ready for Takeoff! Should work with older Windows-Versions too, if the correct .NET Framework Version is installed.<br/>
-You can check your installed Framework Version with Powershell:
-```powershell
-(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release -ge 528040
-(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Version
-```
-The first Command should show "True", the second something with "4.8.x".<br/>
-The Connection to FSUIPC / the happens automaticallly when the StreamDeck Software (with the Plugin installed) runs. The Plugin's Manifest-File includes the Executables of all relevant Sims, so that it is informed by the StreamDeck Software when a Simulator starts (only then it tries to connect). The Executable-Names can be altered in the [Plugin Settings](README.md#plugin-settings).<br/>
+Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing:<br/>
+It is compiled for the .NET Framework and tested on Windows 10. For the newer Releases of the Plugin (starting with 7.0.0) .NET 6 is required for which you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)). You'll need ".NET Runtime 6.0.x" and ".NET Desktop Runtime 6.0.x" as x64. (Do not confuse it with arm64!)<br/>
+Older Versions of the Plugin (until 0.6.x) only need .NET 4.8 which should be already installed on your System (as Part of Windows).
+- To test if .NET 6.0 is installed (Plugin Version 0.7.0 or greater), run this in Powershell or Commandline:
+ ```powershell
+ dotnet --list-runtimes
+ ``` 
+ The Runtimes "Microsoft.NETCore.App 6.0.5" and "Microsoft.WindowsDesktop.App 6.0.5" should be listed (as an Example, the Version can be greater).
+- To test if .NET 4.8 is installed (Plugin Version up to 0.6.x), run this in Powershell:
+ ```powershell
+ (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release -ge 528040
+ (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Version
+ ```
+The first Command should show "True", the second something with "4.8.x".<br/><br/>
+The Connection to FSUIPC happens automaticallly when the StreamDeck Software (with the Plugin installed) runs. The Plugin's Manifest-File includes the Executables of all relevant Sims, so that it is informed by the StreamDeck Software when a Simulator starts (only then it tries to connect). The Executable-Names can be altered in the [Plugin Settings](README.md#plugin-settings).<br/>
+Running the Plugin or the StreamDeck Software "as Admin" is NOT neccessary (and could probably even cause Problems)!<br/><br/>
 The Sims and their FSUIPC Version/Variant are:
 - FSUIPC3 - Microsoft Flight Simulator 2004
 - FSUIPC4 - Microsoft FSX, FSX Steam Edition, Prepar3d 1.4 to 3.4
@@ -31,7 +39,8 @@ The Sims and their FSUIPC Version/Variant are:
 - **FSUIPC7** - Microsoft Flight Simulator 2020
 - XPUIPC - X-Plane<br/><br/>
 If you let me know what works and which Features work in which Sim (other than P3D v4/5, MSFS2020), I'll add it to the Readme! :wink:<br/>
-:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so for FSUIPC a registered Version is recommended (but not neccessary)!
+:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so a registered Version of FSUIPC is highly recommended (but not neccessary)!<br/>
+:grey_exclamation: For MSFS2020 / FSUIPC7 you will need at least Version 7.3.6 installed, with the "WASM/WAPI" Module also installed and activated.
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
@@ -41,15 +50,27 @@ Just put the Contents of the Zip in your Plugin-Folder under<br/>
 If it should not "work right" after Installation, check the [Troubleshooting-Section](README.md#troubleshooting).<br/><br/>
 
 Optional: If you need/want to read Values generated by Lua-Scripts, you have to add the [PilotsDeck.lua](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) Script from the Plugin's *\lua* Subfolder to your FSUIPC Installation as an Autostart Script. More Instructions can be found in that File. (If your Sim supports Lua)
+### Upgrade
+Just drop in / extract the new Version and you're good to go (if you modified/changed some Files like the json, config or Images you have to take care of it).<br/>
+**BUT** if you switch from 0.6.x to 0.7.x follow the Steps below! After you have switched to 0.7.x it is "just drop in" again :slightly_smiling_face:<br/>
+### Upgrade 0.6.x to 0.7.x
+- First make a Backup of your current (PilotsDeck) Profiles with StreamDeck, close StreamDeck and make a Backup of your Plugin-Directory (%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin).<br/>
+- Delete the Plugin-Directory!
+- Install/extract the new Version
+- If you did not modify or added anything in your old Installation: cleared for takeoff :smile:
+- If you changed or added Images, place them again in the \Images Sub-Directory of the Plugin.
+- If you changed the manifest.json (e.g. for Profile-Switching of custom Profiles), change the new manifest.json accordingly. (Or take your old one and edit the Version, as long there are no new Actions)
+- If you changed the PilotsDeck.exe.config File you have to modify Values now in the PilotsDeck.dll.config File. Please do NOT just copy in the Contents of the old .config File!
+- If you added your own StreamDeck-Profiles in the \Profiles Directory, add them again (if you used the Profile-Switching Feature in that Way). They don't need to be reinstalled with the Profile-Switcher Action.
 <br/><br/><br/>
 ## Overview of included Actions
 As of now, there are 8-9 Actions:<br/>
-* ![ActionDisplay](PilotsDeck/Images/category/ActionDisplay.png) **Display Value** - Read any Offset or Lvar Value and display it as Text. You can Scale, Round, Format and/or BCD-Decode the Value and you can customize the resulting Text to your liking.
+* ![ActionDisplay](PilotsDeck/Images/category/ActionDisplay.png) **Display Value** - Read any Offset or Lvar Value and display it as Text. You can Scale, Round, Format and/or BCD-Decode the Value and you can customize the resulting Text to your liking. Numeric Values can also be mapped to Text!
 * ![ActionDisplaySwitch](PilotsDeck/Images/category/ActionDisplay.png) **Display Value Button** - Same as before, but you can bind Macro(s), Control(s), Lvar(s) an Offset or a Lua-Script to it so that the Button does actually do something.
 * ![ActionSwitch](PilotsDeck/Images/category/ActionSwitch.png) **Simple Button** - As simple as it gets - a straight-forward Button like any of your Joystick-Buttons. BUT: it can have have two different Mappings depending on a short or long Press AND it can be added to Multi-Actions in StreamDeck, so you can build Action-Sequences!
-* ![ActionSwitchDisplay](PilotsDeck/Images/category/ActionSwitchDisplay.png) **Dynamic Button** - My Reason to start this Journey - a Button which reflects the actual State of a Control in the Sim! It does not matter from which Input Device you alter a Control: this Button will show the correct "Live"-State. (As long as this State can be correctly read from the Sim / Aircraft)
+* ![ActionSwitchDisplay](PilotsDeck/Images/category/ActionSwitchDisplay.png) **Dynamic Button** - My Reason to start this Journey - a Button which reflects the actual State of a Control in the Sim! It does not matter from which Input Device you alter a Control: this Button will show the correct "Live"-State. (As long as this State can be correctly read from the Sim / Aircraft). Basically it switches the Background-Image of the Action depending on the current Value. Either 2-3 distinct States or 2 distinct States and "any" State.
 * ![ActionSwitchKorry](PilotsDeck/Images/category/ActionSwitchKorry.png) **Korry Button** - This is a more specialized Variant of the Dynamic Button. It can read up to two Values (one for each Half) and draws two different/independent Images on the Background (does not swap the whole Image like the Dynamic Button).
-* ![ActionRadio](PilotsDeck/Images/category/ActionRadio.png) **COM Radio** - It is more or less a "Display Value Button" with two Values instead of one. Read the Radios from anywhere you want (BCD encoded or Integer) and swap the Frequencies by any Way you want.
+* ![ActionRadio](PilotsDeck/Images/category/ActionRadio.png) **COM Radio** - It is more or less a "Display Value Button" with two Values to be read instead of one. Read the Radios from anywhere you want (BCD encoded or Integer) and swap the Frequencies by any Way you want. The Background Image is customizable.
 * ![ActionGaugeBar](PilotsDeck/Images/category/ActionGaugeBar.png) **Display Gauge** - If you want a graphical Representation of a Value, let's say for your Engines N1 Value, Trim, Control Surface Deflection, Fuel Level ... this Action is for you! It can either be a Bar or an Arc. With Text or without.
 * ![ActionGaugeBarDual](PilotsDeck/Images/category/ActionGaugeBarDual.png) **Display Gauge Dual** - New! Now with two Indicators instead of one! So you can have your Left/Right, Engine 1/Engine 2 or whatever in one Display.
 * ![ActionProfileSwitcher](PilotsDeck/Images/category/category.png) **Profile Switcher** - This is more an Interface than an Action to configure the Profile Switching, it is only needed for Configuration and Profile Installation. Whey you press it's StreamDeck Button the Profile Switching is enabled/disabled.
@@ -58,12 +79,12 @@ As of now, there are 8-9 Actions:<br/>
 Now we're getting to the "Fun" part! :flushed:<br/>
 The Actions behave like any other Actions on the StreamDeck. All the Action's Settings are stored in the StreamDeck Profiles (and therefore are also saved when you Backup/Export Profiles). They can be moved arround, swapped, copy-pasted and put in Folders. In case of the "Simple Button" it can be put in Multi-Actions like any other Action. Only replacing one Type with another could lead to unexpected Results and is "not recommended".<br/>
 All Configuration is done via the Property Inspector. Some Input-Fields combine multiple Fiels/Inputs in one string, so let's start with the common Syntax:<br/>
-### Common Syntax & Fields & Behavior
+### Common Syntax, Fields and Behavior
 Plain Numeric Values are separated by "**;**". E.g. an Size or Range Definition like "0; 10". All numeric Input-Fields support Float-Values and support both Decimal-Characters ("**,**" or "**.**") regardless of System Setting. The Output is forced to have a Decimal-Point regardless of System Setting (I'm not aware of any "localized" Cockpits :laughing:), but you can change that in the [Plugin Settings](README.md#plugin-settings).<br/>
 Addresses, Format and Profiles are separated by "**:**".<br/>
 Address Fields and some other Fields are using Syntax Checking on the Input. So if an Exclamation Mark is shown in the Input Field, it is likely wrong (or just missing). The Property Inspector matches not all Cases and in any Case the Input will be saved. The "real" Syntax Checking is done when a Button is pressed and then will only allow valid Syntax. Mind the Difference between "Syntax" and "Semantics": The Plugin can check if the Input is correct to specifiy e.g. a Macro via FSUIPC, but it can't check if that Macrofile or Macro exists :wink:<br/>
-If a Button Press could not be executed for whatever Reason (P3D closed, not ready, Syntax incorecct, Action not configured ...), the Plugin will show the StreamDeck Alert-Symbol (yellow Triangle with an Exclamation Mark).<br/>
-If the Plugin is waiting for FSUIPC to connect, P3D to become ready (again) or while loading, all Actions will show a "..." Background.<br/>
+If a Button Press could not be executed for whatever Reason (Sim closed, not ready, Syntax incorecct, Action not configured ...), the Plugin will show the StreamDeck Alert-Symbol (yellow Triangle with an Exclamation Mark).<br/>
+If the Plugin is waiting for FSUIPC to connect, Sim to become ready (again) or while loading, all Actions will show a "..." Background.<br/>
 #### Address Fields (Action Types)
 * **Offset**
   \[ (0x)Hex-Address:Size(:Type:Signedness|BitNum) ] (Read / Command)
@@ -81,14 +102,14 @@ Examples:
   <br/>
 * **Lvar**
   \[ (L:)Name ] (Read / Command)
-  - Name*: The Lvar's Name with or without the preceding "L:". When used as Action/Command, the Values for On and Off can be configured in respective Fields.<br/><br/>
+  - *Name*: The Lvar's Name with or without the preceding "L:". When used as Action/Command, the Values for On and Off can be configured in respective Fields.<br/><br/>
   Example:
   - ```VC_OVHD_AC_Pack_1_Button```
   <br/>
 * **Control**
   \[ Control=Paramater(:Parameter)*(:Control=Paramater(:Parameter)*)* ] (Command)<br>
   \[ Control(:Control)* ]
-  - The known "FS Controls" - FSUIPC provides a List of the available Standard/P3D Controls available. First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at once or move both at once). A Sequence of Controls only (no Parameters) is also possible.<br/><br/>
+  - The known "FS Controls" - FSUIPC provides a List of the available Standard/P3D Controls available. Also known as Events. First the *Control*-Number and then 0 or more *Parameter* for that Control. (e.g. Landing Light Switches, move them up two times and/or move multiple at once or move both at once). A Sequence of Controls only (no Parameters) is also possible.<br/><br/>
   Examples:
   - ```66587=72497:72507``` (Send Control 66587 with Parameter 72497 and then Control 66587 with Parameter 72507)
   - ```66168:65567``` (Send Control 66168 and then send Control 65567)
@@ -131,19 +152,34 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   Examples:
   - ```1:2``` (the StreamDeck Button is recognized as Joystick 1, Button 2 in the Sim)
   - ```2:3:t``` (the StreamDeck Button is recognized as Joystick 2, Button 3 in the Sim and will be toggled on KeyUp)
+ <br/>
+ 
+* **Hvar**
+ \[ (H:)Name ] (Command - MSFS2020 only)<br/>
+  - *Name*: The Hvar's Name with or without the preceding "H:". You don't need to have a .hvar for FSUIPC7 / your Plane installed. The Hvar is activated via Calculator Code, so FSUIPC7 does not know it in Advance.<br/><br/>
+  Example:
+  - ```A32NX_EFIS_L_CHRONO_PUSHED```
+ <br/>
+ 
+* **Calculator**
+ \[ Code ] (Command - MSFS2020 only)<br/>
+  - *Code*: The desired Calculator Code to be executed.<br/><br/>
 <br/><br/>
 #### DecodeBCD / Scale / Format / Mappings
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
 * **Format**: Round the Value and/or add Text to it \[ Digits:Text %s Text ]
   - *Digits*: The Value is rounded to that fixed Number of Digits after the decimal Point (can be zero for an Integer). If not specified, the Value is not rounded at all.
-  - *Text*: The Value is embedded at the "*%s*" in the Text you specify here. E.g. to add Units to the Value like "%s kg" or "%s %". Or put something in front of it. Every "%s" will be replaced by the Value.
-* **Mappings**: You can map specific Values to specific Texts. For example 0 will show as "OFF" and 10 will show as "ON" (Syntax: 0=OFF:10=ON). A simple Comparison is also allowed, for Example if 1 is greater-or-equal the current Value show the Text "XX" (Syntax: 1>=XX). You can either have multiple Mappings or one Comparison but not both!
+  - *Text*: The Value is embedded at the "*%s*" in the Text you specify here. E.g. to add Units to the Value like "%s kg" or "%s %". Or put something in front of it. Every "%s" will be replaced by the Value.<br/>
+  Examples:<br/>
+   ```1```     One Digit after the Decimal Point, the current Value of 20.522534 will be displayed as 20.5 for Example. Match for zero would be "0.0".<br/>
+   ```2:1%s``` Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!<br/>
+   ```%s ft``` Add "ft" after the Value<br/>
+  <br/>
+* **Mappings**: You can map specific Values to specific Texts. For example 0 will show as "OFF" and 10 will show as "ON" (Syntax: 0=OFF:10=ON). A simple Comparison is also allowed, for Example if 1 is greater-or-equal the current Value show the Text "XX" (Syntax: 1>=XX). You can either have multiple Mappings or one Comparison but not both!<br/>
+This is a rather powerfull Feature together with the Ability to change Font and Position as it reduces the need to create new Images in most Use-Cases!
 * **Order**: DecodeBCD -> Scale -> Round -> Format -> Map. If the Value is to be matched (On/Off/Special State e.g.) it is done after Round and before Format.
-* **Examples**
-  - ```1```     One Digit after the Decimal Point, the current Value of 20.522534 will be displayed as 20.5 for Example. Match for zero would be "0.0".
-  - ```2:1%s``` Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!
-  - ```%s ft``` Add "ft" after the Value<br/>
+<br/><br/>
 #### Images
 All Images are stored in the \Images Subdirectory. You can change and remove the existing ones and you can add your own Images. Newly added Images are automatically listed when you open any of the Actions Property Inspector, you don't have to restart the StreamDeck Software. If you change an existing Image, you have have to switch Profiles or restart the Software - all used Images are cached, so all Actions using the changed Image must disappear before the Image is loaded again from Disk.<br/>
 The Images for the Korry Button are in the \Images\korry Subdirectory.<br/>
@@ -310,16 +346,16 @@ Within the Plugin I then use
 <br/><br/>
 ## Plugin Settings
 There are two Files where Settings can be altered (both can be found in the Plugin's directory):<br/>
-The first is the [PilotsDeck.exe.config](README.md#pilotsdeckexeconfig) File which is the "main" Configuration File for the General Application/Plugin Settings.<br/>
+The first is the [PilotsDeck.dll.config](README.md#pilotsdeckexeconfig) File (former PilotsDeck.exe.config) which is the "main" Configuration File for the General Application/Plugin Settings.<br/>
 The second is the [manifest.json](README.md#manifestjson) which is specific for StreamDeck (it defines it as Plugin so to speak). This only needs to be touched for a different Application to monitor and to customize (or add) StreamDeck Profiles to switch to.<br/>
 Generally take care when editing them, the XML/JSON Syntax must be the correct for the Application/Plugin to start at all. Backups FTW! :laughing:<br/>
-### PilotsDeck.exe.config
+### PilotsDeck.dll.config
 These are the available Settings and their Default:
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
 * **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
 * **appStartDelay**="30"		- When P3D (or any other Sim) is started, it will throttle the Process Calls to FSUIPC to every 10s (based on Ticks) in the first X seconds after FSUIPC successfully processed. Depending on how fast/slow P3D and the selected Aircraft are loading this could be too long/short. This only applies to when the Plugin (StreamDeck Software) was already running, if the Plugin is started when P3D was already running, it will directly connect and process.
-* **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim.
+* **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim. This Delay (times 2) is also used for the "Lvar Reset".
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.
 * **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".<br/><br/>
@@ -356,12 +392,18 @@ The Master Control Panel on your StreamDeck:
 
 <br/><br/>
 ## Troubleshooting
-If you encounter the Issue that although the Plugin and its Actions are displayed in the StreamDeck Software but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic.
-One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell:
+If you encounter the Issue that although the Plugin and its Actions are displayed in the StreamDeck Software but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in the Sim!<br/>
+One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell (change <USERNAME> accordingly):
 ```powershell
 dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
 ```
-If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch), but other AV Scanners might behave differently and just silently block it!
+If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local WebSockets.<br/><br/>
+If it still doesn't work, contact me on one of the Plattforms / Forums! To help you I'll need:
+- The Version of the Plugin you have downloaded
+- Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
+- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin).
+- If that does not exist: First tell me, so I know you did not forget :laughing:<br/>
+ Second: Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
