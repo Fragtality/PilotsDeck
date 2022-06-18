@@ -5,6 +5,7 @@ function FNX_SYNC()
 	FNX_READ_LANDING_LGT() --0x5400 + 1
 	FNX_READ_BARO()	--0x5401 + 5
 	FNX_READ_GEAR() --0x5406/0x5407 + 1
+	--0x5408 --> 0x5xxx used in Binary
 end
 
 function FNX_SYNC_FD()
@@ -37,7 +38,7 @@ function FNX_READ_BARO()
 			newvalue = string.format("%.0f", pressure * 0.1845585973546601)
 			newvalue = string.sub(newvalue, 0,2) .. "." .. string.sub(newvalue, 3)
 		else
-			newvalue = string.format("%.0f", pressure * 0.0625)
+			newvalue = string.format("%04.0f", pressure * 0.0625)
 		end
 	end
 	

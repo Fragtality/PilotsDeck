@@ -239,6 +239,30 @@ function FNX_FCU_VS_PULL()
 	FNX_TWIST("S_FCU_VERTICAL_SPEED", 1)
 end
 
+function FNX_FCU_SPD_TOGGLE()
+	if ipc.readLvar("I_FCU_SPEED_MANAGED") == 1 then
+		FNX_TWIST("S_FCU_SPEED", 1)
+	else
+		FNX_TWIST("S_FCU_SPEED", -1)
+	end
+end
+
+function FNX_FCU_HDG_TOGGLE()
+	if ipc.readLvar("I_FCU_HEADING_MANAGED") == 1 then
+		FNX_TWIST("S_FCU_HEADING", 1)
+	else
+		FNX_TWIST("S_FCU_HEADING", -1)
+	end
+end
+
+function FNX_FCU_ALT_TOGGLE()
+	if ipc.readLvar("I_FCU_ALTITUDE_MANAGED") == 1 or ipc.readSTR(0x544E, 1) == "1" then
+		FNX_TWIST("S_FCU_ALTITUDE", 1)
+	else
+		FNX_TWIST("S_FCU_ALTITUDE", -1)
+	end
+end
+
 -----------------------------------------
 -- $$ MIP
 
@@ -284,8 +308,12 @@ function FNX_ISIS_DEC()
 	FNX_TWIST("E_MIP_ISFD_BARO", -1)
 end
 
+function FNX_PEDAL_DISCO_TGL()
+	FNX_TOGGLER("S_FC_CAPT_TILLER_PEDAL_DISCONNECT", 1, 0)
+end
+
 -----------------------------------------
--- $$ Pedestal
+-- $$ RMP1/ACP1
 
 function FNX_RMP1_OUTER_INC()
 	FNX_TWIST("E_PED_RMP1_OUTER", 1)
@@ -318,6 +346,41 @@ end
 function FNX_RMP1_INNER_DECFAST()
 	FNX_TWIST("E_PED_RMP1_INNER", -10)
 end
+
+function FNX_ACP1_VHF1_VOLINC()
+	FNX_TWIST("A_ASP_VHF_1_VOLUME", 0.1, 0.99)
+end
+
+function FNX_ACP1_VHF1_VOLDEC()
+	FNX_TWIST("A_ASP_VHF_1_VOLUME", -0.1, 0.01)
+end
+
+function FNX_ACP1_INT_VOLINC()
+	FNX_TWIST("A_ASP_INT_VOLUME", 0.1, 0.99)
+end
+
+function FNX_ACP1_INT_VOLDEC()
+	FNX_TWIST("A_ASP_INT_VOLUME", -0.1, 0.01)
+end
+
+function FNX_ACP1_CAB_VOLINC()
+	FNX_TWIST("A_ASP_CAB_VOLUME", 0.1, 0.99)
+end
+
+function FNX_ACP1_CAB_VOLDEC()
+	FNX_TWIST("A_ASP_CAB_VOLUME", -0.1, 0.01)
+end
+
+function FNX_ACP1_PA_VOLINC()
+	FNX_TWIST("A_ASP_PA_VOLUME", 0.1, 0.99)
+end
+
+function FNX_ACP1_PA_VOLDEC()
+	FNX_TWIST("A_ASP_PA_VOLUME", -0.1, 0.01)
+end
+
+-----------------------------------------
+-- $$ Pedestal
 
 function FNX_ENG_MODE_CRANK()
 	ipc.writeLvar("S_ENG_MODE", 0)
@@ -406,6 +469,18 @@ function FNX_WX_MODE_SEQ()
 	FNX_SEQUENCE("S_WR_MODE", 3, 0)
 end
 
+function FNX_WX_PWS_MASTER()
+	if ipc.readLvar("S_WR_SYS") ~= 1 then
+		ipc.writeLvar("S_WR_SYS", 1)
+		ipc.writeLvar("S_WR_MULTISCAN", 0)
+		ipc.writeLvar("S_WR_GCS", 0)
+	else
+		ipc.writeLvar("S_WR_SYS", 0)
+		ipc.writeLvar("S_WR_MULTISCAN", 1)
+		ipc.writeLvar("S_WR_GCS", 1)
+	end
+end
+
 function FNX_XPDR_THRT_SEQ()
 	FNX_SEQUENCE("S_TCAS_RANGE", 3, 0)
 end
@@ -447,6 +522,56 @@ function FNX_MCDU_WXREQ()
 	FNX_BTN_PRESS("S_CDU1_KEY_LSK1R")
 	ipc.sleep(100)
 	FNX_BTN_PRESS("S_CDU1_KEY_LSK1L")
+end
+
+-----------------------------------------
+-----------------------------------------
+-- $$ INIT Function
+
+function FNX_INIT_AC()
+	if ipc.readLvar("S_OH_EXT_LT_NAV_LOGO") ~= 0 then
+		return
+	end
+	
+	--Batteries ON
+	ipc.writeLvar("S_OH_ELEC_BAT1", 1)
+	ipc.sleep(1500)
+	ipc.writeLvar("S_OH_ELEC_BAT2", 1)
+	ipc.sleep(1500)
+	
+	--External Power
+	ipc.writeLvar("S_OH_ELEC_EXT_PWR", 1)
+	
+	--Flood Lights 50% and Dome Dim
+	ipc.writeLvar("A_MIP_LIGHTING_FLOOD_MAIN", 0.5)
+	ipc.writeLvar("A_MIP_LIGHTING_FLOOD_PEDESTAL", 0.5)
+	ipc.writeLvar("S_OH_INT_LT_DOME", 1)
+	
+	--Cargo Heat AFT
+	ipc.writeLvar("A_OH_PNEUMATIC_CARGO_AFT_TEMP", 0.5)
+	
+	--Hide CP Armrest Right and FO EFB
+	ipc.writeLvar("S_ARMREST_RIGHT_CAPT", 1)
+	ipc.writeLvar("S_EFB_VISIBLE_FO", 0)
+	
+	--Reset/Stop Clock
+	ipc.writeLvar("S_MIP_CLOCK_ET", 2)
+	ipc.sleep(250)
+	ipc.writeLvar("S_MIP_CLOCK_ET", 1)
+	
+	--For Thrustmastet TCA: Sync Parking Brake
+	local prkBtn = ipc.testbutton(1, 19)
+	local chocks = ipc.readLvar("B_CONFIG_CHOCKS")
+	local posBrk = ipc.readLvar("S_MIP_PARKING_BRAKE")
+
+	if not prkBtn and chocks == 1 and posBrk == 1 then	--TCA is off but Sim is on -> toggle (but only when chocks set)
+		ipc.control(65752)
+	elseif prkBtn and posBrk == 0 then	--TCA is on but Sim is off -> toggle
+		ipc.control(65752)
+	end
+	
+	--NAV Lights
+	ipc.writeLvar("S_OH_EXT_LT_NAV_LOGO", 1)
 end
 
 -----------------------------------------
@@ -533,3 +658,18 @@ event.flag(78, "FNX_TRIM_WHEEL_DEC")
 event.flag(79, "FNX_SIDE_CAPT_DISC")
 event.flag(80, "FNX_PFD_BRIGHT_CP_INC")
 event.flag(81, "FNX_PFD_BRIGHT_CP_DEC")
+event.flag(82, "FNX_PEDAL_DISCO_TGL")
+event.flag(83, "FNX_ACP1_VHF1_VOLINC")
+event.flag(84, "FNX_ACP1_VHF1_VOLDEC")
+event.flag(85, "FNX_ACP1_INT_VOLINC")
+event.flag(86, "FNX_ACP1_INT_VOLDEC")
+event.flag(87, "FNX_ACP1_CAB_VOLINC")
+event.flag(88, "FNX_ACP1_CAB_VOLDEC")
+event.flag(89, "FNX_ACP1_PA_VOLINC")
+event.flag(90, "FNX_ACP1_PA_VOLDEC")
+event.flag(91, "FNX_WX_PWS_MASTER")
+event.flag(92, "FNX_FCU_SPD_TOGGLE")
+event.flag(93, "FNX_FCU_HDG_TOGGLE")
+event.flag(94, "FNX_FCU_ALT_TOGGLE")
+
+event.flag(254, "FNX_INIT_AC")
