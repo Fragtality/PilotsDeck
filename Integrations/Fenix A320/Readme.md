@@ -16,6 +16,7 @@ Mix and match as you like :relaxed:<br/>
 - Tested with Fenix 1.0.2.104 (01.06.22)
 - Update to at least PilotsDeck 0.6.6!
 - Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
+- Place the Images in the Images\korry Folder in the Plugin-Directory
 - Just double-click on the Profiles you want to use to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
 - The cameras.cfg is optional (for the Views via vJoy-Driver Buttons)! If you want to use it: %appdata%\Microsoft Flight Simulator\SimObjects\Airplanes\FNX320
