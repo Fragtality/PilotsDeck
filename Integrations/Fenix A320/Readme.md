@@ -1,8 +1,10 @@
 # Fenix A320 Files for PilotsDeck
 Here you'll find a mostly working / ready to use Example I use myself for the Fenix A320. A registered Version of FSUIPC7 is required.<br/>
 My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementary/supportive Actions (e.g. showing the FCU while being in the "Flight" Folder on the XL), so there are two Profiles designed to be used together:
-- **MSFS-Fenix320-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS, MCP, CDU and MIP/Pedestal
-- **MSFS-Fenix320:** SD (15 Buttons) Profile FCU, Radio and Transponder
+- **MSFS-Fenix320-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS/Glareshield, FCU, MCDU and MIP/Pedestal
+- **MSFS-Fenix320:** SD (15 Buttons) Profile FCU, Radio and Transponder<br/>
+
+There is also a third Profile for the SD called **MSFS-Fenix320-SDLIB**: It has most of the Buttons from the XL Profile in a Format openable on the SD. Not to be meant for direct use, but to allow SD Users to create their own Profile with that (copy & paste). It misses the MCDU Keyboard, FWD/AFT Calls and the ACP.
 
 Mix and match as you like :relaxed:<br/>
 
@@ -13,10 +15,11 @@ Mix and match as you like :relaxed:<br/>
 # Installation
 - Tested with Fenix 1.0.2.104 (01.06.22)
 - Update to at least PilotsDeck 0.6.6!
-- Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
-- Just double-click on the Profiles to add them to your StreamDeck Software
+- Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
+- Just double-click on the Profiles you want to use to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
 - The cameras.cfg is optional (for the Views via vJoy-Driver Buttons)! If you want to use it: %appdata%\Microsoft Flight Simulator\SimObjects\Airplanes\FNX320
+- Optional / Your choice: Install the PilotsDeck_FNX2PLD Binary for the FCU / Displays to work. Follow the Instructions [here](https://github.com/Fragtality/PilotsDeck_FNX).
 - Either start the Scripts (Auto + Sync) manually ...
 - ... or add them as Auto-Scripts to your FSUIPC7.ini. Start MSFS/FSUIPC7 once so the Files are added (if you're not familiar with adding them manually). Then add the following to your FSUIPC7.ini:<br/>
 ```
@@ -36,7 +39,6 @@ If you don't have a FSUIPC Profile for the Fenix, start them as "Global" Scripts
 The Sync-Script synchronizes the FD-Buttons for both Captain and FO. If you don't want that, comment out (--) Line 4 (the call for the Function FNX_SYNC_FD)
 
 ## Profiles
-As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work.<br/>As Alternatives I'd recommend: For Text-Displays "Alte Din 1451 Mittelschrift" and for the Quartz-Displays "Digital 7".<br/>
 The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed. You could also build something similar with the Default StreamDeck "HotKey" Action (under System) - but this requires MSFS to have Input-Focus (the vJoy-Driver Buttons work regardless of which Application has Input-Focus - like your normal Joystick Buttons)<br/>
 The Mapping I use:<br/>
 | vJoy Button# | Mapping in MSFS | Title in Profile |
@@ -60,9 +62,9 @@ Some Functions are not used in the Profile (like Engine Masters) - I'll use them
 
 ## FNX320_SYNC
 This Script is essential for some Buttons / Displays from the Profiles to show their State / Value (Gear Indication, Baro, Landing Light).<br/>
-It uses Offsets at 0x5400 and above to generate Informations for some Buttons - if these are used by some other Addon you have to change them in the Lua and the Profile.
+The Script (and the Binary) use Offsets at 0x5400 and above to generate Informations for some Buttons - if these are used by some other Addon you have to change them in the Lua and the Profile (and the Configuration File of the Binary). This Offset-Range is normally associated with "Project Magenta".<br/>
 
 # Usage
 I hope/think most Buttons should be self-explanatory. Some Buttons use a Long-Press Actions, for Example:<br/>
 - Light Switches which have 3 States. The normal Action is to switch from Off to mid-Position with the Long Press Action to switch from mid-Position to On. In the "Taxi" Folder this is swapped (so that you can quickly toggle all Lights when entering/leaving the Runway).
-- The FCU-Display (between the +/- Buttons ... sadly currently empty) are also Buttons. They either toggle between Managed/Selected (normal Press) or toggle things like SPD/MACH, HDG/TRK, Alt Scale. The VS Display/Button is Pull (normal) or Push (long).
+- The FCU-Displays (between the +/- Buttons) are also Buttons. They either toggle between Managed/Selected (normal Press) or toggle things like SPD/MACH, HDG/TRK, Alt Scale. The VS Display/Button is Pull (normal) or Push (long).
