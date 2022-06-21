@@ -6,7 +6,7 @@ My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementa
 
 So with a SD only you'll can still use the SD-Profile separately (and generally the Plugin to build your own Profile). Also there is a third "SDLIB" Profile with nearly all Buttons from the XL-Profile. It's intended to be used to built your own SD Profile with it.
 
-Mix and match as you like :relaxed:<br/>
+Mix and match as you like! :relaxed:<br/>
 
 ![ExampleFNX00](../../img/ExampleFNX00.jpg)<br/>
 ![ExampleFBW00](../../img/ExampleFBW00.jpg)<br/>
