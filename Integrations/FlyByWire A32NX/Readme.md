@@ -1,8 +1,10 @@
 # FBW A32NX Files for PilotsDeck
-Here you'll find a mostly working / ready to use Example I use myself for the FlyByWire A320 Neo. A registered Version of FSUIPC7 is required.<br/>
+Here you'll find a mostly working / ready to use Example I made myself for the FlyByWire A320 Neo. A registered Version of FSUIPC7 is required. It has the most critical Buttons/Switches/Korries from the Overhead, MIP/Glareshield, Pedestal, FCU and MCDU (with Full Keyboard).<br/>
 My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementary/supportive Actions (e.g. showing the FCU while being in the "Flight" Folder on the XL), so there are two Profiles designed to be used together:
 - **MSFS-FBW32N-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS, MCP, CDU and MIP/Pedestal
-- **MSFS-FBW32N:** SD (15 Buttons) Profile FCU, Radio and Transponder
+- **MSFS-FBW32N:** SD (15 Buttons) Profile FCU, Radio and Transponder<br/>
+
+So with a SD only you'll can still use the SD-Profile separately (and generally the Plugin to build your own Profile). Also there is a third "SDLIB" Profile with nearly all Buttons from the XL-Profile. It's intended to be used to built your own SD Profile with it.
 
 Mix and match as you like :relaxed:<br/>
 
@@ -11,9 +13,9 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
 
 # Installation
-- Tested with A32NX Development Release 9a56143 (30.05.22)
+- Tested with A32NX Development Release fe80bbf (20.06.22)
 - Minimum Plugin-Version is 0.7.0
-- Uses the Fonts from FSLabs - you have to costumize all Actions yourself if you don't have them installed. Sorry! :/
+- Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
 - Just double-click on the Profiles to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
 - Place the myOffsets.txt in your FSUIPC7 Folder (or merge it with your existing one)
@@ -34,11 +36,10 @@ If you don't have a FSUIPC Profile for the FlyByWire, start them as "Global" Scr
 ```
 
 # Configuration
-The "myOffset.txt" File is used to make some SimVars accessible via FSUIPC Offsets. Addresses at/above 0x5400 are used! If these are used by some other Addon you have to change them in the Lua and the Profile.
+The "myOffset.txt" File is used to make some SimVars accessible via FSUIPC Offsets. Addresses at/above 0x58A0 are used (normally associated with "Project Magenta")! If these are used by some other Addon you have to change them in the Lua and the Profile.
 
 
 ## Profiles
-As already stated, if you don't have the FSLabs Fonts you have to customize the Fonts-Settings for every Action. From my testing, the Plugin/.NET should default to another Font (like Sans Serif or something). So the Plugin/Profile should basically work. As Alternatives I'd recommend: For Text-Displays "Alte Din 1451 Mittelschrift" and for the Quartz-Displays "Digital 7".<br/>
 The View Buttons use the vJoy Device Driver and Custom Cameras. You have to install the vJoy Device Driver (and configure a Joystick), map the vJoy's Buttons to the "Load Custom Camera" Bindings and Save/Create your Custom Cameras for the respective Button. If you want to use these! When you don't want to use the View-Buttons you don't need the vJoy Driver installed.<br/>
 The Mapping I use:<br/>
 | vJoy Button# | Mapping in MSFS | Title in Profile |
@@ -58,11 +59,13 @@ The Mapping I use:<br/>
 
 
 ## FBW320_AUTO
-This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:FBW320_AUTO:*NUM*" in PilotsDeck. Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work.
+This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:FBW320_AUTO:*NUM*" in PilotsDeck.<br/>
+Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work. These Functions also be mapped in the FSUIPC GUI to Joystick Buttons with "LuaToggle FBW320_AUTO" and as Parameter the *NUM*ber.
 
 ## FBW320_SYNC
-This Script is essential for some Buttons / Displays from the Profiles to show their State / Value (Gear Indication, Baro, Landing Light).
-It uses Offsets at 0x5800 and above to generate Informations for some Buttons (Ext Power, FCU, Baro, Gear, Clock) - if these are used by some other Addon you have to change them in the Lua and the Profile.
+This Script is essential for some Buttons / Displays from the Profiles to show their State / Value (Ext Power, FCU, Baro, Gear, Clock).<br/>
+It uses Offsets at 0x5800 and above to generate Informations for some Buttons - if these are used by some other Addon you have to change them in the Lua and the Profile.<br/>
+It also reloads the WASM Module (once) as soon as both Batteries and External Power is on.
 
 # Usage
 I hope/think most Buttons should be self-explanatory. Some Buttons use a Long-Press Actions, for Example:<br/>
