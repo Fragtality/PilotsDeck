@@ -242,10 +242,16 @@ Most fields work the same as described before, you define the Addresses where th
 ### Display Gauge
 ![ActionDisplayGauge](img/GaugeBarRudder.png)<br/>
 This Action can display a Value on a Bar or an Arc. The graphics are rendered on refresh.
+* **Has Action**: If you want to map any Action to this Button, check this Box. Configure the Action/Address like described before, all the Fields behave the same.
 * **Normal Background**: The graphics are rendered on that Background. 
 * **Value Format**: Yo have to define a *Minimum* and *Maximum* Value for that Action to work. The Value after Decoding and Scaling is used for the Indicator.
 * **Gauge Settings**
   - *Gauge Size*: The Size of the Bar or Arc. For a Bar it is "Width; Height", for an Arc it is "Radius; Thickness".
+  - *Bar Color*: The Base Color of the Bar or Arc.
+  - *Color Change*: Check this Box to change the Base Color when a Variable has a specific Value.
+  - *Address Color*: Which Variable to read for the Color Change (can be the same or different to the Variable used for the current Value).
+  - *Value*: On which Value the Color should change (only the Base Color will be changed - the Warning Ranges are unaffected).
+  - *Value Color*: The new Base Color to use when the given Variable has the specified Value.
   - *Orientation* (Bar): Define if this Bar is horizontal or vertical and if the Values are increasing right/left or up/down. An Arc does not need (and ignores) that - it is a Circle, it has all directions. :smile:
   - *Start Angle* (Arc): The Angle at wich the Arc starts. 0° is at right center.
   - *Sweep Angle* (Arc): This Angle defines how "big" or "long" the Arc is from the *Start Angle*. For positive angles the Indicator moves clock-wise, for negative counterclock-wise.
