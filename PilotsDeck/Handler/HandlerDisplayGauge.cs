@@ -5,7 +5,7 @@ namespace PilotsDeck
     public class HandlerDisplayGauge : HandlerDisplayText
     {
         public virtual ModelDisplayGauge GaugeSettings { get { return Settings; } }
-        public override IModelSwitch SwitchSettings => throw new System.NotImplementedException();
+        public override IModelSwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplayGauge Settings { get; protected set; }
 
         public override string Address { get { return GaugeSettings.Address; } }
@@ -22,23 +22,55 @@ namespace PilotsDeck
 
         public override bool OnButtonDown(long tick)
         {
-            return false;
+            if (GaugeSettings.HasAction)
+            {
+                TickDown = tick;
+                return HandlerSwitch.RunButtonDown(SwitchSettings);
+            }
+            else
+                return false;
         }
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            return false;
+            if (GaugeSettings.HasAction)
+            {
+                bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings);
+                TickDown = 0;
+
+                return result;
+            }
+            else
+                return false;
         }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
+            HasAction = GaugeSettings.HasAction;
             base.Register(imgManager, ipcManager);
+            
+            if (GaugeSettings.UseColorSwitching)
+                ValueManager.RegisterValue("AddressColorOff", GaugeSettings.AddressColorOff);
+            
             RenderDefaultImage(imgManager);
+        }
+
+        public override void Deregister(ImageManager imgManager)
+        {
+            if (GaugeSettings.UseColorSwitching)
+                ValueManager.DeregisterValue("AddressColorOff");
+
+            base.Deregister(imgManager);
         }
 
         public override void Update(ImageManager imgManager)
         {
+            HasAction = GaugeSettings.HasAction;
             base.Update(imgManager);
+            
+            if (GaugeSettings.UseColorSwitching)
+                ValueManager.UpdateValueAddress("AddressColorOff", GaugeSettings.AddressColorOff);
+
             RenderDefaultImage(imgManager);
             NeedRedraw = true;
 
@@ -80,7 +112,7 @@ namespace PilotsDeck
 
         protected override void Redraw(ImageManager imgManager)
         {
-            if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.ControlState) && !ValueManager.IsChanged("AddressColorOff") && !ForceUpdate)
                 return;
 
             //Stopwatch sw = new Stopwatch();
@@ -119,10 +151,17 @@ namespace PilotsDeck
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
-            render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), drawBar);
+            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ValueManager["AddressColorOff"] == GaugeSettings.StateColorOff);
+            Color drawColor;
+            if (useOffColor)
+                drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColorOff);
+            else
+                drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColor);
 
-            if (GaugeSettings.DrawWarnRange)
+            render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
+            render.DrawBar(drawColor, drawBar);
+
+            if (GaugeSettings.DrawWarnRange && !useOffColor)
                 render.DrawBarRanges(drawBar, GaugeSettings.GetColorRange(), GaugeSettings.GetWarnRange(), min, max, GaugeSettings.SymmRange);
 
             if (GaugeSettings.CenterLine)
@@ -136,10 +175,17 @@ namespace PilotsDeck
             Arc drawArc = GaugeSettings.GetArc();
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
-            
-            render.DrawArc(drawArc, ColorTranslator.FromHtml(GaugeSettings.GaugeColor));
 
-            if (GaugeSettings.DrawWarnRange)
+            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ValueManager["AddressColorOff"] == GaugeSettings.StateColorOff);
+            Color drawColor;
+            if (useOffColor)
+                drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColorOff);
+            else
+                drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColor);
+
+            render.DrawArc(drawArc, drawColor);
+
+            if (GaugeSettings.DrawWarnRange && !useOffColor)
                 render.DrawArcRanges(drawArc, GaugeSettings.GetColorRange(), GaugeSettings.GetWarnRange(), min, max, GaugeSettings.SymmRange);
             
             if (GaugeSettings.CenterLine)

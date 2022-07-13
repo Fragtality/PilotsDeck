@@ -12,15 +12,37 @@ namespace PilotsDeck
         RIGHT = 0
     }
 
-    public class ModelDisplayGauge : ModelDisplayText
+    public class ModelDisplayGauge : ModelDisplayText, IModelSwitch
     {
+        //Action
+        public virtual bool HasAction { get; set; } = false;
+        public virtual string AddressAction { get; set; } = "";
+        public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
+        public override bool SwitchOnCurrentValue { get; set; } = true;
+        public virtual bool UseControlDelay { get; set; } = false;
+        public virtual bool UseLvarReset { get; set; } = false;
+        public virtual string SwitchOnState { get; set; } = "";
+        public virtual string SwitchOffState { get; set; } = "";
+
+        public virtual bool HasLongPress { get; set; } = false;
+        public virtual string AddressActionLong { get; set; } = "";
+        public virtual int ActionTypeLong { get; set; } = (int)ActionSwitchType.MACRO;
+
+        public virtual string SwitchOnStateLong { get; set; } = "";
+        public virtual string SwitchOffStateLong { get; set; } = "";
+
+        //Gauge
         public virtual string MinimumValue { get; set; } = "0";
         public string MaximumValue { get; set; } = "100";
         
         public virtual string GaugeSize { get; set; } = "58; 10";
         public virtual int BarOrientation { get; set; } = (int)GaugeOrientation.RIGHT;
         public virtual string GaugeColor { get; set; } = "#006400";
-        
+        public virtual bool UseColorSwitching { get; set; } = false;
+        public virtual string AddressColorOff { get; set; } = "";
+        public virtual string StateColorOff { get; set; } = "";
+        public virtual string GaugeColorOff { get; set; } = "#636363";
+
         public virtual bool DrawArc { get; set; } = false;
         public virtual string StartAngle { get; set; } = "135";
         public virtual string SweepAngle { get; set; } = "180";

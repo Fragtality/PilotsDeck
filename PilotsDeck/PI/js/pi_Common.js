@@ -89,6 +89,17 @@ function toggleConfigItem(value, name) {
 	}
 }
 
+function setFormItem(value, name) {
+	if (value) {
+		document.getElementById(name).style.display = displayInfo[name];
+	}
+	else if (document.getElementById(name).style.display != "none") {
+		displayInfo[name] = document.getElementById(name).style.display;
+
+		document.getElementById(name).style.display = "none";
+	}
+}
+
 function setPattern(field, type) {
 	var regName = "[a-zA-Z0-9\x2D\x5F]+";
 	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;

@@ -145,7 +145,7 @@
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://github.com/Fragtality/PilotsDeck",
-  "Version": "0.7.0",
+  "Version": "0.7.1",
   "SDKVersion": 2,
   "Profiles": [
     {
