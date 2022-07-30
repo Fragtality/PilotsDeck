@@ -188,7 +188,7 @@ namespace PilotsDeck
                         value = new IPCValueOffset(address, group);
                     else
                     {
-                        if (currentSim == Simulator.MSFS)
+                        if (currentSim == Simulator.MSFS && !AppSettings.Fsuipc7LegacyLvars)
                             value = new IPCValueWASM(address);
                         else
                             value = new IPCValueLvar(address);
@@ -343,7 +343,7 @@ namespace PilotsDeck
             bool result = false;
             try
             {
-                if (currentSim == Simulator.MSFS)
+                if (currentSim == Simulator.MSFS && !AppSettings.Fsuipc7LegacyLvars)
                 {
                     if (WASM.LVars.Exists(name))
                     {

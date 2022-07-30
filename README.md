@@ -364,7 +364,8 @@ These are the available Settings and their Default:
 * **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim. This Delay (times 2) is also used for the "Lvar Reset".
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.
-* **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".<br/><br/>
+* **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".
+* **Fsuipc7LegacyLvars**="false"	- With "true", the new MSFS Variable Services in FSUIPC7 is not used and instead the legacy way over Offset 0x0D70.<br/><br/>
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
@@ -394,6 +395,9 @@ The essential Overhead Buttons for 787.
 
 The Master Control Panel on your StreamDeck:
 ![Example-MCP](img/QW_ExampleMCP.jpg)<br/>
+
+The ACP Panel on your StreamDeck:
+![Example-ACP](img/ExampleACP.jpg)<br/>
 
 
 <br/><br/>
