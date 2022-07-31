@@ -92,9 +92,9 @@ function updateForm() {
 		toggleConfigItem(true, 'AddressAction');
 
 		var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
+		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', false);
 		if (settingsModel.HasLongPress && longAllowed)
-			toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', settingsModel.SwitchOnCurrentValue);
+			toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
 		else
 			toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
 		toggleConfigItem(false, 'SwitchOnCurrentValue');
