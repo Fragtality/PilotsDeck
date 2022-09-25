@@ -11,8 +11,8 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX00](../../img/ExampleFNX00.jpg)<br/>
 ![ExampleFNX01](../../img/ExampleFNX01.jpg)<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
-![ExampleFNX02](../../img/ExampleFNX03.jpg)<br/>
-![ExampleFNX02](../../img/ExampleFNX04.jpg)<br/>
+![ExampleFNX03](../../img/ExampleFNX03.jpg)<br/>
+![ExampleFNX04](../../img/ExampleFNX04.jpg)<br/>
 ![ExampleMSFSGSX](../../img/ExampleMSFSGSX.jpg)<br/>
 
 
