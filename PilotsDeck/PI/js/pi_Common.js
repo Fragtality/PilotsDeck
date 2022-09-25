@@ -159,19 +159,7 @@ function toggleLvarReset(settingsModel) {
 
 function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 	//On/Off States
-	//if (actionType == 0) { //macro
-	//	toggleConfigItem(false, onField);
-	//	toggleConfigItem(false, offField);
-	//}
-	//else if (actionType == 1) { //script
-	//	toggleConfigItem(false, onField);
-	//	toggleConfigItem(false, offField);
-	//}
-	//else if (actionType == 2) { //control
-	//	toggleConfigItem(false, onField);
-	//	toggleConfigItem(false, offField);
-	//}
-	/*else*/ if (actionType == 3 && !switchCurrent) { //lvar
+	if (actionType == 3 && !switchCurrent) { //lvar
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
@@ -183,10 +171,6 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
-	//else if (actionType == 6) { //vjoy
-	//	toggleConfigItem(false, onField);
-	//	toggleConfigItem(false, offField);
-	//}
 	else {
 		toggleConfigItem(false, onField);
 		toggleConfigItem(false, offField);
