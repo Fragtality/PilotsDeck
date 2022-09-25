@@ -182,6 +182,7 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   - ```AirbusFBW/FuelOHPArray[2]```
   - ```FlyWithLua/TLS2PLD/fcuHdg:s8```
  <br/><br/>
+
 #### DecodeBCD / Scale / Format / Mappings
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
@@ -364,18 +365,20 @@ function FSLUpdateButtonLt()
 end
 ```
 <br/>
-Within the Plugin I then use
+Within the Plugin I then use:
 - "66C5:4:s" to read the TCAS State and display & toggle it with a "Display Value with Button" Action (toggling via Lua-Script). Displayed with a nice quick-google-searched LCD Font. This Example is now more or less obsolete, since you can do the same with new Mappings Feature without writing any Lua-Code.
 - "66C0:4:s" to read the Position/State of both Landing Lights in a "Dynamic Button" and display the appropiate Images for the three States On, Off and Retracted (via Special State). One Button which sends "Up" for both Landing Lights, one to send "Down" for both Landing Lights via FSControls. (If both Landing Lights positions differ, the Action will show the Error Image which is configured for "Fault". Since the current Value does not match the On, Off or Special State, the Plugin "assumes" a Read-Error. So there is some kind of fourth State to display :wink:)
 - "66CA:1:i" to read the Pack State and display them On/Off or "Fault" (if they are not both in the same State) with a "Dynamic Button" to also toggle both Packs via two Macro Calls at once.
 <br/><br/>
+
 ## Plugin Settings
 There are two Files where Settings can be altered (both can be found in the Plugin's directory):<br/>
 The first is the [PilotsDeck.dll.config](README.md#pilotsdeckexeconfig) File (former PilotsDeck.exe.config) which is the "main" Configuration File for the General Application/Plugin Settings.<br/>
 The second is the [manifest.json](README.md#manifestjson) which is specific for StreamDeck (it defines it as Plugin so to speak). This only needs to be touched for a different Application to monitor and to customize (or add) StreamDeck Profiles to switch to.<br/>
 Generally take care when editing them, the XML/JSON Syntax must be the correct for the Application/Plugin to start at all. Backups FTW! :laughing:<br/>
+
 ### PilotsDeck.dll.config
-These are the available Settings and their Default:
+These are the available Settings and their Default:<br/>
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
 * **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
@@ -387,15 +390,18 @@ These are the available Settings and their Default:
 * **Fsuipc7LegacyLvars**="false"	- With "true", the new MSFS Variable Services in FSUIPC7 is not used and instead the legacy way over Offset 0x0D70.
 * **xpIP**"="127.0.0.1" 		-  The IP (not Hostname) where X-Plane is running. Networked Installation currently not supported.
 * **xpPort**"="49000" 			-  The Port on which X-Plane is running.<br/><br/>
+
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
 * **fontItalic_XX**="Italic"<br/><br/>
+
 ### manifest.json
 There are only two Use-Cases to fiddle in that file, so these are the interesting Parts:
 * **ApplicationsToMonitor**: Change this to alter the Executable the Plugin reacts upon.
 * **Profiles**: Like described under [Profile Switcher](README.md#customization) - here you add or change the StreamDeck Profiles. If the .streamDeckProfile File is in the \Profiles Subdirectory, you must prefix the Name with "*Profiles/*". Mind the JSON-Syntax: the last Entry must not have a "**,**" at the End, but all others have to be separated by that.
 <br/><br/>
+
 ## Examples
 Here a Number of Example Screenshots. Under [Integrations](Integrations/) you'll find some predefined and ready-to-use Profiles which also serve as Examples. So even if you don't have these Planes, it may give you some Ideas on what and how it can be done 😉<br/><br/>
 
