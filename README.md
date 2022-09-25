@@ -16,7 +16,8 @@ Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.m
 As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE; and MSFS2020, so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
-Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing: Starting with Version 0.7.3 the Plugin connects directly with **X-Plane** - you don't need to install XUIPC to use the Plugin!<br/>
+Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing: <br/>
+Starting with Version 0.7.3 the Plugin connects directly with **X-Plane** - you don't need to install XUIPC to use the Plugin!<br/>
 It is compiled for the .NET Framework and tested on Windows 10. For the newer Releases of the Plugin (starting with 7.0.0) .NET 6 is required for which you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)). You'll need ".NET Runtime 6.0.x" and ".NET Desktop Runtime 6.0.x" as x64. (Do not confuse it with arm64!)<br/>
 Older Versions of the Plugin (until 0.6.x) only need .NET 4.8 which should be already installed on your System (as Part of Windows).
 - To test if .NET 6.0 is installed (Plugin Version 0.7.0 or greater), run this in Powershell or Commandline:
@@ -39,7 +40,7 @@ The Sims and their FSUIPC Version/Variant are:
 - FSUIPC6 - **Prepar3D Version 4 and 5**
 - FSUIPC7 - **Microsoft Flight Simulator 2020**
 - XPUIPC/WebSocket - **X-Plane 12 & 11** (and probably older)<br/><br/>
-If you let me know what works and which Features work in which Sim (other than P3D v4/5, MSFS2020), I'll add it to the Readme! :wink:<br/>
+If you let me know what works and which Features work in which Sim (other than P3D v5, MSFS2020, X-Plane 12/11), I'll add it to the Readme! :wink:<br/>
 :grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so a registered Version of FSUIPC is highly recommended (but not neccessary)!<br/>
 :grey_exclamation: For MSFS2020 SU10 you will need at least Version 7.3.9 installed, with the "WASM/WAPI" Module also installed and activated.
 <br/><br/>
@@ -165,7 +166,6 @@ There is no need to install the vJoy Driver if you are not planning to use this 
 * **Calculator**
  \[ Code ] (Command - MSFS2020 only)<br/>
   - *Code*: The desired Calculator Code to be executed.<br/><br/>
-<br/>
 
 * **XP Command** (XPCMD)
  \[ data/ref/path ] (Command - X-Plane only)<br/>
@@ -174,7 +174,7 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   - ```toliss_airbus/aircondcommands/Pack1Toggle```
  <br/>
  
- * **XP DataRef** (XPWREF)
+* **XP DataRef** (XPWREF)
  \[ data/ref/path(\[index\]|:sX) ] (Read/Command - X-Plane only)<br/>
   - *Path*: The official dataRef Path for the Value (as seen in DataRefTool for example). If the DataRef is an Array, you can directly access the Values when you append the index in Brackets. You can also access string DataRefs if you add *:s* and the Length after the Path.<br/><br/>
   Example:
@@ -384,10 +384,10 @@ These are the available Settings and their Default:
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw the Buttons always, even if the Sim or FSUIPC are not running.
 * **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".
-* **Fsuipc7LegacyLvars**="false"	- With "true", the new MSFS Variable Services in FSUIPC7 is not used and instead the legacy way over Offset 0x0D70.<br/><br/>
+* **Fsuipc7LegacyLvars**="false"	- With "true", the new MSFS Variable Services in FSUIPC7 is not used and instead the legacy way over Offset 0x0D70.
+* * **xpIP**"="127.0.0.1" 		-  The IP (not Hostname) where X-Plane is running. Networked Installation currently not supported.
+* **xpPort**"="49000" 			-  The Port on which X-Plane is running.<br/><br/>
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
-* **xpIP**"="127.0.0.1" 		-  The IP (not Hostname) where X-Plane is running. Networked Installation currently not supported.
-* **xpPort**"="49000" 			-  The Port on which X-Plane is running.
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
 * **fontItalic_XX**="Italic"<br/><br/>
