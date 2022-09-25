@@ -39,7 +39,7 @@ These Commands need to be mapped in X-Plane to the vJoy Virtual Joystick:<br/>
 | 39 | sim/flight_controls/rudder_trim_right | Yaw trim right |
 | 40 | sim/flight_controls/pitch_trim_down | Pitch trim down |
 | 41 | sim/flight_controls/pitch_trim_up | Pitch trim up |
-(The Button Number referr to the Number in the Blue Circle)<br/>
+<br/>(The Button Number referr to the Number in the Blue Circle)<br/>
 
 ## PilotsDeck-TLS321-Cmd
 This Script contains Lua Functions addressed by some Actions in the Profiles. They are prefixed with "FlyWithLua/TLS2PLD".<br/>
