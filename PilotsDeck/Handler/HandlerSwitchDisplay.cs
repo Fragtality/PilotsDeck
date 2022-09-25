@@ -73,16 +73,17 @@
             string lastImage = DrawImage;
             string currentValue = ValueManager[ID.ControlState];
 
-            if (Settings.OnState == currentValue || Settings.OffState == currentValue)
+            if (ModelBase.Compare(Settings.OnState, currentValue))
             {
-                if (Settings.OnState == currentValue)
-                    DrawImage = Settings.OnImage;
-                else
-                    DrawImage = Settings.OffImage;
+                DrawImage = Settings.OnImage;
+            }
+            else if (ModelBase.Compare(Settings.OffState, currentValue))
+            {
+                DrawImage = Settings.OffImage;
             }
             else if (Settings.HasIndication)
             {
-                if (Settings.IndicationValueAny || Settings.IndicationValue == currentValue)
+                if (Settings.IndicationValueAny || ModelBase.Compare(Settings.IndicationValue, currentValue))
                     DrawImage = Settings.IndicationImage;
                 else
                     DrawImage = Settings.ErrorImage;

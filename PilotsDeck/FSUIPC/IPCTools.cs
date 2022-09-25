@@ -9,6 +9,9 @@ namespace PilotsDeck
 
     public static class IPCTools
     {
+        //2D => -
+        //2F => /
+        //5F => _
         public static readonly string validName = @"[a-zA-Z0-9\x2D\x5F]+";
         public static readonly Regex rxMacro = new ($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
         public static readonly Regex rxScript = new ($"^(Lua(Set|Clear|Toggle)?:){{1}}{validName}(:[0-9]{{1,3}})*$", RegexOptions.Compiled);
@@ -19,12 +22,13 @@ namespace PilotsDeck
         public static readonly Regex rxOffset = new (@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoy = new (@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoyDrv = new (@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex rxDref = new ($"^({validName}[\\x2F]){{1}}({validName}[\\x2F])*({validName}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){{0,1}}){{1}}$", RegexOptions.Compiled);
 
         public static bool IsReadAddress(string address)
         {
             if (string.IsNullOrEmpty(address))
                 return false;
-            else if (rxOffset.IsMatch(address) || rxLvar.IsMatch(address))
+            else if (rxOffset.IsMatch(address) || rxLvar.IsMatch(address) || rxDref.IsMatch(address))
                 return true;
             else
                 return false;
@@ -55,6 +59,10 @@ namespace PilotsDeck
                     return rxVjoyDrv.IsMatch(address);
                 case ActionSwitchType.CALCULATOR:
                     return !string.IsNullOrWhiteSpace(address);
+                case ActionSwitchType.XPCMD:
+                    return rxDref.IsMatch(address);
+                case ActionSwitchType.XPWREF:
+                    return rxDref.IsMatch(address);
                 default:
                     return false;
             }
@@ -97,6 +105,10 @@ namespace PilotsDeck
                         return VjoyToggle(actionType, Address);
                     case ActionSwitchType.CALCULATOR:
                         return ipcManager.RunCalculatorCode(Address);
+                    case ActionSwitchType.XPCMD:
+                        return ipcManager.xpConnector.SendCommand(Address);
+                    case ActionSwitchType.XPWREF:
+                        return ipcManager.xpConnector.SetDataRef(Address, newValue);
                     default:
                         return false;
                 }

@@ -1,6 +1,7 @@
 # Pilot's Deck
 Directly control the FlightSim from your StreamDeck&#x00AE; via FSUIPC!
 ![Example01XL](img/Example01XL.jpg)<br/>
+![ExampleFNX04](img/ExampleFNX04.jpg)<br/>
 More Screenshots can be found under [Examples](README.md#Examples). Working ready-to-use / Example Profiles can be found under [Integrations](Integrations/).
 
 <br/><br/>
@@ -15,7 +16,7 @@ Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.m
 As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE; and MSFS2020, so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
-Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing:<br/>
+Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing: Starting with Version 0.7.3 the Plugin connects directly with **X-Plane** - you don't need to install XUIPC to use the Plugin!<br/>
 It is compiled for the .NET Framework and tested on Windows 10. For the newer Releases of the Plugin (starting with 7.0.0) .NET 6 is required for which you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)). You'll need ".NET Runtime 6.0.x" and ".NET Desktop Runtime 6.0.x" as x64. (Do not confuse it with arm64!)<br/>
 Older Versions of the Plugin (until 0.6.x) only need .NET 4.8 which should be already installed on your System (as Part of Windows).
 - To test if .NET 6.0 is installed (Plugin Version 0.7.0 or greater), run this in Powershell or Commandline:
@@ -35,12 +36,12 @@ The Sims and their FSUIPC Version/Variant are:
 - FSUIPC3 - Microsoft Flight Simulator 2004
 - FSUIPC4 - Microsoft FSX, FSX Steam Edition, Prepar3d 1.4 to 3.4
 - FSUIPC5 - Prepar3D Version 4
-- **FSUIPC6** - Prepar3D Version 4 and 5
-- **FSUIPC7** - Microsoft Flight Simulator 2020
-- XPUIPC - X-Plane<br/><br/>
+- FSUIPC6 - **Prepar3D Version 4 and 5**
+- FSUIPC7 - **Microsoft Flight Simulator 2020**
+- XPUIPC/WebSocket - **X-Plane 12 & 11** (and probably older)<br/><br/>
 If you let me know what works and which Features work in which Sim (other than P3D v4/5, MSFS2020), I'll add it to the Readme! :wink:<br/>
 :grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so a registered Version of FSUIPC is highly recommended (but not neccessary)!<br/>
-:grey_exclamation: For MSFS2020 / FSUIPC7 you will need at least Version 7.3.6 installed, with the "WASM/WAPI" Module also installed and activated.
+:grey_exclamation: For MSFS2020 SU10 you will need at least Version 7.3.9 installed, with the "WASM/WAPI" Module also installed and activated.
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
@@ -164,7 +165,23 @@ There is no need to install the vJoy Driver if you are not planning to use this 
 * **Calculator**
  \[ Code ] (Command - MSFS2020 only)<br/>
   - *Code*: The desired Calculator Code to be executed.<br/><br/>
-<br/><br/>
+<br/>
+
+* **XP Command** (XPCMD)
+ \[ data/ref/path ] (Command - X-Plane only)<br/>
+  - *Path*: The official dataRef Path for the Command (as seen in DataRefTool for example).<br/><br/>
+  Example:
+  - ```toliss_airbus/aircondcommands/Pack1Toggle```
+ <br/>
+ 
+ * **XP DataRef** (XPWREF)
+ \[ data/ref/path(\[index\]|:sX) ] (Read/Command - X-Plane only)<br/>
+  - *Path*: The official dataRef Path for the Value (as seen in DataRefTool for example). If the DataRef is an Array, you can directly access the Values when you append the index in Brackets. You can also access string DataRefs if you add *:s* and the Length after the Path.<br/><br/>
+  Example:
+  - ```ckpt/lamp/74```
+  - ```AirbusFBW/FuelOHPArray[2]```
+  - ```FlyWithLua/TLS2PLD/fcuHdg:s8```
+ <br/><br/>
 #### DecodeBCD / Scale / Format / Mappings
 * **DecodeBCD**: If the Value is a BCD, the Plugin can decode it for you! 
 * **Scale**: Multiply the Value by that Number to scale it, if it is too big or small. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have a human-readable Value.
@@ -176,7 +193,7 @@ There is no need to install the vJoy Driver if you are not planning to use this 
    ```2:1%s``` Two Digits and add an "1" before the Text - useful for the BCD encoded Frequencies!<br/>
    ```%s ft``` Add "ft" after the Value<br/>
   <br/>
-* **Mappings**: You can map specific Values to specific Texts. For example 0 will show as "OFF" and 10 will show as "ON" (Syntax: 0=OFF:10=ON). A simple Comparison is also allowed, for Example if 1 is greater-or-equal the current Value show the Text "XX" (Syntax: 1>=XX). You can either have multiple Mappings or one Comparison but not both!<br/>
+* **Mappings**: You can map specific Values to specific Texts. For example 0 will show as "OFF" and 10 will show as "ON" (Syntax: 0=OFF:10=ON). Comparisons are also allowed, for Example if 1 is greater-or-equal the current Value show the Text "XX" (Syntax: 1>=XX). You can have multiple Mappings and Comparisons, they are evaluated in the Order entered.<br/>
 This is a rather powerfull Feature together with the Ability to change Font and Position as it reduces the need to create new Images in most Use-Cases!
 * **Order**: DecodeBCD -> Scale -> Round -> Format -> Map. If the Value is to be matched (On/Off/Special State e.g.) it is done after Round and before Format.
 <br/><br/>
@@ -198,8 +215,8 @@ If you care at all to inherit the Font: Since the Plugin reads *all* installed F
 ![ActionDisplay](img/DisplayXpndr.png)<br/>
 Most Settings should be explained by the common part.
 * **Draw Box**: Will draw a Frame in the configured *Thickness* and *Color* arround the Value. The Frame's *Size & Position* is defined as *"X; Y; Width; Height"* (0, 0 is Top-Left).
-* **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals the one you specified here. It will reset to the Normal Background if it is unequal again. Mind Scale and Round - the Matching is done after both. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
-You can optionally hide the Text when the Values match (current Value and configured Special Value). Maybe you want to display a nice "STD" Image?
+* **Special Value Indication**: When you enable it, the Background will be changed to the specified Image as soon as the current Value from the Sim equals/compares the one you specified here (you can write a Comparison like ">=0.3"). It will reset to the Normal Background if it is does not match. Mind Scale and Round - the Matching is done after both. To stay with the Pressure QNH Example - you would need to enter 1013, not 16208. <br/>
+You can optionally hide the Text when the Value matches. Maybe you want to display a nice "STD" Image?
 You can also specify a *Different Color* when the Values match. This Color has priority over both inheritted or customized Font Settings. This Color is also used for the Frame, if *Draw Frame* is enabled.
 * **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background defined as *"X; Y; Width; Height"*. If *Draw Frame* is enabled, it is relative to the Frame's *Size & Position*. If it not enabled it is relative to the whole Button. The Text is always drawn horizontal/vertical centered within that Box. When *Draw Frame* is toggled this will reset to the respective Default.
 <br/><br/>
@@ -207,10 +224,10 @@ You can also specify a *Different Color* when the Values match. This Color has p
 ![ActionSwitch](img/SimpleButton.png)![ActionDisplaySwitch](img/DisplaySwitchTcas.png)<br/>
 Since Display Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
-* **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar(s) to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lua Flags), multiple Requests will be send to the Sim in fast Sequence.
+* **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar/DataRef to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lua Flags), multiple Requests will be send to the Sim in fast Sequence.
 * **Use Delay**: If Control is selected as Action Type, you can check that to have a small Delay of 50ms between the Control-Commands send to the Sim.
 * **Reset Value**: If Lvar is selected as Action Type, you can check that to have the Lvar being reset to the Off-Value after the Button was pressed (the Plugin will set the Lvar to the On-Value for 100ms (controlDelay\*2) and then to the Off-Value). Useful for some Cockpit-Buttons which do not stay in the their pushed-Position and reflect that in their Lvar.
-* **On / Off State**: For Lvar and Offset you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar or Offset. The Button will toggle between these based on the current Value when pushed ("keyUp") and sends it to the Sim. So if the Lvar/Offset is 1, then the Plugin will write a 0.<br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
+* **On / Off State**: For Lvar, Offset and DataRef you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar, Offset or DataRef. The Button will toggle between these based on the current Value when pushed ("keyUp") and sends it to the Sim. So if the Lvar/Offset is 1, then the Plugin will write a 0.<br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
 * **Long Press**: When enabled, the Button can execute a completely different Command when pressed for longer than 600ms (with the default [Plugin Settings](README.md#plugin-settings). This second Command Settings' work mostly like described before. For Lvar and Offset as Action Type, the toggling is always done on the current value from the Action Address for the Long Press (meaning you can use two different Lvars/Offsets). The "Use Delay" and "Reset Value" option is used if enabled (they apply to both Actions)!<br/>
 Note that the internal Mechanic is based on "keyUp": regardless of how long you press the Button, it will only execute once when released! For that Reason this Long Press Option is not offered when the first Command is a non-toggleable vJoy Address! A non-toggleable vJoy is "down" (set) as soon as the StreamDeck Button is pressed and "up" (clear) as soon as the StreamDeck Button is released. A toggelable vJoy though behaves like the other Action (evaluated on "keyUp") and can therefore have a second Command on with the Long Press Option.
 <br/><br/>
@@ -219,14 +236,14 @@ Note that the internal Mechanic is based on "keyUp": regardless of how long you 
 Action Type and Address work exactly like described above.<br/>
 * **Use Status Value**: When Lvar or Offset is selected as Action Type, the Dynamic Button defaults to use the current Value and "On" & "Off" States defined for the Control Status for Toggling. If you do want to use a different Lvars / Offsets with and/or different On & Off States for the Action Address and the Status Address, you can uncheck this Box.<br/>Note that this does only affect the "normal" Command, but not for the "Long Press".
 * **Address** (Control Status Value): Here you specify where the current State (Value) of a Switch in the Sim can be read. Since there are only two Ways to read something from the Sim via FSUIPC, it is either an Offset or a (single) Lvar.<br/>The Syntax works as described [before](README.md#address-fields). The "third" Way, reading a Lua Value is described [below](README.md#lua-values).
-* **On / Off State**: When the Value matches On or Off, the respective On or Off Image is displayed.<br/>
-* **Special State**: For Switches which have something "in between" or other than the On/Off States, this Special State can be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches to the current Value. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
+* **On / Off State**: When the Value matches On or Off, the respective On or Off Image is displayed. You can either specifiy a discrete Value or a Comparison (like ">=0.3" to show the Image as long as the current Value is greater or equal to 0.3)<br/>
+* **Special State**: For Switches which have something "in between" or other than the On/Off States, this Special State can be displayed with that Setting. When you enable the Special State the specified Image is shown when the Value matches. You can either specifiy a discrete Value or a Comparison. If that State is not a specific Value but any other Value than On/Off, check *Any Value*. An Example would be Gear Position: it retracted (~off), extended (~on) or in transit (any value).
 <br/><br/>
 ### Korry Button
 ![DisplaySwitchKorry](img/DisplaySwitchKorry.png)<br/>
 The Addresses work the same as before, but now there can be two of them. In contrast to the Dynamic Button, this Button does not change the whole Image, it can draw two Images independently. There is some overlapping with the Dynamic Button (for Korrys), you could easily get the same functionality with a Dynamic Button in some Use-Cases. But the Benefit here is, not every Korry-Combination (Top+Bottom) has to be provided as complete Image. You can just create a new "Label" and combine that with the existing ones.
 * **Top Address only**: You can use only one (the top) Address for both Halves, if you wish.
-* **Show Value**: When the current Value (from the specified Address) matches the Value specified here, the selected Image will show in the respective Half (regardless what the other Half is displaying).
+* **Show Value**: When the current Value (from the specified Address) matches the Value specified here, the selected Image will show in the respective Half (regardless what the other Half is displaying). You can either specifiy a discrete Value or a Comparison.
 * **Show while non-zero**: Alternatively the Image is shown whenever the current Value is not Zero. Mind that an empty Value will be counted as zero and non-empty Strings (which don't represent a Number) will be counted as non-zero.
 * **Image**: The Image to show for the respective Half. These Images have transparent Backgrounds and are stored in the Images\korry Subfolder and can be changed and extended like the "normal" Images. They default to 54x20 px but that is not a Requirement (as having a transparent Background).
 * **Tweak Position**: This defines the Location and Size of each Half (in *x; y; w; h*). You can resize Images with that. Since the Image-Size is no where hard-coded, you can actually make yourself a vertical split Korry for Example, if you change these Positions and provide the appropiate Images!
@@ -250,7 +267,7 @@ This Action can display a Value on a Bar or an Arc. The graphics are rendered on
   - *Bar Color*: The Base Color of the Bar or Arc.
   - *Color Change*: Check this Box to change the Base Color when a Variable has a specific Value.
   - *Address Color*: Which Variable to read for the Color Change (can be the same or different to the Variable used for the current Value).
-  - *Value*: On which Value the Color should change (only the Base Color will be changed - the Warning Ranges are unaffected).
+  - *Value*: On which Value the Color should change (only the Base Color will be changed - the Warning Ranges are unaffected). You can either specifiy a discrete Value or a Comparison.
   - *Value Color*: The new Base Color to use when the given Variable has the specified Value.
   - *Orientation* (Bar): Define if this Bar is horizontal or vertical and if the Values are increasing right/left or up/down. An Arc does not need (and ignores) that - it is a Circle, it has all directions. :smile:
   - *Start Angle* (Arc): The Angle at wich the Arc starts. 0° is at right center.
@@ -272,11 +289,13 @@ The most notabel Difference: with a Bar, both Values can be displayed as Text. W
 ![ActionProfileSwitcher](img/ProfileSwitcher.png)<br/>
 With this Action the Profile Switching is configured. If you want to use that (disabled by default), drag this Action somewhere on your StreamDeck. Upon first use, as soon as you select this Action and the Property Inspector appears, you will be asked if you want to install preconfigured Profiles. The Software should ask once per every connected StreamDeck, but the API has the Tendency to pop-up one additional Dialog sometimes. Only accept the first x Dialogs (or delete the "Copy" Profiles afterwards).<br/>This is *required* for the Switching to work! The StreamDeck API only allows to switch Profiles which came preconfigured with a Plugin and internally keeps Track of that (meaning, the StreamDeck *knows* if a Profile came frome a User or from a Plugin). You only have to install the Profiles if you want to use the Switching capabilities.<br/>
 For that Reason the Plugin conveniently includes 3 StreamDeck Profiles for the "normal" StreamDeck (Default, Yankee, Zulu) and 3 Profiles for the XL StreamDeck (DefaultXL, Whiskey, X-Ray) that you can map to any FSUIPC Profiles. You don't have to use them (that is also customizable), you can use your own Profiles or add additional Profiles. But that requires a change in the Plugin Settings (they have to be "published" to StreamDeck upon Plugin Start and have to be installed by the Plugin/StreamDeck Software).<br/>
-The Plugin will switch to a Profile as soon FSUIPC is ready (somewhere while P3D loads). It attempts to switch back to the previous used Profile, but that only works if you don't use Folders (did not switch between them within the Profile) - again for API Reasons.<br/>
+The Plugin will switch to a Profile as soon FSUIPC is ready (somewhere while the Sim loads). It attempts to switch back to the previous used Profile, but that only works if you don't use Folders (did not switch between them within the Profile) - again for API Reasons.<br/>
+For X-Plane the DataRef "sim/aircraft/view/acf_livery_path" (the first 64 Characters) for the Comparison.<br/>
+In both Cases it will be tested if the Mapping(s) you entered are contained in current FSUIPC ProfileName or X-Plane Livery Path. For example entering "a320" will match everything that has it in the Name/Path.<br/>
 * **Enabled** When this is checked, this Feature is activated. You don not have to keep this Action anywhere on your StreamDeck after Configuration (it is a Global Setting).
 * **Profiles Installed** You can reset the Installed flag (uncheck), if you wish. You will immediately be asked if you want to install the preconfigured Profiles (=all Profiles which where listed in the Manifest-File when the StreamDeck Software loaded the Plugin). Profiles that already exist will *not* be overwritten - StreamDeck will add a "xyz copy" Profile.
 * **Use Default** (per Deck) For unknown FSUIPC Profiles (or Aircrafts which do not have a FSUIPC Profile), the Plugin will switch to the Profile configured by *Name* if this Option is checked. If unchecked, only mapped FSUIPC Profiles will be switched. Default is obviously the bundled Default Profile :wink:
-* **Profile Mappings** (per Deck) Here you can map your FSUIPC Profiles to the different StreamDeck Profiles. Use the FSUIPC Profile's Name exactly as it is configured in FSUIPC. Multiple FSUIPC Profiles can be mapped to the same StreamDeck Profile, their Names are separated by "**:**".
+* **Profile Mappings** (per Deck) Here you can map your FSUIPC Profiles / X-Plane Aircrafts to the different StreamDeck Profiles. It is a substring (contains) match and is Case-Sensitive. Multiple Mappings can point to the same StreamDeck Profile, their Names are separated by "**:**".
 #### Customization
 If you want to use your own Names or need more Profiles, you can customize that. But because of the described Limitation of the StreamDeck API, you have to fiddle with the Plugin's [Manifest](README.md#manifestjson) File directly (so the Plugin can install it).<br/>
 * First create a new empty Profile in your StreamDeck and export it (or an existing one, does not need to be empty). Name it any way you want, non-alpha-numeric Characters are also allowed, but rename the File afterwards if these Characters are more "special" then Space, Minus or Underscore (it has no Influence on the displayed Name).
@@ -344,7 +363,7 @@ function FSLUpdateButtonLt()
 	end
 end
 ```
-(Note to FSLabs Users: you can find a complete working Example wit predefined StreadmDeck Profiles and a Lua Library in the Downloads Section)<br/>
+<br/>
 Within the Plugin I then use
 - "66C5:4:s" to read the TCAS State and display & toggle it with a "Display Value with Button" Action (toggling via Lua-Script). Displayed with a nice quick-google-searched LCD Font. This Example is now more or less obsolete, since you can do the same with new Mappings Feature without writing any Lua-Code.
 - "66C0:4:s" to read the Position/State of both Landing Lights in a "Dynamic Button" and display the appropiate Images for the three States On, Off and Retracted (via Special State). One Button which sends "Up" for both Landing Lights, one to send "Down" for both Landing Lights via FSControls. (If both Landing Lights positions differ, the Action will show the Error Image which is configured for "Fault". Since the current Value does not match the On, Off or Special State, the Plugin "assumes" a Read-Error. So there is some kind of fourth State to display :wink:)
@@ -367,6 +386,8 @@ These are the available Settings and their Default:
 * **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".
 * **Fsuipc7LegacyLvars**="false"	- With "true", the new MSFS Variable Services in FSUIPC7 is not used and instead the legacy way over Offset 0x0D70.<br/><br/>
 For the Font-Inheritance Workaround (mentioned caveat in the StreamDeck API). "XX" is the two-letter Code for the (general) Language. For instance, en_US and en_GB both map to "en". You have to define all 3 Styles for a language.
+* **xpIP**"="127.0.0.1" 		-  The IP (not Hostname) where X-Plane is running. Networked Installation currently not supported.
+* **xpPort**"="49000" 			-  The Port on which X-Plane is running.
 * **fontDefault_XX**="Regular"
 * **fontBold_XX**="Bold"
 * **fontItalic_XX**="Italic"<br/><br/>

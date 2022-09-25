@@ -151,7 +151,7 @@ namespace PilotsDeck
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ValueManager["AddressColorOff"] == GaugeSettings.StateColorOff);
+            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ModelBase.Compare(GaugeSettings.StateColorOff, ValueManager["AddressColorOff"]));
             Color drawColor;
             if (useOffColor)
                 drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColorOff);
@@ -176,7 +176,7 @@ namespace PilotsDeck
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ValueManager["AddressColorOff"] == GaugeSettings.StateColorOff);
+            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ModelBase.Compare(GaugeSettings.StateColorOff, ValueManager["AddressColorOff"]));
             Color drawColor;
             if (useOffColor)
                 drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColorOff);

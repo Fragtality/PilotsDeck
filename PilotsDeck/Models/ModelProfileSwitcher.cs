@@ -192,8 +192,11 @@ namespace PilotsDeck
 
             string[] profiles = profile.Split(':');
             for (int i = 0; i < profiles.Length; i++)
-                if (profiles[i] == name)
+                if (name.Contains(profiles[i]))
+                {
+                    Log.Logger.Debug($"ModelProfileSwitcher:IsInProfile - Profile-Mapping '{profiles[i]}' matched to '{name}'");
                     return true;
+                }
 
             return false;
         }

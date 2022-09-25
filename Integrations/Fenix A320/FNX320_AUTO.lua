@@ -17,25 +17,25 @@ end
 
 function FNX_TOGGLER(lvar, poson, posoff)
 	local pos = ipc.readLvar(lvar)
-	
+
 	if pos == poson then
 		pos = posoff
 	else
 		pos = poson
 	end
-	
+
 	ipc.writeLvar(lvar, pos)
 end
 
 function FNX_SEQUENCE(lvar, posmax, posstart)
 	local pos = ipc.readLvar(lvar)
-	
+
 	if (pos + 1) > posmax then
 		pos = posstart
 	else
 		pos = pos + 1
 	end
-		
+
 	ipc.writeLvar(lvar, pos)
 end
 
@@ -62,7 +62,7 @@ end
 function FNX_FIRE_TEST()
 	local hold = 4000
 	local delay = 1000
-	
+
 	ipc.writeLvar("S_OH_FIRE_APU_TEST",1)
 	ipc.sleep(hold)
 	ipc.writeLvar("S_OH_FIRE_APU_TEST",0)
@@ -103,6 +103,11 @@ function FNX_LT_LAND_OFF_TGL()
 	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 1, 0)
 end
 
+function FNX_LT_LAND_FULL_TGL()
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 2, 0)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 2, 0)
+end
+
 function FNX_LT_NOSE_TO_TGL()
 	FNX_TOGGLER("S_OH_EXT_LT_NOSE", 2, 1)
 end
@@ -117,6 +122,42 @@ end
 
 function FNX_LT_DOME_DIM_TGL()
 	FNX_TOGGLER("S_OH_INT_LT_DOME", 1, 0)
+end
+
+local cabinOffset = 0x58AB
+function FNX_LT_CABIN_SET(param)
+	ipc.execCalcCode(string.format("%s (>K:LIGHT_POTENTIOMETER_13_SET)", param))
+end
+
+function FNX_LT_CABIN_TGL()
+	local curValue = ipc.readUD(cabinOffset)
+
+	if curValue ~= 25 then
+		FNX_LT_CABIN_SET(25)
+	else
+		FNX_LT_CABIN_SET(100)
+	end
+end
+
+local cabinStep = 20
+function FNX_LT_CABIN_INC()
+	local curValue = ipc.readUD(cabinOffset)
+
+	if curValue + cabinStep <= 100 then
+		FNX_LT_CABIN_SET(curValue + cabinStep)
+	else
+		FNX_LT_CABIN_SET(100)
+	end
+end
+
+function FNX_LT_CABIN_DEC()
+	local curValue = ipc.readUD(cabinOffset)
+
+	if curValue - cabinStep >= 0 then
+		FNX_LT_CABIN_SET(curValue - cabinStep)
+	else
+		FNX_LT_CABIN_SET(0)
+	end
 end
 
 -----------------------------------------
@@ -146,6 +187,10 @@ end
 
 function FNX_BARO_DEC_FAST()
 	FNX_TWIST("E_FCU_EFIS1_BARO", -5)
+end
+
+function FNX_BARO_TGL()
+	FNX_TOGGLER("S_FCU_EFIS1_BARO_STD", 1, 0)
 end
 
 function FNX_NDZOOM_INC()
@@ -256,7 +301,7 @@ function FNX_FCU_HDG_TOGGLE()
 end
 
 function FNX_FCU_ALT_TOGGLE()
-	if ipc.readLvar("I_FCU_ALTITUDE_MANAGED") == 1 or ipc.readSTR(0x544E, 1) == "1" then
+	if ipc.readLvar("I_FCU_ALTITUDE_MANAGED") == 1 or tonumber(ipc.readSTR(0x544F, 2)) == 1 then
 		FNX_TWIST("S_FCU_ALTITUDE", 1)
 	else
 		FNX_TWIST("S_FCU_ALTITUDE", -1)
@@ -310,6 +355,14 @@ end
 
 function FNX_PEDAL_DISCO_TGL()
 	FNX_TOGGLER("S_FC_CAPT_TILLER_PEDAL_DISCONNECT", 1, 0)
+end
+
+function FNX_PEDAL_DISCO_ON()
+	ipc.writeLvar("S_FC_CAPT_TILLER_PEDAL_DISCONNECT", 1)
+end
+
+function FNX_PEDAL_DISCO_OFF()
+	ipc.writeLvar("S_FC_CAPT_TILLER_PEDAL_DISCONNECT", 0)
 end
 
 -----------------------------------------
@@ -429,7 +482,7 @@ end
 function FNX_SPEEDBRK_TGL()
 	local lvar = "A_FC_SPEEDBRAKE"
 	local pos = ipc.readLvar(lvar)
-	
+
 	if pos ~= 0 then
 		ipc.writeLvar(lvar, 0)
 	else
@@ -472,12 +525,13 @@ end
 function FNX_WX_PWS_MASTER()
 	if ipc.readLvar("S_WR_SYS") ~= 1 then
 		ipc.writeLvar("S_WR_SYS", 1)
-		ipc.writeLvar("S_WR_MULTISCAN", 0)
-		ipc.writeLvar("S_WR_GCS", 0)
+		ipc.writeLvar("S_WR_PRED_WS", 0)
 	else
 		ipc.writeLvar("S_WR_SYS", 0)
+		ipc.writeLvar("S_WR_MODE", 1)
 		ipc.writeLvar("S_WR_MULTISCAN", 1)
 		ipc.writeLvar("S_WR_GCS", 1)
+		ipc.writeLvar("S_WR_PRED_WS", 1)
 	end
 end
 
@@ -524,6 +578,24 @@ function FNX_MCDU_WXREQ()
 	FNX_BTN_PRESS("S_CDU1_KEY_LSK1L")
 end
 
+function FNX_P2A_XPDR_toggle()		--Toggle Transponder in FSL and P2A to keep them in sync
+	local state = ipc.readLvar("S_XPDR_OPERATION")
+
+	if state == 0 then
+		ipc.writeLvar(1)
+		ipc.keypress(131) --F20
+	elseif state == 1 then
+		ipc.writeLvar(2)
+		ipc.keypress(131)
+		ipc.keypress(131)
+	elseif state == 2 then
+		ipc.writeLvar(0)
+		ipc.keypress(131)
+		ipc.keypress(131)
+		ipc.keypress(131)
+	end
+end
+
 -----------------------------------------
 -----------------------------------------
 -- $$ INIT Function
@@ -532,44 +604,71 @@ function FNX_INIT_AC()
 	if ipc.readLvar("S_OH_EXT_LT_NAV_LOGO") ~= 0 then
 		return
 	end
-	
+
 	--Batteries ON
 	ipc.writeLvar("S_OH_ELEC_BAT1", 1)
 	ipc.sleep(1500)
 	ipc.writeLvar("S_OH_ELEC_BAT2", 1)
 	ipc.sleep(1500)
-	
+
 	--External Power
 	ipc.writeLvar("S_OH_ELEC_EXT_PWR", 1)
-	
-	--Flood Lights 50% and Dome Dim
-	ipc.writeLvar("A_MIP_LIGHTING_FLOOD_MAIN", 0.5)
-	ipc.writeLvar("A_MIP_LIGHTING_FLOOD_PEDESTAL", 0.5)
+	ipc.sleep(150)
+	ipc.writeLvar("S_OH_ELEC_EXT_PWR", 0)
+
+	--Integrity Lights
+	local bright = 0.4
+	ipc.writeLvar("A_OH_LIGHTING_OVD", bright)
+	ipc.writeLvar("A_FCU_LIGHTING", bright)
+	ipc.writeLvar("A_FCU_LIGHTING_TEXT", bright * 2)
+	ipc.writeLvar("A_PED_LIGHTING_PEDESTAL", bright)
+
+	--Flood Lights and Dome Dim
+	bright = 0.25
+	ipc.writeLvar("A_MIP_LIGHTING_MAP_L", bright)
+	ipc.writeLvar("A_MIP_LIGHTING_FLOOD_MAIN", bright)
+	ipc.writeLvar("A_MIP_LIGHTING_FLOOD_PEDESTAL", bright)
 	ipc.writeLvar("S_OH_INT_LT_DOME", 1)
-	
+
+	--Display Brightness 60%
+	bright = 0.8
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_CO", bright)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_CI_OUTER", bright - 0.2)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_CI", bright)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_ECAM_U", bright)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_ECAM_L", bright)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_FO", bright)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_FI_OUTER", bright - 0.2)
+	ipc.writeLvar("A_DISPLAY_BRIGHTNESS_FI", bright)
+
 	--Cargo Heat AFT
 	ipc.writeLvar("A_OH_PNEUMATIC_CARGO_AFT_TEMP", 0.5)
-	
+
 	--Hide CP Armrest Right and FO EFB
 	ipc.writeLvar("S_ARMREST_RIGHT_CAPT", 1)
 	ipc.writeLvar("S_EFB_VISIBLE_FO", 0)
-	
-	--Reset/Stop Clock
-	ipc.writeLvar("S_MIP_CLOCK_ET", 2)
-	ipc.sleep(250)
-	ipc.writeLvar("S_MIP_CLOCK_ET", 1)
-	
+
+	--ACP1
+	ipc.writeLvar("S_ASP_VHF_1_REC_LATCH", 1)
+	ipc.writeLvar("S_ASP_VHF_2_REC_LATCH", 0)
+	ipc.writeLvar("S_ASP_INT_REC_LATCH", 1)
+	ipc.writeLvar("S_ASP_CAB_REC_LATCH", 1)
+	ipc.writeLvar("S_ASP_PA_REC_LATCH", 1)
+
 	--For Thrustmastet TCA: Sync Parking Brake
 	local prkBtn = ipc.testbutton(1, 19)
 	local chocks = ipc.readLvar("B_CONFIG_CHOCKS")
 	local posBrk = ipc.readLvar("S_MIP_PARKING_BRAKE")
 
-	if not prkBtn and chocks == 1 and posBrk == 1 then	--TCA is off but Sim is on -> toggle (but only when chocks set)
-		ipc.control(65752)
+	if not prkBtn and chocks == 1 and posBrk == 1 then	--TCA is off but Sim is on -> set OFF (but only when chocks set)
+		ipc.writeLvar("S_MIP_PARKING_BRAKE", 0)
 	elseif prkBtn and posBrk == 0 then	--TCA is on but Sim is off -> toggle
-		ipc.control(65752)
+		ipc.writeLvar("S_MIP_PARKING_BRAKE", 1)
 	end
-	
+
+	ipc.sleep(7500)
+	ipc.writeLvar("GSX_AUTO_CONNECT_REQUESTED", 1)
+
 	--NAV Lights
 	ipc.writeLvar("S_OH_EXT_LT_NAV_LOGO", 1)
 end
@@ -607,7 +706,7 @@ event.flag(26, "FNX_FCU_HDG_INC")
 event.flag(27, "FNX_FCU_HDG_DEC")
 event.flag(28, "FNX_FCU_HDG_INC_FAST")
 event.flag(29, "FNX_FCU_HDG_DEC_FAST")
--- event.flag(30, "FNX_FCU_ALTSCALE")
+event.flag(30, "FNX_LT_LAND_FULL_TGL")
 event.flag(31, "FNX_FCU_ALT_INC")
 event.flag(32, "FNX_FCU_ALT_DEC")
 event.flag(33, "FNX_FCU_ALT_INC_FAST")
@@ -671,5 +770,11 @@ event.flag(91, "FNX_WX_PWS_MASTER")
 event.flag(92, "FNX_FCU_SPD_TOGGLE")
 event.flag(93, "FNX_FCU_HDG_TOGGLE")
 event.flag(94, "FNX_FCU_ALT_TOGGLE")
-
+event.flag(95, "FNX_P2A_XPDR_toggle")
+event.flag(96, "FNX_LT_CABIN_TGL")
+event.flag(97, "FNX_LT_CABIN_INC")
+event.flag(98, "FNX_LT_CABIN_DEC")
+event.flag(99, "FNX_PEDAL_DISCO_ON")
+event.flag(100, "FNX_PEDAL_DISCO_OFF")
+event.flag(101, "FNX_BARO_TGL")
 event.flag(254, "FNX_INIT_AC")

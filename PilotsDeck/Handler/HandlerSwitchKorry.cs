@@ -88,14 +88,14 @@ namespace PilotsDeck
             string top = ValueManager[ID.Top];
             string bot = ValueManager[ID.Bot];
 
-            if (((top == KorrySettings.TopState && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(top))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
+            if (((ModelBase.Compare(KorrySettings.TopState, top) && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(top))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
                 render.DrawImage(imgManager.GetImageObject(KorrySettings.TopImage, DeckType), KorrySettings.GetRectangleTop());
 
             string testValue = bot;
             if (KorrySettings.UseOnlyTopAddr)
                 testValue = top;
 
-            if (((testValue == KorrySettings.BotState && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(testValue))) && !string.IsNullOrEmpty(KorrySettings.BotImage))
+            if (((ModelBase.Compare(KorrySettings.BotState, testValue) && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(testValue))) && !string.IsNullOrEmpty(KorrySettings.BotImage))
                 render.DrawImage(imgManager.GetImageObject(KorrySettings.BotImage, DeckType), KorrySettings.GetRectangleBot());
 
             DrawImage = render.RenderImage64();

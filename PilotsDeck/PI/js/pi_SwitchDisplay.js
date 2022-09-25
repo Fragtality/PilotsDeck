@@ -46,7 +46,7 @@ function updateForm() {
 	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
 	//On/Off States & SwitchOnCurrent
-	if (settingsModel.ActionType != 3 && settingsModel.ActionType != 4)
+	if (settingsModel.ActionType != 3 && settingsModel.ActionType != 4 && settingsModel.ActionType != 11)
 		toggleConfigItem(false, 'SwitchOnCurrentValue');
 	else
 		toggleConfigItem(true, 'SwitchOnCurrentValue');

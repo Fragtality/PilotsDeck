@@ -191,7 +191,7 @@
 
         public static bool IsActionReadable(int type)
         {
-            return type == (int)ActionSwitchType.LVAR || type == (int)ActionSwitchType.OFFSET;
+            return type == (int)ActionSwitchType.LVAR || type == (int)ActionSwitchType.OFFSET || type == (int)ActionSwitchType.XPWREF;
         }
     }
 }

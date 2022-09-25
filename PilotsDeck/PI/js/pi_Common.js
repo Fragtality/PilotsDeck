@@ -102,8 +102,11 @@ function setFormItem(value, name) {
 
 function setPattern(field, type) {
 	var regName = "[a-zA-Z0-9\x2D\x5F]+";
+	//var regNameXP = "[a-zA-Z][a-zA-Z0-9\x2D\x5F]+";
 	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
 	var regHvar = `^([^0-9]{1}(H:){0,1}${regName}){1}$`;
+	var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
+	//var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[\x5D])|(:s[0-9]+)){0,1}){1}$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	
 	if (type == 0) //macro
@@ -117,13 +120,17 @@ function setPattern(field, type) {
 	else if (type == 4)  //offset
 		document.getElementById(field).pattern = regOffset;
 	else if (type == 5) //offset | lvar
-		document.getElementById(field).pattern = `${regOffset}|${regLvar}`;
+		document.getElementById(field).pattern = `${regOffset}|${regLvar}|${regDref}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv
 		document.getElementById(field).pattern = "^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$";
 	else if (type == 8) //HVar
 		document.getElementById(field).pattern = regHvar;
+	else if (type == 10) //XPCmd
+		document.getElementById(field).pattern = regDref;
+	else if (type == 11) //XPWRef
+		document.getElementById(field).pattern = regDref;
 	else
 		document.getElementById(field).pattern = ".*";
 }
@@ -169,6 +176,10 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 		toggleConfigItem(true, offField);
 	}
 	else if (actionType == 4 && !switchCurrent) { //offset
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
+	else if (actionType == 11 && !switchCurrent) { //xp write ref
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}

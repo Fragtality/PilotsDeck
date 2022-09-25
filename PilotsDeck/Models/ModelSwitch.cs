@@ -11,7 +11,9 @@
         VJOY = 6, //FSUIPC vJoy
         VJOYDRV = 7, //vJoy Driver by
         HVAR,
-        CALCULATOR
+        CALCULATOR,
+        XPCMD,
+        XPWREF
     }
 
     public interface IModelSwitch

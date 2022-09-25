@@ -11,12 +11,15 @@ Mix and match as you like :relaxed:<br/>
 ![ExampleFNX00](../../img/ExampleFNX00.jpg)<br/>
 ![ExampleFNX01](../../img/ExampleFNX01.jpg)<br/>
 ![ExampleFNX02](../../img/ExampleFNX02.jpg)<br/>
+![ExampleFNX02](../../img/ExampleFNX03.jpg)<br/>
+![ExampleFNX02](../../img/ExampleFNX04.jpg)<br/>
+![ExampleMSFSGSX](../../img/ExampleMSFSGSX.jpg)<br/>
+
 
 # Installation
-- Tested with Fenix 1.0.2.104 (01.06.22)
-- Update to at least PilotsDeck 0.6.6!
+- Tested with Fenix 1.0.3.125 (21.09.22)
+- Update to at least PilotsDeck 0.7.3!
 - Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
-- Place the Images in the Images\korry Folder in the Plugin-Directory
 - Just double-click on the Profiles you want to use to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
 - The cameras.cfg is optional (for the Views via vJoy-Driver Buttons)! If you want to use it: %appdata%\Microsoft Flight Simulator\SimObjects\Airplanes\FNX320
@@ -24,6 +27,9 @@ Mix and match as you like :relaxed:<br/>
 - Either start the Scripts (Auto + Sync) manually ...
 - ... or add them as Auto-Scripts to your FSUIPC7.ini. Start MSFS/FSUIPC7 once so the Files are added (if you're not familiar with adding them manually). Then add the following to your FSUIPC7.ini:<br/>
 ```
+[Auto]
+1=Lua GSX_AUTO
+
 [Auto.FNX320]
 1=Lua FNX320_AUTO
 2=Lua FNX320_SYNC
@@ -59,11 +65,17 @@ The Mapping I use:<br/>
 
 ## FNX320_AUTO
 This Script contains the Functions addressed by some Actions in the Profiles. They are addressed via "LuaToggle:FNX320_AUTO:*NUM*" in PilotsDeck. Which *NUM*ber maps to which Function can be found at the End of the File! This Script is essential for these Buttons to work.
-Some Functions are not used in the Profile (like Engine Masters) - I'll use them for my Thrustmaster TCA.
+Some Functions are not used in the Profile (like Engine Masters) - I'll use them for my Thrustmaster TCA.<br/>
+It contains also a "INIT" Function that helps when starting in the Cold and Dark State: it applies Power to Plane and sets some Basic Knobs and Switches (like e.g. Integ/Flood Lights).<br/>
 
 ## FNX320_SYNC
 This Script is essential for some Buttons / Displays from the Profiles to show their State / Value (Gear Indication, Baro, Landing Light).<br/>
 The Script (and the Binary) use Offsets at 0x5400 and above to generate Informations for some Buttons - if these are used by some other Addon you have to change them in the Lua and the Profile (and the Configuration File of the Binary). This Offset-Range is normally associated with "Project Magenta".<br/>
+
+## GSX_AUTO and GSX_AUTO_FNX
+These Scripts are used to integrate with GSX Pro and you only need them if you own it. The GSX_AUTO Script is not tied to the Fenix only, it can also be used with GSX and other Aircrafts! <br/>
+With these Scripts you can call the GSX Services via LuaToggle Functions so they can be called via StreamDeck (or Joystick). They also generate 3 Values that can be displayed on the StreamDeck: Current Service State, Passenger De/Boarding Progress and Cargo Un/Loading Progress.<br/>
+The easiest way is to use the "Call/State" Action on the StreamDeck, it always calls the next available Service: Refuel -> Cater -> Board -> Push -> Push Confirm ... Deboard (and then it starts over). <br/>
 
 # Usage
 I hope/think most Buttons should be self-explanatory. Some Buttons use a Long-Press Actions, for Example:<br/>

@@ -33,6 +33,8 @@ namespace PilotsDeck
             }
         }
         public static readonly bool Fsuipc7LegacyLvars = Convert.ToBoolean(ConfigurationManager.AppSettings["Fsuipc7LegacyLvars"]);
+        public static readonly string xpIP = Convert.ToString(ConfigurationManager.AppSettings["xpIP"]);
+        public static readonly int xpPort = Convert.ToInt32(ConfigurationManager.AppSettings["xpPort"]);
 
         public static string fontDefault { get; private set; } = Convert.ToString(ConfigurationManager.AppSettings["fontDefault_en"]);
         public static string fontBold { get; private set; } = Convert.ToString(ConfigurationManager.AppSettings["fontBold_en"]);

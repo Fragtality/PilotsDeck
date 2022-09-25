@@ -27,7 +27,13 @@ namespace PilotsDeck
         private ImageManager imgManager = null;
 
         public ConnectionManager DeckManager { get; set; }
-        public int Timing { get { return AppSettings.waitTicks; } }
+        public int Timing
+        {
+            get
+            {
+                return AppSettings.pollInterval;
+            }
+        }
         public bool IsApplicationOpen { get; set; }
         public Simulator CurrentSim { get; set; }
 
@@ -50,9 +56,36 @@ namespace PilotsDeck
         private List<string> profileSwitcherActions = new();
         private List<string> switchedDecks = new();
         private List<StreamDeckProfile> manifestProfiles;
-        private IPCValueOffset loadedFSProfile;
+        //private IPCValueOffset loadedFSProfile;
+        private IPCValue loadedFSProfile
+        {
+            get
+            {
+                if (CurrentSim != Simulator.XP)
+                {
+                    return ipcManager["9540:64:s"];
+                }
+                else
+                {
+                    return ipcManager[IPCManager.xpAircraftString];
+                }
+            }
+        }
         private string lastFSProfile = null;
-        private IPCValueOffset loadedAircraft;
+        private IPCValue loadedAircraft
+        {
+            get
+            {
+                if (CurrentSim != Simulator.XP)
+                {
+                    return ipcManager["3500:24:s"];
+                }
+                else
+                {
+                    return ipcManager[IPCManager.xpAircraftString];
+                }
+            }
+        }
         private string lastAircraft = "none";
 
 
@@ -68,8 +101,8 @@ namespace PilotsDeck
         {
             if (currentActions != null && ipcManager != null && imgManager != null && manifestProfiles != null)
             {
-                loadedFSProfile = ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead, true) as IPCValueOffset;
-                loadedAircraft = ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead, true) as IPCValueOffset;
+                ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead, true);
+                ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead, true);
                 Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
             }
 
@@ -189,9 +222,8 @@ namespace PilotsDeck
         {
             Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
 
-            IsApplicationOpen = false;
+            IsApplicationOpen = false;  
             CurrentSim = Simulator.UNKNOWN;
-            ipcManager.SetSimulator(CurrentSim);
         }
 
         public void UpdateProfileSwitchers()
@@ -255,7 +287,10 @@ namespace PilotsDeck
             }
 
             lastFSProfile = loadedFSProfile.Value;
-            lastAircraft = loadedAircraft.Value;
+            if (CurrentSim != Simulator.XP)
+                lastAircraft = loadedAircraft.Value;
+            else
+                lastAircraft = loadedFSProfile.Value;
         }
 
         public void LoadProfiles()
@@ -307,9 +342,9 @@ namespace PilotsDeck
             if (tickCounter < firstTick) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 20 Ticks => 20 * <200> = 4s )
                 return;
 
-            if (!IsApplicationOpen)     //P3D closed
+            if (!IsApplicationOpen)     //SIM closed
             {
-                if (lastAppState)       //P3D changed to closed
+                if (lastAppState)       //SIM changed to closed
                 {
                     lastAppState = false;
                     appAlreadyRunning = false;
@@ -327,9 +362,9 @@ namespace PilotsDeck
                         }
                 }
             }
-            else                        //P3D open
+            else                        //SIM open
             {
-                if (!lastAppState)      //P3D changed to opened
+                if (!lastAppState)      //SIM changed to opened
                 {
                     lastAppState = true;
                     lastConnectState = false;
@@ -351,35 +386,48 @@ namespace PilotsDeck
                         CallOnAll(handler => handler.SetWait());
                     }
 
+
+
                     if (!lastProcessState && tickCounter % (waitTicks / 3) != 0 && tickCounter != firstTick && !appAlreadyRunning)  //throttle process calls to every 10s (150/3 * 200ms) if last was unsuccessful (but not on first)
                     {
                         lastProcessState = false;
                         Log.Logger.Verbose("PROC - Throttle (not proc)");
                     }
-                    else if (!appAlreadyRunning && appIsStarting && tickCounter % (waitTicks / 3) != 0) //throttle calls while still loading (60s timer still running) to every 10s
+                    else if (CurrentSim != Simulator.XP && !appAlreadyRunning && appIsStarting && tickCounter % (waitTicks / 3) != 0) //throttle calls while still loading (60s timer still running) to every 10s
                     {
                         Log.Logger.Verbose($"PROC - Throttle (starting) - Delay Elapsed: {watchLoading.Elapsed.Seconds} | Total: {watchLoading.Elapsed.TotalSeconds} | in ms {watchLoading.ElapsedMilliseconds}");
+                    }
+                    else if (CurrentSim == Simulator.XP && !ipcManager.xpConnector.IsReady)
+                    {
+                        ipcManager.xpConnector.Reconnect();
                     }
                     else if (ipcManager.Process(AppSettings.groupStringRead))
                     {
                         if (!appAlreadyRunning && appIsStarting)
                         {
-                            if (!watchLoading.IsRunning)
+                            if (CurrentSim != Simulator.XP)
                             {
-                                watchLoading.Restart();
-                                Log.Logger.Verbose("PROC - Processed OK - Start App Delay");
+                                if (!watchLoading.IsRunning)
+                                {
+                                    watchLoading.Restart();
+                                    Log.Logger.Verbose("PROC - Processed OK - Start App Delay");
+                                }
+                                else
+                                    Log.Logger.Debug($"ActionController: Throttled Processing, awaiting appStartDelay - elapsed: {watchLoading.Elapsed.TotalSeconds:n0}");
+
+                                if (watchLoading.Elapsed.TotalSeconds > AppSettings.appStartDelay || CurrentSim == Simulator.MSFS)
+                                {
+                                    watchLoading.Stop();
+                                    watchLoading.Reset();
+                                    appIsStarting = false;
+                                    Log.Logger.Debug($"ActionController: appStartDelay expired, Processing normally.");
+                                    lastProcessState = false;
+                                    Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
+                                }
                             }
                             else
-                                Log.Logger.Debug($"ActionController: Throttled Processing, awaiting appStartDelay - elapsed: {watchLoading.Elapsed.TotalSeconds:n0}");
-
-                            if (watchLoading.Elapsed.TotalSeconds > AppSettings.appStartDelay)
                             {
-                                watchLoading.Stop();
-                                watchLoading.Reset();
                                 appIsStarting = false;
-                                Log.Logger.Debug($"ActionController: appStartDelay expired, Processing normally.");
-                                lastProcessState = false;
-                                Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
                             }
                         }
                         else if (appAlreadyRunning && appIsStarting)
@@ -388,12 +436,15 @@ namespace PilotsDeck
                             Log.Logger.Verbose("PROC - Processed OK");
 
                         if (tickCounter % (waitTicks / 3) == 0) //every 10s force redraw
-                            RefreshActions(token, true);  
+                            RefreshActions(token, true);
                         else
                             RefreshActions(token, !lastProcessState);   //toggles process change
                         lastProcessState = true;
-                        if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
-                            SwitchProfiles();
+                        if (GlobalProfileSettings.EnableSwitching)
+                        {
+                            if (!string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
+                                SwitchProfiles();
+                        }
                     }
                     else
                     {

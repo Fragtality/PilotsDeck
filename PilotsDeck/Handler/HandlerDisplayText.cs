@@ -146,7 +146,7 @@ namespace PilotsDeck
             Color boxColor = ColorTranslator.FromHtml(TextSettings.BoxColor);
 
             string text = "";
-            if (TextSettings.HasIndication && TextSettings.IndicationValue == value)
+            if (TextSettings.HasIndication && ModelBase.Compare(TextSettings.IndicationValue, value)) 
             {
                 background = TextSettings.IndicationImage;
                 if (!TextSettings.IndicationHideValue)

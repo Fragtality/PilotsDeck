@@ -14,12 +14,16 @@ namespace PilotsDeck
         private List<string> persistentValues = new();
         private static readonly string inMenuAddr = "3365:1";
         private static readonly string isPausedAddr = "0262:2";
+        public static readonly string xpAircraftString = "sim/aircraft/view/acf_livery_path:s64";
         private Simulator currentSim = Simulator.UNKNOWN;
+        public XPConnector xpConnector = new();
         
 
         private IPCValueOffset inMenuValue;
         private IPCValueOffset isPausedValue;
         private bool isWASMReady = false;
+        private int ticks = 0;
+        private Simulator lastSim = Simulator.UNKNOWN;
 
         public bool IsConnected
         {
@@ -27,7 +31,8 @@ namespace PilotsDeck
             {
                 if (currentSim == Simulator.MSFS)
                     return FSUIPCConnection.IsOpen && WASM.IsRunning;
-                //return true;
+                else if (currentSim == Simulator.XP)
+                    return xpConnector.IsConnected;
                 else
                     return FSUIPCConnection.IsOpen;
             }
@@ -37,7 +42,10 @@ namespace PilotsDeck
         {
             get
             {
-                return inMenuValue.Value == "0" && isPausedValue.Value == "0" && IsConnected; 
+                if (currentSim != Simulator.XP)
+                    return inMenuValue.Value == "0" && isPausedValue.Value == "0" && IsConnected;
+                else
+                    return xpConnector.IsReady;
             }
         }
 
@@ -64,6 +72,7 @@ namespace PilotsDeck
         public void SetSimulator(Simulator sim)
         {
             currentSim = sim;
+            lastSim = currentSim;
             if (currentSim != Simulator.MSFS)
                 isWASMReady = true;
             else
@@ -72,7 +81,18 @@ namespace PilotsDeck
 
         public bool Connect()
         {
-            Log.Logger.Debug("CONNECT");
+            ticks = 0;
+            
+            bool result = ConnectFSUIPC();
+            if (currentSim == Simulator.XP)
+                return ConnectXP();
+            else
+                return result;
+        }
+
+        private bool ConnectFSUIPC()
+        {
+            Log.Logger.Debug("CONNECT FSUIPC");
             try
             {
                 FSUIPCConnection.Open();
@@ -88,7 +108,7 @@ namespace PilotsDeck
                     WASM.OnVariableListChanged += OnVariableServiceListChanged;
                     WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
                     WASM.LVARUpdateFrequency = 0;
-                    WASM.LogLevel = LOGLEVEL.LOG_LEVEL_INFO;
+                    WASM.LogLevel = LOGLEVEL.LOG_LEVEL_DEBUG;
 
                     WASM.Start();
                     if (WASM.IsRunning)
@@ -101,6 +121,29 @@ namespace PilotsDeck
             catch
             {
                 Log.Logger.Error("IPCManager: Exception while opening FSUIPC");
+            }
+
+            return IsConnected;
+        }
+
+        private bool ConnectXP()
+        {
+            Log.Logger.Debug("CONNECT XP-PLANE");
+            try
+            {
+                if (xpConnector.Connect())
+                {
+                    RegisterAddress(xpAircraftString, AppSettings.groupStringRead);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error("IPCManager: Exception while connecting to X-Plane");
             }
 
             return IsConnected;
@@ -140,29 +183,54 @@ namespace PilotsDeck
 
             try
             {
-                FSUIPCConnection.Close();
-
-                if (!FSUIPCConnection.IsOpen)
-                {
-                    Log.Logger.Information("IPCManager: FSUIPC Closed");
-                }
-
-                if (currentSim == Simulator.MSFS)
-                {
-                    WASM.OnLogEntryReceived -= OnVariableServiceLogEvent;
-                    WASM.OnVariableListChanged -= OnVariableServiceListChanged;
-                    WASM.Stop();
-                    if (!WASM.IsRunning)
-                        Log.Logger.Information("IPCManager: FSUIPC WASM Stopped");
-                    isWASMReady = false;  
-                }
+                ticks = 0;
+                CloseFSUIPC();
+                CloseXP();
             }
             catch
             {
-                Log.Logger.Error("IPCManager: Exception while closing FSUIPC");
+                Log.Logger.Error("IPCManager: Exception while closing Connections");
             }
 
             return !IsConnected;
+        }
+
+        private void CloseFSUIPC()
+        {
+            FSUIPCConnection.Close();
+
+            if (!FSUIPCConnection.IsOpen)
+            {
+                Log.Logger.Information("IPCManager: FSUIPC Closed");
+            }
+
+            if (lastSim == Simulator.MSFS)
+            {
+                WASM.OnLogEntryReceived -= OnVariableServiceLogEvent;
+                WASM.OnVariableListChanged -= OnVariableServiceListChanged;
+                WASM.Stop();
+                if (!WASM.IsRunning)
+                    Log.Logger.Information("IPCManager: FSUIPC WASM Stopped");
+                else
+                    Log.Logger.Warning("IPCManager: FSUIPC WASM still running!");
+                
+                isWASMReady = false;
+            }
+        }
+
+        private void CloseXP()
+        {
+            if (lastSim == Simulator.XP)
+            {
+                xpConnector.CloseRequested = true;
+                if (currentValues.ContainsKey(xpAircraftString))
+                    DeregisterAddress(xpAircraftString);
+
+                xpConnector.Disconnect();
+
+                if (!xpConnector.IsConnected)
+                    Log.Logger.Information("IPCManager: X-Plane Closed");
+            }
         }
 
         public IPCValue RegisterAddress(string address, string group, bool persistent = false)
@@ -186,6 +254,18 @@ namespace PilotsDeck
                 {
                     if (IPCTools.rxOffset.IsMatch(address))
                         value = new IPCValueOffset(address, group);
+                    else if (IPCTools.rxDref.IsMatch(address))
+                    {
+                        value = xpConnector.Register(address);
+                        if (value == null)
+                        {
+                            value.Dispose();
+                            value = null;
+
+                            Log.Logger.Error($"RegisterValue: Failed to register XP DataRef! [{address}]");
+                            return value;
+                        }
+                    }
                     else
                     {
                         if (currentSim == Simulator.MSFS && !AppSettings.Fsuipc7LegacyLvars)
@@ -222,7 +302,8 @@ namespace PilotsDeck
                     if (currentRegistrations[address] == 1)
                     {
                         currentRegistrations.Remove(address);
-
+                        if (currentSim == Simulator.XP && IPCTools.rxDref.IsMatch(address))
+                            xpConnector.Deregister(address);
                         currentValues[address].Dispose();
                         currentValues.Remove(address);
 
@@ -246,31 +327,56 @@ namespace PilotsDeck
         public bool Process(string group)
         {
             //Log.Logger.Debug("PROCESS");
-
+            ticks += 10;
             try
             {
-                foreach (var address in persistentValues)
-                    currentValues[address].Connect();
-
-                FSUIPCConnection.Process(group); //should update all offsets in currentOffsets (type OFFSETx and SCRIPT)
-                if (!IsReady)
+                if (currentSim != Simulator.XP)
                 {
-                    Log.Logger.Debug("NOT READY");
-                    return false;
-                }
+                    foreach (var address in persistentValues)
+                        currentValues[address].Connect();
 
-                if (!isWASMReady)
+                    FSUIPCConnection.Process(group); //should update all offsets in currentOffsets (type OFFSETx and SCRIPT)
+                    if (!IsReady)
+                    {
+                        Log.Logger.Debug("NOT READY");
+                        return false;
+                    }
+
+                    if (!isWASMReady)
+                    {
+                        if (!WASM.IsRunning)
+                        {
+                            Log.Logger.Debug("WASM NOT READY - NOT RUNNING");
+                            return false;
+                        }
+                        else if (WASM.LVarsChanged.Count > 0 && WASM.LVars.Count > 0 && ticks > AppSettings.waitTicks)
+                        {
+                            Log.Logger.Debug("WASM NOT READY - But Lvars changed, set to READY");
+                            isWASMReady = true;
+                            return true;
+                        }
+                        else
+                        {
+                            Log.Logger.Debug($"WASM NOT READY (Vars Changed {WASM.LVarsChanged.Count} | Vars Total {WASM.LVars.Count} | Ticks {ticks})");
+                            return false;
+                        }
+                    }
+                    foreach (var value in currentValues.Values) //read Lvars
+                    {
+                        value.Process();
+                    }
+
+                    return true;
+                }
+                else
                 {
-                    Log.Logger.Debug("WASM NOT READY");
-                    return false;
+                    if (xpConnector.IsReady)
+                    {
+                        xpConnector.Process();
+                    }
+                    
+                    return xpConnector.IsReady;
                 }
-                foreach (var value in currentValues.Values) //read Lvars
-                {
-                    value.Process();
-                }
-
-
-                return true;
             }
             catch
             {

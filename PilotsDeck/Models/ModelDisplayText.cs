@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 
 namespace PilotsDeck
 {
-    public class ModelDisplayText : ModelDisplay
+	public class ModelDisplayText : ModelDisplay
     {
 		public virtual bool DrawBox { get; set; } = true;
 		public virtual string BoxSize { get; set; } = "2";
@@ -35,38 +34,81 @@ namespace PilotsDeck
 			ErrorImage = @"Images/Error.png";
 		}
 
-		public string GetValueMapped(string text)
+		//public string GetValueMapped(string text)
+		//{
+		//	if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains('='))
+		//	{
+		//		var dict = GetValueMap();
+		//		if (HasComparison() && dict.Count > 0)
+  //              {
+		//			var comparison = dict.First();
+
+		//			bool greater = comparison.Key.Contains('>');
+		//			string key = comparison.Key.Replace(">", "").Replace("<", "");
+		//			float val = GetNumValue(text, 0.0f);
+		//			float limit = GetNumValue(key, 0.0f);
+					
+		//			if (greater)
+		//				if (limit >= val)
+		//					text = comparison.Value;
+					
+		//			if (!greater)
+		//				if (limit <= val)
+		//					text = comparison.Value;
+		//		}
+		//		else if (dict.ContainsKey(text))
+  //              {
+		//			text = dict[text];
+  //              }
+		//	}
+
+		//	return text;
+		//}
+
+        public string GetValueMapped(string strValue)
 		{
 			if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains('='))
 			{
 				var dict = GetValueMap();
-				if (HasComparison() && dict.Count > 0)
-                {
-					var comparison = dict.First();
+				foreach (var mapping in dict)
+				{
+					if (mapping.Key.Contains('<') || mapping.Key.Contains('>'))
+					{
+                        bool greater = mapping.Key.Contains('>');
+                        string key = mapping.Key.Replace(">", "").Replace("<", "");
+                        float val = GetNumValue(strValue, 0.0f);
+                        float limit = GetNumValue(key, 0.0f);
 
-					bool greater = comparison.Key.Contains('>');
-					string key = comparison.Key.Replace(">", "").Replace("<", "");
-					float val = GetNumValue(text, 0.0f);
-					float limit = GetNumValue(key, 0.0f);
-					
-					if (greater)
-						if (limit >= val)
-							text = comparison.Value;
-					
-					if (!greater)
-						if (limit <= val)
-							text = comparison.Value;
+						if (greater)
+						{
+							if (limit >= val)
+							{
+								strValue = mapping.Value;
+								break;
+							}
+						}
+						else
+						{
+							if (limit <= val)
+							{
+								strValue = mapping.Value;
+								break;
+							}
+						}
+                    }
+					else if (mapping.Key == strValue)
+					{
+						strValue = mapping.Value;
+						break;
+					}
 				}
-				else if (dict.ContainsKey(text))
-                {
-					text = dict[text];
-                }
 			}
 
-			return text;
+            return strValue;
 		}
 
-		protected virtual Dictionary<string, string> GetValueMap()
+
+        protected virtual Dictionary<string, string> GetValueMap()
         {
 			var dict = new Dictionary<string, string>();
 
