@@ -2,7 +2,6 @@
 {
     public class IPCValueDataRefString : IPCValue
     {
-        private string lastString = "";
         private char[] charArray;
         public int Length { private set; get; }
         public string BaseAddress
@@ -28,10 +27,7 @@
         {
             get
             {
-                string tmp = Value;
-                bool result = lastString != tmp;
-                lastString = tmp;
-                return result;
+                return true;
             }
         }
 

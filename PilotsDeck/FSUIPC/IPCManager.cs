@@ -106,7 +106,8 @@ namespace PilotsDeck
                 {
                     WASM.OnLogEntryReceived += OnVariableServiceLogEvent;
                     WASM.OnVariableListChanged += OnVariableServiceListChanged;
-                    WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
+                    //WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
+                    WASM.Init();
                     WASM.LVARUpdateFrequency = 0;
                     WASM.LogLevel = LOGLEVEL.LOG_LEVEL_DEBUG;
 
@@ -259,9 +260,6 @@ namespace PilotsDeck
                         value = xpConnector.Register(address);
                         if (value == null)
                         {
-                            value.Dispose();
-                            value = null;
-
                             Log.Logger.Error($"RegisterValue: Failed to register XP DataRef! [{address}]");
                             return value;
                         }

@@ -6,20 +6,18 @@ namespace PilotsDeck
     public class IPCValueDataRef : IPCValue
     {
         public float FloatValue { get; set; } = 0.0f;
-        private float _lastValue = 0.0f;
+        //private float _lastValue = 0.0f;
 
         public IPCValueDataRef(string address) : base(address)
         {
-
+            
         }
 
         public override bool IsChanged
         {
             get
             { 
-                bool result = _lastValue != FloatValue;
-                _lastValue = FloatValue;
-                return result;
+                return true;
             }
         }
 
