@@ -42,7 +42,7 @@ The Sims and their FSUIPC Version/Variant are:
 - XPUIPC/WebSocket - **X-Plane 12 & 11** (and probably older)<br/><br/>
 If you let me know what works and which Features work in which Sim (other than P3D v5, MSFS2020, X-Plane 12/11), I'll add it to the Readme! :wink:<br/>
 :grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so a registered Version of FSUIPC is highly recommended (but not neccessary)!<br/>
-:grey_exclamation: For MSFS2020 SU10 you will need at least Version 7.3.9 installed, with the "WASM/WAPI" Module also installed and activated.
+:grey_exclamation: For MSFS2020 SU10 you will need at least Version 7.3.9 installed, with the "WASM/WAPI" Module also installed and activated (Version 0.9.0).
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>

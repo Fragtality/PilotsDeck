@@ -17,8 +17,8 @@ Mix and match as you like :relaxed:<br/>
 
 
 # Installation
-- Tested with Fenix 1.0.3.125 (21.09.22)
-- Update to at least PilotsDeck 0.7.3!
+- Tested with Fenix 1.0.3.128 (25.09.22)
+- Update to at least PilotsDeck 0.7.4!
 - Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
 - Just double-click on the Profiles you want to use to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)

@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
     <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
-    <Version>0.7.3.0</Version>
+    <Version>0.7.4.0</Version>
     <Authors>Fragtality</Authors>
     <Description>Directly control your FlightSim from your StreamDeck via FSUIPC!</Description>
     <Copyright>Copyright ©  2022</Copyright>
@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSUIPCClientDLL" Version="3.2.21-beta" />
+    <PackageReference Include="FSUIPCClientDLL" Version="3.2.21" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />

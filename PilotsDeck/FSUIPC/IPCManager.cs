@@ -109,7 +109,7 @@ namespace PilotsDeck
                     //WASM.Init(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
                     WASM.Init();
                     WASM.LVARUpdateFrequency = 0;
-                    WASM.LogLevel = LOGLEVEL.LOG_LEVEL_DEBUG;
+                    WASM.LogLevel = LOGLEVEL.LOG_LEVEL_INFO;
 
                     WASM.Start();
                     if (WASM.IsRunning)
