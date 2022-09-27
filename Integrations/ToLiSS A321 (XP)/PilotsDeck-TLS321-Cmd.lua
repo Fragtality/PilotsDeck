@@ -1,3 +1,11 @@
+dataref("author", "sim/aircraft/view/acf_author")
+dataref("icao", "sim/aircraft/view/acf_ICAO")
+
+if not string.match(author, "Gliding Kiwi") or (not string.match(icao, "A321") and not string.match(icao, "A319")) then
+	logMsg("ToLissA321/A319 not found - exiting Script")
+	return
+end
+
 ------------------------------------------------------------------
 -- Base Functions
 

@@ -14,7 +14,7 @@ namespace PilotsDeck
         private List<string> persistentValues = new();
         private static readonly string inMenuAddr = "3365:1";
         private static readonly string isPausedAddr = "0262:2";
-        public static readonly string xpAircraftString = "sim/aircraft/view/acf_livery_path:s64";
+        public static readonly string xpAircraftString = "sim/aircraft/view/acf_relative_path:s32";
         private Simulator currentSim = Simulator.UNKNOWN;
         public XPConnector xpConnector = new();
         

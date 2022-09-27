@@ -1,11 +1,16 @@
 local SYNC_FDLS = true
 local FRAME_MOD = 6
-local WAIT_TIME = 10
 
 local frameCounter = 0
-local startTime = os.clock()
 
-dataref("aircraft", "sim/aircraft/view/acf_livery_path")
+
+dataref("author", "sim/aircraft/view/acf_author")
+dataref("icao", "sim/aircraft/view/acf_ICAO")
+
+if not string.match(author, "Gliding Kiwi") or (not string.match(icao, "A321") and not string.match(icao, "A319")) then
+	logMsg("ToLissA321/A319 not found - exiting Script")
+	return
+end
 
 local fcuStrSpd = create_dataref_table("FlyWithLua/TLS2PLD/fcuSpd", "Data")
 local fcuStrHdg = create_dataref_table("FlyWithLua/TLS2PLD/fcuHdg", "Data")
@@ -268,18 +273,7 @@ function UpdateRefs()
 	frameCounter = frameCounter + 1
 	if frameCounter % FRAME_MOD ~= 0 then
 		return
-	end
-	
-	if os.clock() < startTime + WAIT_TIME then
-		return
-	end	
-	
-	if not string.match(aircraft, "ToLissA321") then
-		logMsg("Toliss not found, exiting!")
-		os.exit()
-	end
-	
-	if frameCounter % FRAME_MOD == 0 then
+	else
 		UpdateFCU()
 		UpdateLights()
 		UpdateEFIS()

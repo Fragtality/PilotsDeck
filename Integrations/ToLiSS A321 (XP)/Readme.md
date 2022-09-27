@@ -13,7 +13,7 @@ Mix and match as you like :relaxed:<br/>
 
 
 # Installation
-- Tested with ToLiSS A321 V1.4 on X-Plane 12
+- Tested with ToLiSS A321 V1.4.1 on X-Plane 11/12
 - Install/Update to at least PilotsDeck 0.7.3!
 - Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
 - Just double-click on the Profiles you want to use to add them to your StreamDeck Software
