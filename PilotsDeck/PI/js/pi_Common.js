@@ -112,7 +112,7 @@ function setPattern(field, type) {
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
 	else if (type == 1) //script
-		document.getElementById(field).pattern = `^Lua(Set|Clear|Toggle)?:${regName}(:[0-9]{1,3})*$`;
+		document.getElementById(field).pattern = `^Lua(Set|Clear|Toggle|Value)?:${regName}(:[0-9]{1,4})*$`;
 	else if (type == 2) //control
 		document.getElementById(field).pattern = "^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$|^[0-9]+(:[0-9]+)*$";    //"^[0-9]+(:[0-9]+)*$";
 	else if (type == 3)  //lvar

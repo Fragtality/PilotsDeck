@@ -14,7 +14,7 @@ namespace PilotsDeck
         //5F => _
         public static readonly string validName = @"[a-zA-Z0-9\x2D\x5F]+";
         public static readonly Regex rxMacro = new ($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
-        public static readonly Regex rxScript = new ($"^(Lua(Set|Clear|Toggle)?:){{1}}{validName}(:[0-9]{{1,3}})*$", RegexOptions.Compiled);
+        public static readonly Regex rxScript = new ($"^(Lua(Set|Clear|Toggle|Value)?:){{1}}{validName}(:[0-9]{{1,4}})*$", RegexOptions.Compiled);
         public static readonly Regex rxControlSeq = new (@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         public static readonly Regex rxControl = new (@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
         public static readonly Regex rxLvar = new ($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
