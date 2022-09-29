@@ -130,7 +130,7 @@ Examples:
   - ```Lua:Baro_Toggle``` (run Lua-Script "Baro_Toggle.lua")
   - ```LuaToggle:FSL_CMD:21``` (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
   - ```LuaToggle:FSL_CMD:21:22``` (toggle Flag 21 for Lua-Script "FSL_CMD.lua" and the toggle Flag 22)
-  - ```LuaValue:FSL_CMD:420``` (Pass Value (ipcPARAM) to Lua-Script "FSL_CMD.lua" an)
+  - ```LuaValue:FSL_CMD:420``` (Pass Value 420 (ipcPARAM) to Lua-Script "FSL_CMD.lua")
   <br/>
 * **vJoy**
   \[ Joystick:Button(:t) ] (Command)<br/>
