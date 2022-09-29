@@ -124,12 +124,13 @@ Examples:
   - ```FSLA3XX_MAIN:ACPACK1:ACPACK2``` (Run Macro ACPACK1 from Macro-File FSLA3XX_MAIN and then ACPACK2 from the same File)
   <br/>
 * **Script**
-  \[ Lua|LuaToggle|LuaSet|LuaClear:File(:flag)* ] (Command)
-  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear or Toggle) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle work as described in FSUIPC's Documentation. You can specifiy multiple Flags, the Plugin will call the Script / Lua Control multiple times, each time with a different Parameter. Useful to Set/Clear/Toggle multiple Flags at once.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/><br/>
+  \[ Lua|LuaToggle|LuaSet|LuaClear|LuaValue:File(:flag)* ] (Command)
+  - *File*: The Filename of a Lua-Script (known to FSUIPC). Without Extension and it has to be preceded with one of the Lua Commands. To run a Script use "*Lua:*", to use one of the Lua Controls (Set, Clear, Toggle or Value) use the respective Prefix and specify a *:flag*. Set, Clear, Toggle and Value work as described in FSUIPC's Documentation. You can specifiy multiple Flags, the Plugin will call the Script / Lua Control multiple times, each time with a different Flag/Parameter. Useful to Set/Clear/Toggle/Value multiple Flags/Values at once.<br/>Note that all Syntax Checks allow to use *Lua:* with a *:flag* and that such a Command would run - but I can't tell yet what that would do :laughing:<br/><br/>
   Examples:
   - ```Lua:Baro_Toggle``` (run Lua-Script "Baro_Toggle.lua")
   - ```LuaToggle:FSL_CMD:21``` (toggle Flag 21 for Lua-Script "FSL_CMD.lua")
   - ```LuaToggle:FSL_CMD:21:22``` (toggle Flag 21 for Lua-Script "FSL_CMD.lua" and the toggle Flag 22)
+  - ```LuaValue:FSL_CMD:420``` (Pass Value (ipcPARAM) to Lua-Script "FSL_CMD.lua" an)
   <br/>
 * **vJoy**
   \[ Joystick:Button(:t) ] (Command)<br/>
