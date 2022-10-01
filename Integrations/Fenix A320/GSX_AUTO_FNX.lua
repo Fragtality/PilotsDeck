@@ -16,28 +16,37 @@ function FNX_BTN_PRESS(lvar, delay, value, offvalue)
 end
 
 function GSX_CUSTOM_CONNECT()
-	if fnxIsColdAndDark then
-		fnxIsColdAndDark = false
-		GSX_AUTO_MENU(4500)
-
-		local gsxJetway = ipc.readLvar("FSDT_GSX_JETWAY")
-		if gsxJetway == 2 then
-			ipc.log("GSX_CUSTOM_CONNECT: Connect Stairs")
-			GSX_AUTO_STAIRS_TOGGLE()
+	GSX_AUTO_MENU(4500)
+	local gsxJetway = ipc.readLvar("FSDT_GSX_JETWAY")
+	if gsxJetway ~= 2 then
+		if not GSX_AUTO_JETWAY_CONNECTED then
+			ipc.log("GSX_CUSTOM_CONNECT: Connect Jetway")
+			GSX_AUTO_KEY(6)
+			if ipc.readLvar("B_CONFIG_GPU") ~= 1 then
+				ipc.log("GSX_CUSTOM_CONNECT: Connect GPU & AirCon")
+				GSX_CUSTOM_GPU(false)
+			elseif fnxIsColdAndDark then
+				fnxIsColdAndDark = false
+				ipc.log("GSX_CUSTOM_CONNECT: Connect AirCon")
+				FNX_GROUND_AIR()
+			end
 		end
-
+	elseif gsxJetway == 2 then
+		ipc.log("GSX_CUSTOM_CONNECT: Connect GPU")
 		if ipc.readLvar("B_CONFIG_GPU") ~= 1 then
 			ipc.log("GSX_CUSTOM_CONNECT: Connect GPU & AirCon")
 			GSX_CUSTOM_GPU(false)
-		else
+		elseif fnxIsColdAndDark then
+			fnxIsColdAndDark = false
 			ipc.log("GSX_CUSTOM_CONNECT: Connect AirCon")
 			FNX_GROUND_AIR()
 		end
-
-		return true
-	else
-		return false
+		ipc.sleep(750)
+		ipc.log("GSX_CUSTOM_CONNECT: Connect Stairs")
+		GSX_AUTO_STAIRS_TOGGLE()
 	end
+
+	return true
 end
 
 function GSX_CUSTOM_DISCONNECT()
@@ -75,6 +84,8 @@ function GSX_CUSTOM_GPU(menuIsOpen)
 	FNX_BTN_PRESS("S_CDU1_KEY_LSK3L")
 	ipc.sleep(125)
 	FNX_BTN_PRESS("S_CDU1_KEY_INIT")
+
+	return true
 end
 
 function FNX_GROUND_AIR()

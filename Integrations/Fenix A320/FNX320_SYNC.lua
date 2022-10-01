@@ -80,7 +80,12 @@ function FNX_BTN_PRESS(lvar, delay, value, offvalue)
 end
 
 function FNX_READ_TRIM()
-	local trim = (ipc.readLvar("A_FC_ELEVATOR_TRIM") * 0.01)
+	local trim = ipc.readLvar("A_FC_ELEVATOR_TRIM")
+	if trim == nil then
+		return
+	end
+
+	trim = trim * 0.01
 	if trim > 0 then
 		trim = math.floor(trim + 0.49)
 	else

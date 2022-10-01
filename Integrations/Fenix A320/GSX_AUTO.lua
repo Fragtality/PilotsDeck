@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global
 
-ipc.sleep(15000)
-
 ----------------------------------
 -- CONFIGURATION
 local delayOperator = 0		--Delay for manual Operator Selection before next Action (applied when not connected and in Refuel State)
@@ -18,6 +16,8 @@ local GSX_OFFSET_CARGO = 0x66C5 --String, Length 6 0x66C5:6:s
 local GSX_AUTO_SERVICE_STATE = 0
 ipc.createLvar("GSX_AUTO_SERVICE_STATE", GSX_AUTO_SERVICE_STATE)
 local GSX_AUTO_CONNECTED = 0
+local GSX_AUTO_JETWAY_CONNECTED = false
+ipc.createLvar("GSX_AUTO_JETWAY_CONNECTED", GSX_AUTO_JETWAY_CONNECTED)
 ipc.createLvar("GSX_AUTO_CONNECTED", GSX_AUTO_CONNECTED)
 ipc.createLvar("GSX_AUTO_CONNECT_REQUESTED", 0)
 ipc.createLvar("GSX_AUTO_DISCONNECT_REQUESTED", 0)
@@ -91,6 +91,9 @@ function GSX_AUTO_SYNC_CYCLE()
 	elseif GSX_AUTO_SERVICE_STATE == 1 and (cater_state >= 5 or board_state >= 4 )then
 		GSX_AUTO_SERVICE_STATE = 2
 		ipc.log("GSX_AUTO: Service State switched from Cater to Board")
+	elseif GSX_AUTO_SERVICE_STATE == 2 and board_state >= 4 and board_state < 6 and not GSX_AUTO_JETWAY_CONNECTED then
+		ipc.log("GSX_AUTO: Reconnecting Jetway for Boarding")
+		ipc.control(66695)
 	elseif GSX_AUTO_SERVICE_STATE == 2 and board_state == 6 then
 		GSX_AUTO_SERVICE_STATE = 3
 		ipc.log("GSX_AUTO: Service State switched from Bord to Push")
@@ -113,6 +116,9 @@ function GSX_AUTO_SYNC_CYCLE()
 			ipc.log("GSX_AUTO: Call Deboard automatically")
 			GSX_AUTO_DEBOARD()
 		end
+	elseif GSX_AUTO_SERVICE_STATE == 7 and deboard_state >=4 and deboard_state < 6 and not GSX_AUTO_JETWAY_CONNECTED then
+		ipc.log("GSX_AUTO: Reconnecting Jetway for Deboarding")
+		ipc.control(66695)
 	elseif GSX_AUTO_SERVICE_STATE == 7 and deboard_state == 6 then
 		GSX_AUTO_SERVICE_STATE = 0
 		ipc.log("GSX_AUTO: Service State switched from Deboard to Refuel")
@@ -185,13 +191,13 @@ function GSX_AUTO_UPDATE_OFFSETS(board_state, deboard_state)
 			end
 		end
 	end
-
+	
 	ipc.writeSTR(GSX_OFFSET_PAX, resultPax, 5)
 	ipc.writeSTR(GSX_OFFSET_CARGO, resultCargo, 6)
 end
 
 function GSX_DISABLE_CREW()
-	ipc.log("Disabling Crew De/Boarding")
+	ipc.log("GSX_AUTO: Disabling Crew De/Boarding")
 	ipc.writeLvar("FSDT_GSX_CREW_ON_BOARD", 1)
 	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
 	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
@@ -238,8 +244,10 @@ function GSX_AUTO_CONNECT()
 		GSX_AUTO_MENU(4500)
 		local gsxJetway = ipc.readLvar("FSDT_GSX_JETWAY")
 		if gsxJetway ~= 2 then
-			ipc.log("GSX_AUTO_CONNECT: Connect Jetway")
-			GSX_AUTO_KEY(6)
+			if not GSX_AUTO_JETWAY_CONNECTED then
+				ipc.log("GSX_AUTO_CONNECT: Connect Jetway")
+				GSX_AUTO_KEY(6)
+			end
 		elseif gsxJetway == 2 then
 			ipc.log("GSX_AUTO_CONNECT: Connect GPU")
 			GSX_AUTO_GPU(true)
@@ -259,8 +267,10 @@ function GSX_AUTO_DISCONNECT()
 		GSX_AUTO_MENU(1750)
 		local gsxJetway = ipc.readLvar("FSDT_GSX_JETWAY")
 		if gsxJetway ~= 2 then
-			ipc.log("GSX_AUTO_DISCONNECT: Disconnect Jetway")
-			GSX_AUTO_JETWAY_TOGGLE(true)
+			if GSX_AUTO_JETWAY_CONNECTED then
+				ipc.log("GSX_AUTO_DISCONNECT: Disconnect Jetway")
+				GSX_AUTO_JETWAY_TOGGLE(true)
+			end
 		else
 			ipc.log("GSX_AUTO_DISCONNECT: Disconnect GPU")
 			GSX_AUTO_GPU(true)
@@ -358,6 +368,11 @@ function GSX_AUTO_PUSH()
 			ipc.log("GSX_AUTO_PUSH: Request Push")
 			GSX_AUTO_MENU(1750)
 			GSX_AUTO_KEY(5, 500)
+			if GSX_AUTO_JETWAY_CONNECTED then
+				ipc.log("GSX_AUTO: Disconecting Jetway for Push")
+				ipc.control(66695)
+			end
+			GSX_AUTO_SET_CONNECTED(0)
 		elseif depature_state == 5 then
 			ipc.log("GSX_AUTO_PUSH: Confirm Good-Start")
 			GSX_AUTO_PUSH_CONFIRM()
@@ -433,4 +448,17 @@ event.flag(12, "GSX_AUTO_SERVICE_CYCLE")
 event.flag(13, "GSX_AUTO_CONNECT_TGL")
 
 event.timer(3000, "GSX_AUTO_SYNC_CYCLE")
-ipc.log("GSX Sync active - starting in State " .. GSX_AUTO_SERVICE_STATE)
+ipc.log("GSX_AUTO: GSX Sync active - starting in State " .. GSX_AUTO_SERVICE_STATE)
+
+function GSX_AUTO_CHECK_JETWAY()
+	if not GSX_AUTO_JETWAY_CONNECTED then
+		GSX_AUTO_JETWAY_CONNECTED = true
+		ipc.writeLvar("GSX_AUTO_JETWAY_CONNECTED", 1)
+		ipc.log("GSX_AUTO: Jetway Event captured - connected")
+	else
+		GSX_AUTO_JETWAY_CONNECTED = false
+		ipc.writeLvar("GSX_AUTO_JETWAY_CONNECTED", 0)
+		ipc.log("GSX_AUTO: Jetway Event captured - disconnected")
+	end
+end
+event.control(66695, "GSX_AUTO_CHECK_JETWAY")

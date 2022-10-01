@@ -668,7 +668,7 @@ function FNX_INIT_AC()
 
 	ipc.sleep(7500)
 	ipc.writeLvar("GSX_AUTO_CONNECT_REQUESTED", 1)
-
+	ipc.sleep(3500)
 	--NAV Lights
 	ipc.writeLvar("S_OH_EXT_LT_NAV_LOGO", 1)
 end
