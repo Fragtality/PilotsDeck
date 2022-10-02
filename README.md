@@ -18,7 +18,7 @@ As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Cl
 ## Plugin Requirements
 Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing: <br/>
 Starting with Version 0.7.3 the Plugin connects directly with **X-Plane** - you don't need to install XUIPC to use the Plugin!<br/>
-It is compiled for the .NET Framework and tested on Windows 10. For the newer Releases of the Plugin (starting with 7.0.0) .NET 6 is required for which you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)). You'll need ".NET Runtime 6.0.x" and ".NET Desktop Runtime 6.0.x" as x64. (Do not confuse it with arm64!)<br/>
+It is compiled for the .NET Framework and tested on Windows 10. For the newer Releases of the Plugin (starting with 0.7.0) .NET 6 is required for which you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)). You'll need ".NET Runtime 6.0.x" and ".NET Desktop Runtime 6.0.x" as x64. (Do not confuse it with arm64!)<br/>
 Older Versions of the Plugin (until 0.6.x) only need .NET 4.8 which should be already installed on your System (as Part of Windows).
 - To test if .NET 6.0 is installed (Plugin Version 0.7.0 or greater), run this in Powershell or Commandline:
  ```powershell
