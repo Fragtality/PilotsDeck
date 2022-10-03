@@ -22,6 +22,10 @@ Mix and match as you like :relaxed:<br/>
 - Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
 - Just double-click on the Profiles you want to use to add them to your StreamDeck Software
 - Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
+- Add this to the myOffsets.txt File in your FSUIPC7 Folder (for the Cabin Lights)
+```
+0x58AB, 4, LIGHT POTENTIOMETER:13, I32, percent
+```
 - The cameras.cfg is optional (for the Views via vJoy-Driver Buttons)! If you want to use it: %appdata%\Microsoft Flight Simulator\SimObjects\Airplanes\FNX320
 - Optional but recommended: Install the PilotsDeck_FNX2PLD Binary for the FCU / Displays to work. Follow the Instructions [here](https://github.com/Fragtality/PilotsDeck_FNX).
 - Either start the Scripts (Auto + Sync) manually ...
