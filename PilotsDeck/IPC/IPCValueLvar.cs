@@ -1,5 +1,6 @@
 ﻿using FSUIPC;
 using Serilog;
+using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
 {
@@ -15,18 +16,24 @@ namespace PilotsDeck
 
         public override bool IsChanged { get { return isChanged; } }
 
-        public override void Process()
+        public override void Process(SimulatorType simType)
         {
             try
             {
-                double result = FSUIPCConnection.ReadLVar(Address);
+                double result = 0;
+
+                if (simType == SimulatorType.FSX || simType == SimulatorType.P3D || (simType == SimulatorType.MSFS && AppSettings.Fsuipc7LegacyLvars))
+                    result = FSUIPCConnection.ReadLVar(Address);
+                else if (simType == SimulatorType.MSFS && !AppSettings.Fsuipc7LegacyLvars && WASM.LVars.Exists(Address))
+                    result = WASM.LVars[Address].Value;
+
                 isChanged = currentValue != result;
                 if (isChanged)
                     currentValue = result;
             }
             catch
             {
-                Log.Logger.Error($"Exception while Reading LVar {Address} via FSUIPC");
+                Log.Logger.Error($"Exception while Reading LVar {Address} via {simType}");
             }
         }
 

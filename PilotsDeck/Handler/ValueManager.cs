@@ -36,7 +36,7 @@ namespace PilotsDeck
 
         public bool RegisterValue(string id, string address)
         {
-            IPCValue value = ipcManager.RegisterAddress(address, AppSettings.groupStringRead);
+            IPCValue value = ipcManager.RegisterAddress(address);
             
             if (value != null)
             {
@@ -47,12 +47,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RegisterValue: Variable {id} already exists!");
+                    Log.Logger.Error($"ValueManager: Variable {id} already exists!");
                 }
             }
             else
             {
-                Log.Logger.Error($"RegisterValue: Could not Register Address {address} for Variable {id}!");
+                Log.Logger.Error($"ValueManager: Could not Register Address {address} for Variable {id}!");
             }
 
             return false;
@@ -63,18 +63,18 @@ namespace PilotsDeck
             if (managedValues[id].Key != newAddress)
             {
                 ipcManager.DeregisterAddress(managedValues[id].Key);
-                IPCValue value = ipcManager.RegisterAddress(newAddress, AppSettings.groupStringRead);
+                IPCValue value = ipcManager.RegisterAddress(newAddress);
 
                 if (value != null)
                 {
-                    Log.Logger.Debug($"UpdateIPC: Updated Variable {id} with new Address {newAddress}. (Old: {managedValues[id].Key}");
+                    Log.Logger.Debug($"ValueManager: Updated Variable {id} with new Address {newAddress}. (Old: {managedValues[id].Key}");
                     managedValues[id] = new ValuePair(newAddress, value);
 
                     return true;
                 }
                 else
                 {
-                    Log.Logger.Error($"UpdateIPC: Udapte for Variable {id} failed! The new Address {newAddress} could not be registered!");
+                    Log.Logger.Error($"ValueManager: Udapte for Variable {id} failed! The new Address {newAddress} could not be registered!");
                 }
             }
 
@@ -92,13 +92,13 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Debug($"UpdateValueAddress: Variable {id} did not exist! Added new Registration to {newAddress}");
+                    Log.Logger.Debug($"ValueManager: Variable {id} did not exist! Added new Registration to {newAddress}");
                     return RegisterValue(id, newAddress);
                 }
             }
             else
             {
-                Log.Logger.Error($"UpdateValueAddress: Variable {id} does not exist!");
+                Log.Logger.Error($"ValueManager: Variable {id} does not exist!");
             }
 
             return false;
@@ -106,14 +106,14 @@ namespace PilotsDeck
 
         public bool DeregisterValue(string id)
         {
-            if (!string.IsNullOrEmpty(id) && managedValues.ContainsKey(id))
+            if (!string.IsNullOrEmpty(id) && managedValues.TryGetValue(id, out ValuePair value))
             {
-                ipcManager.DeregisterAddress(managedValues[id].Key);
+                ipcManager.DeregisterAddress(value.Key);
                 return true;
             }
             else
             {
-                Log.Logger.Error($"DeregisterValue: Variable {id} does not exist!");
+                Log.Logger.Error($"ValueManager: Variable {id} does not exist!");
             }
 
             return false;
@@ -129,8 +129,8 @@ namespace PilotsDeck
 
         public bool IsChanged(string id)
         {
-            if (managedValues.ContainsKey(id))
-                return managedValues[id].Value.IsChanged;
+            if (managedValues.TryGetValue(id, out ValuePair value))
+                return value.Value.IsChanged;
             else
                 return false;
         }
@@ -148,11 +148,12 @@ namespace PilotsDeck
 
         protected string GetValue(string id)
         {
-            if (managedValues.ContainsKey(id))
-                return managedValues[id].Value.Value;
+            if (managedValues.TryGetValue(id, out ValuePair value))
+                return value.Value.Value;
             else
             {
-                Log.Logger.Debug($"GetValue: Returning empty Value for Variable {id}");
+                if (id != ID.SwitchState && id != ID.SwitchStateLong)
+                    Log.Logger.Debug($"ValueManager: Returning empty Value for Variable {id}");
                 return "";
             }
         }

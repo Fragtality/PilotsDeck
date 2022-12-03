@@ -11,15 +11,6 @@ using System.Threading;
 
 namespace PilotsDeck
 {
-    public enum Simulator
-    {
-        FSX,
-        P3D,
-        MSFS,
-        XP,
-        UNKNOWN
-    }
-
     public class ActionController : IActionController
     {
         private Dictionary<string, IHandler> currentActions = null;
@@ -34,65 +25,33 @@ namespace PilotsDeck
                 return AppSettings.pollInterval;
             }
         }
-        public bool IsApplicationOpen { get; set; }
-        public Simulator CurrentSim { get; set; }
+        public SimulatorConnector SimConnector { get; set; }
 
         public long Ticks { get { return tickCounter; } }
         private long tickCounter = 0;
-        private bool lastAppState = false;
-        private bool appIsStarting = false;
-        private bool appAlreadyRunning = false;
-        private bool lastConnectState = false;
-        private bool lastProcessState = false;
-        private bool redrawRequested = false;
+        private int waitCounter = 0;
+
+        private bool wasPaused = false;
         private readonly int waitTicks = AppSettings.waitTicks;
         private readonly int firstTick = (int)(AppSettings.waitTicks / 7.5);
         private Stopwatch watchRefresh = new();
         private Stopwatch watchLoading = new();
         private double averageTime = 0;
+        private bool redrawRequested = false;
         private bool redrawAlways = AppSettings.redrawAlways;
 
         public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
         private List<string> profileSwitcherActions = new();
         private List<string> switchedDecks = new();
         private List<StreamDeckProfile> manifestProfiles;
-        //private IPCValueOffset loadedFSProfile;
-        private IPCValue loadedFSProfile
-        {
-            get
-            {
-                if (CurrentSim != Simulator.XP)
-                {
-                    return ipcManager["9540:64:s"];
-                }
-                else
-                {
-                    return ipcManager[IPCManager.xpAircraftString];
-                }
-            }
-        }
-        private string lastFSProfile = null;
-        private IPCValue loadedAircraft
-        {
-            get
-            {
-                if (CurrentSim != Simulator.XP)
-                {
-                    return ipcManager["3500:24:s"];
-                }
-                else
-                {
-                    return ipcManager[IPCManager.xpAircraftString];
-                }
-            }
-        }
-        private string lastAircraft = "none";
+        private string lastAircraft = "";
 
 
         public ActionController()
         {
             currentActions = new Dictionary<string, IHandler>();
-            ipcManager = new IPCManager(AppSettings.groupStringRead);
+            ipcManager = new IPCManager();
+            SimConnector = SimulatorConnector.CreateConnector("", tickCounter, ipcManager);
             imgManager = new ImageManager();
             manifestProfiles = new List<StreamDeckProfile>();
         }
@@ -101,8 +60,7 @@ namespace PilotsDeck
         {
             if (currentActions != null && ipcManager != null && imgManager != null && manifestProfiles != null)
             {
-                ipcManager.RegisterAddress("9540:64:s", AppSettings.groupStringRead, true);
-                ipcManager.RegisterAddress("3500:24:s", AppSettings.groupStringRead, true);
+                SimConnector = new ConnectorDummy();
                 Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
             }
 
@@ -193,37 +151,15 @@ namespace PilotsDeck
         {
             Log.Logger.Debug($"ActionController:OnApplicationDidLaunchAsync {args.payload.application}");
 
-            IsApplicationOpen = true;
-            appAlreadyRunning = tickCounter < firstTick;
-            appIsStarting = true;
-
-            switch (args.payload.application)
-            {
-                case "Prepar3D.exe":
-                    CurrentSim = Simulator.P3D;
-                    break;
-                case "FlightSimulator.exe":
-                    CurrentSim = Simulator.MSFS;
-                    break;
-                case "X-Plane.exe":
-                    CurrentSim = Simulator.XP;
-                    break;
-                case "fsx.exe":
-                    CurrentSim = Simulator.FSX;
-                    break;
-                default:
-                    CurrentSim = Simulator.UNKNOWN;
-                    break;
-            }
-            ipcManager.SetSimulator(CurrentSim);
+            SimConnector.Dispose();
+            SimConnector = SimulatorConnector.CreateConnector(args.payload.application, tickCounter, ipcManager);
         }
 
         protected void OnApplicationDidTerminate(StreamDeckEventPayload args)
         {
             Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
 
-            IsApplicationOpen = false;  
-            CurrentSim = Simulator.UNKNOWN;
+            SimConnector.Close();
         }
 
         public void UpdateProfileSwitchers()
@@ -260,13 +196,13 @@ namespace PilotsDeck
             {
                 string switchTo = "";
 
-                if (string.IsNullOrEmpty(loadedFSProfile.Value) && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
+                if (string.IsNullOrEmpty(SimConnector.AicraftString) && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
                     switchTo = deviceMapping.DefaultProfile;
                 else if (deviceMapping.Profiles != null && deviceMapping.Profiles.Count > 0)
                 {
                     foreach (var profile in deviceMapping.Profiles)
                     {
-                        if (ModelProfileSwitcher.IsInProfile(profile.Mappings, loadedFSProfile.Value))
+                        if (ModelProfileSwitcher.IsInProfile(profile.Mappings, SimConnector.AicraftString))
                         {
                             switchTo = profile.Name;
                             break;
@@ -279,18 +215,26 @@ namespace PilotsDeck
 
                 if (switchTo != "")
                 {
-                    Log.Logger.Information($"ActionController: FSUIPC Profile [{loadedFSProfile.Value}] active for Aircraft [{loadedAircraft.Value}]-> switching to [{switchTo}] on StreamDeck [{deviceMapping.Name}]");
+                    Log.Logger.Information($"ActionController: Current Aircraft [{SimConnector.AicraftString}] matched -> switching to [{switchTo}] on StreamDeck [{deviceMapping.Name}]");
                     _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deviceMapping.ID, switchTo);
                     if (!switchedDecks.Contains(deviceMapping.ID))
                         switchedDecks.Add(deviceMapping.ID);
                 }
             }
 
-            lastFSProfile = loadedFSProfile.Value;
-            if (CurrentSim != Simulator.XP)
-                lastAircraft = loadedAircraft.Value;
-            else
-                lastAircraft = loadedFSProfile.Value;
+            lastAircraft = SimConnector.AicraftString;
+        }
+
+        protected void SwitchToDefaultProfile()
+        {
+            if (GlobalProfileSettings.EnableSwitching && GlobalProfileSettings.ProfilesInstalled)
+            {
+                foreach (var deck in switchedDecks)
+                {
+                    Log.Logger.Information($"ActionController: Switching back profile on Deck {deck}");
+                    _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, null);
+                }
+            }
         }
 
         public void LoadProfiles()
@@ -334,7 +278,10 @@ namespace PilotsDeck
         public void Run(CancellationToken token)
         {
             watchRefresh.Restart();
+            bool resultProcess = false;
+            bool forceRefresh = false;
             tickCounter++;
+            SimConnector.TickCounter = tickCounter;
 
             if (tickCounter == 1)
                 _ = DeckManager.GetGlobalSettingsAsync(DeckManager.PluginUUID);
@@ -342,152 +289,152 @@ namespace PilotsDeck
             if (tickCounter < firstTick) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 20 Ticks => 20 * <200> = 4s )
                 return;
 
-            if (!IsApplicationOpen)     //SIM closed
+            if (waitCounter > 0)
             {
-                if (lastAppState)       //SIM changed to closed
+                if (SimConnector.IsRunning)
                 {
-                    lastAppState = false;
-                    appAlreadyRunning = false;
-                    appIsStarting = false;
-                    lastAircraft = "none";
-                    lastFSProfile = null;
-                    ipcManager.Close();
+                    waitCounter--;
+                    if (waitCounter == 0)
+                        Log.Logger.Information($"ActionController: Wait ended");
+                    else if (waitCounter % 25 == 0)
+                        Log.Logger.Information($"ActionController: Waiting ...");
+                }
+                else
+                    waitCounter = 0;
+            }          
+
+            if (!SimConnector.IsRunning) //SIM not running
+            {
+                if (SimConnector.LastStateApp()) //SIM changed to not running
+                {
+                    SimConnector.Close();
+                    lastAircraft = "";
+                    wasPaused = false;
                     CallOnAll(handler => handler.SetDefault());
                     redrawRequested = true;
-                    if (GlobalProfileSettings.EnableSwitching && GlobalProfileSettings.ProfilesInstalled)
-                        foreach (var deck in switchedDecks)
-                        {
-                            Log.Logger.Information($"ActionController: Switching back profile on Deck {deck}");
-                            _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, null);
-                        }
+                    if (GlobalProfileSettings.EnableSwitching)
+                        SwitchToDefaultProfile();
                 }
             }
-            else                        //SIM open
+            else //SIM running
             {
-                if (!lastAppState)      //SIM changed to opened
+                if (!SimConnector.LastStateApp()) //SIM changed to running
                 {
-                    lastAppState = true;
-                    lastConnectState = false;
-                    lastProcessState = false;
                     CallOnAll(handler => handler.SetWait());
                     redrawRequested = true;
-                    ipcManager.Connect();
-                }
-
-                if (!ipcManager.IsConnected && (tickCounter % waitTicks == 0 || tickCounter == firstTick)) //still open not connected, check retry connection every 30s when not connected (every <150> Ticks * <200>ms)
-                {
-                    ipcManager.Connect();
-                }
-                else if (ipcManager.IsConnected)            //open and connected
-                {
-                    if (!lastConnectState)                  //connection changed to opened
+                    if (tickCounter > firstTick)
                     {
-                        lastConnectState = true;
-                        CallOnAll(handler => handler.SetWait());
-                    }
-
-
-
-                    if (!lastProcessState && tickCounter % (waitTicks / 3) != 0 && tickCounter != firstTick && !appAlreadyRunning)  //throttle process calls to every 10s (150/3 * 200ms) if last was unsuccessful (but not on first)
-                    {
-                        lastProcessState = false;
-                        Log.Logger.Verbose("PROC - Throttle (not proc)");
-                    }
-                    else if (CurrentSim != Simulator.XP && !appAlreadyRunning && appIsStarting && tickCounter % (waitTicks / 3) != 0) //throttle calls while still loading (60s timer still running) to every 10s
-                    {
-                        Log.Logger.Verbose($"PROC - Throttle (starting) - Delay Elapsed: {watchLoading.Elapsed.Seconds} | Total: {watchLoading.Elapsed.TotalSeconds} | in ms {watchLoading.ElapsedMilliseconds}");
-                    }
-                    else if (CurrentSim == Simulator.XP && !ipcManager.xpConnector.IsReady)
-                    {
-                        ipcManager.xpConnector.Reconnect();
-                    }
-                    else if (ipcManager.Process(AppSettings.groupStringRead))
-                    {
-                        if (!appAlreadyRunning && appIsStarting)
-                        {
-                            if (CurrentSim != Simulator.XP)
-                            {
-                                if (!watchLoading.IsRunning)
-                                {
-                                    watchLoading.Restart();
-                                    Log.Logger.Verbose("PROC - Processed OK - Start App Delay");
-                                }
-                                else
-                                    Log.Logger.Debug($"ActionController: Throttled Processing, awaiting appStartDelay - elapsed: {watchLoading.Elapsed.TotalSeconds:n0}");
-
-                                if (watchLoading.Elapsed.TotalSeconds > AppSettings.appStartDelay || CurrentSim == Simulator.MSFS)
-                                {
-                                    watchLoading.Stop();
-                                    watchLoading.Reset();
-                                    appIsStarting = false;
-                                    Log.Logger.Debug($"ActionController: appStartDelay expired, Processing normally.");
-                                    lastProcessState = false;
-                                    Log.Logger.Verbose("PROC - Processed OK - Stop App Delay");
-                                }
-                            }
-                            else
-                            {
-                                appIsStarting = false;
-                            }
-                        }
-                        else if (appAlreadyRunning && appIsStarting)
-                            appIsStarting = false;
-                        else
-                            Log.Logger.Verbose("PROC - Processed OK");
-
-                        if (tickCounter % (waitTicks / 3) == 0) //every 10s force redraw
-                            RefreshActions(token, true);
-                        else
-                            RefreshActions(token, !lastProcessState);   //toggles process change
-                        lastProcessState = true;
-                        if (GlobalProfileSettings.EnableSwitching)
-                        {
-                            if (!string.IsNullOrEmpty(loadedAircraft.Value) && lastAircraft != loadedAircraft.Value)
-                                SwitchProfiles();
-                        }
+                        waitCounter = waitTicks * 2;
+                        Log.Logger.Information($"ActionController: Sim changed to running, waiting for {(waitCounter * 200) / 1000}s");
                     }
                     else
                     {
-                        Log.Logger.Verbose("PROC - Processed ERR");
-                        lastProcessState = false;
+                        Log.Logger.Information($"ActionController: Sim changed to running, directly connect");
+                        SimConnector.Connect();
                     }
-
-                    redrawRequested = true;
                 }
-                else if (!ipcManager.IsConnected)       //open and disconnected
+
+                if (!SimConnector.IsConnected && waitCounter == 0) //NOT connected
                 {
-                    if (lastConnectState)               //changed to disconnected
+                    if (SimConnector.LastStateConnect())
                     {
-                        lastConnectState = false;
-                        lastProcessState = false;
-                        ipcManager.Close();
                         CallOnAll(handler => handler.SetError());
                         redrawRequested = true;
+                        waitCounter = waitTicks / 2;
+                        Log.Logger.Information($"ActionController: Sim changed to disconnected, waiting for {(waitCounter * 200) / 1000}s");
+                    }
+
+                    if (!SimConnector.Connect())
+                    {
+                        waitCounter = waitTicks;
+                        Log.Logger.Information($"ActionController: Sim Connection failed, waiting for {(waitCounter * 200) / 1000}s");
+                    }
+                    else
+                        Log.Logger.Information($"ActionController: Sim is connected");
+                }
+                else if (SimConnector.IsConnected) //CONNECTED
+                {
+                    if (!SimConnector.LastStateConnect()) //changed to connected
+                    {
+                        CallOnAll(handler => handler.SetWait());
+                        redrawRequested = true;
+                        if (tickCounter > firstTick)
+                        {
+                            waitCounter = waitTicks / 2;
+                            Log.Logger.Information($"ActionController: Sim changed to connected, waiting for {(waitCounter * 200) / 1000}s");
+                        }
+                    }
+
+                    if (waitCounter == 0 && SimConnector.IsReady && !SimConnector.IsPaused) //process possible
+                    {
+                        //if (tickCounter % 5 == 0)
+                        //    Log.Logger.Debug("Process()");
+                        resultProcess = ipcManager.Process();
+                        if (resultProcess)
+                        {
+                            if (!SimConnector.LastStateProcess() || wasPaused)
+                            {
+                                redrawRequested = true;
+                                forceRefresh = true;
+                                if (wasPaused)
+                                {
+                                    wasPaused = false;
+                                    Log.Logger.Information($"ActionController: Sim is unpaused");
+                                }
+                                else
+                                    Log.Logger.Information($"ActionController: Process OK, force Redraw");
+                            }
+                        }
+                        else
+                        {
+                            CallOnAll(handler => handler.SetError());
+                            redrawRequested = true;
+                            waitCounter = waitTicks / 2;                            
+                            Log.Logger.Warning($"ActionController: Process failed, waiting for {(waitCounter * 200) / 1000}s");
+                        }
+                    }
+                    else if (SimConnector.IsPaused)
+                    {
+                        if (!wasPaused)
+                        {
+                            wasPaused = true;
+                            CallOnAll(handler => handler.SetWait());
+                            redrawRequested = true;
+                            Log.Logger.Information($"ActionController: Sim is paused");
+                        }
+                    }
+                    else if (!SimConnector.IsReady && waitCounter == 0)
+                    {
+                        waitCounter = waitTicks / 6;
+                        SimConnector.Process();
+                        CallOnAll(handler => handler.SetWait());
+                        redrawRequested = true;
+                        wasPaused = true;
+                        Log.Logger.Information($"ActionController: Sim not ready, waiting for {(waitCounter * 200) / 1000}s");
                     }
                 }
             }
-
-            if (redrawRequested)
-                RedrawAll(token);
-
-            if (redrawAlways || (tickCounter % (waitTicks / 2) == 0 && IsApplicationOpen && !appIsStarting))
+            if (tickCounter % (waitTicks / 2) == 0 && SimConnector.IsReady && !SimConnector.IsPaused)
             {
-                RefreshActions(token, true);
-                RedrawAll(token);
+                Log.Logger.Information($"ActionController: Forcing Redraw");
+                redrawRequested = true;
+                forceRefresh = true;
             }
+            RefreshActions(token, forceRefresh); //every 15s force update
+            RedrawAll(token);
 
             watchRefresh.Stop();
-            if (IsApplicationOpen)
+            averageTime += watchRefresh.Elapsed.TotalMilliseconds;
+            if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
-                averageTime += watchRefresh.Elapsed.TotalMilliseconds;
-                if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
-                {
-                    Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}. Redraw was forced.");
-                    averageTime = 0;
-                }
+                Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}.");
+                averageTime = 0;
+            }
 
-                if (appAlreadyRunning && tickCounter > waitTicks)
-                    appAlreadyRunning = false;
+            if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(SimConnector.AicraftString) && lastAircraft != SimConnector.AicraftString && SimConnector.IsReady && waitCounter == 0)
+            {
+                Log.Logger.Information($"ActionController: AircraftString changed to '{SimConnector.AicraftString}' -> Switch Profiles");
+                SwitchProfiles();
             }
         }
 
@@ -521,7 +468,7 @@ namespace PilotsDeck
                     if (token.IsCancellationRequested)
                         return;
 
-                    if (action.Value.NeedRedraw || action.Value.ForceUpdate)
+                    if (action.Value.NeedRedraw || action.Value.ForceUpdate || redrawAlways || redrawRequested)
                     {
                         //Log.Logger.Verbose($"RedrawAll: Needs Redraw [{action.Value.ActionID}] [{action.Key}] ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
                         if (action.Value.IsRawImage)
@@ -545,7 +492,7 @@ namespace PilotsDeck
         {
             try
             {
-                if (!ipcManager.IsConnected)
+                if (!SimConnector.IsConnected)
                 {
                     Log.Logger.Error($"RunAction: IPC not connected {context}");
                     return false;
@@ -572,7 +519,7 @@ namespace PilotsDeck
         {
             try
             {
-                if (!ipcManager.IsConnected)
+                if (!SimConnector.IsConnected)
                 {
                     Log.Logger.Error($"RunAction: IPC not connected {context}");
                     return false;
@@ -616,11 +563,11 @@ namespace PilotsDeck
 
         protected void SetActionState(IHandler handler)
         {
-            if (!IsApplicationOpen || !handler.IsInitialized)
+            if (!SimConnector.IsRunning || !handler.IsInitialized)
                 handler.SetDefault();
-            else if (!ipcManager.IsConnected)
+            else if (SimConnector.IsRunning && !SimConnector.IsConnected)
                 handler.SetError();
-            else if (!lastProcessState)
+            else if (SimConnector.IsRunning && (!SimConnector.IsReady || SimConnector.IsPaused))
                 handler.SetWait();
             else
             {

@@ -59,7 +59,7 @@ namespace PilotsDeck
                 else if (IsActionReadable(switchSettings.ActionType))
                     newValue = switchSettings.SwitchOnState;
 
-                result = IPCTools.RunAction(ipcManager, switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue, switchSettings, switchSettings.SwitchOffState);
+                result = ipcManager.RunAction(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue, switchSettings, switchSettings.SwitchOffState);
             }
             else if (longPress && switchSettings.HasLongPress)
             {
@@ -75,7 +75,7 @@ namespace PilotsDeck
                     else if (IsActionReadable(switchSettings.ActionTypeLong))
                         newValue = switchSettings.SwitchOnStateLong;
 
-                    result = IPCTools.RunAction(ipcManager, switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue, switchSettings, switchSettings.SwitchOffStateLong);
+                    result = ipcManager.RunAction(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue, switchSettings, switchSettings.SwitchOffStateLong);
                 }
             }
 

@@ -212,9 +212,9 @@ namespace PilotsDeck
             try
             {
                 var imageDef = new ImageDefinition(image, deckType, false);
-                if (cachedImages.ContainsKey(imageDef.FileNameReal))
+                if (cachedImages.TryGetValue(imageDef.FileNameReal, out ImageDefinition value))
                 {
-                    return cachedImages[imageDef.FileNameReal].GetImageBase64();
+                    return value.GetImageBase64();
                 }
                 else
                 {
@@ -235,9 +235,9 @@ namespace PilotsDeck
             try
             {
                 var imageDef = new ImageDefinition(image, deckType, false);
-                if (cachedImages.ContainsKey(imageDef.FileNameReal))
+                if (cachedImages.TryGetValue(imageDef.FileNameReal, out ImageDefinition value))
                 {
-                    return cachedImages[imageDef.FileNameReal].GetImageObject();
+                    return value.GetImageObject();
                 }
                 else
                 {

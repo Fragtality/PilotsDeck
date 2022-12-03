@@ -14,7 +14,7 @@ namespace PilotsDeck
             GC.SuppressFinalize(this);
         }
 
-        public virtual void Process()
+        public virtual void Process(SimulatorType simType)
         {
 
         }

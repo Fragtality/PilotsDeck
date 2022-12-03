@@ -1,7 +1,9 @@
-﻿using Serilog;
+﻿using FSUIPC;
+using Serilog;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
+using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
 {
@@ -80,45 +82,6 @@ namespace PilotsDeck
                     (type == (int)ActionSwitchType.VJOYDRV && rxVjoyDrv.IsMatch(address) && address.ToLowerInvariant().Contains(":t"));
         }
 
-        public static bool RunAction(IPCManager ipcManager, string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null)
-        {
-            if (ipcManager.IsConnected && IsWriteAddress(Address, actionType))
-            {
-                Log.Logger.Debug($"IPCTools: Writing to {Address}");
-                switch (actionType)
-                {
-                    case ActionSwitchType.MACRO:
-                        return RunMacros(Address);
-                    case ActionSwitchType.SCRIPT:
-                        return RunScript(Address);
-                    case ActionSwitchType.LVAR:
-                        return WriteLvar(ipcManager, Address, newValue, switchSettings.UseLvarReset, offValue);
-                    case ActionSwitchType.HVAR:
-                        return WriteHvar(ipcManager, Address);
-                    case ActionSwitchType.CONTROL:
-                        return SendControls(Address, switchSettings.UseControlDelay);
-                    case ActionSwitchType.OFFSET:
-                        return WriteOffset(Address, newValue);
-                    case ActionSwitchType.VJOY:
-                        return VjoyToggle(actionType, Address);
-                    case ActionSwitchType.VJOYDRV:
-                        return VjoyToggle(actionType, Address);
-                    case ActionSwitchType.CALCULATOR:
-                        return ipcManager.RunCalculatorCode(Address);
-                    case ActionSwitchType.XPCMD:
-                        return ipcManager.xpConnector.SendCommand(Address);
-                    case ActionSwitchType.XPWREF:
-                        return ipcManager.xpConnector.SetDataRef(Address, newValue);
-                    default:
-                        return false;
-                }
-            }
-            else
-                Log.Logger.Error($"IPCTools: not connected or Address not passed {Address}");
-
-            return false;
-        }
-
         public static bool VjoyToggle(ActionSwitchType type, string address)
         {
             if (!IsVjoyToggle(address, (int)type))
@@ -127,7 +90,28 @@ namespace PilotsDeck
             if (type == ActionSwitchType.VJOYDRV)
                 return vJoyManager.ToggleButton(address);
             else
-                return IPCManager.SendVjoy(address, 0);
+                return SendVjoy(address, 0);
+        }
+
+        public static bool SendVjoy(string address, byte action)
+        {
+            try
+            {
+                string[] parts = address.Split(':');
+                byte[] offValue = new byte[4];
+
+                offValue[3] = 0;
+                offValue[2] = action;
+                offValue[1] = Convert.ToByte(parts[0]); //joy
+                offValue[0] = Convert.ToByte(parts[1]); //btn
+
+                return WriteOffset("0x29F0:4:i", BitConverter.ToUInt32(offValue, 0).ToString());
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCTools: Exception while sending Virtual Joystick <{address}> to FSUIPC");
+                return false;
+            }
         }
 
         public static bool VjoyClearSet(ActionSwitchType type, string address, bool clear)
@@ -142,15 +126,38 @@ namespace PilotsDeck
             else
             {
                 if (clear)
-                    return IPCManager.SendVjoy(address, 2);
+                    return SendVjoy(address, 2);
                 else
-                    return IPCManager.SendVjoy(address, 1);
+                    return SendVjoy(address, 1);
             }
         }
 
-        public static bool RunScript(string address)
+        public static bool WriteOffset(string address, string value)
         {
-            return IPCManager.RunScript(address);
+            if (string.IsNullOrEmpty(address) || !FSUIPCConnection.IsOpen)
+                return false;
+
+            bool result = false;
+            IPCValueOffset offset = null;
+            try
+            {
+                offset = new IPCValueOffset(address, AppSettings.groupStringWrite, OffsetAction.Write);
+                offset.Write(value, AppSettings.groupStringWrite);
+                offset.Dispose();
+                offset = null;
+                result = true;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error($"IPCTools: Exception while writing Offset <{address}> (size:{offset?.Size}/float:{offset?.IsFloat}/string:{offset?.IsString}/signed:{offset?.IsSigned}) to FSUIPC! {ex.Message} - {ex.StackTrace}");
+                if (offset != null)
+                {
+                    offset.Dispose();
+                }
+            }
+
+            return result;
         }
 
         public static bool RunMacros(string address)
@@ -159,14 +166,14 @@ namespace PilotsDeck
 
             string[] tokens = address.Split(':');
             if (tokens.Length == 2)
-                result = IPCManager.RunMacro(address);
+                result = RunMacro(address);
             else
             {
                 string macroFile = tokens[0];
                 int fails = 0;
                 for (int i = 1; i < tokens.Length; i++)
                 {
-                    if (!IPCManager.RunMacro(macroFile + ":" + tokens[i]))
+                    if (!RunMacro(macroFile + ":" + tokens[i]))
                         fails++;
                 }
                 if (fails == 0)
@@ -176,7 +183,26 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool WriteLvar(IPCManager ipcManager, string address, string newValue, bool lvarReset, string offValue)
+        public static bool RunMacro(string name)
+        {
+            try
+            {
+                Offset request = new(0x0D70, 128);
+                request.SetValue(name);
+                FSUIPCConnection.Process();
+                request.Disconnect();
+                request = null;
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCTools: Exception while Executing Macro: {name}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool WriteLvar(string address, string newValue, bool lvarReset, string offValue, bool useWASM)
         {
             bool result = false;
             if (newValue?.Length < 1)
@@ -184,7 +210,7 @@ namespace PilotsDeck
 
             double value = Convert.ToDouble(newValue, new RealInvariantFormat(newValue));
             address = address.Replace("L:", "");
-            result = ipcManager.WriteLvar(address, value);
+            result = WriteLvar(address, value, useWASM);
 
             if (!result)
                 return result;
@@ -193,18 +219,40 @@ namespace PilotsDeck
             {
                 Thread.Sleep(AppSettings.controlDelay * 2);
                 value = Convert.ToDouble(offValue, new RealInvariantFormat(offValue));
-                result = ipcManager.WriteLvar(address, value);
+                result = WriteLvar(address, value, useWASM);
             }
 
             return result;
         }
 
-        public static bool WriteHvar(IPCManager ipcManager, string address)
+        public static bool WriteLvar(string address, double value, bool useWASM)
         {
-            if (!address.Contains("H:"))
-                address = "H:" + address;
+            bool result = false;
+            try
+            {
+                if (useWASM)
+                {
+                    if (WASM.LVars.Exists(address))
+                    {
+                        WASM.LVars[address].SetValue(value);
+                        result = true;
+                        //Log.Logger.Debug($"IPCTools: LVar <{name}> updated via WASM");
+                    }
+                    else
+                        Log.Logger.Error($"IPCTools: LVar <{address}> does not exist");
+                }
+                else
+                {
+                    FSUIPCConnection.WriteLVar(address, value);
+                    result = true;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCTools: Exception while writing LVar <{address}:{value}> to FSUIPC/WASM");
+            }
 
-            return ipcManager.WriteHvar(address);
+            return result;
         }
 
         public static bool SendControls(string address, bool useControlDelay)
@@ -212,7 +260,7 @@ namespace PilotsDeck
             if (!address.Contains('=') && address.Contains(':') && rxControlSeq.IsMatch(address))
                 return SendControlsSeq(address, useControlDelay);
             else if (!address.Contains('=') && !address.Contains(':'))
-                return IPCManager.SendControl(address);
+                return SendControl(address);
 
             int fails = 0;
             
@@ -223,13 +271,13 @@ namespace PilotsDeck
                 codeControl = GetNextTokenMove(ref address, "=");
 
                 if (address.Length == 0)
-                    if (!IPCManager.SendControl(codeControl))
+                    if (!SendControl(codeControl))
                         fails++;
                 
                 while (address.Length > 0 && !PeekNextDelim(address, "="))
                 {
                     codeParam = GetNextTokenMove(ref address, ":");
-                    if (!IPCManager.SendControl(codeControl, codeParam))
+                    if (!SendControl(codeControl, codeParam))
                         fails++;
                     if (useControlDelay)
                         Thread.Sleep(AppSettings.controlDelay);
@@ -237,6 +285,133 @@ namespace PilotsDeck
             }
 
             return fails == 0;
+        }
+
+        public static bool SendControl(string control, string param = "0")
+        {
+            return SendControl(Convert.ToInt32(control), Convert.ToInt32(param));
+        }
+
+        public static bool SendControl(int control, int param = 0)
+        {
+            bool result = false;
+            try
+            {
+                FSUIPCConnection.SendControlToFS(control, param);
+                result = true;
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCTools: Exception while sending Control <{control}:{param}> to FSUIPC");
+            }
+
+            return result;
+        }
+
+        public static bool RunSingleScript(string name, int flag)
+        {
+            try
+            {
+                Offset param = null;
+                if (flag != -1)
+                {
+                    param = new Offset(0x0D6C, 4);
+                    param.SetValue(flag);
+                    FSUIPCConnection.Process();
+                }
+
+                Offset request = new(0x0D70, 128);
+                request.SetValue(name);
+
+                FSUIPCConnection.Process();
+                request.Disconnect();
+                request = null;
+                if (flag != -1)
+                {
+                    param.Disconnect();
+                    param = null;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool RunScript(string name)
+        {
+            try
+            {
+                string[] parts = name.Split(':');
+                if (parts.Length == 3 && int.TryParse(parts[2], out int result))    //Script with flag
+                    return RunSingleScript(parts[0] + ":" + parts[1], result);
+                if (parts.Length == 2)                                              //Script
+                    return RunSingleScript(parts[0] + ":" + parts[1], -1);          //Script with mulitple flags
+                if (parts.Length >= 3)
+                {
+                    for (int i = 2; i < parts.Length; i++)
+                    {
+                        if (int.TryParse(parts[i], out result))
+                        {
+                            if (!RunSingleScript(parts[0] + ":" + parts[1], result))
+                                return false;
+                        }
+                        else
+                        {
+                            Log.Logger.Error($"IPCManager: Exception while Executing Script: {name} - flag could not be parsed");
+                            return false;
+                        }
+                        Thread.Sleep(25);
+                    }
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool WriteHvar(string name)
+        {
+            bool result = false;
+
+            if (!name.Contains("H:"))
+                name = "H:" + name;
+
+            try
+            {
+                WASM.ExecuteCalculatorCode($"(>{name})");
+                result = true;
+            }
+            catch
+            {
+                Log.Logger.Error($"ConnectorMSFS: Exception while setting HVar <{name}> via WASM");
+            }
+
+            return result;
+        }
+
+        public static bool RunCalculatorCode(string code)
+        {
+            bool result = false;
+
+            try
+            {
+                WASM.ExecuteCalculatorCode(code);
+                result = true;
+            }
+            catch
+            {
+                Log.Logger.Error($"ConnectorMSFS: Exception while running Calculator Code <{code}> via WASM");
+            }
+
+            return result;
         }
 
         public static bool PeekNextDelim(string address, string delim)
@@ -273,7 +448,7 @@ namespace PilotsDeck
 
                 if (codeControl != null)
                 {
-                    if (!IPCManager.SendControl(codeControl))
+                    if (!SendControl(codeControl))
                         fails++;
                     if (PeekNextDelim(address, ":") && useControlDelay)
                         Thread.Sleep(AppSettings.controlDelay);
@@ -281,14 +456,6 @@ namespace PilotsDeck
             }
 
             return fails == 0;
-        }
-
-        public static bool WriteOffset(string address, string newValue)
-        {
-            if (newValue != "")
-                return IPCManager.WriteOffset(address, newValue);
-            else
-                return false;
         }
     }
 }
