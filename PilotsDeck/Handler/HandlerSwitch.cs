@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System.Threading;
 
 namespace PilotsDeck
 {
@@ -37,18 +38,21 @@ namespace PilotsDeck
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings);
+            bool result = RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings, (tick - TickDown));
             TickDown = 0;
 
             return result;
         }
 
-        public static bool RunButtonUp(IPCManager ipcManager, bool longPress, string lastState, string lastStateLong, IModelSwitch switchSettings)
+        public static bool RunButtonUp(IPCManager ipcManager, bool longPress, string lastState, string lastStateLong, IModelSwitch switchSettings, long ticks)
         {
             bool result = false;
 
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
             {
+                if (ticks < 1)
+                    Thread.Sleep(AppSettings.controlDelay);
+
                 result = IPCTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, true);
             }
             else if (!longPress)

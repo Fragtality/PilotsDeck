@@ -35,7 +35,7 @@ namespace PilotsDeck
         {
             if (GaugeSettings.HasAction)
             {
-                bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings);
+                bool result = HandlerSwitch.RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], SwitchSettings, (tick - TickDown));
                 TickDown = 0;
 
                 return result;

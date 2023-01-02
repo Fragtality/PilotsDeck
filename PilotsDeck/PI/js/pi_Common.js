@@ -106,6 +106,8 @@ function setPattern(field, type) {
 	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
 	var regHvar = `^([^0-9]{1}(H:){0,1}${regName}){1}$`;
 	var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
+	var strPathXP = `(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}){1}`;
+	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
 	//var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[\x5D])|(:s[0-9]+)){0,1}){1}$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	
@@ -128,7 +130,7 @@ function setPattern(field, type) {
 	else if (type == 8) //HVar
 		document.getElementById(field).pattern = regHvar;
 	else if (type == 10) //XPCmd
-		document.getElementById(field).pattern = regDref;
+		document.getElementById(field).pattern = regCmdXP;
 	else if (type == 11) //XPWRef
 		document.getElementById(field).pattern = regDref;
 	else

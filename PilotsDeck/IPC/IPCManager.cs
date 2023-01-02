@@ -162,6 +162,7 @@ namespace PilotsDeck
                 }
                 else
                 {
+                    //CHANGE: Switch Address (Action) based on NewValue
                     Log.Logger.Debug($"IPCManager: Running Action '{Address}' on Connector '{SimConnector.GetType().Name}'");
                     result = SimConnector.RunAction(Address, actionType, newValue, switchSettings, offValue);
                 }

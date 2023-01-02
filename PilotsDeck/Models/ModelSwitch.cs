@@ -18,7 +18,7 @@
 
     public interface IModelSwitch
     {
-        string AddressAction { get; set; }
+        string AddressAction { get; set; }  //CHANGE: Address for Off
         int ActionType { get; set; }
         string SwitchOnState { get; set; }
         string SwitchOffState { get; set; }

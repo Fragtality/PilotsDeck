@@ -372,13 +372,38 @@ namespace PilotsDeck
             switch (actionType)
             {
                 case ActionSwitchType.XPCMD:
-                    return XPDatagram.SendCommand(senderSocket, Address);
+                    return RunCommands(Address);
                 case ActionSwitchType.XPWREF:
                     return XPDatagram.SetDataRef(senderSocket, Address, newValue);
                 default:
                     Log.Logger.Error($"ConnectorXP: ActionType {actionType} not valid for Address {Address}");
                     return false;
             }
+        }
+
+        protected bool RunCommands(string Address)
+        {
+            bool result = false;
+            string[] commands = Address.Split(':');
+
+            if (commands.Length > 1)
+            {
+                foreach (string command in commands)
+                {
+                    result = XPDatagram.SendCommand(senderSocket, command);
+                    Thread.Sleep(AppSettings.controlDelay);
+                }
+            }
+            else if (commands.Length == 1)
+            {
+                result = XPDatagram.SendCommand(senderSocket, Address);
+            }
+            else
+            {
+                Log.Logger.Error($"ConnectorXP: Command-Array has zero members! Address: {Address}");
+            }
+
+            return result;
         }
 
         protected virtual void Dispose(bool a)
