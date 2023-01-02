@@ -13,6 +13,7 @@ namespace PilotsDeck
         private IPCValueOffset inMenuValue;
         private IPCValueOffset isPausedValue;
         private IPCValueOffset camReadyValue;
+        private bool wasmReloaded = false;
 
         public override bool IsConnected { get { return FSUIPCConnection.IsOpen && WASM.IsRunning; } protected set { } }
         public virtual bool IsCamReady()
@@ -160,6 +161,11 @@ namespace PilotsDeck
                         Log.Logger.Debug($"ConnectorMSFS: WASM NOT READY (Vars Changed {WASM.LVarsChanged.Count} | Vars Total {WASM.LVars.Count} | Ticks {ticks})");
                         resultProcess = false;
                     }
+                }
+                else if (IsReady && !wasmReloaded)
+                {
+                    wasmReloaded = true;
+                    WASM.Reload();
                 }
 
                 resultProcess = true;

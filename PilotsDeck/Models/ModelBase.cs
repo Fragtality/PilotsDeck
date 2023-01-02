@@ -24,7 +24,7 @@ namespace PilotsDeck
                     else
                     return fb <= fa;
             }
-            else if (!string.IsNullOrEmpty(a) && float.TryParse(a, NumberStyles.Number, new RealInvariantFormat(a), out _) && float.TryParse(a, NumberStyles.Number, new RealInvariantFormat(a), out _))
+            else if (!string.IsNullOrEmpty(a) && float.TryParse(a, NumberStyles.Number, new RealInvariantFormat(a), out _) && float.TryParse(b, NumberStyles.Number, new RealInvariantFormat(b), out _))
             {
                 return ModelDisplayText.GetNumValue(a, 0.0f) == ModelDisplayText.GetNumValue(b, 0.0f);
             }

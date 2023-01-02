@@ -315,6 +315,13 @@ namespace PilotsDeck
                     if (GlobalProfileSettings.EnableSwitching)
                         SwitchToDefaultProfile();
                 }
+                else if (lastAircraft != "")
+                {
+                    lastAircraft = "";
+                    wasPaused = false;
+                    CallOnAll(handler => handler.SetDefault());
+                    redrawRequested = true;
+                }
             }
             else //SIM running
             {
