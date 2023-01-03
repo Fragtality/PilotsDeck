@@ -159,14 +159,14 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   Examples:
   - ```1:2``` (the StreamDeck Button is recognized as Joystick 1, Button 2 in the Sim)
   - ```2:3:t``` (the StreamDeck Button is recognized as Joystick 2, Button 3 in the Sim and will be toggled on KeyUp)
- <br/>
+  <br/>
 * **Hvar**
  \[ Name(:Name)* ] (Command - MSFS2020 only)<br/>
   - *Name*: The Hvar's Name with or without the preceding "H:". Multiple Hvars can be chained by a colon (**:**). You don't need to have a .hvar for FSUIPC7 / your Plane installed. The Hvar is activated via Calculator Code, so FSUIPC7 does not know it in Advance.<br/><br/>
   Example:
   - ```A32NX_EFIS_L_CHRONO_PUSHED```
   - ```A320_Neo_CDU_1_BTN_DOWN:A320_Neo_CDU_1_BTN_DOWN```
- <br/>
+  <br/>
 * **Calculator**
  \[ Code ] (Command - MSFS2020 only)<br/>
   - *Code*: The desired Calculator Code to be executed.<br/><br/>
@@ -176,7 +176,7 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   Example:
   - ```toliss_airbus/aircondcommands/Pack1Toggle```
   - ```AirbusFBW/PopUpPFD1:AirbusFBW/PopUpND1```
- <br/>
+  <br/>
 * **XP DataRef** (XPWREF)
  \[ data/ref/path(\[index\]|:sX) ] (Read/Command - X-Plane only)<br/>
   - *Path*: The official dataRef Path for the Value (as seen in DataRefTool for example). If the DataRef is an Array, you can directly access the Values when you append the index in Brackets. You can also access string DataRefs if you add *:s* and the Length after the Path.<br/><br/>
@@ -229,7 +229,7 @@ You can also specify a *Different Color* when the Values match. This Color has p
 Since Display Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
 * **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar/DataRef to write to or which Macro(s)/Script to run or which Controls/Commands/Hvars to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lua Flags), multiple Requests will be send to the Sim in fast Sequence.
-* **Toggle Switch**: Only available on the "Display Value with Switch" Action and when either *Control* or *XPCmd* is selected as Action Type. When checked, you can specify an *Alternate Action Address* for second Command (Control/XPCmd) to send. It is send when the current *Control Status Value* is in it the *Off State* (either by exact Value or Comparison). Put in another Way: with that Setting you can two different Commands depending on the current Control's State/Value, e.g. either Pull/Push a Knob or move a Switch up/down.
+* **Toggle Switch**: Only available on the "Display Value with Switch" Action and when either *Control* or *XPCmd* is selected as Action Type. When checked, you can specify an *Alternate Action Address* for a second Command (Control/XPCmd) to send. It is send when the current *Control Status Value* is in it the *Off State* (either by exact Value or Comparison). Put in another Way: with that Setting you can two different Commands depending on the current Control's State/Value, e.g. either Pull/Push a Knob or move a Switch up/down.
 * **Alternate Action Address**: Explained in *Toggle Switch*.
 * **Use Delay**: If Control is selected as Action Type, you can check that to have a small Delay of 50ms between the Control-Commands send to the Sim.
 * **Reset Value**: If Lvar is selected as Action Type, you can check that to have the Lvar being reset to the Off-Value after the Button was pressed (the Plugin will set the Lvar to the On-Value for 100ms (controlDelay\*2) and then to the Off-Value). Useful for some Cockpit-Buttons which do not stay in the their pushed-Position and reflect that in their Lvar.
@@ -311,7 +311,7 @@ If you want to use your own Names or need more Profiles, you can customize that.
 * You can use the added Profiles now like the included ones. If everything went well, they should be listed in StreamDeck and in the Profile Switcher Action to map FSUIPC Profiles to it. That's the best I can offer, I'm glad it works at all - as per StreamDeck SDK it shouldn't work because the preconfigured Profiles are writeable :laughing:
 <br/><br/>
 ## Lua Values
-:grey_exclamation: Only applicable to FSX/P3D/MSFS. For X-Plane use FlyWithLua and create custom DataRefs with it.<br/>
+:grey_exclamation: Only applicable to FSX/P3D/MSFS. For X-Plane use **FlyWithLua** and create custom DataRefs with it for the same (and more elegant) "Lua Value" Mechanic. You can even create custom Commands with FlyWithLua which you can use like normal XP-Commands in the Plugin. Check out the ToLiss Profile/Integration for Examples!<br/><br/>
 Somewhere along the way, I wanted to add a Feature to read the current State of a Switch in the Sim with a Lua-Script. Maybe the State can't be read via one Lvar/Offset (FSL APU Avail...) and needs some "logic" from a Script to determine the State. Or it is just easier to read the Control's State via Lua (FSL2Lua). Wouldn't it be cool if the Plugin could run Lua-Scripts to read their return Values and display/use these Values? :thinking:<br/>
 You can!! Strictly speaking it is just one Script, it returns nothing, is not run by the Plugin and there is really no third way to read a Value from the Sim - but it still works. :laughing: Here is how:<br/>
 The [Lua-Script](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) which is provided in the \lua Subfolder is called by FSUIPC every 250ms as soon as it is started (given that you installed/configured it like described in that File). In that File (only) you can add your own Code to do that Control / State checking logic and generate a Value. Then you can write these Values to the "General Use" Range 66C0-66FF (64 bytes) via one of the ipc.writeXX Functions provided by FSUIPC (given that this Range is not used by an P3D Addon/Application!). Where you put them (in that Range) and in which Type (int/float/string/...) is up to you. You have to keep track of these and allocate these Addresses all by yourself! And then you read these Addresses via any Plugin Action like any other Offset. Yeah ... it is more a "mechanic" than a "Feature", but let's ignore that :shushing_face:<br/>
@@ -436,6 +436,7 @@ The ACP Panel on your StreamDeck:
 <br/><br/>
 ## Troubleshooting
 First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that you have used the %appdata% Path and that your Archive Software did not add an extra Subfolder. The Path to the Executable should be: %appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe<br/>
+<br/>
 Second, if you see the Actions but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in the Sim!<br/>
 One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell (change <USERNAME> accordingly, the %appdata% Path does not work on PowerShell - congrats MicroShit!):
 ```powershell
@@ -445,10 +446,11 @@ If that is not the Culprit, check your AV Scanner and try if it works if you add
 If it still doesn't work, contact me on one of the Plattforms / Forums! To help you I'll need:
 - The Version of the Plugin you have downloaded
 - Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
-- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin).
-- If that does not exist: First tell me, so I know you did not forget :laughing:<br/>
- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.<br/><br/>
-If the Plugin is working, but you have Issues with Lvars on MSFS2020: Check in the PilotsDeck Log that you have the latest FSUIPC WASM Version running (check Requirements, just search for "WASM"). There was an Issue where the FSUIPC Installer did not update it correctly.
+- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me - so I know you did not forget :laughing:).
+- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.<br/>
+<br/>
+If the Plugin is working, but you have Issues with Lvars on MSFS2020: Check in the PilotsDeck Log that you have the latest FSUIPC WASM Version running (check the Requirements, just search for "WASM" in the Log). There was an Issue where the FSUIPC Installer did not update it correctly.
+
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
