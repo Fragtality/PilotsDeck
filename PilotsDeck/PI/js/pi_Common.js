@@ -102,13 +102,12 @@ function setFormItem(value, name) {
 
 function setPattern(field, type) {
 	var regName = "[a-zA-Z0-9\x2D\x5F]+";
-	//var regNameXP = "[a-zA-Z][a-zA-Z0-9\x2D\x5F]+";
 	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
-	var regHvar = `^([^0-9]{1}(H:){0,1}${regName}){1}$`;
+	var strHvar = `((H:){0,1}${regName}){1}`;
+	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
 	var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
 	var strPathXP = `(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
-	//var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[\x5D])|(:s[0-9]+)){0,1}){1}$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	
 	if (type == 0) //macro
@@ -157,6 +156,31 @@ function toggleLvarReset(settingsModel) {
 		toggleConfigItem(true, resetField);
 	else
 		toggleConfigItem(false, resetField);
+}
+
+function toggleSwitchToggle(settingsModel) {
+	var toggleField = "ToggleSwitch";
+	var currentValueField = "SwitchOnCurrentValue";
+	var actionType = settingsModel.ActionType;
+
+	if (actionType != 2 && actionType != 10) {
+		settingsModel.ToggleSwitch = false;
+		document.getElementById(toggleField).checked = false;
+		toggleConfigItem(false, toggleField);
+		settingsModel.AddressActionOff = "";
+		document.getElementById("AddressActionOff").value = "";
+		if (actionType == 3 || actionType == 4 || actionType == 5)
+			toggleConfigItem(true, currentValueField);
+	}
+	else if (actionType == 2 || actionType == 10) {
+		toggleConfigItem(true, toggleField);
+		toggleConfigItem(false, currentValueField);
+		setPattern('AddressActionOff', settingsModel.ActionType);
+	}
+
+	toggleConfigItem(settingsModel.ToggleSwitch, "AddressActionOff");
+
+	return settingsModel;
 }
 
 function toggleOnOffState(actionType, onField, offField, switchCurrent) {

@@ -38,15 +38,16 @@ namespace PilotsDeck
 
         public override bool OnButtonUp(IPCManager ipcManager, long tick)
         {
-            bool result = RunButtonUp(ipcManager, (tick - TickDown) >= AppSettings.longPressTicks, ValueManager[ID.SwitchState], ValueManager[ID.SwitchStateLong], BaseSettings, (tick - TickDown));
+            bool result = RunButtonUp(ipcManager, tick - TickDown, ValueManager, BaseSettings);
             TickDown = 0;
 
             return result;
         }
 
-        public static bool RunButtonUp(IPCManager ipcManager, bool longPress, string lastState, string lastStateLong, IModelSwitch switchSettings, long ticks)
+        public static bool RunButtonUp(IPCManager ipcManager, long ticks, AddressValueManager valueManager, IModelSwitch switchSettings)
         {
             bool result = false;
+            bool longPress = ticks >= AppSettings.longPressTicks;
 
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
             {
@@ -59,7 +60,9 @@ namespace PilotsDeck
             {
                 string newValue = "";
                 if (IsActionReadable(switchSettings.ActionType) && !switchSettings.UseLvarReset)
-                    newValue = ToggleValue(lastState, switchSettings.SwitchOffState, switchSettings.SwitchOnState);
+                    newValue = ToggleValue(valueManager[ID.SwitchState], switchSettings.SwitchOffState, switchSettings.SwitchOnState);
+                else if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(switchSettings.AddressActionOff))
+                    newValue = valueManager[ID.ControlState];
                 else if (IsActionReadable(switchSettings.ActionType))
                     newValue = switchSettings.SwitchOnState;
 
@@ -75,7 +78,7 @@ namespace PilotsDeck
                 {
                     string newValue = "";
                     if (IsActionReadable(switchSettings.ActionTypeLong) && !switchSettings.UseLvarReset)
-                        newValue = ToggleValue(lastStateLong, switchSettings.SwitchOffStateLong, switchSettings.SwitchOnStateLong);
+                        newValue = ToggleValue(valueManager[ID.SwitchStateLong], switchSettings.SwitchOffStateLong, switchSettings.SwitchOnStateLong);
                     else if (IsActionReadable(switchSettings.ActionTypeLong))
                         newValue = switchSettings.SwitchOnStateLong;
 

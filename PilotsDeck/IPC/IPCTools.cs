@@ -20,7 +20,8 @@ namespace PilotsDeck
         public static readonly Regex rxControlSeq = new (@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         public static readonly Regex rxControl = new (@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
         public static readonly Regex rxLvar = new ($"^[^0-9]{{1}}((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
-        public static readonly Regex rxHvar = new ($"^[^0-9]{{1}}((H:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
+        public static readonly string validHvar = $"((H:){{0,1}}{validName}){{1}}";
+        public static readonly Regex rxHvar = new ($"^({validHvar}){{1}}(:{validHvar})*$", RegexOptions.Compiled);
         public static readonly Regex rxOffset = new (@"^((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoy = new (@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoyDrv = new (@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -336,7 +337,7 @@ namespace PilotsDeck
             }
             catch
             {
-                Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
+                Log.Logger.Error($"IPCTools: Exception while Executing Script: {name}");
                 return false;
             }
 
@@ -363,7 +364,7 @@ namespace PilotsDeck
                         }
                         else
                         {
-                            Log.Logger.Error($"IPCManager: Exception while Executing Script: {name} - flag could not be parsed");
+                            Log.Logger.Error($"IPCTools: Exception while Executing Script: {name} - flag could not be parsed");
                             return false;
                         }
                         Thread.Sleep(25);
@@ -372,14 +373,42 @@ namespace PilotsDeck
             }
             catch
             {
-                Log.Logger.Error($"IPCManager: Exception while Executing Script: {name}");
+                Log.Logger.Error($"IPCTools: Exception while Executing Script: {name}");
                 return false;
             }
 
             return true;
         }
 
-        public static bool WriteHvar(string name)
+        public static bool WriteHvar(string Address)
+        {
+            bool result = false;
+            string[] hVars = Address.Split(':');
+
+            if (hVars.Length > 2 || (hVars.Length == 2 && hVars[0].Length > 2))
+            {
+                foreach (string var in hVars)
+                {
+                    if (var.Length > 1)
+                    {
+                        result = WriteSingleHvar(var);
+                        Thread.Sleep(AppSettings.controlDelay);
+                    }
+                }
+            }
+            else if ((hVars.Length == 2 && hVars[0] == "H") || (hVars.Length == 1 && hVars[0].Length > 1))
+            {
+                result = WriteSingleHvar(Address);
+            }
+            else
+            {
+                Log.Logger.Error($"IPCTools: HVar Address is not valid! Address: {Address}");
+            }
+
+            return result;
+        }
+
+        public static bool WriteSingleHvar(string name)
         {
             bool result = false;
 

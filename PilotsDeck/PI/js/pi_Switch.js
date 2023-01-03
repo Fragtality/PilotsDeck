@@ -1,19 +1,21 @@
 ﻿// Implement settingsModel for the Action
 var settingsModel = {
-		DefaultImage: "Images/Switch.png",
-		ErrorImage: "Images/SwitchError.png",
-		AddressAction: "",
-		ActionType: 0,
-		SwitchOnState: "",
-		SwitchOffState: "",
-		UseControlDelay: false,
-		UseLvarReset: false,
-		SwitchOnCurrentValue: false,
-		HasLongPress: false,
-        AddressActionLong: "",
-        ActionTypeLong: 0,
-        SwitchOnStateLong: "",
-        SwitchOffStateLong: ""
+	DefaultImage: "Images/Switch.png",
+	ErrorImage: "Images/SwitchError.png",
+	AddressAction: "",
+	AddressActionOff: "",
+	ActionType: 0,
+	SwitchOnState: "",
+	SwitchOffState: "",
+	ToggleSwitch: false,
+	UseControlDelay: false,
+	UseLvarReset: false,
+	SwitchOnCurrentValue: false,
+	HasLongPress: false,
+    AddressActionLong: "",
+    ActionTypeLong: 0,
+    SwitchOnStateLong: "",
+    SwitchOffStateLong: ""
   };
 
 function fillSelectBoxes() {

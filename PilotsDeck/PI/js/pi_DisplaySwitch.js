@@ -4,10 +4,12 @@ var settingsModel = {
 	ErrorImage: "Images/Error.png",
 	Address: "",
 	AddressAction: "",
+	AddressActionOff: "",
 	ActionType: 0,
 	SwitchOnState: "",
 	SwitchOffState: "",
 	SwitchOnCurrentValue: false,
+	ToggleSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
 	HasLongPress: false,
@@ -63,9 +65,18 @@ function updateForm() {
 	setPattern('AddressAction', settingsModel.ActionType);
 	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
+	//Alternative Action
+	toggleSwitchToggle(settingsModel);
+
 	//On/Off States & SwitchOnCurrent
+	if ((settingsModel.ActionType == 2 || settingsModel.ActionType == 10) && settingsModel.ToggleSwitch) {
+		toggleOnOffState(3, 'SwitchOnState', 'SwitchOffState', false);
+	}
+	else {
+		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
+	}
+
 	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
 	if (settingsModel.HasLongPress && longAllowed)
 		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', settingsModel.SwitchOnCurrentValue);
 	else

@@ -13,42 +13,46 @@ The Communication is Bi-Directional - it does not only send Commands into the Si
 The included Images do not aim to create a "photorealistic" Look of Buttons and Switches like other Plugins do. But if you preferr that, you can configure your Actions that way with your own Images!<br/>
 The Plugin can also switch between StreamDeck Profiles (on multiple Decks) when the Aircraft (Model) and FSUIPC Profile change.<br/>
 Another "Feature" would be that you can "read" Values via [Lua-Scripts](README.md#lua-values).<br/><br/>
-As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions & Variants. Which Features / Action Types work depends on the Sim / the FSUIPC Variant (and if it is free or registered). It is developed on Prepar3D&#x00AE; and MSFS2020, so this Readme describes the Features which work there.
+As there is no Sim-specific Library involved (only FSUIPC in form of the .NET Client), the Plugin should automatically connect to all FSUIPC Versions. Which Features / Action Types work depends on the Sim (and if FSUIPC is free or registered). It is developed on Prepar3D&#x00AE;, MSFS2020 and X-Plane 12: so this Readme describes the Features which work there.
 <br/><br/>
 ## Plugin Requirements
-Uhm ... I'd say a FlightSim, \*UIPC and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing: <br/>
-Starting with Version 0.7.3 the Plugin connects directly with **X-Plane** - you don't need to install XUIPC to use the Plugin!<br/>
-It is compiled for the .NET Framework and tested on Windows 10. For the newer Releases of the Plugin (starting with 0.7.0) .NET 6 is required for which you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)). You'll need ".NET Runtime 6.0.x" and ".NET Desktop Runtime 6.0.x" as x64. (Do not confuse it with arm64!)<br/>
+Uhm ... I'd say a FlightSim, FSUIPC, .NET and StreamDeck (Software) installed, updated and working would be a bloody good Start :laughing: <br/>
+You can generally directly install new StreamDeck Software Version as they come out.<br/>
+Starting with Version 0.7.3 the Plugin connects directly with **X-Plane** - you don't need to install XUIPC to use the Plugin! (You still can of course, but PilotsDeck will not use it :wink:)<br/>
+It is compiled for the .NET Framework and tested on Windows 10 (and known to work on Windows 11 based on User Reports). It is currently compiled for **.NET 7**, you'll probably need to download the according Runtimes (Download [here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)). You'll need ".NET Runtime 7.0.x" and ".NET Desktop Runtime 7.0.x" as x64. (Do not confuse it with arm64!)<br/>
 Older Versions of the Plugin (until 0.6.x) only need .NET 4.8 which should be already installed on your System (as Part of Windows).
-- To test if .NET 6.0 is installed (Plugin Version 0.7.0 or greater), run this in Powershell or Commandline:
+- To test if .NET 7.0 is installed, run this in Powershell or Commandline:
  ```powershell
  dotnet --list-runtimes
  ``` 
- The Runtimes "Microsoft.NETCore.App 6.0.5" and "Microsoft.WindowsDesktop.App 6.0.5" should be listed (as an Example, the Version can be greater).
+ The Runtimes "Microsoft.NETCore.App 7.0.1" and "Microsoft.WindowsDesktop.App 7.0.1" should be listed (as an Example, the Version can be greater).
 - To test if .NET 4.8 is installed (Plugin Version up to 0.6.x), run this in Powershell:
  ```powershell
  (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release -ge 528040
  (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Version
  ```
 The first Command should show "True", the second something with "4.8.x".<br/><br/>
-The Connection to FSUIPC happens automaticallly when the StreamDeck Software (with the Plugin installed) runs. The Plugin's Manifest-File includes the Executables of all relevant Sims, so that it is informed by the StreamDeck Software when a Simulator starts (only then it tries to connect). The Executable-Names can be altered in the [Plugin Settings](README.md#plugin-settings).<br/>
+## Supported Simulators
+The Connection to FSUIPC happens automatically when the StreamDeck Software (with the Plugin installed) runs. The Plugin's Manifest-File includes the Executables of all relevant Sims, so that it is informed by the StreamDeck Software when a Simulator starts (only then it tries to connect). The Executable-Names can be altered in the [Plugin Settings](README.md#plugin-settings).<br/>
 Running the Plugin or the StreamDeck Software "as Admin" is NOT neccessary (and could probably even cause Problems)!<br/><br/>
-The Sims and their FSUIPC Version/Variant are:
+The Sims and their Connection Variant are (bold tested & confirmed):
 - FSUIPC3 - Microsoft Flight Simulator 2004
 - FSUIPC4 - Microsoft FSX, FSX Steam Edition, Prepar3d 1.4 to 3.4
 - FSUIPC5 - Prepar3D Version 4
 - FSUIPC6 - **Prepar3D Version 4 and 5**
 - FSUIPC7 - **Microsoft Flight Simulator 2020**
-- XPUIPC/WebSocket - **X-Plane 12 & 11** (and probably older)<br/><br/>
+- WebSocket - **X-Plane 12 & 11** (and maybe older)<br/><br/>
 If you let me know what works and which Features work in which Sim (other than P3D v5, MSFS2020, X-Plane 12/11), I'll add it to the Readme! :wink:<br/>
-:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your \*UIPC Installation supports, so a registered Version of FSUIPC is highly recommended (but not neccessary)!<br/>
-:grey_exclamation: For MSFS2020 SU10 you will need at least Version 7.3.9 installed, with the "WASM/WAPI" Module also installed and activated (Version 0.9.0).
+:grey_exclamation: Please mind that the Action Types Script, Macro, Lvar and vJoy can only work with a registered Version of FSUIPC! The Plugin can only do what your FSUIPC Installation supports, so a registered Version of FSUIPC is highly recommended (but not neccessary)!<br/>
+:grey_exclamation: For MSFS2020 **SU11** you will need at least Version 7.3.15 installed, with the "WASM/WAPI" Module also installed and activated (Version 0.9.1).
 <br/><br/>
 ## Plugin Installation
 It is not (yet) distributed in the StreamDeck Store, so it is a manual Installation for now.<br/>
 Just put the Contents of the Zip in your Plugin-Folder under<br/>
   > **%appdata%\Elgato\StreamDeck\Plugins**
 
+and Restart the StreamDeck Software.<br/>
+(Use this exact Path, it is a virtual Path in Windows which will automatically point to the right Location).<br/>
 If it should not "work right" after Installation, check the [Troubleshooting-Section](README.md#troubleshooting).<br/><br/>
 
 Optional: If you need/want to read Values generated by Lua-Scripts, you have to add the [PilotsDeck.lua](https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck/lua/PilotsDeck.lua) Script from the Plugin's *\lua* Subfolder to your FSUIPC Installation as an Autostart Script. More Instructions can be found in that File. (If your Sim supports Lua)
@@ -156,18 +160,16 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   - ```1:2``` (the StreamDeck Button is recognized as Joystick 1, Button 2 in the Sim)
   - ```2:3:t``` (the StreamDeck Button is recognized as Joystick 2, Button 3 in the Sim and will be toggled on KeyUp)
  <br/>
- 
 * **Hvar**
- \[ (H:)Name ] (Command - MSFS2020 only)<br/>
-  - *Name*: The Hvar's Name with or without the preceding "H:". You don't need to have a .hvar for FSUIPC7 / your Plane installed. The Hvar is activated via Calculator Code, so FSUIPC7 does not know it in Advance.<br/><br/>
+ \[ Name(:Name)* ] (Command - MSFS2020 only)<br/>
+  - *Name*: The Hvar's Name with or without the preceding "H:". Multiple Hvars can be chained by a colon (**:**). You don't need to have a .hvar for FSUIPC7 / your Plane installed. The Hvar is activated via Calculator Code, so FSUIPC7 does not know it in Advance.<br/><br/>
   Example:
   - ```A32NX_EFIS_L_CHRONO_PUSHED```
+  - ```A320_Neo_CDU_1_BTN_DOWN:A320_Neo_CDU_1_BTN_DOWN```
  <br/>
- 
 * **Calculator**
  \[ Code ] (Command - MSFS2020 only)<br/>
   - *Code*: The desired Calculator Code to be executed.<br/><br/>
-
 * **XP Command** (XPCMD)
  \[ data/ref/path(:data/ref/path)* ] (Command - X-Plane only)<br/>
   - *Path*: The official dataRef Path for the Command (as seen in DataRefTool for example). Multiple Commands can be chained by a colon (**:**).<br/><br/>
@@ -175,7 +177,6 @@ There is no need to install the vJoy Driver if you are not planning to use this 
   - ```toliss_airbus/aircondcommands/Pack1Toggle```
   - ```AirbusFBW/PopUpPFD1:AirbusFBW/PopUpND1```
  <br/>
- 
 * **XP DataRef** (XPWREF)
  \[ data/ref/path(\[index\]|:sX) ] (Read/Command - X-Plane only)<br/>
   - *Path*: The official dataRef Path for the Value (as seen in DataRefTool for example). If the DataRef is an Array, you can directly access the Values when you append the index in Brackets. You can also access string DataRefs if you add *:s* and the Length after the Path.<br/><br/>
@@ -223,11 +224,13 @@ You can optionally hide the Text when the Value matches. Maybe you want to displ
 You can also specify a *Different Color* when the Values match. This Color has priority over both inheritted or customized Font Settings. This Color is also used for the Frame, if *Draw Frame* is enabled.
 * **Tweak Position**: This defines the Rectangle (the "Box") the Text is drawn on the current Background defined as *"X; Y; Width; Height"*. If *Draw Frame* is enabled, it is relative to the Frame's *Size & Position*. If it not enabled it is relative to the whole Button. The Text is always drawn horizontal/vertical centered within that Box. When *Draw Frame* is toggled this will reset to the respective Default.
 <br/><br/>
-### Simple Button / Display Value with Button
+### Simple Button / Display Value with Switch
 ![ActionSwitch](img/SimpleButton.png)![ActionDisplaySwitch](img/DisplaySwitchTcas.png)<br/>
 Since Display Value is explained above and a simple Button has nothing much to configure visually, we can concentrate on how a "Mapping" is done - how you can define what is send to the Sim.
 * **Action Type**: Defines the Type of Action. There's nothing more to add, if you're familiar with FSUIPC and binding everything you can to your Joystick(s) it is exactly that what you would guess :wink:
-* **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar/DataRef to write to or which Macro(s)/Script to run or which Control(s) to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lua Flags), multiple Requests will be send to the Sim in fast Sequence.
+* **Action Address**: This, in essence, is your Mapping. Here you specify which Offset/Lvar/DataRef to write to or which Macro(s)/Script to run or which Controls/Commands/Hvars to send. The Syntax is referenced [above](README.md#address-fields). For Types with multiple "Targets" (Macro, Control, Lua Flags), multiple Requests will be send to the Sim in fast Sequence.
+* **Toggle Switch**: Only available on the "Display Value with Switch" Action and when either *Control* or *XPCmd* is selected as Action Type. When checked, you can specify an *Alternate Action Address* for second Command (Control/XPCmd) to send. It is send when the current *Control Status Value* is in it the *Off State* (either by exact Value or Comparison). Put in another Way: with that Setting you can two different Commands depending on the current Control's State/Value, e.g. either Pull/Push a Knob or move a Switch up/down.
+* **Alternate Action Address**: Explained in *Toggle Switch*.
 * **Use Delay**: If Control is selected as Action Type, you can check that to have a small Delay of 50ms between the Control-Commands send to the Sim.
 * **Reset Value**: If Lvar is selected as Action Type, you can check that to have the Lvar being reset to the Off-Value after the Button was pressed (the Plugin will set the Lvar to the On-Value for 100ms (controlDelay\*2) and then to the Off-Value). Useful for some Cockpit-Buttons which do not stay in the their pushed-Position and reflect that in their Lvar.
 * **On / Off State**: For Lvar, Offset and DataRef you have to specify which Value stands for "On" and which for "Off". The Value to be written to the Lvar, Offset or DataRef. The Button will toggle between these based on the current Value when pushed ("keyUp") and sends it to the Sim. So if the Lvar/Offset is 1, then the Plugin will write a 0.<br/>If it is a Toggle-style Switch which you want to control (there is no On/Off State), write the same Value to both Fields (swap Frequencies e.g.).
@@ -236,7 +239,7 @@ Note that the internal Mechanic is based on "keyUp": regardless of how long you 
 <br/><br/>
 ### Dynamic Button
 ![ActionSwitchDisplay](img/DynamicButtonKorry.png)![ActionSwitchDisplay](img/DynamicButtonGear.png)![ActionSwitchDisplay](img/DynamicButtonLight.png)<br/>
-Action Type and Address work exactly like described above.<br/>
+Action Type and Address work exactly like described above. The *Toggle Switch* (and *Alternate Action Address*) Option is also available here.<br/>
 * **Use Status Value**: When Lvar or Offset is selected as Action Type, the Dynamic Button defaults to use the current Value and "On" & "Off" States defined for the Control Status for Toggling. If you do want to use a different Lvars / Offsets with and/or different On & Off States for the Action Address and the Status Address, you can uncheck this Box.<br/>Note that this does only affect the "normal" Command, but not for the "Long Press".
 * **Address** (Control Status Value): Here you specify where the current State (Value) of a Switch in the Sim can be read. Since there are only two Ways to read something from the Sim via FSUIPC, it is either an Offset or a (single) Lvar.<br/>The Syntax works as described [before](README.md#address-fields). The "third" Way, reading a Lua Value is described [below](README.md#lua-values).
 * **On / Off State**: When the Value matches On or Off, the respective On or Off Image is displayed. You can either specifiy a discrete Value or a Comparison (like ">=0.3" to show the Image as long as the current Value is greater or equal to 0.3)<br/>
@@ -432,18 +435,20 @@ The ACP Panel on your StreamDeck:
 
 <br/><br/>
 ## Troubleshooting
-If you encounter the Issue that although the Plugin and its Actions are displayed in the StreamDeck Software but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in the Sim!<br/>
-One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell (change <USERNAME> accordingly):
+First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that you have used the %appdata% Path and that your Archive Software did not add an extra Subfolder. The Path to the Executable should be: %appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe<br/>
+Second, if you see the Actions but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in the Sim!<br/>
+One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell (change <USERNAME> accordingly, the %appdata% Path does not work on PowerShell - congrats MicroShit!):
 ```powershell
 dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
 ```
-If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local WebSockets.<br/><br/>
+If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local WebSockets (also the Connection to X-Plane).<br/><br/>
 If it still doesn't work, contact me on one of the Plattforms / Forums! To help you I'll need:
 - The Version of the Plugin you have downloaded
 - Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
 - Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin).
 - If that does not exist: First tell me, so I know you did not forget :laughing:<br/>
- Second: Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.
+ Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.<br/><br/>
+If the Plugin is working, but you have Issues with Lvars on MSFS2020: Check in the PilotsDeck Log that you have the latest FSUIPC WASM Version running (check Requirements, just search for "WASM"). There was an Issue where the FSUIPC Installer did not update it correctly.
 <br/><br/>
 ## License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>

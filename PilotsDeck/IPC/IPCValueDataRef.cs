@@ -7,24 +7,25 @@ namespace PilotsDeck
     {
         public float FloatValue { get; set; } = 0.0f;
         private float _lastValue = 0.0f;
+        private bool _valueChanged = false;
 
         public IPCValueDataRef(string address) : base(address)
         {
-            
+
         }
 
         public override bool IsChanged
         {
             get
-            { 
-                if (_lastValue != FloatValue)
-                {
-                    _lastValue = FloatValue;
-                    return true;
-                }
-                else
-                    return false;
+            {
+                return _valueChanged;
             }
+        }
+
+        public override void Process(SimulatorType simType)
+        {
+            _valueChanged = _lastValue != FloatValue;
+            _lastValue = FloatValue;
         }
 
         public override dynamic RawValue()

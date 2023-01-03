@@ -17,6 +17,15 @@
             <div class="sdpi-item-label" id="lblAddressAction">Action Address</div>
             <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar, Offset or vJoy" />
         </div>
+        <div type="checkbox" class="sdpi-item" id="Config_ToggleSwitch">
+            <div class="sdpi-item-label" id="lblToggleSwitch">Toggle Switch</div>
+            <input class="sdpi-item-value" id="ToggleSwitch" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="ToggleSwitch"><span></span>Toggle Switch with two different Commands</label>
+        </div>
+        <div class="sdpi-item" id="Config_AddressActionOff">
+            <div class="sdpi-item-label" id="lblAddressActionOff">Alternate Action Address</div>
+            <input id="AddressActionOff" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar, Offset or vJoy" />
+        </div>
         <div type="checkbox" class="sdpi-item" id="Config_UseControlDelay">
             <div class="sdpi-item-label" id="lblUseControlDelay">Use Delay</div>
             <input class="sdpi-item-value" id="UseControlDelay" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">

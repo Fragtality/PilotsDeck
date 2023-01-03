@@ -149,7 +149,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null)
+        public bool RunAction(string Address, ActionSwitchType actionType, string currentValue, IModelSwitch switchSettings, string offValue = null)
         {
             bool result = false;
 
@@ -162,9 +162,14 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    //CHANGE: Switch Address (Action) based on NewValue
-                    Log.Logger.Debug($"IPCManager: Running Action '{Address}' on Connector '{SimConnector.GetType().Name}'");
-                    result = SimConnector.RunAction(Address, actionType, newValue, switchSettings, offValue);
+                    string runAddress = Address;
+                    if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(switchSettings.AddressActionOff) && ModelBase.Compare(switchSettings.SwitchOffState, currentValue))
+                    {
+                        runAddress= switchSettings.AddressActionOff;
+                    }
+ 
+                    Log.Logger.Debug($"IPCManager: Running Action '{runAddress}' on Connector '{SimConnector.GetType().Name}'");
+                    result = SimConnector.RunAction(runAddress, actionType, currentValue, switchSettings, offValue);
                 }
             }
             else

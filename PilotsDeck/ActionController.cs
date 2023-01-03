@@ -32,6 +32,7 @@ namespace PilotsDeck
         private int waitCounter = 0;
 
         private bool wasPaused = false;
+        private bool isClosing = false;
         private readonly int waitTicks = AppSettings.waitTicks;
         private readonly int firstTick = (int)(AppSettings.waitTicks / 7.5);
         private Stopwatch watchRefresh = new();
@@ -291,16 +292,16 @@ namespace PilotsDeck
 
             if (waitCounter > 0)
             {
-                if (SimConnector.IsRunning)
-                {
+                //if (SimConnector.IsRunning)
+                //{
                     waitCounter--;
                     if (waitCounter == 0)
                         Log.Logger.Information($"ActionController: Wait ended");
                     else if (waitCounter % 25 == 0)
                         Log.Logger.Information($"ActionController: Waiting ...");
-                }
-                else
-                    waitCounter = 0;
+                //}
+                //else
+                //    waitCounter = 0;
             }          
 
             if (!SimConnector.IsRunning) //SIM not running
@@ -308,19 +309,23 @@ namespace PilotsDeck
                 if (SimConnector.LastStateApp()) //SIM changed to not running
                 {
                     SimConnector.Close();
-                    lastAircraft = "";
-                    wasPaused = false;
+                    CallOnAll(handler => handler.SetError());
+                    redrawRequested = true;
+                    isClosing = true;
+
+                    waitCounter = waitTicks / 4;
+                    Log.Logger.Information($"ActionController: Sim changed to NOT running, waiting for {(waitCounter * 200) / 1000}s");
+                }
+                else if (isClosing && waitCounter == 0)
+                {
                     CallOnAll(handler => handler.SetDefault());
                     redrawRequested = true;
+                    isClosing = false;
+
+                    lastAircraft = "";
+                    wasPaused = false;
                     if (GlobalProfileSettings.EnableSwitching)
                         SwitchToDefaultProfile();
-                }
-                else if (lastAircraft != "")
-                {
-                    lastAircraft = "";
-                    wasPaused = false;
-                    CallOnAll(handler => handler.SetDefault());
-                    redrawRequested = true;
                 }
             }
             else //SIM running
@@ -329,9 +334,11 @@ namespace PilotsDeck
                 {
                     CallOnAll(handler => handler.SetWait());
                     redrawRequested = true;
+                    isClosing = false;
+
                     if (tickCounter > firstTick)
                     {
-                        waitCounter = waitTicks * 2;
+                        waitCounter = waitTicks;
                         Log.Logger.Information($"ActionController: Sim changed to running, waiting for {(waitCounter * 200) / 1000}s");
                     }
                     else

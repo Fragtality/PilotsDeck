@@ -54,6 +54,7 @@ namespace PilotsDeck
                 if (AircraftValue != null)
                 {
                     UnsubscribeAddress(AircraftRefString);
+                    ipcManager.DeregisterAddress(AircraftRefString);
                     AircraftValue.Dispose();
                     AircraftValue = null;
                 }

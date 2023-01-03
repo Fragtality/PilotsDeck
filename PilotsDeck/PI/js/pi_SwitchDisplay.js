@@ -7,9 +7,11 @@ var settingsModel = {
     IndicationImage: "Images/Fault.png",
     IndicationValue: "0",
 	AddressAction: "",
+	AddressActionOff: "",
 	ActionType: 0,
 	SwitchOnState: "",
 	SwitchOffState: "",
+	ToggleSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
 	HasLongPress: false,
@@ -50,6 +52,9 @@ function updateForm() {
 		toggleConfigItem(false, 'SwitchOnCurrentValue');
 	else
 		toggleConfigItem(true, 'SwitchOnCurrentValue');
+
+	//Alternative Action
+	toggleSwitchToggle(settingsModel);
 
 	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
 	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);

@@ -34,37 +34,6 @@ namespace PilotsDeck
 			ErrorImage = @"Images/Error.png";
 		}
 
-		//public string GetValueMapped(string text)
-		//{
-		//	if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains('='))
-		//	{
-		//		var dict = GetValueMap();
-		//		if (HasComparison() && dict.Count > 0)
-  //              {
-		//			var comparison = dict.First();
-
-		//			bool greater = comparison.Key.Contains('>');
-		//			string key = comparison.Key.Replace(">", "").Replace("<", "");
-		//			float val = GetNumValue(text, 0.0f);
-		//			float limit = GetNumValue(key, 0.0f);
-					
-		//			if (greater)
-		//				if (limit >= val)
-		//					text = comparison.Value;
-					
-		//			if (!greater)
-		//				if (limit <= val)
-		//					text = comparison.Value;
-		//		}
-		//		else if (dict.ContainsKey(text))
-  //              {
-		//			text = dict[text];
-  //              }
-		//	}
-
-		//	return text;
-		//}
-
         public string GetValueMapped(string strValue)
 		{
 			if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains('='))

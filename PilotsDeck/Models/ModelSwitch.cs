@@ -18,10 +18,12 @@
 
     public interface IModelSwitch
     {
-        string AddressAction { get; set; }  //CHANGE: Address for Off
+        string AddressAction { get; set; }
+        string AddressActionOff { get; set; }
         int ActionType { get; set; }
         string SwitchOnState { get; set; }
         string SwitchOffState { get; set; }
+        bool ToggleSwitch { get; set; }
         bool SwitchOnCurrentValue { get; set; }
         bool UseControlDelay { get; set; }
         bool UseLvarReset { get; set; }
@@ -36,7 +38,9 @@
     public class ModelSwitch : ModelBase, IModelSwitch
     {
         public virtual string AddressAction { get; set; } = "";
+        public virtual string AddressActionOff { get; set; } = "";
         public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
+        public virtual bool ToggleSwitch { get; set; } = false;
         public virtual bool UseControlDelay { get; set; } = false;
         public virtual bool UseLvarReset { get; set; } = false;
         public virtual string SwitchOnState { get; set; } = "";

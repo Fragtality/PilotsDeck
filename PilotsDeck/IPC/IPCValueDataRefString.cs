@@ -4,6 +4,7 @@
     {
         private char[] charArray;
         private string _lastString = "";
+        private bool _valueChanged = false;
         public int Length { private set; get; }
         public string BaseAddress
         {
@@ -28,15 +29,15 @@
         {
             get
             {
-                string current = new(charArray);
-                if (current != _lastString)
-                {
-                    _lastString = current;
-                    return true;
-                }
-                else
-                    return false;
+                return _valueChanged;
             }
+        }
+
+        public override void Process(SimulatorType simType)
+        {
+            string current = new(charArray);
+            _valueChanged = _lastString != current;
+            _lastString = current;
         }
 
         public override dynamic RawValue()
