@@ -32,7 +32,7 @@ function GSX_CUSTOM_CONNECT()
 			end
 		end
 	elseif gsxJetway == 2 then
-		ipc.log("GSX_CUSTOM_CONNECT: Connect GPU")
+		ipc.log("GSX_CUSTOM_CONNECT: Connect Stairs")
 		if ipc.readLvar("B_CONFIG_GPU") ~= 1 then
 			ipc.log("GSX_CUSTOM_CONNECT: Connect GPU & AirCon")
 			GSX_CUSTOM_GPU(false)
@@ -79,11 +79,15 @@ function GSX_CUSTOM_GPU(menuIsOpen)
 	ipc.sleep(125)
 	FNX_BTN_PRESS("S_CDU1_KEY_LSK3L")
 	ipc.sleep(125)
-	FNX_BTN_PRESS("S_CDU1_KEY_LSK2L")
+	FNX_BTN_PRESS("S_CDU1_KEY_LSK2L")	--GPU
 	ipc.sleep(125)
-	FNX_BTN_PRESS("S_CDU1_KEY_LSK3L")
+	FNX_BTN_PRESS("S_CDU1_KEY_LSK3L")	--AIR
 	ipc.sleep(125)
-	FNX_BTN_PRESS("S_CDU1_KEY_INIT")
+	if ipc.readLvar("GSX_AUTO_SERVICE_STATE") == 3 then
+		FNX_BTN_PRESS("S_CDU1_KEY_PERF")
+	else
+		FNX_BTN_PRESS("S_CDU1_KEY_INIT")
+	end	
 
 	return true
 end

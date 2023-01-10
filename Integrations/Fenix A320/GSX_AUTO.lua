@@ -28,9 +28,24 @@ function GSX_AUTO_SET_CONNECTED(value)
 	ipc.writeLvar("GSX_AUTO_CONNECTED", value)
 end
 
+function GSX_DISABLE_CREW()
+	ipc.log("GSX_AUTO: Disabling Crew De/Boarding")
+	ipc.writeLvar("FSDT_GSX_CREW_ON_BOARD", 1)
+	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_CREW_NOT_BOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_DEBOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_CREW_NOT_DEBOARDING", 1)
+	ipc.writeLvar("FSDT_GSX_NUMCREW", 0)
+	ipc.writeLvar("FSDT_GSX_NUMPILOTS", 0)
+end
+
 local debugArrival = false
 if debugArrival then
 	GSX_AUTO_SERVICE_STATE = 5
+	GSX_AUTO_JETWAY_CONNECTED = false
 	ipc.writeLvar("GSX_AUTO_SERVICE_STATE", GSX_AUTO_SERVICE_STATE)
 	ipc.writeLvar("FSDT_GSX_NUMPASSENGERS", 30)
 	GSX_DISABLE_CREW()
@@ -102,6 +117,7 @@ function GSX_AUTO_SYNC_CYCLE()
 		ipc.log("GSX_AUTO: Service State switched from Push to Taxi Out")
 	elseif onGnd ~= 1 and GSX_AUTO_SERVICE_STATE ~= 5 then
 		GSX_AUTO_SERVICE_STATE = 5
+		GSX_AUTO_JETWAY_CONNECTED = false
 		ipc.log("GSX_AUTO: Service State switched to Flight")
 	elseif GSX_AUTO_SERVICE_STATE == 5 and onGnd == 1 then
 		GSX_AUTO_SERVICE_STATE = 6
@@ -113,7 +129,8 @@ function GSX_AUTO_SYNC_CYCLE()
 		GSX_AUTO_SERVICE_STATE = 7
 		ipc.log("GSX_AUTO: Service State switched from Taxi In to Deboard")
 		if customAcHandling and GSX_CUSTOM_IS_AUTO_DEBOARD() then
-			ipc.log("GSX_AUTO: Call Deboard automatically")
+			ipc.log("GSX_AUTO: Call Connect/Deboard automatically")
+			GSX_AUTO_CONNECT()
 			GSX_AUTO_DEBOARD()
 		end
 	elseif GSX_AUTO_SERVICE_STATE == 7 and deboard_state >=4 and deboard_state < 6 and not GSX_AUTO_JETWAY_CONNECTED then
@@ -133,19 +150,19 @@ function GSX_AUTO_SYNC_CYCLE()
 	ipc.writeLvar("GSX_AUTO_SERVICE_STATE", GSX_AUTO_SERVICE_STATE)
 
 	-- REQUEST HANDLING
-	if ipc.readLvar("GSX_AUTO_CONNECT_REQUESTED") ~= 0 and GSX_AUTO_CONNECTED == 0 then
+	if ipc.readLvar("GSX_AUTO_CONNECT_REQUESTED") == 1 and GSX_AUTO_CONNECTED == 0 then
 		ipc.writeLvar("GSX_AUTO_CONNECT_REQUESTED", 0)
 		ipc.log("GSX_AUTO: Connect Request received")
 		GSX_AUTO_CONNECT()
 	end
 
-	if ipc.readLvar("GSX_AUTO_DISCONNECT_REQUESTED") ~= 0 and GSX_AUTO_CONNECTED == 1 then
+	if ipc.readLvar("GSX_AUTO_DISCONNECT_REQUESTED") == 1 and GSX_AUTO_CONNECTED == 1 then
 		ipc.writeLvar("GSX_AUTO_DISCONNECT_REQUESTED", 0)
 		ipc.log("GSX_AUTO: Disconnect Request received")
 		GSX_AUTO_DISCONNECT()
 	end
 
-	if ipc.readLvar("GSX_AUTO_DEBOARD_REQUESTED") ~= 0 and deboard_state < 6 then
+	if ipc.readLvar("GSX_AUTO_DEBOARD_REQUESTED") == 1 and deboard_state < 6 then
 		ipc.writeLvar("GSX_AUTO_DEBOARD_REQUESTED", 0)
 		ipc.log("GSX_AUTO: Deboard Request received")
 		GSX_AUTO_DEBOARD()
@@ -194,20 +211,6 @@ function GSX_AUTO_UPDATE_OFFSETS(board_state, deboard_state)
 	
 	ipc.writeSTR(GSX_OFFSET_PAX, resultPax, 5)
 	ipc.writeSTR(GSX_OFFSET_CARGO, resultCargo, 6)
-end
-
-function GSX_DISABLE_CREW()
-	ipc.log("GSX_AUTO: Disabling Crew De/Boarding")
-	ipc.writeLvar("FSDT_GSX_CREW_ON_BOARD", 1)
-	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_BOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_CREW_NOT_BOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_PILOTS_NOT_DEBOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_CREW_NOT_DEBOARDING", 1)
-	ipc.writeLvar("FSDT_GSX_NUMCREW", 0)
-	ipc.writeLvar("FSDT_GSX_NUMPILOTS", 0)
 end
 
 ----------------------------------

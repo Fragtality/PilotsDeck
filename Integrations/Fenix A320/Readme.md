@@ -17,12 +17,12 @@ Mix and match as you like :relaxed:<br/>
 
 
 # Installation
-- Tested with Fenix 1.0.4.134 (29.09.22)
-- Update to at least PilotsDeck 0.7.4!
+- Tested with Fenix 1.0.6.146 (07.11.22)
+- Update to at least PilotsDeck 0.7.7!
 - Uses the Fonts *"Digital 7"* and *"Alte Din 1451 Mittelschrift"* - you can find them freely on the Internet
 - Just double-click on the Profiles you want to use to add them to your StreamDeck Software
-- Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located)
-- Add this to the myOffsets.txt File in your FSUIPC7 Folder (for the Cabin Lights)
+- Place the Lua-Files in your FSUIPC7 Folder (the Folder where your FSUIPC7.ini is located respectively the Folder you have installed FSUIPC7 into)
+- Add this to the myOffsets.txt File in your FSUIPC7 Folder for the Cabin Lights (create the File if it does not exist)
 ```
 0x58AB, 4, LIGHT POTENTIOMETER:13, I32, percent
 ```
@@ -39,7 +39,7 @@ Mix and match as you like :relaxed:<br/>
 2=Lua FNX320_SYNC
 ```
 Assuming your FSUIPC Profile is named "FNX320"! Replace that with the correct Name. If already using Auto-Scripts, change the Numbers accordingly (these Scripts don't need to be run first).<br/>
-If you don't have a FSUIPC Profile for the Fenix, start them all "Global" Scripts:
+If you don't have a FSUIPC Profile for the Fenix, start them all as "Global" Scripts:
 ```
 [Auto]
 1=Lua GSX_AUTO

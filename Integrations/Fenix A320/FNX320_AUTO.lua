@@ -604,6 +604,18 @@ function FNX_INIT_AC()
 	if ipc.readLvar("S_OH_EXT_LT_NAV_LOGO") ~= 0 then
 		return
 	end
+	
+	--Reset position at current Gate/Parking
+	if ipc.readLvar("FSDT_GSX_STATE") ~=5 then
+		ipc.keypress(123,11)
+	else
+		ipc.writeLvar("FSDT_GSX_MENU_OPEN", 1)
+	end
+	ipc.sleep(1000)
+	ipc.keypress(48,8)	--0
+	ipc.sleep(500)
+	ipc.keypress(49,8)	--1
+	ipc.sleep(4000)
 
 	--Batteries ON
 	ipc.writeLvar("S_OH_ELEC_BAT1", 1)

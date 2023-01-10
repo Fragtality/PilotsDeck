@@ -10,7 +10,7 @@
     <Version>0.7.7.0</Version>
     <Authors>Fragtality</Authors>
     <Description>Directly control your FlightSim from your StreamDeck via FSUIPC!</Description>
-    <Copyright>Copyright ©  2022</Copyright>
+    <Copyright>Copyright ©  2023</Copyright>
     <PackageIcon>PluginIcon.png</PackageIcon>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
