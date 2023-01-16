@@ -9,9 +9,13 @@ namespace PilotsDeck
     {
         public static readonly string SwitchState = "SwitchState";
         public static readonly string SwitchStateLong = "SwitchStateLong";
-        
+        public static readonly string SwitchStateLeft = "SwitchStateLeft";
+        public static readonly string SwitchStateRight = "SwitchStateRight";
+        public static readonly string SwitchStateTouch = "SwitchStateTouch";
+
         public static readonly string ControlState = "ControlState";
-        
+        public static readonly string MonitorState = "MonitorState";
+
         public static readonly string Top = "ControlState";
         public static readonly string Bot = "ControlStateBot";
         
@@ -67,7 +71,7 @@ namespace PilotsDeck
 
                 if (value != null)
                 {
-                    Log.Logger.Debug($"ValueManager: Updated Variable {id} with new Address {newAddress}. (Old: {managedValues[id].Key}");
+                    Log.Logger.Debug($"ValueManager: Updated Variable {id} with new Address {newAddress}. (Old: {managedValues[id].Key})");
                     managedValues[id] = new ValuePair(newAddress, value);
 
                     return true;
@@ -144,6 +148,14 @@ namespace PilotsDeck
             }
 
             return false;
+        }
+
+        public string GetAddress(string id)
+        {
+            if (managedValues.TryGetValue(id, out ValuePair value))
+                return value.Key;
+            else
+                return "";
         }
 
         protected string GetValue(string id)

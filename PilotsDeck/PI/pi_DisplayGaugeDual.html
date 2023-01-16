@@ -8,66 +8,13 @@
 </head>
 <body>
     <div class="sdpi-wrapper">
-        <div class="sdpi-heading">Control</div>
         <div type="checkbox" class="sdpi-item" id="Config_HasAction">
             <div class="sdpi-item-label" id="lblHasAction">Has Action</div>
             <input class="sdpi-item-value" id="HasAction" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
             <label for="HasAction"><span></span>Make this Button clickable</label>
         </div>
-        <div class="sdpi-item" id="Config_ActionType">
-            <div class="sdpi-item-label" id="lblActionType">Action Type</div>
-            <select id="ActionType" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-        <div class="sdpi-item" id="Config_AddressAction">
-            <div class="sdpi-item-label" id="lblAddressAction">Action Address</div>
-            <input id="AddressAction" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar, Offset or vJoy" />
-        </div>
-        <div type="checkbox" class="sdpi-item" id="Config_UseControlDelay">
-            <div class="sdpi-item-label" id="lblUseControlDelay">Use Delay</div>
-            <input class="sdpi-item-value" id="UseControlDelay" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="UseControlDelay"><span></span>Wait 50ms before next Control</label>
-        </div>
-        <div type="checkbox" class="sdpi-item" id="Config_UseLvarReset">
-            <div class="sdpi-item-label" id="lblUseLvarReset">Reset Value</div>
-            <input class="sdpi-item-value" id="UseLvarReset" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="UseLvarReset"><span></span>Reset Switch to Off Position</label>
-        </div>
-        <div type="checkbox" class="sdpi-item" id="Config_SwitchOnCurrentValue">
-            <div class="sdpi-item-label" id="lblSwitchOnCurrentValue">Use Status Value</div>
-            <input class="sdpi-item-value" id="SwitchOnCurrentValue" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="SwitchOnCurrentValue"><span></span>Switch on Value from Status Address</label>
-        </div>
-        <div class="sdpi-item" id="Config_SwitchOnState">
-            <div class="sdpi-item-label" id="lblSwitchOnState">On Value</div>
-            <input id="SwitchOnState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value when On" />
-        </div>
-        <div class="sdpi-item" id="Config_SwitchOffState">
-            <div class="sdpi-item-label" id="lblSwitchOffState">Off Value</div>
-            <input id="SwitchOffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value when Off" />
-        </div>
 
-        <div class="sdpi-heading" id="hdrSecondControl">Second Control</div>
-        <div type="checkbox" class="sdpi-item" id="Config_HasLongPress">
-            <div class="sdpi-item-label" id="lblHasLongPress">Long Press</div>
-            <input class="sdpi-item-value" id="HasLongPress" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="HasLongPress"><span></span>&gt;&#61; 600ms</label>
-        </div>
-        <div class="sdpi-item" id="Config_ActionTypeLong">
-            <div class="sdpi-item-label" id="lblActionTypeLong">Action Type</div>
-            <select id="ActionTypeLong" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
-        <div class="sdpi-item" id="Config_AddressActionLong">
-            <div class="sdpi-item-label" id="lblAddressActionLong">Action Address</div>
-            <input id="AddressActionLong" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Macro, Lua, Control, LVar, Offset or vJoy" />
-        </div>
-        <div class="sdpi-item" id="Config_SwitchOnStateLong">
-            <div class="sdpi-item-label" id="lblSwitchOnStateLong">On Value</div>
-            <input id="SwitchOnStateLong" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value when On" />
-        </div>
-        <div class="sdpi-item" id="Config_SwitchOffStateLong">
-            <div class="sdpi-item-label" id="lblSwitchOffStateLong">Off Value</div>
-            <input id="SwitchOffStateLong" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value when Off" />
-        </div>
+        <div id="DefaultActions" class="inline"></div>
 
         <div class="sdpi-heading">Read Values</div>
         <div class="sdpi-item" id="Config_Address">
@@ -264,6 +211,7 @@
             <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
     </div>
+    <script src="inc_DefaultActions.html"></script>
     <script src="js/pi_Common.js"></script>
     <script src="js/pi_DisplayGaugeDual.js"></script>
 </body>

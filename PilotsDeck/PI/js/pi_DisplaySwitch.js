@@ -2,7 +2,9 @@
 var settingsModel = {
 	DefaultImage: "Images/Empty.png",
 	ErrorImage: "Images/Error.png",
+	IsEncoder: false,
 	Address: "",
+	AddressMonitor: "",
 	AddressAction: "",
 	AddressActionOff: "",
 	ActionType: 0,
@@ -17,6 +19,18 @@ var settingsModel = {
 	ActionTypeLong: 0,
 	SwitchOnStateLong: "",
 	SwitchOffStateLong: "",
+	AddressActionLeft: "",
+	ActionTypeLeft: 0,
+	SwitchOnStateLeft: "",
+	SwitchOffStateLeft: "",
+	AddressActionRight: "",
+	ActionTypeRight: 0,
+	SwitchOnStateRight: "",
+	SwitchOffStateRight: "",
+	AddressActionTouch: "",
+	ActionTypeTouch: 0,
+	SwitchOnStateTouch: "",
+	SwitchOffStateTouch: "",
 	DecodeBCD: false,
 	Scalar: "1",
 	Format: "",
@@ -52,44 +66,13 @@ function fillSelectBoxes() {
 	if (FontStyles && FontStyles != "") {
 		fillTypeSelectBox(FontStyles, 'FontStyle', settingsModel.FontStyle);
 	}
-	if (ActionTypes && ActionTypes != "") {
-		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
-		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
-	}
 }
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
-	//PATTERN
-	setPattern('Address', 5);
-	setPattern('AddressAction', settingsModel.ActionType);
-	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
-
-	//Alternative Action
-	toggleSwitchToggle(settingsModel);
-
-	//On/Off States & SwitchOnCurrent
-	if ((settingsModel.ActionType == 2 || settingsModel.ActionType == 10) && settingsModel.ToggleSwitch) {
-		toggleOnOffState(3, 'SwitchOnState', 'SwitchOffState', false);
-	}
-	else {
-		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
-	}
-
-	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-	if (settingsModel.HasLongPress && longAllowed)
-		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', settingsModel.SwitchOnCurrentValue);
-	else
-		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
+	//CURRENT VALUE
+	document.getElementById('SwitchOnCurrentValue').checked = false;
 	toggleConfigItem(false, 'SwitchOnCurrentValue');
-
-	toggleControlDelay(settingsModel);
-	toggleLvarReset(settingsModel);
-
-	//LongPress
-	toggleConfigItem(longAllowed, 'HasLongPress');
-	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
-	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 
 	//BOX
 	toggleConfigItem(settingsModel.DrawBox, 'BoxSize');

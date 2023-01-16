@@ -9,12 +9,13 @@ namespace PilotsDeck
         public override IModelSwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplayRadio Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayRadio] Read1: {Settings.AddressRadioActiv} | Read2: {Settings.AddressRadioStandby} | Write: {SwitchSettings.AddressAction}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayRadio] Read1: {Settings.AddressRadioActiv} | Read2: {Settings.AddressRadioStandby} | Write: {SwitchSettings.AddressAction}"; } }
         public override string Address { get { return Settings.AddressRadioActiv; } }
 
         protected int ticksIndication = 0;
         protected static readonly int ticksActive = 16;
-        protected bool wasPushed = false;
+        protected string lastActive = "";
+        protected bool firstLoad = true;
 
         public HandlerDisplayRadio(string context, ModelDisplayRadio settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
@@ -33,32 +34,31 @@ namespace PilotsDeck
             ValueManager.RegisterValue(ID.Standby, Settings.AddressRadioStandby);
         }
 
-        public override void Deregister(ImageManager imgManager)
+        public override void Deregister()
         {
-            base.Deregister(imgManager);
+            base.Deregister();
 
             ValueManager.DeregisterValue(ID.Standby);
         }
 
-        public override void Update(ImageManager imgManager)
+        public override void Update()
         {
-            base.Update(imgManager);
+            base.Update();
 
             ValueManager.UpdateValueAddress(ID.Standby, Settings.AddressRadioStandby);
         }
 
-        public override bool OnButtonUp(IPCManager ipcManager, long tick)
-        {
-            bool result = base.OnButtonUp(ipcManager, tick);
-            if (result)
-                wasPushed = true;
+        //public override bool OnButtonUp(long tick)
+        //{
+        //    bool result = base.OnButtonUp(tick);
+        //    if (result)
+        //        wasPushed = true;
+        //    return result;
+        //}
 
-            return result;
-        }
-
-        protected override void Redraw(ImageManager imgManager)
+        protected override void Redraw()
         {
-            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !ForceUpdate && !wasPushed)
+            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !ForceUpdate && ticksIndication == 0)
                 return;
 
             string valueAct = ValueManager[ID.Active];
@@ -66,7 +66,8 @@ namespace PilotsDeck
                 valueAct = ModelDisplay.ConvertFromBCD(valueAct);
             valueAct = Settings.ScaleValue(valueAct);
             valueAct = Settings.RoundValue(valueAct);
-            valueAct = Settings.FormatValue(valueAct);
+            if (!IsEncoder)
+                valueAct = Settings.FormatValue(valueAct);
 
             string valueStb = ValueManager[ID.Standby];
             if (Settings.DecodeBCD && !Settings.StbyHasDiffFormat || Settings.StbyHasDiffFormat && Settings.DecodeBCDStby)
@@ -76,16 +77,26 @@ namespace PilotsDeck
             valueStb = ModelDisplay.FormatValue(valueStb, Settings.StbyHasDiffFormat ? Settings.FormatStby : Settings.Format);
 
             string background = Settings.DefaultImage;
-            if (wasPushed)
+
+            bool wasPushed = false;
+            if (lastActive != ValueManager[ID.Active] && ticksIndication < ticksActive && !firstLoad)
             {
                 ticksIndication++;
                 if (ticksIndication < ticksActive)
+                {
                     background = Settings.IndicationImage;
+                    wasPushed = true;
+                }
                 else
                 {
-                    wasPushed = false;
                     ticksIndication = 0;
+                    lastActive = ValueManager[ID.Active];
                 }
+            }
+            else if (firstLoad)
+            {
+                lastActive = ValueManager[ID.Active];
+                firstLoad = false;
             }
 
             if (lastText != valueAct + valueStb || ForceUpdate || wasPushed && ticksIndication < ticksActive)
@@ -105,9 +116,13 @@ namespace PilotsDeck
                 else
                     colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
 
-                ImageRenderer render = new(imgManager.GetImageObject(background, DeckType));
+                ImageRenderer render = new(ImgManager.GetImageDefinition(background, DeckType));
+
                 render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
                 render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
+
+                if (IsEncoder)
+                    DrawTitle(render, new PointF(100, 51.0f));
 
                 DrawImage = render.RenderImage64();
                 IsRawImage = true;
@@ -117,6 +132,23 @@ namespace PilotsDeck
                 else
                     lastText = "";
                 render.Dispose();
+            }
+        }
+
+        protected override void RenderImages()
+        {
+            if (IsEncoder)
+            {
+                ImageRenderer render = new(ImgManager.GetImageDefinition(TextSettings.DefaultImage, DeckType));
+                DrawTitle(render, new PointF(100, 51.0f));
+                DefaultImageRender = render.RenderImage64();
+                render.Dispose();
+
+                render = new(ImgManager.GetImageDefinition(TextSettings.ErrorImage, DeckType));
+                DrawTitle(render, new PointF(100, 51.0f));
+                ErrorImageRender = render.RenderImage64();
+                render.Dispose();
+                IsRawImage = true;
             }
         }
 

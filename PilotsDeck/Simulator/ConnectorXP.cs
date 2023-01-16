@@ -368,12 +368,12 @@ namespace PilotsDeck
             }
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null)
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null, int ticks = 1)
         {
             switch (actionType)
             {
                 case ActionSwitchType.XPCMD:
-                    return RunCommands(Address);
+                    return RunCommands(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.XPWREF:
                     return XPDatagram.SetDataRef(senderSocket, Address, newValue);
                 default:
@@ -382,7 +382,7 @@ namespace PilotsDeck
             }
         }
 
-        protected bool RunCommands(string Address)
+        protected bool RunCommands(string Address, bool useDelay)
         {
             bool result = false;
             string[] commands = Address.Split(':');
@@ -392,7 +392,8 @@ namespace PilotsDeck
                 foreach (string command in commands)
                 {
                     result = XPDatagram.SendCommand(senderSocket, command);
-                    Thread.Sleep(AppSettings.controlDelay);
+                    if (useDelay)
+                        Thread.Sleep(AppSettings.controlDelay);
                 }
             }
             else if (commands.Length == 1)
@@ -458,7 +459,6 @@ namespace PilotsDeck
         public override void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected void ParseResponse(byte[] buffer)

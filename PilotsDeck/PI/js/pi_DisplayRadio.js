@@ -2,9 +2,11 @@
 var settingsModel = {
 	DefaultImage: "Images/Arrow.png",
 	ErrorImage: "Images/Error.png",
+	IsEncoder: false,
 	AddressRadioActiv: "",
 	AddressRadioStandby: "",
 	AddressAction: "",
+	AddressMonitor: "",
 	AddressActionOff: "",
 	ActionType: 0,
 	SwitchOnState: "",
@@ -18,6 +20,18 @@ var settingsModel = {
 	ActionTypeLong: 0,
 	SwitchOnStateLong: "",
 	SwitchOffStateLong: "",
+	AddressActionLeft: "",
+	ActionTypeLeft: 0,
+	SwitchOnStateLeft: "",
+	SwitchOffStateLeft: "",
+	AddressActionRight: "",
+	ActionTypeRight: 0,
+	SwitchOnStateRight: "",
+	SwitchOffStateRight: "",
+	AddressActionTouch: "",
+	ActionTypeTouch: 0,
+	SwitchOnStateTouch: "",
+	SwitchOffStateTouch: "",
 	DecodeBCD: false,
 	Scalar: "1",
 	Format: "",
@@ -45,10 +59,6 @@ function fillSelectBoxes() {
 	if (FontNames && FontNames != "") {
 		fillFontSelectBox(FontNames, 'FontName', settingsModel.FontName);
 	}
-	if (ActionTypes && ActionTypes != "") {
-		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
-		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
-	}
 }
 
 // Show/Hide elements on Form (required function)
@@ -56,24 +66,10 @@ function updateForm() {
 	//PATTERN
 	setPattern('AddressRadioActiv', 5);
 	setPattern('AddressRadioStandby', 5);
-	setPattern('AddressAction', settingsModel.ActionType);
-	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
-	//On/Off States
-	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', false);
-	if (settingsModel.HasLongPress && longAllowed)
-		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
-	else
-		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
-
-	toggleControlDelay(settingsModel);
-	toggleLvarReset(settingsModel);
-
-	//LongPress
-	toggleConfigItem(longAllowed, 'HasLongPress');
-	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
-	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
+	//CURRENT VALUE
+	document.getElementById('SwitchOnCurrentValue').checked = false;
+	toggleConfigItem(false, 'SwitchOnCurrentValue');
 
 	//FONT
 	toggleConfigItem(!settingsModel.FontInherit, 'FontName');

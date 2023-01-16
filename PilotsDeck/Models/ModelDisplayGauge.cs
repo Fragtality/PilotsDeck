@@ -17,6 +17,7 @@ namespace PilotsDeck
         //Action
         public virtual bool HasAction { get; set; } = false;
         public virtual string AddressAction { get; set; } = "";
+        public virtual string AddressMonitor { get; set; } = "";
         public virtual string AddressActionOff { get; set; } = "";
         public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
         public virtual bool ToggleSwitch { get; set; } = false;
@@ -32,6 +33,23 @@ namespace PilotsDeck
 
         public virtual string SwitchOnStateLong { get; set; } = "";
         public virtual string SwitchOffStateLong { get; set; } = "";
+
+        //Rotate Controls
+        public virtual string AddressActionLeft { get; set; } = "";
+        public virtual int ActionTypeLeft { get; set; } = (int)ActionSwitchType.MACRO;
+        public virtual string SwitchOnStateLeft { get; set; } = "";
+        public virtual string SwitchOffStateLeft { get; set; } = "";
+
+        public virtual string AddressActionRight { get; set; } = "";
+        public virtual int ActionTypeRight { get; set; } = (int)ActionSwitchType.MACRO;
+        public virtual string SwitchOnStateRight { get; set; } = "";
+        public virtual string SwitchOffStateRight { get; set; } = "";
+
+        //Touch Control
+        public virtual string AddressActionTouch { get; set; } = "";
+        public virtual int ActionTypeTouch { get; set; } = (int)ActionSwitchType.MACRO;
+        public virtual string SwitchOnStateTouch { get; set; } = "";
+        public virtual string SwitchOffStateTouch { get; set; } = "";
 
         //Gauge
         public virtual string MinimumValue { get; set; } = "0";

@@ -6,7 +6,7 @@
         public override IModelSwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplaySwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplaySwitch] Read: {TextSettings.Address} | Write: {SwitchSettings.AddressAction}| LongWrite: {SwitchSettings.HasLongPress} - {SwitchSettings.AddressActionLong}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplaySwitch] Read: {TextSettings.Address} | Write: {SwitchSettings.AddressAction}| LongWrite: {SwitchSettings.HasLongPress} - {SwitchSettings.AddressActionLong}"; } }
 
         public override bool HasAction { get; protected set; } = true;
 
@@ -33,12 +33,22 @@
             return HandlerSwitch.RunButtonDown(SwitchSettings);
         }
 
-        public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        public override bool OnButtonUp(long tick)
         {
-            bool result = HandlerSwitch.RunButtonUp(ipcManager, tick - TickDown, ValueManager, SwitchSettings);
+            bool result = HandlerSwitch.RunButtonUp(IPCManager, tick - TickDown, ValueManager, SwitchSettings);
             TickDown = 0;
 
             return result;
+        }
+
+        public override bool OnDialRotate(int ticks)
+        {
+            return HandlerSwitch.RunDialRotate(IPCManager, ticks, ValueManager, SwitchSettings);
+        }
+
+        public override bool OnTouchTap()
+        {
+            return HandlerSwitch.RunTouchTap(IPCManager, ValueManager, SwitchSettings);
         }
     }
 }

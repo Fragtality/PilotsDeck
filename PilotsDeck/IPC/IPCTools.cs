@@ -1,6 +1,7 @@
 ﻿using FSUIPC;
 using Serilog;
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using WASM = FSUIPC.MSFSVariableServices;
@@ -154,10 +155,7 @@ namespace PilotsDeck
             catch (Exception ex)
             {
                 Log.Logger.Error($"IPCTools: Exception while writing Offset <{address}> (size:{offset?.Size}/float:{offset?.IsFloat}/string:{offset?.IsString}/signed:{offset?.IsSigned}) to FSUIPC! {ex.Message} - {ex.StackTrace}");
-                if (offset != null)
-                {
-                    offset.Dispose();
-                }
+                offset?.Dispose();
             }
 
             return result;
@@ -239,7 +237,6 @@ namespace PilotsDeck
                     {
                         WASM.LVars[address].SetValue(value);
                         result = true;
-                        //Log.Logger.Debug($"IPCTools: LVar <{name}> updated via WASM");
                     }
                     else
                         Log.Logger.Error($"IPCTools: LVar <{address}> does not exist");
@@ -428,14 +425,20 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool RunCalculatorCode(string code)
+        public static bool RunCalculatorCode(string code, int ticks = 1)
         {
             bool result = false;
 
+            if (code[0] == '$')
+                code = BuildCalculatorCode(code[1..], ticks);
+
             try
             {
-                WASM.ExecuteCalculatorCode(code);
-                result = true;
+                if (!string.IsNullOrEmpty(code))
+                {
+                    WASM.ExecuteCalculatorCode(code);
+                    result = true;
+                }
             }
             catch
             {
@@ -443,6 +446,40 @@ namespace PilotsDeck
             }
 
             return result;
+        }
+
+        public static string BuildCalculatorCode(string template, int ticks)
+        {
+            string code = "";
+            string[] parts = template.Split(':');
+
+            if (parts[1][0] != '+' && parts[1][0] != '-')
+                parts[1] = parts[1].Insert(0, "+");
+
+            if (parts.Length >= 2 && rxLvar.IsMatch(parts[0]) && (parts[1][0] == '+' || parts[1][0] == '-') && double.TryParse(parts[1][1..], NumberStyles.Number, new RealInvariantFormat(parts[1][1..]), out double numStep))
+            {
+                string lvar = parts[0];
+                if (!lvar.StartsWith("L:"))
+                    lvar = "L:" + lvar;
+                string op = parts[1][0..1];
+                string step = string.Format(AppSettings.numberFormat, "{0:G}", numStep * (double)ticks);
+                if (step.Contains(','))
+                    step = step.Replace(',','.');
+
+                code = $"({lvar}) {step} {op} ({lvar}) {step} {op} (>{lvar})";
+
+                if (parts.Length == 3 && (parts[2][0..2] != "<=" || parts[2][0..2] != ">=") && double.TryParse(parts[2][2..], NumberStyles.Number, new RealInvariantFormat(parts[2][2..]), out _))
+                {
+                    string limit = parts[2][2..];
+                    if (limit.Contains(','))
+                        limit = limit.Replace(',', '.');
+                    code = $"({lvar}) {limit} {parts[2][0..2]} if{{ {code} }}";
+                }
+            }
+
+            Log.Logger.Debug($"ConnectorMSFS: Resulting Calculator Code: {code}");
+            
+            return code;
         }
 
         public static bool PeekNextDelim(string address, string delim)

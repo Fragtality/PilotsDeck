@@ -32,6 +32,11 @@ namespace PilotsDeck
         public abstract bool IsChanged { get; }
 
         public abstract dynamic RawValue();
-        protected abstract string Read();        
+        protected abstract string Read();
+
+        public virtual void SetValue(string value)
+        {
+
+        }
     }
 }

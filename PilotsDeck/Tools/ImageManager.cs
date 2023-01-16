@@ -51,35 +51,88 @@ namespace PilotsDeck
             return Image.FromStream(stream);
         }
 
+        protected static string GetHqImage(string image, string hqSuffix = null)
+        {
+            string result;
+
+            if (hqSuffix == null)
+                hqSuffix = AppSettings.hqImageSuffix;
+
+            if (!image.Contains(hqSuffix))
+            {
+                int idx = image.IndexOf(".png");
+                result = image.Insert(idx, hqSuffix);
+                if (!File.Exists(result))
+                {
+                    if (File.Exists(image))
+                        result = image;
+                    else
+                        result = AppSettings.waitImage;
+                }
+            }
+            else
+                result = image;
+
+            return result;
+        }
+
         public static string GetImageFileReal(string image, StreamDeckType deckType)
         {
             string imageReal = image;
 
-            switch (deckType)
+            if (deckType.IsEncoder)
             {
-                case StreamDeckType.StreamDeckXL:
-                    if (!image.Contains(AppSettings.hqImageSuffix))
-                    {
-                        int idx = image.IndexOf(".png");
-                        imageReal = image.Insert(idx, AppSettings.hqImageSuffix);
+                imageReal = GetHqImage(image, AppSettings.plusImageSuffix);
+                if (!imageReal.Contains(AppSettings.plusImageSuffix) && !imageReal.Contains(AppSettings.hqImageSuffix))
+                    imageReal = GetHqImage(image, AppSettings.hqImageSuffix);
+            }
+            else
+            {
+                switch (deckType.Type)
+                {
+                    case StreamDeckTypeEnum.StreamDeckXL:
+                        imageReal = GetHqImage(image);
+                        break;
+                    case StreamDeckTypeEnum.StreamDeckPlus:
+                        imageReal = GetHqImage(image);
+                        break;
+                    default:
+                        if (image.Contains(AppSettings.hqImageSuffix))
+                            imageReal = image.Replace(AppSettings.hqImageSuffix, "");
                         if (!File.Exists(imageReal))
-                        {
-                            if (File.Exists(image))
-                                imageReal = image;
-                            else
-                                imageReal = AppSettings.waitImage;
-                        }
-                    }
-                    break;
-                default:
-                    if (image.Contains(AppSettings.hqImageSuffix))
-                        imageReal = image.Replace(AppSettings.hqImageSuffix, "");
-                    if (!File.Exists(imageReal))
-                        imageReal = AppSettings.waitImage;
-                    break;
+                            imageReal = AppSettings.waitImage;
+                        break;
+                }
             }
 
             return imageReal;
+        }
+
+        public PointF GetCanvasSize()
+        {
+            PointF canvasSize;
+
+            if (DeckType.Type == StreamDeckTypeEnum.StreamDeckXL)
+                canvasSize = new(144, 144);
+            else if (DeckType.Type == StreamDeckTypeEnum.StreamDeckPlus)
+            {
+                if (DeckType.IsEncoder)
+                    canvasSize = new(200, 100);
+                else
+                    canvasSize = new(144, 144);
+            }
+            else
+                canvasSize = new(72, 72);
+
+            return canvasSize;
+        }
+
+        public static PointF GetImageSize(Image image)
+        {
+            GraphicsUnit units = GraphicsUnit.Pixel;
+            RectangleF size = image.GetBounds(ref units);
+
+            return new PointF(size.Width, size.Height);
         }
 
         public override string ToString()
@@ -106,7 +159,7 @@ namespace PilotsDeck
         }
     }
 
-    public sealed class ImageManager : IDisposable
+    public class ImageManager : IDisposable
     {
         private Dictionary<string, ImageDefinition> cachedImages = new(); //realname -> obj
 
@@ -163,21 +216,30 @@ namespace PilotsDeck
                     return;
                 }
 
-                cachedImages[image.FileNameReal].Registrations--;
-
-                if (cachedImages[image.FileNameReal].Registrations == 0)
+                if (cachedImages[image.FileNameReal].Registrations > 0)
                 {
-                    cachedImages.Remove(image.FileNameReal);
-                    Log.Logger.Debug($"ImageManager: Image removed from Cache. {image}");
-                }
-                else
-                {
+                    cachedImages[image.FileNameReal].Registrations--;
                     Log.Logger.Debug($"ImageManager: Registration removed from Image. {image} - Registrations {cachedImages[image.FileNameReal].Registrations}");
                 }
             }
             catch
             {
                 Log.Logger.Error($"ImageManager: Exception during RemoveImage! {image}");
+            }
+        }
+
+        public void RemoveUnusedImages()
+        {
+            var unusedImages = cachedImages.Where(v => v.Value.Registrations <= 0);
+
+            string fileReal;
+            foreach (var image in unusedImages)
+            {
+                fileReal = image.Value.FileNameReal;
+                cachedImages[fileReal] = null;
+                cachedImages.Remove(fileReal);
+
+                Log.Logger.Debug($"RemoveUnusedImages: Removed Image {fileReal} from Cache");
             }
         }
 
@@ -230,20 +292,41 @@ namespace PilotsDeck
             }
         }
 
-        public Image GetImageObject(string image, StreamDeckType deckType)
+        public static string LoadImageBase64(string image)
         {
             try
             {
-                var imageDef = new ImageDefinition(image, deckType, false);
-                if (cachedImages.TryGetValue(imageDef.FileNameReal, out ImageDefinition value))
+                if (File.Exists(image))
                 {
-                    return value.GetImageObject();
+                    return Convert.ToBase64String(File.ReadAllBytes(image), Base64FormattingOptions.None);
                 }
                 else
                 {
-                    Log.Logger.Error($"ImageManager: Could not find Image for ImageObject. {imageDef}");
+                    Log.Logger.Error($"ImageManager: Could not find Image File for LoadImageBase64: {image}");
+                    return "";
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"ImageManager: Exception during LoadImageBase64! {image}");
+                return "";
+            }
+        }
+
+        public ImageDefinition GetImageDefinition(string image, StreamDeckType deckType, bool load = false)
+        {
+            try
+            {
+                var imageDef = new ImageDefinition(image, deckType, load);
+                if (cachedImages.TryGetValue(imageDef.FileNameReal, out ImageDefinition value))
+                {
+                    return value;
+                }
+                else
+                {
+                    Log.Logger.Error($"ImageManager: Could not find Image for ImageDefinition. {imageDef}");
                     AddImage(imageDef);
-                    return cachedImages[imageDef.FileNameReal].GetImageObject();
+                    return imageDef;
                 }
             }
             catch
@@ -256,6 +339,7 @@ namespace PilotsDeck
         public void Dispose()
         {
             InvalidateCaches();
+            GC.SuppressFinalize(this);
         }
 
         public void InvalidateCaches()

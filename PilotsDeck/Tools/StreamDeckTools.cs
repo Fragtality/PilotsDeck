@@ -16,12 +16,13 @@ namespace PilotsDeck
             public string KorryFiles { get; set; } = "";
             public string ActionTypes { get; set; } = "";
             public string GaugeOrientations { get; set; } = "";
+            public bool IsEncoder { get; set; } = false;
 
-            public ModelPropertyInspector(bool sendKorrys)
+            public ModelPropertyInspector(bool isEncoder, bool sendKorrys)
             {
-                ImageFiles = String.Join("|", ReadImageDirectory().Where(f => !f.Contains(AppSettings.hqImageSuffix)));
+                ImageFiles = String.Join("|", ReadImageDirectory().Where(f => !f.Contains(AppSettings.hqImageSuffix) && !f.Contains(AppSettings.plusImageSuffix)));
                 if (sendKorrys)
-                    KorryFiles = String.Join("|", ReadImageDirectory(@"korry\").Where(f => !f.Contains(AppSettings.hqImageSuffix)));
+                    KorryFiles = String.Join("|", ReadImageDirectory(@"korry\").Where(f => !f.Contains(AppSettings.hqImageSuffix) && !f.Contains(AppSettings.plusImageSuffix)));
 
                 Array values = Enum.GetValues(typeof(ActionSwitchType));
                 for (int i = 0; i < values.Length; i++)
@@ -38,6 +39,8 @@ namespace PilotsDeck
                     if (i + 1 < values.Length)
                         GaugeOrientations += "|";
                 }
+
+                IsEncoder = isEncoder;
             }
         }
 
@@ -46,7 +49,7 @@ namespace PilotsDeck
             public string FontNames { get; set; } = "";
             public string FontStyles { get; set; } = "";
 
-            public ModelPropertyInspectorFonts(bool sendKorrys = false) : base(sendKorrys)
+            public ModelPropertyInspectorFonts(bool isEncoder, bool sendKorrys = false) : base(isEncoder, sendKorrys)
             {
                 try
                 {
@@ -101,6 +104,23 @@ namespace PilotsDeck
             public int FontSize { get; set; }
             public int FontStyle { get; set; }
             public string FontColor { get; set; }
+
+            public Font GetFont(int size = -1)
+            {
+                if (size == -1)
+                    size = FontSize;
+                return new Font(FontName, size, (FontStyle)FontStyle);
+            }
+
+            public Color GetColor()
+            {
+                return ColorTranslator.FromHtml(FontColor);
+            }
+        }
+
+        public static string TitleLog(string title)
+        {
+            return title.Replace("\t","").Replace("\r","").Replace("\n", "");
         }
 
         public static StreamDeckTitleParameters ConvertTitleParameter(StreamDeckEventPayload.TitleParameters titleParameters)

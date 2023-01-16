@@ -2,6 +2,7 @@
 var settingsModel = {
 	EnableSwitching: false,
 	ProfilesInstalled: false,
+	IsEncoder: false,
 	MappingsJson: ""
 };
 installationRequested = false;

@@ -9,7 +9,7 @@ namespace PilotsDeck
         public new ModelDisplayGauge Settings { get; protected set; }
 
         public override string Address { get { return GaugeSettings.Address; } }
-        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayGauge] Read: {Address}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayGauge] Read: {Address}"; } }
         public override bool UseFont { get { return true; } }
 
         protected bool IsArc = false;
@@ -31,11 +31,37 @@ namespace PilotsDeck
                 return false;
         }
 
-        public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        public override bool OnButtonUp(long tick)
         {
             if (GaugeSettings.HasAction)
             {
-                bool result = HandlerSwitch.RunButtonUp(ipcManager, tick - TickDown, ValueManager, SwitchSettings);
+                bool result = HandlerSwitch.RunButtonUp(IPCManager, tick - TickDown, ValueManager, SwitchSettings);
+                TickDown = 0;
+
+                return result;
+            }
+            else
+                return false;
+        }
+
+        public override bool OnDialRotate(int ticks)
+        {
+            if (GaugeSettings.HasAction)
+            {
+                bool result = HandlerSwitch.RunDialRotate(IPCManager, ticks, ValueManager, SwitchSettings);
+                TickDown = 0;
+
+                return result;
+            }
+            else
+                return false;
+        }
+
+        public override bool OnTouchTap()
+        {
+            if (GaugeSettings.HasAction)
+            {
+                bool result = HandlerSwitch.RunTouchTap(IPCManager, ValueManager, SwitchSettings);
                 TickDown = 0;
 
                 return result;
@@ -52,26 +78,26 @@ namespace PilotsDeck
             if (GaugeSettings.UseColorSwitching)
                 ValueManager.RegisterValue("AddressColorOff", GaugeSettings.AddressColorOff);
             
-            RenderDefaultImage(imgManager);
+            RenderDefaultImage();
         }
 
-        public override void Deregister(ImageManager imgManager)
+        public override void Deregister()
         {
             if (GaugeSettings.UseColorSwitching)
                 ValueManager.DeregisterValue("AddressColorOff");
 
-            base.Deregister(imgManager);
+            base.Deregister();
         }
 
-        public override void Update(ImageManager imgManager)
+        public override void Update()
         {
             HasAction = GaugeSettings.HasAction;
-            base.Update(imgManager);
+            base.Update();
             
             if (GaugeSettings.UseColorSwitching)
                 ValueManager.UpdateValueAddress("AddressColorOff", GaugeSettings.AddressColorOff);
 
-            RenderDefaultImage(imgManager);
+            RenderDefaultImage();
             NeedRedraw = true;
 
             if (IsArc != GaugeSettings.DrawArc)
@@ -82,9 +108,14 @@ namespace PilotsDeck
             }
         }
 
-        protected virtual void RenderDefaultImage(ImageManager imgManager)
+        protected override void RenderImages()
         {
-            ImageRenderer render = new (imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
+            RenderDefaultImage();
+        }
+
+        protected virtual void RenderDefaultImage()
+        {
+            ImageRenderer render = new (ImgManager.GetImageDefinition(GaugeSettings.DefaultImage, DeckType));
 
             if (GaugeSettings.DrawArc)
             {
@@ -95,9 +126,19 @@ namespace PilotsDeck
                 render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
                 render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), GaugeSettings.GetBar());
             }
-            
+
+            if (IsEncoder)
+                DrawTitle(render);
+
             DefaultImageRender = render.RenderImage64();
             render.Dispose();
+
+            render = new(ImgManager.GetImageDefinition(TextSettings.ErrorImage, DeckType));
+            if (IsEncoder)
+                DrawTitle(render);
+            ErrorImageRender = render.RenderImage64();
+            render.Dispose();
+            IsRawImage = true;
         }
 
         public override void SetDefault()
@@ -110,20 +151,20 @@ namespace PilotsDeck
             }
         }
 
-        protected override void Redraw(ImageManager imgManager)
+        protected override void Redraw()
         {
             if (!ValueManager.IsChanged(ID.ControlState) && !ValueManager.IsChanged("AddressColorOff") && !ForceUpdate)
                 return;
 
             //Stopwatch sw = new Stopwatch();
             //sw.Start();
-            
+
             string value = ValueManager[ID.ControlState];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            ImageRenderer render = new (imgManager.GetImageObject(GaugeSettings.DefaultImage, DeckType));
+            ImageRenderer render = new (ImgManager.GetImageDefinition(GaugeSettings.DefaultImage, DeckType));
 
             if (GaugeSettings.DrawArc)
             {
@@ -135,6 +176,9 @@ namespace PilotsDeck
                 DrawBar(value, render);
                 DrawText(value, render);
             }
+
+            if (IsEncoder)
+                DrawTitle(render);
 
             DrawImage = render.RenderImage64();
             render.Dispose();

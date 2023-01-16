@@ -3,6 +3,7 @@ var settingsModel = {
 	DefaultImage: "Images/Empty.png",
 	ErrorImage: "Images/Error.png",
 	Address: "",
+	IsEncoder: false,
 	DecodeBCD: false,
 	Scalar: "1",
 	Format: "",

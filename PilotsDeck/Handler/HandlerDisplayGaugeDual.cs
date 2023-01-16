@@ -7,7 +7,7 @@ namespace PilotsDeck
         public override ModelDisplayGauge GaugeSettings { get { return Settings; } }
         public new ModelDisplayGaugeDual Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayGaugeDual] Read1: {Address} | Read2: {Settings.Address2}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayGaugeDual] Read1: {Address} | Read2: {Settings.Address2}"; } }
 
         public HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
@@ -26,16 +26,16 @@ namespace PilotsDeck
             ValueManager.RegisterValue(ID.Second, Settings.Address2);
         }
 
-        public override void Deregister(ImageManager imgManager)
+        public override void Deregister()
         {
-            base.Deregister(imgManager);
+            base.Deregister();
 
             ValueManager.DeregisterValue(ID.Second);
         }
 
-        public override void Update(ImageManager imgManager)
+        public override void Update()
         {
-            base.Update(imgManager);
+            base.Update();
 
             ValueManager.UpdateValueAddress(ID.Second, Settings.Address2);
         }

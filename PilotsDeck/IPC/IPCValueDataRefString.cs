@@ -1,4 +1,6 @@
-﻿namespace PilotsDeck
+﻿using System;
+
+namespace PilotsDeck
 {
     public class IPCValueDataRefString : IPCValue
     {
@@ -62,6 +64,7 @@
         {
             base.Dispose();
             charArray = null;
+            GC.SuppressFinalize(this);
         }
 
         public static bool IsStringDataRef(string address)

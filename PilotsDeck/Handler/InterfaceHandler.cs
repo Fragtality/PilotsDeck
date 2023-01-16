@@ -5,7 +5,7 @@
         string ActionID { get; }
         string Context { get; }
         StreamDeckType DeckType { get; }
-        
+
         string Address { get; }
 
         string DrawImage { get; }
@@ -24,17 +24,20 @@
         long TickDown { get; }
 
         bool OnButtonDown(long tick);
-        bool OnButtonUp(IPCManager ipcManager, long tick);
+        bool OnButtonUp(long tick);
+        bool OnDialRotate(int ticks);
+        bool OnTouchTap();
 
         void Register(ImageManager imgManager, IPCManager ipcManager);
-        void Deregister(ImageManager imgManager);
+        void Deregister();
 
         void SetError();
         void SetDefault();
         void SetWait();
         void ResetDrawState();
-        void Refresh(ImageManager imgManager);
-        void Update(ImageManager imgManager);
+        void Refresh();
+        void RefreshTitle();
+        void Update();
         void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
     }
 }

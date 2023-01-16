@@ -6,7 +6,7 @@ namespace PilotsDeck
     public class ModelDisplay : ModelBase
     {
         public virtual string Address { get; set; } = "";
-
+        public virtual bool DrawBox { get; set; } = true;
         public virtual bool DecodeBCD { get; set; } = false;
         public virtual string Scalar { get; set; } = "1";
         public virtual string Format { get; set; } = "";
@@ -41,11 +41,17 @@ namespace PilotsDeck
 
         public virtual string FormatValue(string value)
         {
-            return FormatValue(value, Format);
+            if (!string.IsNullOrEmpty(value))
+                return FormatValue(value, Format);
+            else
+                return value;
         }
 
         public static string FormatValue(string value, string format)
         {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
             string[] parts = format.Split(':');
             string replaceFrom = AppSettings.stringReplace;
 

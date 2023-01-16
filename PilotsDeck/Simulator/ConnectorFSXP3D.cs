@@ -120,7 +120,18 @@ namespace PilotsDeck
             Log.Logger.Debug("ConnectorFSXP3D: Subscribed all IPCValues");
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null)
+        protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
+        {
+            bool result = IPCTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+            if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
+            {
+                ipcManager[Address].SetValue(newValue);
+            }
+
+            return result;
+        }
+
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null, int ticks = 1)
         {
             switch (actionType)
             {
@@ -129,7 +140,7 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return IPCTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
-                    return IPCTools.WriteLvar(Address, newValue, switchSettings.UseLvarReset, offValue, false);
+                    return UpdateLvar(Address, newValue, switchSettings.UseLvarReset, offValue, false);
                 case ActionSwitchType.CONTROL:
                     return IPCTools.SendControls(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.OFFSET:

@@ -1,0 +1,11 @@
+﻿{
+  "id": "com.extension.pilotsdeck.layout",
+  "items": [
+    {
+      "key": "canvas",
+      "type": "pixmap",
+      "rect": [ 0, 0, 200, 100 ],
+      "value": "Images/Wait@3x"
+    }
+  ]
+}

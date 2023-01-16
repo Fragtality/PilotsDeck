@@ -198,7 +198,18 @@ namespace PilotsDeck
             Log.Logger.Debug("ConnectorMSFS: Subscribed all IPCValues");
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null)
+        protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
+        {
+            bool result = IPCTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+            if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
+            {
+                ipcManager[Address].SetValue(newValue);
+            }
+
+            return result;
+        }
+
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null, int ticks = 1)
         {
             switch (actionType)
             {
@@ -207,7 +218,7 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return IPCTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
-                    return IPCTools.WriteLvar(Address, newValue, switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
+                    return UpdateLvar(Address, newValue, switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
                 case ActionSwitchType.HVAR:
                     return IPCTools.WriteHvar(Address);
                 case ActionSwitchType.CONTROL:
@@ -215,7 +226,7 @@ namespace PilotsDeck
                 case ActionSwitchType.OFFSET:
                     return IPCTools.WriteOffset(Address, newValue);
                 case ActionSwitchType.CALCULATOR:
-                    return IPCTools.RunCalculatorCode(Address);
+                    return IPCTools.RunCalculatorCode(Address, ticks);
                 default:
                     Log.Logger.Error($"ConnectorMSFS: Action-Type {actionType} not valid for Address {Address}");
                     return false;

@@ -1,5 +1,12 @@
 ﻿// global websocket, used to communicate from/to Stream Deck software
-// as well as some info about our plugin, as sent by Stream Deck software 
+// as well as some info about our plugin, as sent by Stream Deck software
+
+if (document.getElementById("DefaultActions") && defaultHtml)
+	document.getElementById("DefaultActions").innerHTML = defaultHtml;
+if (document.getElementById("EncoderActions") && encoderHtml)
+	document.getElementById("EncoderActions").innerHTML = encoderHtml;
+
+
 var websocket = null,
 	uuid = null,
 	inInfo = null,
@@ -13,6 +20,9 @@ var websocket = null,
 	displayInfo = {};
 
 function fillImageSelectBox(values, elementID, configured) {
+	if (!document.getElementById(elementID))
+		return;
+
 	values = values.split('|');
 	for (i = 0; i < values.length; i++) {
 		var option = document.createElement("option");
@@ -26,6 +36,9 @@ function fillImageSelectBox(values, elementID, configured) {
 }
 
 function fillFontSelectBox(values, elementID, configured) {
+	if (!document.getElementById(elementID))
+		return;
+
 	values = values.split('|');
 	for (i = 0; i < values.length; i++) {
 		var option = document.createElement("option");
@@ -38,6 +51,9 @@ function fillFontSelectBox(values, elementID, configured) {
 }
 
 function fillTypeSelectBox(values, elementID, configured) {
+	if (!document.getElementById(elementID))
+		return;
+
 	if (values || values != "") {
 		values = values.split('|');
 		for (i = 0; i < values.length; i++) {
@@ -48,6 +64,18 @@ function fillTypeSelectBox(values, elementID, configured) {
 			if (type[0] == configured)
 				option.selected = true;
 			document.getElementById(elementID).add(option);
+		}
+	}
+}
+
+function fillActionSelectBoxes() {
+	if (ActionTypes && ActionTypes != "") {
+		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
+		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
+		if (settingsModel.IsEncoder) {
+			fillTypeSelectBox(ActionTypes, 'ActionTypeLeft', settingsModel.ActionTypeLeft);
+			fillTypeSelectBox(ActionTypes, 'ActionTypeRight', settingsModel.ActionTypeRight);
+			fillTypeSelectBox(ActionTypes, 'ActionTypeTouch', settingsModel.ActionTypeTouch);
 		}
 	}
 }
@@ -73,6 +101,9 @@ function toggleConfigItem(value, name) {
 	var block = "Config_" + name;
 	var label = "lbl" + name;
 
+	if (!document.getElementById(name))
+		return;
+
 	if (value) {
 		document.getElementById(block).style.display = displayInfo[block];
 		document.getElementById(label).style.display = displayInfo[label];
@@ -90,6 +121,9 @@ function toggleConfigItem(value, name) {
 }
 
 function setFormItem(value, name) {
+	if (!document.getElementById(name))
+		return;
+
 	if (value) {
 		document.getElementById(name).style.display = displayInfo[name];
 	}
@@ -101,6 +135,9 @@ function setFormItem(value, name) {
 }
 
 function setPattern(field, type) {
+	if (!document.getElementById(field))
+		return;
+
 	var regName = "[a-zA-Z0-9\x2D\x5F]+";
 	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
 	var strHvar = `((H:){0,1}${regName}){1}`;
@@ -140,13 +177,36 @@ function isLongPressAllowed(actionType, address) {
 	return (actionType != 6 || (actionType == 6 && address.includes(":t"))) && (actionType != 7 || (actionType == 7 && address.includes(":t")));
 }
 
+function isActionTypeSelected(actionType, settingsModel) {
+	if (settingsModel.ActionType == actionType)
+		return true;
+	else if (settingsModel.HasLongPress && settingsModel.ActionTypeLong == actionType)
+		return true;
+	else if (settingsModel.IsEncoder) {
+		if (settingsModel.ActionTypeLeft == actionType)
+			return true;
+		else if (settingsModel.ActionTypeRight == actionType)
+			return true;
+		else if (settingsModel.ActionTypeTouch == actionType)
+			return true;
+	}
+	else
+		return false;
+}
+
 function toggleControlDelay(settingsModel) {
 	var delayField = "UseControlDelay";
 
-	if (settingsModel.ActionType == 2 || (settingsModel.HasLongPress && settingsModel.ActionTypeLong == 2))
+	if (isActionTypeSelected(2, settingsModel))
 		toggleConfigItem(true, delayField);
-	else
+	else if (isActionTypeSelected(10, settingsModel)) {
+		toggleConfigItem(true, delayField);
+		document.getElementById(delayField).checked = true;
+	}
+	else {
 		toggleConfigItem(false, delayField);
+		document.getElementById(delayField).checked = false;
+	}
 }
 
 function toggleLvarReset(settingsModel) {
@@ -154,19 +214,23 @@ function toggleLvarReset(settingsModel) {
 
 	if (settingsModel.ActionType == 3 || (settingsModel.HasLongPress && settingsModel.ActionTypeLong == 3))
 		toggleConfigItem(true, resetField);
-	else
+	else {
+		document.getElementById(resetField).checked = false;
 		toggleConfigItem(false, resetField);
+	}
 }
 
 function toggleSwitchToggle(settingsModel) {
 	var toggleField = "ToggleSwitch";
 	var currentValueField = "SwitchOnCurrentValue";
+	var monitorField = "AddressMonitor";
 	var actionType = settingsModel.ActionType;
 
 	if (actionType != 2 && actionType != 10) {
 		settingsModel.ToggleSwitch = false;
 		document.getElementById(toggleField).checked = false;
 		toggleConfigItem(false, toggleField);
+		toggleConfigItem(false, monitorField);
 		settingsModel.AddressActionOff = "";
 		document.getElementById("AddressActionOff").value = "";
 		if (actionType == 3 || actionType == 4 || actionType == 5)
@@ -175,15 +239,18 @@ function toggleSwitchToggle(settingsModel) {
 	else if (actionType == 2 || actionType == 10) {
 		toggleConfigItem(true, toggleField);
 		toggleConfigItem(false, currentValueField);
-		setPattern('AddressActionOff', settingsModel.ActionType);
+		settingsModel.SwitchOnCurrentValue = false;
+		document.getElementById(currentValueField).checked = false;
+		if (settingsModel.ToggleSwitch)
+			toggleConfigItem(true, monitorField);
+		else
+			toggleConfigItem(false, monitorField);
 	}
 
 	toggleConfigItem(settingsModel.ToggleSwitch, "AddressActionOff");
-
-	return settingsModel;
 }
 
-function toggleOnOffState(actionType, onField, offField, switchCurrent) {
+function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSwitch = false) {
 	//On/Off States
 	if (actionType == 3 && !switchCurrent) { //lvar
 		toggleConfigItem(true, onField);
@@ -197,10 +264,71 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent) {
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
+	else if ((actionType == 2 || actionType == 10) && toggleSwitch) { //control/command & toggle
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
 	else {
 		toggleConfigItem(false, onField);
 		toggleConfigItem(false, offField);
 	}
+}
+
+function commonFormUpdate() {
+	//ENCODER ACTIONS
+	if (!settingsModel.IsEncoder) {
+		if (document.getElementById("EncoderActions"))
+			document.getElementById("EncoderActions").style.display = "none";
+	}
+	else {
+		if ((settingsModel.GaugeSize != null && settingsModel.HasAction) || settingsModel.HasAction == null)
+		document.getElementById("EncoderActions").style.display = "inline";
+	}
+
+	//DEFAULT ACTIONS
+	if (document.getElementById("DefaultActions") && ((settingsModel.GaugeSize != null && settingsModel.HasAction) || settingsModel.HasAction == null)) {
+		document.getElementById("DefaultActions").style.display = "inline";
+
+		//PATTERNS
+		setPattern('Address', 5);
+		setPattern('AddressMonitor', 5);
+		setPattern('AddressAction', settingsModel.ActionType);
+		setPattern('AddressActionOff', settingsModel.ActionType);
+		setPattern('AddressActionLong', settingsModel.ActionTypeLong);
+
+		if (settingsModel.IsEncoder) {
+			setPattern('AddressActionLeft', settingsModel.ActionTypeLeft);
+			setPattern('AddressActionRight', settingsModel.ActionTypeRight);
+			setPattern('AddressActionTouch', settingsModel.ActionTypeTouch);
+
+			toggleOnOffState(settingsModel.ActionTypeLeft, 'SwitchOnStateLeft', 'SwitchOffStateLeft', false);
+			toggleOnOffState(settingsModel.ActionTypeRight, 'SwitchOnStateRight', 'SwitchOffStateRight', false);
+			toggleOnOffState(settingsModel.ActionTypeTouch, 'SwitchOnStateTouch', 'SwitchOffStateTouch', false);
+		}
+
+		//OPTIONS / ALTERNATIVE
+		toggleSwitchToggle(settingsModel);
+		toggleControlDelay(settingsModel);
+		toggleLvarReset(settingsModel);
+
+		//LONG
+		var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
+		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue, settingsModel.ToggleSwitch);
+		if (settingsModel.HasLongPress && longAllowed)
+			toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
+		else
+			toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
+
+		toggleConfigItem(longAllowed, 'HasLongPress');
+		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
+		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
+	}
+	else if (document.getElementById("DefaultActions")) {
+		document.getElementById("DefaultActions").style.display = "none";
+	}
+
+	//ACTION UPDATE
+	updateForm();
 }
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
@@ -214,12 +342,14 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 	else
 		refreshSettings(settingsModel);
 
-	updateForm();
+	commonFormUpdate();
 		
 	websocket.onopen = function () {
 		var json = { event: inRegisterEvent, uuid: inUUID };
 		// register property inspector to Stream Deck
 		websocket.send(JSON.stringify(json));
+
+		sendToPlugin("propertyInspectorConnected");
 	};
 
 	websocket.onmessage = function (evt) {
@@ -276,15 +406,24 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 						GaugeOrientations = jsonObj.payload.GaugeOrientations;
 					}
 				}
+				if (jsonObj.payload && settingsModel) {
+					var refresh = settingsModel.IsEncoder != jsonObj.payload.IsEncoder;
+					settingsModel.IsEncoder = jsonObj.payload.IsEncoder;
+					if (refresh)
+						commonFormUpdate();
+				}
+
 				fillSelectBoxes();
+				fillActionSelectBoxes();
+
 				if (jsonObj.payload && jsonObj.payload.MappingsJson != null) {
 					refreshSettings(jsonObj.payload);
-					updateForm();
+					commonFormUpdate();
                 }
 				break;
 			case "didReceiveSettings":
 				refreshSettings(jsonObj.payload.settings.settingsModel);
-				updateForm();
+				commonFormUpdate();
 				break;
 			default:
 				break;
@@ -292,20 +431,18 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 	};
 }
 
-const sendToPlugin = (action, payload) => {
+const sendToPlugin = (payload) => {
 	if (websocket && websocket.readyState == 1) {
 		var json = {
 			"event": "sendToPlugin",
-			"action": action,
+			"action": actionInfo.action,
 			"context": uuid,
 			"payload": {
-				"settings": {
-					"settingsModel": payload
-				}
+				"settings": payload
 			}
 		};
 		websocket.send(JSON.stringify(json));
-    }
+	}
 }
 
 const setSettings = (value, param) => {
@@ -320,5 +457,5 @@ const setSettings = (value, param) => {
 		};
 		websocket.send(JSON.stringify(json));
 	}
-	updateForm();
+	commonFormUpdate();
 };

@@ -7,7 +7,7 @@
         public new ModelSwitchDisplay Settings { get; protected set; }
         
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerSwitchDisplay] Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerSwitchDisplay] Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
         public override string Address { get { return DisplaySettings.Address; } }
 
         public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings, StreamDeckType deckType) : base(context, settings, deckType)
@@ -23,6 +23,7 @@
             imgManager.AddImage(DisplaySettings.OffImage, DeckType);
             if (DisplaySettings.HasIndication)
                 imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
+            DisplaySettings.ManageImageMap(imgManager, DeckType, true);
 
             ValueManager.RegisterValue(ID.ControlState, DisplaySettings.Address);
             if (BaseSettings.SwitchOnCurrentValue)
@@ -32,21 +33,22 @@
             }
         }
 
-        public override void Deregister(ImageManager imgManager)
+        public override void Deregister()
         {
-            base.Deregister(imgManager);
+            base.Deregister();
 
-            imgManager.RemoveImage(DisplaySettings.OnImage, DeckType);
-            imgManager.RemoveImage(DisplaySettings.OffImage, DeckType);
+            ImgManager.RemoveImage(DisplaySettings.OnImage, DeckType);
+            ImgManager.RemoveImage(DisplaySettings.OffImage, DeckType);
             if (DisplaySettings.HasIndication)
-                imgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
+                ImgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
+            DisplaySettings.ManageImageMap(ImgManager, DeckType, false);
 
             ValueManager.DeregisterValue(ID.ControlState);
         }
 
-        public override void Update(ImageManager imgManager)
+        public override void Update()
         {
-            base.Update(imgManager);
+            base.Update();
 
             ValueManager.UpdateValueAddress(ID.ControlState, Address);
         }
@@ -65,7 +67,7 @@
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
-        protected override void Redraw(ImageManager imgManager)
+        protected override void Redraw()
         {
             if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
                 return;
@@ -73,23 +75,32 @@
             string lastImage = DrawImage;
             string currentValue = ValueManager[ID.ControlState];
 
-            if (ModelBase.Compare(Settings.OnState, currentValue))
+            if (!Settings.UseImageMapping)
             {
-                DrawImage = Settings.OnImage;
-            }
-            else if (ModelBase.Compare(Settings.OffState, currentValue))
-            {
-                DrawImage = Settings.OffImage;
-            }
-            else if (Settings.HasIndication)
-            {
-                if (Settings.IndicationValueAny || ModelBase.Compare(Settings.IndicationValue, currentValue))
-                    DrawImage = Settings.IndicationImage;
+                if (ModelBase.Compare(Settings.OnState, currentValue))
+                {
+                    DrawImage = Settings.OnImage;
+                }
+                else if (ModelBase.Compare(Settings.OffState, currentValue))
+                {
+                    DrawImage = Settings.OffImage;
+                }
+                else if (Settings.HasIndication)
+                {
+                    if (Settings.IndicationValueAny || ModelBase.Compare(Settings.IndicationValue, currentValue))
+                        DrawImage = Settings.IndicationImage;
+                    else
+                        DrawImage = Settings.ErrorImage;
+                }
                 else
                     DrawImage = Settings.ErrorImage;
             }
             else
-                DrawImage = Settings.ErrorImage;
+            {
+                DrawImage = Settings.GetValueMapped(currentValue);
+                if (string.IsNullOrEmpty(DrawImage))
+                    DrawImage = Settings.ErrorImage;
+            }
 
             if (lastImage != DrawImage || ForceUpdate)
                 NeedRedraw = true;

@@ -6,6 +6,8 @@ namespace PilotsDeck
     {
         public virtual string DefaultImage { get; set; }
         public virtual string ErrorImage { get; set; }
+        public virtual string WaitImage { get; set; } = AppSettings.waitImage;
+        public virtual bool IsEncoder { get; set; } = false;
 
         public virtual bool SwitchOnCurrentValue { get; set; } = false;
 

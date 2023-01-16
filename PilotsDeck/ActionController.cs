@@ -15,7 +15,7 @@ namespace PilotsDeck
     {
         private Dictionary<string, IHandler> currentActions = null;
         private IPCManager ipcManager = null;
-        private ImageManager imgManager = null;
+        public ImageManager imgManager { get; protected set; } = null;
 
         public ConnectionManager DeckManager { get; set; }
         public int Timing
@@ -97,20 +97,26 @@ namespace PilotsDeck
         {
             get
             {
-                if (currentActions.ContainsKey(context))
-                    return currentActions[context];
+                if (currentActions.TryGetValue(context, out IHandler value))
+                    return value;
                 else
                     return null;
             }
         }
 
-        public StreamDeckType GetDeckTypeById(string device)
+        public StreamDeckType GetDeckTypeById(string device, string controller)
         {
+            StreamDeckType deckObj = new();
+            
             var deckInfo = DeckManager.Info.devices.Where(d => d.id == device);
             if (deckInfo.Any())
-                return (StreamDeckType)deckInfo.First().type;
-            else
-                return StreamDeckType.StreamDeck;
+            {
+                deckObj.Type = (StreamDeckTypeEnum)deckInfo.First().type;
+            }
+
+            deckObj.IsEncoder = controller == "Encoder";
+
+            return deckObj;
         }
 
         public void OnGlobalEvent(StreamDeckEventPayload args)
@@ -242,7 +248,7 @@ namespace PilotsDeck
         {
             if (!GlobalProfileSettings.ProfilesInstalled)
             {
-                var deckTypes = new int[] { (int)StreamDeckType.StreamDeck, (int)StreamDeckType.StreamDeckXL, (int)StreamDeckType.StreamDeckMini, (int)StreamDeckType.StreamDeckMobile };
+                var deckTypes = new int[] { (int)StreamDeckTypeEnum.StreamDeck, (int)StreamDeckTypeEnum.StreamDeckXL, (int)StreamDeckTypeEnum.StreamDeckMini, (int)StreamDeckTypeEnum.StreamDeckPlus, (int)StreamDeckTypeEnum.StreamDeckMobile };
                 List<string> decksToInstall = new();
                 foreach (int deckType in deckTypes)
                 {
@@ -292,16 +298,11 @@ namespace PilotsDeck
 
             if (waitCounter > 0)
             {
-                //if (SimConnector.IsRunning)
-                //{
-                    waitCounter--;
-                    if (waitCounter == 0)
-                        Log.Logger.Information($"ActionController: Wait ended");
-                    else if (waitCounter % 25 == 0)
-                        Log.Logger.Information($"ActionController: Waiting ...");
-                //}
-                //else
-                //    waitCounter = 0;
+                waitCounter--;
+                if (waitCounter == 0)
+                    Log.Logger.Information($"ActionController: Wait ended");
+                else if (waitCounter % 25 == 0)
+                    Log.Logger.Information($"ActionController: Waiting ...");
             }          
 
             if (!SimConnector.IsRunning) //SIM not running
@@ -428,19 +429,23 @@ namespace PilotsDeck
                     }
                 }
             }
+
             if (tickCounter % (waitTicks / 2) == 0 && SimConnector.IsReady && !SimConnector.IsPaused)
             {
                 Log.Logger.Information($"ActionController: Forcing Redraw");
                 redrawRequested = true;
                 forceRefresh = true;
             }
-            RefreshActions(token, forceRefresh); //every 15s force update
+
+            RefreshActions(token, forceRefresh);
             RedrawAll(token);
 
             watchRefresh.Stop();
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
             if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
+                ipcManager.UnsubscribeUnusedAddresses();
+                imgManager.RemoveUnusedImages();
                 Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}.");
                 averageTime = 0;
             }
@@ -461,9 +466,11 @@ namespace PilotsDeck
                 
                 if (forceUpdate)
                     action.ForceUpdate = forceUpdate;
-                
+
                 if (action.IsInitialized || redrawAlways)
-                    action.Refresh(imgManager);
+                    action.Refresh();
+                else if (!action.IsInitialized && action.DeckType.IsEncoder)
+                    action.RefreshTitle();
             }
         }
 
@@ -485,10 +492,7 @@ namespace PilotsDeck
                     if (action.Value.NeedRedraw || action.Value.ForceUpdate || redrawAlways || redrawRequested)
                     {
                         //Log.Logger.Verbose($"RedrawAll: Needs Redraw [{action.Value.ActionID}] [{action.Key}] ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
-                        if (action.Value.IsRawImage)
-                            _ = DeckManager.SetImageRawAsync(action.Key, action.Value.DrawImage);
-                        else 
-                            _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageBase64(action.Value.DrawImage, action.Value.DeckType));
+                        ActionSendImage(action);
                     }
 
                     action.Value.ResetDrawState();
@@ -502,6 +506,30 @@ namespace PilotsDeck
             }
         }
 
+        public void ActionSendImage(KeyValuePair<string, IHandler> action)
+        {
+            if (action.Value.IsRawImage)
+            {
+                if (action.Value.DeckType.IsEncoder)
+                {
+                    _ = DeckManager.SetFeedbackItemImageRawAsync(AppSettings.targetImage, action.Key, action.Value.DrawImage);
+                    _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageDefinition("Images/Empty.png", action.Value.DeckType, true).GetImageBase64());
+                }
+                else
+                    _ = DeckManager.SetImageRawAsync(action.Key, action.Value.DrawImage);
+            }
+            else
+            {
+                if (action.Value.DeckType.IsEncoder)
+                {
+                    _ = DeckManager.SetFeedbackItemImageRawAsync(AppSettings.targetImage, action.Key, imgManager.GetImageBase64(action.Value.DrawImage, action.Value.DeckType));
+                    _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageDefinition("Images/Empty.png", action.Value.DeckType, true).GetImageBase64());
+                }
+                else
+                    _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageBase64(action.Value.DrawImage, action.Value.DeckType));
+            }
+        }
+
         public bool OnButtonDown(string context)
         {
             try
@@ -512,9 +540,9 @@ namespace PilotsDeck
                     return false;
                 }
 
-                if (currentActions.ContainsKey(context))
+                if (currentActions.TryGetValue(context, out IHandler value))
                 {
-                    return currentActions[context].OnButtonDown(tickCounter);
+                    return value.OnButtonDown(tickCounter);
                 }
                 else
                 {
@@ -539,9 +567,63 @@ namespace PilotsDeck
                     return false;
                 }
 
-                if (currentActions.ContainsKey(context))
+                if (currentActions.TryGetValue(context, out IHandler value))
                 {
-                    return currentActions[context].OnButtonUp(ipcManager, tickCounter);
+                    return value.OnButtonUp(tickCounter);
+                }
+                else
+                {
+                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    return false;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                return false;
+            }
+        }
+
+        public bool OnDialRotate(string context, int ticks)
+        {
+            try
+            {
+                if (!SimConnector.IsConnected)
+                {
+                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    return false;
+                }
+
+                if (currentActions.TryGetValue(context, out IHandler value))
+                {
+                    return value.OnDialRotate(ticks);
+                }
+                else
+                {
+                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    return false;
+                }
+            }
+            catch
+            {
+                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                return false;
+            }
+        }
+
+        public bool OnTouchTap(string context)
+        {
+            try
+            {
+                if (!SimConnector.IsConnected)
+                {
+                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    return false;
+                }
+
+                if (currentActions.TryGetValue(context, out IHandler value))
+                {
+                    return value.OnTouchTap();
                 }
                 else
                 {
@@ -560,9 +642,9 @@ namespace PilotsDeck
         {
             try
             {
-                if (currentActions.ContainsKey(context))
+                if (currentActions.TryGetValue(context, out IHandler value))
                 {
-                    currentActions[context].SetTitleParameters(title, StreamDeckTools.ConvertTitleParameter(titleParameters));
+                    value.SetTitleParameters(title, StreamDeckTools.ConvertTitleParameter(titleParameters));
                 }
                 else
                 {
@@ -595,13 +677,13 @@ namespace PilotsDeck
         {
             try
             {
-                if (currentActions.ContainsKey(context))
+                if (currentActions.TryGetValue(context, out IHandler value))
                 {
-                    currentActions[context].Update(imgManager);
-                    SetActionState(currentActions[context]);                        
+                    value.Update();
+                    SetActionState(value);                        
 
-                    if (!currentActions[context].IsRawImage)
-                        imgManager.UpdateImage(currentActions[context].DrawImage, currentActions[context].DeckType);
+                    if (!value.IsRawImage)
+                        imgManager.UpdateImage(value.DrawImage, value.DeckType);
 
                     redrawRequested = true;
                 }
@@ -643,9 +725,9 @@ namespace PilotsDeck
         {
             try
             { 
-                if (currentActions.ContainsKey(context))
+                if (currentActions.TryGetValue(context, out IHandler value))
                 {
-                    currentActions[context].Deregister(imgManager);
+                    value.Deregister();
 
                     currentActions.Remove(context);
                 }

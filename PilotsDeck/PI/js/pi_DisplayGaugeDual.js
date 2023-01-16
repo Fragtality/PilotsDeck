@@ -2,6 +2,7 @@
 var settingsModel = {
 	DefaultImage: "Images/Empty.png",
 	ErrorImage: "Images/Error.png",
+	IsEncoder: false,
 	Address: "",
 	Address2: "",
 	DecodeBCD: false,
@@ -10,9 +11,10 @@ var settingsModel = {
 	ValueMappings: "",
 	HasAction: false,
 	AddressAction: "",
+	AddressMonitor: "",
 	AddressActionOff: "",
 	ActionType: 0,
-	SwitchOnCurrentValue: true,
+	SwitchOnCurrentValue: false,
 	ToggleSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
@@ -74,58 +76,17 @@ function fillSelectBoxes() {
 	if (GaugeOrientations && GaugeOrientations != "") {
 		fillTypeSelectBox(GaugeOrientations, 'BarOrientation', settingsModel.BarOrientation);
 	}
-	if (ActionTypes && ActionTypes != "") {
-		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
-		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
-	}
 }
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
 	//PATTERN
-	setPattern('Address', 5);
 	setPattern('Address2', 5);
 	setPattern('AddressColorOff', 5);
-	setPattern('AddressAction', settingsModel.ActionType);
-	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 
-	//ACTION
-	if (settingsModel.HasAction) {
-		//On/Off States & SwitchOnCurrent
-		setFormItem(true, 'hdrSecondControl');
-		toggleConfigItem(true, 'ActionType');
-		toggleConfigItem(true, 'AddressAction');
-
-		var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', false);
-		if (settingsModel.HasLongPress && longAllowed)
-			toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
-		else
-			toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
-		toggleConfigItem(false, 'SwitchOnCurrentValue');
-
-		toggleControlDelay(settingsModel);
-		toggleLvarReset(settingsModel);
-
-		//LongPress
-		toggleConfigItem(longAllowed, 'HasLongPress');
-		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
-		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
-	}
-	else {
-		setFormItem(false, 'hdrSecondControl');
-		toggleConfigItem(false, 'ActionType');
-		toggleConfigItem(false, 'AddressAction');
-		toggleOnOffState(-1, 'SwitchOnState', 'SwitchOffState');
-		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
-		toggleConfigItem(false, 'SwitchOnCurrentValue');
-		toggleConfigItem(false, 'UseControlDelay');
-		toggleConfigItem(false, 'UseLvarReset');
-
-		toggleConfigItem(false, 'HasLongPress');
-		toggleConfigItem(false, 'ActionTypeLong');
-		toggleConfigItem(false, 'AddressActionLong');
-	}
+	//CURRENT VALUE
+	document.getElementById('SwitchOnCurrentValue').checked = false;
+	toggleConfigItem(false, 'SwitchOnCurrentValue');
 
 	//COLOR
 	toggleConfigItem(settingsModel.UseColorSwitching, 'AddressColorOff');

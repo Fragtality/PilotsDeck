@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using System;
 using System.Threading;
 
 namespace PilotsDeck
@@ -9,7 +9,7 @@ namespace PilotsDeck
         public override IModelSwitch SwitchSettings { get { return Settings; } }
         public virtual ModelSwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerSwitch] Write: {Address} | LongWrite: {BaseSettings.HasLongPress} - {BaseSettings.AddressActionLong}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerSwitch] Write: {Address} | LongWrite: {BaseSettings.HasLongPress} - {BaseSettings.AddressActionLong}"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
 
         public override bool HasAction { get; protected set; } = true;
@@ -36,9 +36,9 @@ namespace PilotsDeck
                 return false;
         }
 
-        public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        public override bool OnButtonUp(long tick)
         {
-            bool result = RunButtonUp(ipcManager, tick - TickDown, ValueManager, BaseSettings);
+            bool result = RunButtonUp(IPCManager, tick - TickDown, ValueManager, BaseSettings);
             TickDown = 0;
 
             return result;
@@ -58,48 +58,111 @@ namespace PilotsDeck
             }
             else if (!longPress)
             {
-                string newValue = "";
-                if (IsActionReadable(switchSettings.ActionType) && !switchSettings.UseLvarReset)
-                    newValue = ToggleValue(valueManager[ID.SwitchState], switchSettings.SwitchOffState, switchSettings.SwitchOnState);
-                else if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(switchSettings.AddressActionOff))
-                    newValue = valueManager[ID.ControlState];
-                else if (IsActionReadable(switchSettings.ActionType))
-                    newValue = switchSettings.SwitchOnState;
+                string controlState = valueManager[ID.ControlState];
+                if (((ActionSwitchType)switchSettings.ActionType == ActionSwitchType.XPCMD || (ActionSwitchType)switchSettings.ActionType == ActionSwitchType.CONTROL) && switchSettings.ToggleSwitch)
+                    controlState = valueManager[ID.MonitorState];
 
-                result = ipcManager.RunAction(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, newValue, switchSettings, switchSettings.SwitchOffState);
+                result = ipcManager.RunAction(switchSettings.AddressAction, switchSettings.AddressActionOff, (ActionSwitchType)switchSettings.ActionType, valueManager[ID.SwitchState], controlState, switchSettings.SwitchOnState, switchSettings.SwitchOffState, switchSettings);
             }
-            else if (longPress && switchSettings.HasLongPress)
+            else if (longPress && switchSettings.HasLongPress && IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong))
             {
-                if (IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong) && IPCTools.IsVjoyToggle(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
-                {
-                    result = IPCTools.VjoyToggle((ActionSwitchType)switchSettings.ActionTypeLong, switchSettings.AddressActionLong);
-                }
-                else if (IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong) && !IPCTools.IsVjoyAddress(switchSettings.AddressActionLong, switchSettings.ActionTypeLong))
-                {
-                    string newValue = "";
-                    if (IsActionReadable(switchSettings.ActionTypeLong) && !switchSettings.UseLvarReset)
-                        newValue = ToggleValue(valueManager[ID.SwitchStateLong], switchSettings.SwitchOffStateLong, switchSettings.SwitchOnStateLong);
-                    else if (IsActionReadable(switchSettings.ActionTypeLong))
-                        newValue = switchSettings.SwitchOnStateLong;
-
-                    result = ipcManager.RunAction(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong, newValue, switchSettings, switchSettings.SwitchOffStateLong);
-                }
+                result = ipcManager.RunAction(switchSettings.AddressActionLong, null, (ActionSwitchType)switchSettings.ActionTypeLong, valueManager[ID.SwitchStateLong], valueManager[ID.ControlState], switchSettings.SwitchOnStateLong, switchSettings.SwitchOffStateLong, switchSettings);
             }
 
             return result;
         }
 
-        public static string ToggleValue(string lastValue, string offState, string onState)
+        public static int RunVjoy(string address, int type)
         {
-            string newValue;
-            if (lastValue == offState)
-                newValue = onState;
-            else
-                newValue = offState;
-            Log.Logger.Debug($"HandlerSwitch: Value toggled {lastValue} -> {newValue}");
-            return newValue;
+            int result = 0;
+            if (IPCTools.IsVjoyAddress(address, type) && !IPCTools.IsVjoyToggle(address, type))
+            {
+                if (!IPCTools.VjoyClearSet((ActionSwitchType)type, address, false))
+
+                    Thread.Sleep(AppSettings.controlDelay);
+
+                if (!IPCTools.VjoyClearSet((ActionSwitchType)type, address, true))
+                    result = -1;
+                else
+                    result = 1;
+            }
+
+            return result;
         }
 
-        
+        public override bool OnDialRotate(int ticks)
+        {
+            return RunDialRotate(IPCManager, ticks, ValueManager, BaseSettings);
+        }
+
+        public static bool RunDialRotate(IPCManager ipcManager, int ticks, AddressValueManager valueManager, IModelSwitch switchSettings)
+        {          
+            string address;
+            int type;
+            string value;
+            string onState;
+            string offState;
+            bool result;
+
+            if (ticks < 0)
+            {
+                address = switchSettings.AddressActionLeft;
+                type = switchSettings.ActionTypeLeft;
+                value = valueManager[ID.SwitchStateLeft];
+                onState = switchSettings.SwitchOnStateLeft;
+                offState = switchSettings.SwitchOffStateLeft;
+            }
+            else
+            {
+                address = switchSettings.AddressActionRight;
+                type = switchSettings.ActionTypeRight;
+                value = valueManager[ID.SwitchStateRight];
+                onState = switchSettings.SwitchOnStateRight;
+                offState = switchSettings.SwitchOffStateRight;
+            }
+
+            ticks = Math.Abs(ticks);
+
+            if (IPCTools.IsVjoyAddress(address, type) && !IPCTools.IsVjoyToggle(address, type))
+            {
+                int i = 0;
+                while (i < ticks)
+                {
+                    if (RunVjoy(address, type) == 1)
+                        i++;
+                    else
+                        break;
+                }
+
+                result = i == ticks;
+            }
+            else
+            {
+                result = ipcManager.RunAction(address, "", (ActionSwitchType)type, value, valueManager[ID.ControlState], onState, offState, switchSettings, true, ticks);
+            }
+
+            return result;
+        }
+
+        public override bool OnTouchTap()
+        {
+            return RunTouchTap(IPCManager, ValueManager, BaseSettings);
+        }
+
+        public static bool RunTouchTap(IPCManager ipcManager, AddressValueManager valueManager, IModelSwitch switchSettings)
+        {
+            int result = RunVjoy(switchSettings.AddressActionTouch, switchSettings.ActionTypeTouch);
+            if (result == 0)
+            {
+                if (!ipcManager.RunAction(switchSettings.AddressActionTouch, "", (ActionSwitchType)switchSettings.ActionTypeTouch, valueManager[ID.SwitchStateTouch], valueManager[ID.ControlState], switchSettings.SwitchOnStateTouch, switchSettings.SwitchOffStateTouch, switchSettings, true))
+                    return false;
+                else
+                    return true;
+            }
+            else if (result != 1)
+                return false;
+            else
+                return true;
+        }
     }
 }

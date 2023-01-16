@@ -7,7 +7,6 @@ namespace PilotsDeck
 {
 	public class ModelDisplayText : ModelDisplay
     {
-		public virtual bool DrawBox { get; set; } = true;
 		public virtual string BoxSize { get; set; } = "2";
 		public virtual string BoxColor { get; set; } = "#ffffff";
 		public virtual string BoxRect { get; set; } = "9; 21; 54; 44";
@@ -34,54 +33,59 @@ namespace PilotsDeck
 			ErrorImage = @"Images/Error.png";
 		}
 
-        public string GetValueMapped(string strValue)
+		public static string GetValueMapped(string strValue, string strMap)
 		{
-			if (!string.IsNullOrEmpty(ValueMappings) && ValueMappings.Contains('='))
-			{
-				var dict = GetValueMap();
-				foreach (var mapping in dict)
-				{
-					if (mapping.Key.Contains('<') || mapping.Key.Contains('>'))
-					{
+            if (!string.IsNullOrEmpty(strMap) && strMap.Contains('='))
+            {
+                var dict = GetValueMap(strMap);
+                foreach (var mapping in dict)
+                {
+                    if (mapping.Key.Contains('<') || mapping.Key.Contains('>'))
+                    {
                         bool greater = mapping.Key.Contains('>');
                         string key = mapping.Key.Replace(">", "").Replace("<", "");
                         float val = GetNumValue(strValue, 0.0f);
                         float limit = GetNumValue(key, 0.0f);
 
-						if (greater)
-						{
-							if (limit >= val)
-							{
-								strValue = mapping.Value;
-								break;
-							}
-						}
-						else
-						{
-							if (limit <= val)
-							{
-								strValue = mapping.Value;
-								break;
-							}
-						}
+                        if (greater)
+                        {
+                            if (limit >= val)
+                            {
+                                strValue = mapping.Value;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (limit <= val)
+                            {
+                                strValue = mapping.Value;
+                                break;
+                            }
+                        }
                     }
-					else if (mapping.Key == strValue)
-					{
-						strValue = mapping.Value;
-						break;
+                    else if (mapping.Key == strValue)
+                    {
+                        strValue = mapping.Value;
+                        break;
 					}
-				}
-			}
+                }
+            }
 
-            return strValue;
+			return strValue;
+        }
+
+        public string GetValueMapped(string strValue)
+		{
+			return GetValueMapped(strValue, ValueMappings);
 		}
 
 
-        protected virtual Dictionary<string, string> GetValueMap()
+        protected static Dictionary<string, string> GetValueMap(string valueMap)
         {
 			var dict = new Dictionary<string, string>();
 
-			string[] parts = ValueMappings.Split(':');
+			string[] parts = valueMap.Split(':');
 
 			string[] pair;
 			foreach (var p in parts)

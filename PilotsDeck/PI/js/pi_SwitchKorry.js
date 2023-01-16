@@ -2,11 +2,13 @@
 var settingsModel = {
 	DefaultImage: "Images/Empty.png",
 	ErrorImage: "Images/Error.png",
+	IsEncoder: false,
 	AddressAction: "",
 	AddressActionOff: "",
 	ActionType: 0,
 	SwitchOnState: "",
 	SwitchOffState: "",
+	AddressMonitor: "",
 	ToggleSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
@@ -38,35 +40,12 @@ function fillSelectBoxes() {
 		fillImageSelectBox(KorryFiles, 'TopImage', settingsModel.TopImage);
 		fillImageSelectBox(KorryFiles, 'BotImage', settingsModel.BotImage);
 	}
-	if (ActionTypes && ActionTypes != "") {
-		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
-		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
-	}
 }
 
 function updateForm() {
 	//PATTERN
-	setPattern('AddressAction', settingsModel.ActionType);
-	setPattern('AddressActionLong', settingsModel.ActionTypeLong);
 	setPattern('AddressTop', 5);
 	setPattern('AddressBot', 5);
-
-	//On/Off States & SwitchOnCurrent
-	var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
-	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue);
-	if (settingsModel.HasLongPress && longAllowed)
-		toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', settingsModel.SwitchOnCurrentValue);
-	else
-		toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
-	toggleConfigItem(false, 'SwitchOnCurrentValue');
-
-	toggleControlDelay(settingsModel);
-	toggleLvarReset(settingsModel);
-
-	//LongPress
-	toggleConfigItem(longAllowed, 'HasLongPress');
-	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
-	toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 
 	//only Top adr
 	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'AddressBot');
@@ -74,4 +53,8 @@ function updateForm() {
 	//non-zero
 	toggleConfigItem(!settingsModel.ShowTopNonZero, 'TopState')
 	toggleConfigItem(!settingsModel.ShowBotNonZero, 'BotState')
+
+	//CURRENT VALUE
+	document.getElementById('SwitchOnCurrentValue').checked = false;
+	toggleConfigItem(false, 'SwitchOnCurrentValue');
 }

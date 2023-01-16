@@ -10,3 +10,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Usage", "CA2211:Nicht konstante Felder dürfen nicht sichtbar sein", Justification = "<Ausstehend>", Scope = "member", Target = "~F:PilotsDeck.vJoyManager.stateTable")]
 [assembly: SuppressMessage("Style", "IDE0044:Modifizierer \"readonly\" hinzufügen")]
 [assembly: SuppressMessage("Style", "IDE0074:Verbundzuweisung verwenden")]
+[assembly: SuppressMessage("GeneratedRegex", "SYSLIB1045:In „GeneratedRegexAttribute“ konvertieren.")]

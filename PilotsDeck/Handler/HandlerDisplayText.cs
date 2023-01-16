@@ -8,7 +8,7 @@ namespace PilotsDeck
         public override IModelSwitch SwitchSettings => throw new System.NotImplementedException();
         public virtual ModelDisplayText Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{Title}\" [HandlerDisplayText] Read: {TextSettings.Address}"; } }
+        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayText] Read: {TextSettings.Address}"; } }
         public override string Address { get { return TextSettings.Address; } }
 
         public override bool UseFont { get { return true; } }
@@ -29,7 +29,17 @@ namespace PilotsDeck
             return false;
         }
 
-        public override bool OnButtonUp(IPCManager ipcManager, long tick)
+        public override bool OnButtonUp(long tick)
+        {
+            return true;
+        }
+
+        public override bool OnDialRotate(int ticks)
+        {
+            return true;
+        }
+
+        public override bool OnTouchTap()
         {
             return true;
         }
@@ -39,28 +49,28 @@ namespace PilotsDeck
             base.Register(imgManager, ipcManager);
 
             if (TextSettings.HasIndication)
-                imgManager.AddImage(TextSettings.IndicationImage, DeckType);
+                _ = imgManager.AddImage(TextSettings.IndicationImage, DeckType);
 
-            if (TextSettings.DrawBox)
-                RenderImages(imgManager);
+            RenderImages();
+            NeedRedraw = true;
 
             ValueManager.RegisterValue(ID.ControlState, Address);
         }
 
-        public override void Deregister(ImageManager imgManager)
+        public override void Deregister()
         {
-            base.Deregister(imgManager);
+            base.Deregister();
 
             if (TextSettings.HasIndication)
-                imgManager.RemoveImage(TextSettings.IndicationImage, DeckType);
+                ImgManager.RemoveImage(TextSettings.IndicationImage, DeckType);
 
             ValueManager.DeregisterValue(ID.ControlState);
         }
 
-        public override void Update(ImageManager imgManager)
+        public override void Update()
         {
-            base.Update(imgManager);
-            RenderImages(imgManager);
+            base.Update();
+            RenderImages();
             NeedRedraw = true;
 
             if (DrawBox != TextSettings.DrawBox)
@@ -73,25 +83,48 @@ namespace PilotsDeck
             ValueManager.UpdateValueAddress(ID.ControlState, Address);
         }
 
-        protected virtual void RenderImages(ImageManager imgManager)
+        protected virtual void RenderImages()
         {
             if (TextSettings.DrawBox)
             {
-                ImageRenderer render = new (imgManager.GetImageObject(TextSettings.DefaultImage, DeckType));
+                ImageRenderer render = new(ImgManager.GetImageDefinition(TextSettings.DefaultImage, DeckType));
                 render.DrawBox(ColorTranslator.FromHtml(TextSettings.BoxColor), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
+                if (IsEncoder)
+                    DrawTitle(render);
                 DefaultImageRender = render.RenderImage64();
                 render.Dispose();
 
-                render = new (imgManager.GetImageObject(TextSettings.ErrorImage, DeckType));
+                render = new(ImgManager.GetImageDefinition(TextSettings.ErrorImage, DeckType));
                 render.DrawBox(ColorTranslator.FromHtml("#d70000"), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
+                if (IsEncoder)
+                    DrawTitle(render);
                 ErrorImageRender = render.RenderImage64();
                 render.Dispose();
+                IsRawImage = true;
+            }
+            else if (IsEncoder)
+            {
+                ImageRenderer render = new(ImgManager.GetImageDefinition(TextSettings.DefaultImage, DeckType));
+                DrawTitle(render);
+                DefaultImageRender = render.RenderImage64();
+                render.Dispose();
+                IsRawImage = true;
+            }
+        }
+
+        public override void RefreshTitle()
+        {
+            if (!IsInitialized && DrawImage != DefaultImageRender)
+            {
+                DrawImage = DefaultImageRender;
+                IsRawImage = true;
+                NeedRedraw = true;
             }
         }
 
         public override void SetDefault()
         {
-            if (TextSettings.DrawBox && DrawImage != DefaultImageRender)
+            if ((TextSettings.DrawBox || IsEncoder) && DrawImage != DefaultImageRender)
             {
                 DrawImage = DefaultImageRender;
                 IsRawImage = true;
@@ -128,7 +161,7 @@ namespace PilotsDeck
             }
         }
 
-        protected override void Redraw(ImageManager imgManager)
+        protected override void Redraw()
         {
             if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
                 return;
@@ -164,21 +197,23 @@ namespace PilotsDeck
 
             text = TextSettings.GetValueMapped(text);
 
-            if (text != lastText || ForceUpdate)
-            {
-                ImageRenderer render = new(imgManager.GetImageObject(background, DeckType));
-                if (TextSettings.DrawBox)
-                    render.DrawBox(boxColor, ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
 
-                if (text != "")
-                    render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
-                
-                DrawImage = render.RenderImage64();
-                IsRawImage = true;
-                NeedRedraw = true;
-                lastText = text;
-                render.Dispose();
-            }
+            ImageRenderer render = new(ImgManager.GetImageDefinition(background, DeckType));
+
+            if (TextSettings.DrawBox)
+                render.DrawBox(boxColor, ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
+
+            if (text != "")
+                render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
+
+            if (IsEncoder)
+                DrawTitle(render);
+
+            DrawImage = render.RenderImage64();
+            IsRawImage = true;
+            NeedRedraw = true;
+            lastText = text;
+            render.Dispose();
         }
     }
 }

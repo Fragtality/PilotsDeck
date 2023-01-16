@@ -1,7 +1,9 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace PilotsDeck
 {
@@ -100,17 +102,7 @@ namespace PilotsDeck
             { 
                 if (!string.IsNullOrEmpty(address) && currentValues.ContainsKey(address))
                 {
-                    if (currentRegistrations[address] == 1)
-                    {
-                        currentRegistrations.Remove(address);
-                        SimConnector.UnsubscribeAddress(address);
-                        currentValues[address].Dispose();
-                        currentValues[address] = null;
-                        currentValues.Remove(address);
-
-                        Log.Logger.Debug($"DeregisterAddress: Removed Address {address}");
-                    }
-                    else
+                    if (currentRegistrations[address] >= 1)
                     {
                         currentRegistrations[address]--;
                         Log.Logger.Debug($"DeregisterAddress: Deregistered Address {address}, Registrations open: {currentRegistrations[address]}");
@@ -122,6 +114,22 @@ namespace PilotsDeck
             catch
             {
                 Log.Logger.Error($"DeregisterAddress: Exception while deregistering Address {address}");
+            }
+        }
+
+        public void UnsubscribeUnusedAddresses()
+        {
+            var unusedAddresses = currentRegistrations.Where(v => v.Value <= 0);
+
+            foreach (var address in unusedAddresses)
+            {
+                currentRegistrations.Remove(address.Key);
+                SimConnector.UnsubscribeAddress(address.Key);
+                currentValues[address.Key].Dispose();
+                currentValues[address.Key] = null;
+                currentValues.Remove(address.Key);
+
+                Log.Logger.Debug($"UnsubscribeUnusedAddresses: Removed Address {address}");
             }
         }
 
@@ -149,31 +157,83 @@ namespace PilotsDeck
             return result;
         }
 
-        public bool RunAction(string Address, ActionSwitchType actionType, string currentValue, IModelSwitch switchSettings, string offValue = null)
+        public static string CalculateSwitchValue(string lastValue, string offState, string onState, int ticks)
+        {
+            if (!string.IsNullOrEmpty(onState) && onState[0] == '$' && double.TryParse(lastValue, NumberStyles.Number, new RealInvariantFormat(lastValue), out _))
+            {
+                ValueManipulator valueManipulator = new();
+                string newValue = valueManipulator.GetValue(lastValue, onState, ticks);
+                Log.Logger.Debug($"IPCManager: Value calculated {lastValue} -> {newValue}");
+                return newValue;
+            }
+            else
+                return ToggleSwitchValue(lastValue, offState, onState);
+        }
+
+        public static string ToggleSwitchValue(string lastValue, string offState, string onState)
+        {
+            string newValue;
+            if (lastValue == offState)
+                newValue = onState;
+            else
+                newValue = offState;
+            Log.Logger.Debug($"IPCManager: Value toggled {lastValue} -> {newValue}");
+            return newValue;
+        }
+
+        public bool RunAction(string addressOn, string addressOff, ActionSwitchType actionType, string switchState, string controlState, string onValue, string offValue, IModelSwitch switchSettings, bool ignoreLvarReset = false, int ticks = 1)
         {
             bool result = false;
 
-            if (SimConnector.IsConnected && IPCTools.IsWriteAddress(Address, actionType))
+            if (SimConnector.IsConnected && IPCTools.IsWriteAddress(addressOn, actionType))
             {
                 if (actionType == ActionSwitchType.VJOY || actionType == ActionSwitchType.VJOYDRV)
                 {
-                    Log.Logger.Debug($"IPCManager: Running vJoy Toggle Action for '{Address}', Type: {actionType}");
-                    result = IPCTools.VjoyToggle(actionType, Address);
+                    Log.Logger.Debug($"IPCManager: Running vJoy Toggle Action for '{addressOn}', Type: {actionType}");
+                    result = IPCTools.VjoyToggle(actionType, addressOn);
                 }
                 else
                 {
-                    string runAddress = Address;
-                    if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(switchSettings.AddressActionOff) && ModelBase.Compare(switchSettings.SwitchOffState, currentValue))
+                    string runAddress = addressOn;
+                    if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(addressOff) && ModelBase.Compare(offValue, controlState))
                     {
-                        runAddress= switchSettings.AddressActionOff;
+                        runAddress = addressOff;
                     }
- 
-                    Log.Logger.Debug($"IPCManager: Running Action '{runAddress}' on Connector '{SimConnector.GetType().Name}'");
-                    result = SimConnector.RunAction(runAddress, actionType, currentValue, switchSettings, offValue);
+                    
+                    string newValue = "";
+                    if (HandlerBase.IsActionReadable(actionType))
+                    {
+                        if (!ignoreLvarReset && switchSettings.UseLvarReset && onValue[0] != '$')
+                            newValue = onValue;
+                        else
+                            newValue = CalculateSwitchValue(switchState, offValue, onValue, ticks);
+                    }
+
+                    if (!HandlerBase.IsActionReadable(actionType) && actionType != ActionSwitchType.CALCULATOR)
+                    {
+                        int success = 0;
+                        int i;
+                        for (i = 0; i < ticks; i++)
+                        {
+                            Log.Logger.Debug($"IPCManager: Running Actions {i+1}/{ticks} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                            if (SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, offValue))
+                            {
+                                success++;
+                                if (actionType == ActionSwitchType.MACRO || actionType == ActionSwitchType.SCRIPT || actionType == ActionSwitchType.XPCMD)
+                                    Thread.Sleep(AppSettings.controlDelay / 2);
+                            }
+                        }
+                        result = i == success;
+                    }
+                    else
+                    {
+                        Log.Logger.Debug($"IPCManager: Running Action '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                        result = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, offValue, ticks);
+                    }
                 }
             }
             else
-                Log.Logger.Error($"IPCManager: not connected or Address not passed {Address}");
+                Log.Logger.Error($"IPCManager: not connected or Address not passed {addressOn}");
 
             return result;
         }

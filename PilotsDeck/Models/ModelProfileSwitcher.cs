@@ -7,13 +7,26 @@ using System.Linq;
 
 namespace PilotsDeck
 {
-    public enum StreamDeckType
+    public enum StreamDeckTypeEnum
     {
         StreamDeck,
         StreamDeckMini,
         StreamDeckXL,
         StreamDeckMobile,
-        CorsairGKeys
+        CorsairGKeys,
+        StreamDeckPlus = 7
+    }
+
+    public class StreamDeckType
+    {
+        public StreamDeckType(StreamDeckTypeEnum type = StreamDeckTypeEnum.StreamDeck, bool isEncoder = false)
+        {
+            Type = type;
+            IsEncoder = isEncoder;
+        }
+
+        public StreamDeckTypeEnum Type { get; set; } = StreamDeckTypeEnum.StreamDeck;
+        public bool IsEncoder { get; set; } = false;
     }
 
     public class StreamDeckProfile
@@ -136,11 +149,11 @@ namespace PilotsDeck
             {
                 if (string.IsNullOrEmpty(deviceMapping.DefaultProfile))
                 {
-                    if (deviceMapping.Type == (int)StreamDeckType.StreamDeck || deviceMapping.Type == (int)StreamDeckType.StreamDeckXL)
+                    if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeck || deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckXL)
                     {
-                        if (deviceMapping.Type == (int)StreamDeckType.StreamDeck && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfile).Any())
+                        if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeck && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfile).Any())
                             deviceMapping.DefaultProfile = AppSettings.deckDefaultProfile;
-                        else if (deviceMapping.Type == (int)StreamDeckType.StreamDeckXL && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfileXL).Any())
+                        else if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckXL && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfileXL).Any())
                             deviceMapping.DefaultProfile = AppSettings.deckDefaultProfileXL;
                         else
                             deviceMapping.UseDefault = false;

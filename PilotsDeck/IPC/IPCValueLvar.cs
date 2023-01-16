@@ -1,5 +1,6 @@
 ﻿using FSUIPC;
 using Serilog;
+using System.Globalization;
 using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
@@ -45,6 +46,16 @@ namespace PilotsDeck
         public override dynamic RawValue()
         {
             return currentValue;
+        }
+
+        public override void SetValue(string strValue)
+        {
+            if (double.TryParse(strValue, NumberStyles.Number, new RealInvariantFormat(strValue), out double value))
+            {
+                isChanged = currentValue != value;
+                if (isChanged)
+                    currentValue = value;
+            }
         }
     }
 }

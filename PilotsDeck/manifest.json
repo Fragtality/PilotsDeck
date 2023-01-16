@@ -25,6 +25,13 @@
           "FontSize": "10"
         }
       ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "layout-pilotsdeck.json"
+      },
       "SupportedInMultiActions": false,
       "PropertyInspectorPath": "PI/pi_DisplaySwitch.html",
       "Tooltip": "The Display Value Action combined with a Simple Button",
@@ -85,6 +92,13 @@
           "FontSize": "10"
         }
       ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "layout-pilotsdeck.json"
+      },
       "SupportedInMultiActions": false,
       "PropertyInspectorPath": "PI/pi_DisplayRadio.html",
       "Tooltip": "Can display and swap your active & standby COM Frequencies",
@@ -100,6 +114,13 @@
           "FontSize": "10"
         }
       ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "layout-pilotsdeck.json"
+      },
       "SupportedInMultiActions": false,
       "PropertyInspectorPath": "PI/pi_DisplayGauge.html",
       "Tooltip": "Display a Value on a Bar or Arc",
@@ -141,11 +162,11 @@
   "Disabled": false,
   "Author": "Fragtality",
   "CodePathWin": "PilotsDeck.exe",
-  "Description": "Directly control your FlightSim from your StreamDeck\u00AE via FSUIPC!",
+  "Description": "Directly control your FlightSim from your StreamDeck® via FSUIPC!",
   "Name": "PilotsDeck",
   "Icon": "Images/category/PluginIcon",
   "URL": "https://github.com/Fragtality/PilotsDeck",
-  "Version": "0.7.7",
+  "Version": "0.7.8",
   "SDKVersion": 2,
   "Profiles": [
     {
@@ -155,32 +176,14 @@
       "DontAutoSwitchWhenInstalled": true
     },
     {
+      "Name": "Profiles/PilotsDeck - DefaultPlus",
+      "DeviceType": 7,
+      "ReadOnly": false,
+      "DontAutoSwitchWhenInstalled": true
+    },
+    {
       "Name": "Profiles/PilotsDeck - DefaultXL",
       "DeviceType": 2,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    },
-    {
-      "Name": "Profiles/PilotsDeck - Whiskey",
-      "DeviceType": 2,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    },
-    {
-      "Name": "Profiles/PilotsDeck - X-Ray",
-      "DeviceType": 2,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    },
-    {
-      "Name": "Profiles/PilotsDeck - Yankee",
-      "DeviceType": 0,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    },
-    {
-      "Name": "Profiles/PilotsDeck - Zulu",
-      "DeviceType": 0,
       "ReadOnly": false,
       "DontAutoSwitchWhenInstalled": true
     }
