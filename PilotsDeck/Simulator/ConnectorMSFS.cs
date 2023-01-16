@@ -209,7 +209,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, string offValue = null, int ticks = 1)
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, bool ignoreLvarReset, string offValue = null, int ticks = 1)
         {
             switch (actionType)
             {
@@ -218,7 +218,7 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return IPCTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
-                    return UpdateLvar(Address, newValue, switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
+                    return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
                 case ActionSwitchType.HVAR:
                     return IPCTools.WriteHvar(Address);
                 case ActionSwitchType.CONTROL:

@@ -52,9 +52,11 @@ namespace PilotsDeck
         {
             if (double.TryParse(strValue, NumberStyles.Number, new RealInvariantFormat(strValue), out double value))
             {
-                isChanged = currentValue != value;
-                if (isChanged)
-                    currentValue = value;
+                //isChanged = currentValue != value;
+                //if (isChanged)
+                //    currentValue = value;
+                isChanged = true;
+                currentValue = value;
             }
         }
     }

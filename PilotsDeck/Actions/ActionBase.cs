@@ -72,6 +72,8 @@ namespace PilotsDeck
                     Log.Logger.Error($"ActionBase: OnButtonUp NOT successful (Long: {Plugin.ActionController.Ticks - ticksDown >= AppSettings.longPressTicks}) for Action {Plugin.ActionController[args.context]?.ActionID}");
                     _ = Manager.ShowAlertAsync(args.context);
                 }
+                else
+                    Plugin.ActionController[args.context].ForceUpdate = true;
             }
             ticksDown = 0;
 
@@ -89,6 +91,8 @@ namespace PilotsDeck
                     Log.Logger.Error($"ActionBase: OnDialRotate NOT successful for Action {Plugin.ActionController[args.context]?.ActionID}");
                     _ = Manager.ShowAlertAsync(args.context);
                 }
+                else
+                    Plugin.ActionController[args.context].ForceUpdate = true;
             }
             ticksDown = 0;
 
@@ -106,6 +110,8 @@ namespace PilotsDeck
                     Log.Logger.Error($"ActionBase: OnTouchTap NOT successful for Action {Plugin.ActionController[args.context]?.ActionID}");
                     _ = Manager.ShowAlertAsync(args.context);
                 }
+                else
+                    Plugin.ActionController[args.context].ForceUpdate = true;
             }
             ticksDown = 0;
 

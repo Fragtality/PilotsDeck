@@ -48,9 +48,9 @@ function updateForm() {
 		toggleConfigItem(false, 'SwitchOnCurrentValue');
 	}
 	else {
-		document.getElementById('SwitchOnCurrentValue').checked = true;
 		toggleConfigItem(true, 'SwitchOnCurrentValue');
 	}
+	toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue, settingsModel.ToggleSwitch);
 
 	//INDICATION
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');

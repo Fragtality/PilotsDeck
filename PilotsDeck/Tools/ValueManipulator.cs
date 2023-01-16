@@ -34,7 +34,7 @@ namespace PilotsDeck
             code = code.Replace("<", "");
 
             string[] parts = code.Split(',');
-            string defValue = parts[^1];
+            string defValue = parts[^1].Replace("=", "");
             for (int i=0; i<parts.Length; i++)
             {
                 if (parts[i].Contains('='))
@@ -47,7 +47,7 @@ namespace PilotsDeck
                 {
                     if (i + 1 < parts.Length)
                     {
-                        result = parts[i + 1];
+                        result = parts[i + 1].Replace("=", "");
                         break;
                     }
                     else
@@ -55,7 +55,7 @@ namespace PilotsDeck
                         if (!bounce)
                             result = defValue;
                         else if (i >= 1)
-                            result = parts[i-1];
+                            result = parts[i-1].Replace("=", "");
                     }
                 }
             }

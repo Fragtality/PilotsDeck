@@ -22,7 +22,10 @@ namespace PilotsDeck
                 if (currentValues.TryGetValue(address, out IPCValue value))
                     return value;
                 else
-                    return null;
+                {
+                    Log.Logger.Error("$IPCManager: Tried to access non-existant Address {address}! Registering ...");
+                    return RegisterAddress(address);
+                }
             }
         }
 
@@ -216,7 +219,7 @@ namespace PilotsDeck
                         for (i = 0; i < ticks; i++)
                         {
                             Log.Logger.Debug($"IPCManager: Running Actions {i+1}/{ticks} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
-                            if (SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, offValue))
+                            if (SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, ignoreLvarReset, offValue))
                             {
                                 success++;
                                 if (actionType == ActionSwitchType.MACRO || actionType == ActionSwitchType.SCRIPT || actionType == ActionSwitchType.XPCMD)
@@ -228,7 +231,7 @@ namespace PilotsDeck
                     else
                     {
                         Log.Logger.Debug($"IPCManager: Running Action '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
-                        result = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, offValue, ticks);
+                        result = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, ignoreLvarReset, offValue, ticks);
                     }
                 }
             }
