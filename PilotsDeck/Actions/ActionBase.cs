@@ -18,13 +18,6 @@ namespace PilotsDeck
             Plugin.ActionController.DeregisterAction(args.context);
         }
 
-        public override async Task OnWillAppear(StreamDeckEventPayload args)
-        {
-            await base.OnWillAppear(args);
-
-            Log.Logger.Debug($"ActionBase:OnWillAppear {args.context} | {Plugin.ActionController[args.context]?.ActionID}");
-        }
-
         public override async Task OnDidReceiveSettings(StreamDeckEventPayload args)
         {
             await base.OnDidReceiveSettings(args);

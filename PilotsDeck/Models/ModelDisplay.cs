@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Web;
 
 namespace PilotsDeck
 {
@@ -32,9 +33,28 @@ namespace PilotsDeck
         public static string RoundValue(string value, string format)
         {
             string[] parts = format.Split(':');
+            int signsLeading = 0;
+            int signsTrailing = 0;
+            bool canRound = false;
 
-            if (parts.Length >= 1 && int.TryParse(parts[0], out int num) && double.TryParse(value, NumberStyles.Number, new RealInvariantFormat(value), out double dbl))
-                return string.Format(AppSettings.numberFormat, $"{{0:F{num}}}", Math.Round(dbl, num));
+            if (parts.Length >= 1 && parts[0].Contains('.'))
+            {
+                string[] signs = parts[0].Split('.');
+                if (signs.Length == 1)
+                    canRound = int.TryParse(signs[0], out signsLeading);
+                if (signs.Length == 2)
+                {
+                    _ = int.TryParse(signs[0], out signsLeading);
+                    canRound = int.TryParse(signs[1], out signsTrailing);
+                    if (signsTrailing > 0)
+                        signsLeading += 1;
+                }
+            }
+            else if (parts.Length >= 1 && int.TryParse(parts[0], out signsTrailing))
+                canRound = true;
+
+            if (canRound && double.TryParse(value, NumberStyles.Number, new RealInvariantFormat(value), out double dbl))
+                return string.Format(AppSettings.numberFormat, $"{{0,{signsLeading + signsTrailing}:F{signsTrailing}}}", Math.Round(dbl, signsTrailing)).Replace(' ', '0');
             else
                 return value;
         }
