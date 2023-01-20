@@ -25,11 +25,17 @@ namespace PilotsDeck
                     KorryFiles = String.Join("|", ReadImageDirectory(@"korry\").Where(f => !f.Contains(AppSettings.hqImageSuffix) && !f.Contains(AppSettings.plusImageSuffix)));
 
                 Array values = Enum.GetValues(typeof(ActionSwitchType));
+                bool first = true;
                 for (int i = 0; i < values.Length; i++)
                 {
-                    ActionTypes += (int)values.GetValue(i) + "=" + Enum.GetName(typeof(ActionSwitchType), values.GetValue(i));
-                    if (i + 1 < values.Length)
-                        ActionTypes += "|";
+                    if ((ActionSwitchType)values.GetValue(i) != ActionSwitchType.READVALUE)
+                    {
+                        if (first)
+                            first = false;
+                        else
+                            ActionTypes += "|";
+                        ActionTypes += (int)values.GetValue(i) + "=" + Enum.GetName(typeof(ActionSwitchType), values.GetValue(i));
+                    }
                 }
 
                 values = Enum.GetValues(typeof(GaugeOrientation));
@@ -73,9 +79,9 @@ namespace PilotsDeck
                     FontStyles += (int)(FontStyle.Bold | FontStyle.Strikeout) + "=" + FontStyle.Bold.ToString() + " + " + FontStyle.Strikeout.ToString() + "|";
                     FontStyles += (int)(FontStyle.Italic | FontStyle.Strikeout) + "=" + FontStyle.Italic.ToString() + " + " + FontStyle.Strikeout.ToString();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Log.Logger.Error("ModelPropertyInspectorFonts: Exception while loading Fonts");
+                    Logger.Log(LogLevel.Critical, "ModelPropertyInspectorFonts:Constructor", $"Exception while loading Fonts! (Exception: {ex.GetType()})");
                 }
             }
         }
@@ -90,9 +96,9 @@ namespace PilotsDeck
   
                 return images;
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("ReadImageDirectory: Exception while loading ImageFiles");
+                Logger.Log(LogLevel.Critical, "ModelPropertyInspectorFonts:ReadImageDirectory", $"Exception while loading ImageFiles! (Exception: {ex.GetType()})");
             }
 
             return Array.Empty<string>();
@@ -116,11 +122,6 @@ namespace PilotsDeck
             {
                 return ColorTranslator.FromHtml(FontColor);
             }
-        }
-
-        public static string TitleLog(string title)
-        {
-            return title.Replace("\t","").Replace("\r","").Replace("\n", "");
         }
 
         public static StreamDeckTitleParameters ConvertTitleParameter(StreamDeckEventPayload.TitleParameters titleParameters)

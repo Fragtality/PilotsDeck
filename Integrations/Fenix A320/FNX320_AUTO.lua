@@ -94,18 +94,23 @@ function FNX_LT_STROBE_OFF_TGL()
 end
 
 function FNX_LT_LAND_ON_TGL()
-	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 2, 1)
-	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 2, 1)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 1, 2)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 1, 2)
 end
 
 function FNX_LT_LAND_OFF_TGL()
-	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 1, 0)
-	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 1, 0)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 0, 0)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 0, 0)
 end
 
 function FNX_LT_LAND_FULL_TGL()
 	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 2, 0)
 	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 2, 0)
+end
+
+function FNX_LT_LAND_SEQ()
+	FNX_SEQUENCE("S_OH_EXT_LT_LANDING_L", 2, 0)
+	FNX_SEQUENCE("S_OH_EXT_LT_LANDING_R", 2, 0)
 end
 
 function FNX_LT_NOSE_TO_TGL()
@@ -132,14 +137,14 @@ end
 function FNX_LT_CABIN_TGL()
 	local curValue = ipc.readUD(cabinOffset)
 
-	if curValue ~= 25 then
-		FNX_LT_CABIN_SET(25)
+	if curValue ~= 20 then
+		FNX_LT_CABIN_SET(20)
 	else
 		FNX_LT_CABIN_SET(100)
 	end
 end
 
-local cabinStep = 20
+local cabinStep = 10
 function FNX_LT_CABIN_INC()
 	local curValue = ipc.readUD(cabinOffset)
 
@@ -367,6 +372,18 @@ end
 
 -----------------------------------------
 -- $$ RMP1/ACP1
+
+function FNX_RMP_XFER(num)
+	FNX_BTN_PRESS("S_PED_RMP" .. num .. "_XFER")
+end
+
+function FNX_RMP1_XFER()
+	FNX_RMP_XFER(1)
+end
+
+function FNX_RMP2_XFER()
+	FNX_RMP_XFER(2)
+end
 
 function FNX_RMP1_OUTER_INC()
 	FNX_TWIST("E_PED_RMP1_OUTER", 1)
@@ -789,4 +806,7 @@ event.flag(98, "FNX_LT_CABIN_DEC")
 event.flag(99, "FNX_PEDAL_DISCO_ON")
 event.flag(100, "FNX_PEDAL_DISCO_OFF")
 event.flag(101, "FNX_BARO_TGL")
+event.flag(102, "FNX_RMP1_XFER")
+event.flag(103, "FNX_RMP2_XFER")
+event.flag(104, "FNX_LT_LAND_SEQ")
 event.flag(254, "FNX_INIT_AC")

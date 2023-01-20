@@ -7,7 +7,7 @@ namespace PilotsDeck
         public override ModelDisplayGauge GaugeSettings { get { return Settings; } }
         public new ModelDisplayGaugeDual Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayGaugeDual] Read1: {Address} | Read2: {Settings.Address2}"; } }
+        public override string ActionID { get { return $"(HandlerDisplayGaugeDual) ({Title.Trim()}) {(GaugeSettings.IsEncoder ? "(Encoder) " : "")}(Read1: {GaugeSettings.Address} / Read2: {Settings.Address2}) (HasAction: {HasAction}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
 
         public HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
@@ -23,21 +23,21 @@ namespace PilotsDeck
         {
             base.Register(imgManager, ipcManager);
 
-            ValueManager.RegisterValue(ID.Second, Settings.Address2);
+            ValueManager.AddValue(ID.GaugeSecond, Settings.Address2);
         }
 
         public override void Deregister()
         {
             base.Deregister();
 
-            ValueManager.DeregisterValue(ID.Second);
+            ValueManager.RemoveValue(ID.GaugeSecond);
         }
 
-        public override void Update()
+        public override void Update(bool skipActionUpdate = false)
         {
-            base.Update();
+            base.Update(skipActionUpdate);
 
-            ValueManager.UpdateValueAddress(ID.Second, Settings.Address2);
+            ValueManager.UpdateValue(ID.GaugeSecond, Settings.Address2);
         }
 
         protected override void DrawBar(string value, ImageRenderer render)
@@ -49,7 +49,7 @@ namespace PilotsDeck
 
             base.DrawBar(value, render);
 
-            value = ValueManager[ID.Second];
+            value = ValueManager[ID.GaugeSecond];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -63,7 +63,7 @@ namespace PilotsDeck
         {
             base.DrawArc(value, render);
 
-            value = ValueManager[ID.Second];
+            value = ValueManager[ID.GaugeSecond];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -80,7 +80,7 @@ namespace PilotsDeck
 
             if (!GaugeSettings.DrawArc)
             {
-                value = ValueManager[ID.Second];
+                value = ValueManager[ID.GaugeSecond];
                 if (GaugeSettings.DecodeBCD)
                     value = ModelDisplay.ConvertFromBCD(value);
                 value = GaugeSettings.ScaleValue(value);

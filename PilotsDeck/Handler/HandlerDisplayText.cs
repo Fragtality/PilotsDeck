@@ -8,7 +8,7 @@ namespace PilotsDeck
         public override IModelSwitch SwitchSettings => throw new System.NotImplementedException();
         public virtual ModelDisplayText Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayText] Read: {TextSettings.Address}"; } }
+        public override string ActionID { get { return $"(HandlerDisplayText) ({Title.Trim()}) {(TextSettings.IsEncoder ? "(Encoder) " : "")}(Read: {TextSettings.Address})"; } }
         public override string Address { get { return TextSettings.Address; } }
 
         public override bool UseFont { get { return true; } }
@@ -50,11 +50,12 @@ namespace PilotsDeck
 
             if (TextSettings.HasIndication)
                 _ = imgManager.AddImage(TextSettings.IndicationImage, DeckType);
+            imgRefs.Add(ID.Indication, TextSettings.IndicationImage);
 
             RenderImages();
             NeedRedraw = true;
 
-            ValueManager.RegisterValue(ID.ControlState, Address);
+            ValueManager.AddValue(ID.Control, Address);
         }
 
         public override void Deregister()
@@ -63,13 +64,14 @@ namespace PilotsDeck
 
             if (TextSettings.HasIndication)
                 ImgManager.RemoveImage(TextSettings.IndicationImage, DeckType);
+            imgRefs.Remove(ID.Indication);
 
-            ValueManager.DeregisterValue(ID.ControlState);
+            ValueManager.RemoveValue(ID.Control);
         }
 
-        public override void Update()
+        public override void Update(bool skipActionUpdate = false)
         {
-            base.Update();
+            base.Update(skipActionUpdate);
             RenderImages();
             NeedRedraw = true;
 
@@ -80,7 +82,14 @@ namespace PilotsDeck
                 UpdateSettingsModel = true;
             }
 
-            ValueManager.UpdateValueAddress(ID.ControlState, Address);
+            ValueManager.UpdateValue(ID.Control, Address);
+        }
+
+        protected override void UpdateImages()
+        {
+            base.UpdateImages();
+
+            UpdateImage(Settings.IndicationImage, ID.Indication);
         }
 
         protected virtual void RenderImages()
@@ -139,34 +148,27 @@ namespace PilotsDeck
         }
 
         public override void SetError()
-        {
-            if (IsInitialized)
+        { 
+            if (TextSettings.DrawBox && DrawImage != ErrorImageRender)
             {
-                if (TextSettings.DrawBox && DrawImage != ErrorImageRender)
-                {
-                    DrawImage = ErrorImageRender;
-                    IsRawImage = true;
-                    NeedRedraw = true;
-                }
-                else if (!TextSettings.DrawBox && DrawImage != ErrorImage)
-                {
-                    DrawImage = ErrorImage;
-                    IsRawImage = false;
-                    NeedRedraw = true;
-                }
+                DrawImage = ErrorImageRender;
+                IsRawImage = true;
+                NeedRedraw = true;
             }
-            else
+            else if (!TextSettings.DrawBox && DrawImage != ErrorImage)
             {
-                SetDefault();
+                DrawImage = ErrorImage;
+                IsRawImage = false;
+                NeedRedraw = true;
             }
         }
 
         protected override void Redraw()
         {
-            if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Control) && !ForceUpdate)
                 return;
 
-            string value = ValueManager[ID.ControlState];
+            string value = ValueManager[ID.Control];
             if (Settings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
 

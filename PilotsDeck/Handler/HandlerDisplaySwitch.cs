@@ -6,8 +6,7 @@
         public override IModelSwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplaySwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplaySwitch] Read: {TextSettings.Address} | Write: {SwitchSettings.AddressAction}| LongWrite: {SwitchSettings.HasLongPress} - {SwitchSettings.AddressActionLong}"; } }
-
+        public override string ActionID { get { return $"(HandlerSwitchDisplay) ({Title.Trim()}) {(TextSettings.IsEncoder ? "(Encoder) " : "")}(Read: {TextSettings.Address}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
         public override bool HasAction { get; protected set; } = true;
 
 

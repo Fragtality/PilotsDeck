@@ -10,6 +10,30 @@ namespace PilotsDeck
         protected string code;
         protected int factor;
 
+        public static string CalculateSwitchValue(string lastValue, string offState, string onState, int ticks)
+        {
+            if (!string.IsNullOrWhiteSpace(onState) && onState[0] == '$' && double.TryParse(lastValue, NumberStyles.Number, new RealInvariantFormat(lastValue), out _))
+            {
+                ValueManipulator valueManipulator = new();
+                string newValue = valueManipulator.GetValue(lastValue, onState, ticks);
+                return newValue;
+            }
+            else
+                return ToggleSwitchValue(lastValue, offState, onState);
+        }
+
+        public static string ToggleSwitchValue(string lastValue, string offState, string onState)
+        {
+            string newValue;
+            if (lastValue == offState ||
+                (double.TryParse(lastValue, new RealInvariantFormat(lastValue), out double val) && double.TryParse(offState, new RealInvariantFormat(offState), out double off) && val == off))
+                newValue = onState;
+            else
+                newValue = offState;
+            Logger.Log(LogLevel.Debug, "ValueManipulator:ToggleSwitchValue", $"Toggled Value '{lastValue}' -> '{newValue}'.");
+            return newValue;
+        }
+
         public string GetValue(string val, string strCode, int ticks)
         {
             code = strCode;
@@ -19,12 +43,17 @@ namespace PilotsDeck
                 return strValue;
 
             code = code.Trim()[1..];
+            bool sequence = false;
 
-            if (code[0] == '+' || code[0] == '-')
+            if (code.Contains(':') || code.Length == 1 || (code.Length >= 2 && !code.Contains(',') && double.TryParse(code, new RealInvariantFormat(code), out _)))
                 Counter();
-            else if (code.Contains(',') || code.Contains('='))
+            else
+            {
+                sequence = true;
                 Sequence();
+            }
 
+            Logger.Log(LogLevel.Debug, "ValueManipulator:GetValue", $"{(sequence ? "Sequence" : "Counter")} Value '{val}' -> '{result}'.");
             return result;
         }
 
@@ -32,6 +61,9 @@ namespace PilotsDeck
         {
             bool bounce = code.EndsWith('<');
             code = code.Replace("<", "");
+            bool numeric = false;
+            if (double.TryParse(strValue, new RealInvariantFormat(strValue), out double val))
+                numeric = true;
 
             string[] parts = code.Split(',');
             string defValue = parts[^1].Replace("=", "");
@@ -43,7 +75,7 @@ namespace PilotsDeck
                     defValue = parts[i];
                 }
 
-                if (parts[i] == strValue)
+                if (parts[i] == strValue || (numeric && double.TryParse(parts[i], new RealInvariantFormat(parts[i]), out double step) && val == step))
                 {
                     if (i + 1 < parts.Length)
                     {
@@ -65,8 +97,9 @@ namespace PilotsDeck
 
         protected void Counter()
         {
-            bool increase = code[0] == '+';
-            code = code[1..];
+            bool increase = code[0] != '-';
+            if (code[0] == '-' || code[0] == '+')
+                code = code[1..];
             string[] parts = code.Split(':');
 
             if (string.IsNullOrEmpty(parts[0]))
@@ -83,10 +116,10 @@ namespace PilotsDeck
                 if (!double.TryParse(parts[1], NumberStyles.Number, new RealInvariantFormat(parts[1]), out double limit))
                     return;
 
-                if (increase && value <= limit - step)
+                if (increase && value < limit)
                     value += step;
 
-                if (!increase && value >= limit + step)
+                if (!increase && value > limit)
                     value -= step;
             }
             else

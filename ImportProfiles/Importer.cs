@@ -1,4 +1,8 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace ImportProfiles
 {
@@ -15,7 +19,7 @@ namespace ImportProfiles
     {
         protected readonly static string dir = Directory.GetCurrentDirectory();
         protected readonly static string manifest = dir + @"\manifest.json";
-        protected static List<Profile> profilesManifest = new();
+        private static List<Profile> profilesManifest = new();
 
         public static void Main()
         {

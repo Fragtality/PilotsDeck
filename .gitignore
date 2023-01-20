@@ -8,7 +8,8 @@ Backups/
 Artwork/
 Releases/
 desktop.ini
-RegisterPluginAndStartStreamDeck.ps1
+BuildPlugin.ps1
+build.lck
 Release.ps1
 RELEASE ORDER.txt
 

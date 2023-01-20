@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Web;
 
 namespace PilotsDeck
 {
@@ -75,12 +74,12 @@ namespace PilotsDeck
             string[] parts = format.Split(':');
             string replaceFrom = AppSettings.stringReplace;
 
-            if (format.Length < 1 || parts.Length < 1 || !format.Contains(replaceFrom))
-                return value;
-            else if (parts.Length >= 2 && int.TryParse(parts[0], out _) && format[(parts[0].Length + 1)..].Contains(replaceFrom))
-                return string.Format(AppSettings.numberFormat, format[(parts[0].Length + 1)..].Replace(replaceFrom, "{0}"), value);
+            if (parts.Length >= 2 && parts[1].Contains(replaceFrom))
+                return string.Format(AppSettings.numberFormat, parts[1].Replace(replaceFrom, "{0}"), value);
+            else if (parts.Length == 1 && parts[0].Contains(replaceFrom))
+                return string.Format(AppSettings.numberFormat, parts[0].Replace(replaceFrom, "{0}"), value);
             else
-                return string.Format(AppSettings.numberFormat, format.Replace(replaceFrom, "{0}"), value);
+                return value;
         }
 
         public static string ConvertFromBCD(string value)

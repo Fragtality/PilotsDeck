@@ -1,7 +1,5 @@
-﻿using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -22,11 +20,19 @@ namespace PilotsDeck
                 if (currentValues.TryGetValue(address, out IPCValue value))
                     return value;
                 else
-                {
-                    Log.Logger.Error("$IPCManager: Tried to access non-existant Address {address}! Registering ...");
-                    return RegisterAddress(address);
-                }
+                    return null;
             }
+        }
+
+        public bool TryGetValue(string address, out IPCValue value)
+        {
+            value = this[address];
+            return value != null;
+        }
+
+        public bool Contains(string address)
+        {
+            return currentValues.ContainsKey(address);
         }
 
         public List<string> AddressList { get { return currentValues.Keys.ToList(); } }
@@ -43,18 +49,18 @@ namespace PilotsDeck
                 currentValues.Clear();
                 currentRegistrations.Clear();
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("IPCManager: Exception while removing Registrations!");
+                Logger.Log(LogLevel.Critical, "IPCManager:Dispose", $"Exception while removing Registrations! (Exception: {ex.GetType()})");
             }
 
             try
             {
                 SimConnector.Close();
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("IPCManager: Exception while closing Connections");
+                Logger.Log(LogLevel.Critical, "IPCManager:Dispose", $"Exception while closing Connections! (Exception: {ex.GetType()})");
             }
         }
 
@@ -63,20 +69,14 @@ namespace PilotsDeck
             IPCValue value = null;
             try
             {
-                if (!IPCTools.IsReadAddress(address))
-                {
-                    Log.Logger.Error($"IPCManager: Not an Read-Address! [{address}]");
-                    return value;
-                }
-
                 if (currentValues.TryGetValue(address, out value))
                 {
                     currentRegistrations[address]++;
-                    Log.Logger.Debug($"IPCManager: Added Registration for Address {address}, Registrations: {currentRegistrations[address]}");
+                    Logger.Log(LogLevel.Debug, "IPCManager:RegisterAddress", $"Added Registration for Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     if (value == null)
-                        Log.Logger.Error($"IPCManager: Registered Address {address} has NULL-Reference Value !!");
+                        Logger.Log(LogLevel.Error, "IPCManager:RegisterAddress", $"Registered Address '{address}' has NULL-Reference Value! (Registrations: {currentRegistrations[address]})");
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(address))
                 {
                     value = SimulatorConnector.CreateIPCValue(address);
 
@@ -85,15 +85,15 @@ namespace PilotsDeck
                         currentValues.Add(address, value);
                         currentRegistrations.Add(address, 1);
                         SimConnector.SubscribeAddress(address);
-                        Log.Logger.Debug($"IPCManager: Added Registration for Address {address}, Registrations: {currentRegistrations[address]}");
+                        Logger.Log(LogLevel.Debug, "IPCManager:RegisterAddress", $"Subscribed Value for Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     }
                     else
-                        Log.Logger.Error($"IPCManager: Registered Address {address} has NULL-Reference Value !!");
+                        Logger.Log(LogLevel.Error, "IPCManager:RegisterAddress", $"SimConnector returned NULL-Reference for Address '{address}'!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"IPCManager: Exception while registering Address {address}");
+                Logger.Log(LogLevel.Critical, "IPCManager:RegisterAddress", $"Exception while registering Address '{address}'! (IsConnected: {SimConnector.IsConnected}) (IsReady: {SimConnector.IsReady}) (Exception: {ex.GetType()})");
             }
 
             return value;
@@ -103,26 +103,29 @@ namespace PilotsDeck
         {
             try
             { 
-                if (!string.IsNullOrEmpty(address) && currentValues.ContainsKey(address))
+                if (!string.IsNullOrWhiteSpace(address) && currentValues.ContainsKey(address))
                 {
                     if (currentRegistrations[address] >= 1)
                     {
                         currentRegistrations[address]--;
-                        Log.Logger.Debug($"DeregisterAddress: Deregistered Address {address}, Registrations open: {currentRegistrations[address]}");
+                        Logger.Log(LogLevel.Debug, "IPCManager:DeregisterAddress", $"Deregistered Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     }
                 }
                 else
-                    Log.Logger.Error($"DeregisterAddress: Could not find Address {address}");
+                    Logger.Log(LogLevel.Error, "IPCManager:DeregisterAddress", $"Could not find Address '{address}'!");
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"DeregisterAddress: Exception while deregistering Address {address}");
+                Logger.Log(LogLevel.Critical, "IPCManager:DeregisterAddress", $"Exception while deregistering Address '{address}'! (IsConnected: {SimConnector.IsConnected}) (IsReady: {SimConnector.IsReady}) (Exception: {ex.GetType()})");
             }
         }
 
         public void UnsubscribeUnusedAddresses()
         {
             var unusedAddresses = currentRegistrations.Where(v => v.Value <= 0);
+
+            if (unusedAddresses.Any() )
+                Logger.Log(LogLevel.Information, "IPCManager:UnsubscribeUnusedAddresses", $"Unsubscribing {unusedAddresses.Count()} unused Addresses ...");
 
             foreach (var address in unusedAddresses)
             {
@@ -132,7 +135,7 @@ namespace PilotsDeck
                 currentValues[address.Key] = null;
                 currentValues.Remove(address.Key);
 
-                Log.Logger.Debug($"UnsubscribeUnusedAddresses: Removed Address {address}");
+                Logger.Log(LogLevel.Debug, "IPCManager:UnsubscribeUnusedAddresses", $"Unsubscribed '{address.Key}' from managed Addresses.");
             }
         }
 
@@ -151,40 +154,16 @@ namespace PilotsDeck
                     value.Process(SimConnector.SimType);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("IPCManager: Exception in Process() Call");
+                Logger.Log(LogLevel.Critical, "IPCManager:Process", $"Exception in Process() Call! (IsConnected: {SimConnector.IsConnected}) (IsReady: {SimConnector.IsReady}) (Exception: {ex.GetType()})");
                 result = false;
             }
 
             return result;
         }
 
-        public static string CalculateSwitchValue(string lastValue, string offState, string onState, int ticks)
-        {
-            if (!string.IsNullOrEmpty(onState) && onState[0] == '$' && double.TryParse(lastValue, NumberStyles.Number, new RealInvariantFormat(lastValue), out _))
-            {
-                ValueManipulator valueManipulator = new();
-                string newValue = valueManipulator.GetValue(lastValue, onState, ticks);
-                Log.Logger.Debug($"IPCManager: Value calculated {lastValue} -> {newValue}");
-                return newValue;
-            }
-            else
-                return ToggleSwitchValue(lastValue, offState, onState);
-        }
-
-        public static string ToggleSwitchValue(string lastValue, string offState, string onState)
-        {
-            string newValue;
-            if (lastValue == offState)
-                newValue = onState;
-            else
-                newValue = offState;
-            Log.Logger.Debug($"IPCManager: Value toggled {lastValue} -> {newValue}");
-            return newValue;
-        }
-
-        public bool RunAction(string addressOn, string addressOff, ActionSwitchType actionType, string switchState, string controlState, string onValue, string offValue, IModelSwitch switchSettings, bool ignoreLvarReset = false, int ticks = 1)
+        public bool RunAction(string addressOn, string addressOff, ActionSwitchType actionType, string currentState, string onValue, string offValue, IModelSwitch switchSettings, bool ignoreLvarReset = false, int ticks = 1)
         {
             bool result = false;
 
@@ -192,33 +171,33 @@ namespace PilotsDeck
             {
                 if (actionType == ActionSwitchType.VJOY || actionType == ActionSwitchType.VJOYDRV)
                 {
-                    Log.Logger.Debug($"IPCManager: Running vJoy Toggle Action for '{addressOn}', Type: {actionType}");
-                    result = IPCTools.VjoyToggle(actionType, addressOn);
+                    Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"Running vJoy Toggle Action for '{addressOn}'. (Type: {actionType})");
+                    result = SimTools.VjoyToggle(actionType, addressOn);
                 }
                 else
                 {
                     string runAddress = addressOn;
-                    if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(addressOff) && ModelBase.Compare(offValue, controlState))
+                    if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(addressOff) && ModelBase.Compare(offValue, currentState))
                     {
                         runAddress = addressOff;
                     }
                     
                     string newValue = "";
-                    if (HandlerBase.IsActionReadable(actionType))
+                    if (IPCTools.IsActionReadable(actionType))
                     {
                         if (!ignoreLvarReset && switchSettings.UseLvarReset && onValue[0] != '$')
                             newValue = onValue;
                         else
-                            newValue = CalculateSwitchValue(switchState, offValue, onValue, ticks);
+                            newValue = ValueManipulator.CalculateSwitchValue(currentState, offValue, onValue, ticks);
                     }
 
-                    if (!HandlerBase.IsActionReadable(actionType) && actionType != ActionSwitchType.CALCULATOR)
+                    if (!IPCTools.IsActionReadable(actionType) && actionType != ActionSwitchType.CALCULATOR)
                     {
                         int success = 0;
                         int i;
                         for (i = 0; i < ticks; i++)
                         {
-                            Log.Logger.Debug($"IPCManager: Running Actions {i+1}/{ticks} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                            Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"Running Action {actionType} {i + 1}/{ticks} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
                             if (SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, ignoreLvarReset, offValue))
                             {
                                 success++;
@@ -230,13 +209,13 @@ namespace PilotsDeck
                     }
                     else
                     {
-                        Log.Logger.Debug($"IPCManager: Running Action '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                        Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"Running Action {actionType} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
                         result = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, ignoreLvarReset, offValue, ticks);
                     }
                 }
             }
             else
-                Log.Logger.Error($"IPCManager: not connected or Address not passed {addressOn}");
+                Logger.Log(LogLevel.Error, "IPCManager:RunAction", $"IPCManager: Address '{addressOn}' is not valid! (IsConnected {SimConnector.IsConnected})");
 
             return result;
         }

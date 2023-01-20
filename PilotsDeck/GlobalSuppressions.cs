@@ -11,3 +11,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0044:Modifizierer \"readonly\" hinzufügen")]
 [assembly: SuppressMessage("Style", "IDE0074:Verbundzuweisung verwenden")]
 [assembly: SuppressMessage("GeneratedRegex", "SYSLIB1045:In „GeneratedRegexAttribute“ konvertieren.")]
+[assembly: SuppressMessage("Performance", "CA1854:Methode „IDictionary.TryGetValue(TKey, out TValue)“ bevorzugen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.ValueManager.SetValue(System.Int32,PilotsDeck.IPCValue)")]

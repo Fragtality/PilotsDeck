@@ -104,12 +104,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"XPDatagram: Error while sending Command '{address}': zero Bytes sent!");
+                    Logger.Log(LogLevel.Error, "XPDatagram:SendCommand", $"Command '{address}' had zero Bytes sent!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"XPDatagram: Exception while sending Command '{address}'!");
+                Logger.Log(LogLevel.Critical, "XPDatagram:SendCommand", $"Exception while sending Command '{address}'! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
             return result;
         }
@@ -138,12 +138,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"XPDatagram: Error while sending Subscription for DataRef '{address}': zero Bytes sent!");
+                    Logger.Log(LogLevel.Error, "XPDatagram:SendSubscribe", $"Subscription for '{address}' had zero Bytes sent!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"XPDatagram: Exception while sending Subscription for DataRef '{address}'!");
+                Logger.Log(LogLevel.Critical, "XPDatagram:SendSubscribe", $"Exception while sending Subscription for DataRef '{address}'! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
             return result;
         }
@@ -172,12 +172,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"XPDatagram: Error while unsubscribing DataRef '{address}': zero Bytes sent!");
+                    Logger.Log(LogLevel.Error, "XPDatagram:SendUnsubscribe", $"Unsubscription for '{address}' had zero Bytes sent!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"XPDatagram: Exception while unsubscribing DataRef '{address}'!");
+                Logger.Log(LogLevel.Critical, "XPDatagram:SendUnsubscribe", $"Exception while unsubscribing DataRef '{address}'! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
             return result;
         }
@@ -206,12 +206,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"XPDatagram: Error while writing DataRef '{address}': conversion failed / zero Bytes sent!");
+                    Logger.Log(LogLevel.Error, "XPDatagram:SetDataRef", $"Error while writing DataRef '{address}': conversion failed / zero Bytes sent!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"XPDatagram: Exception while writing DataRef '{address}'!");
+                Logger.Log(LogLevel.Critical, "XPDatagram:SetDataRef", $"Exception while writing DataRef '{address}'! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
             return result;
         }

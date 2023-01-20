@@ -3,9 +3,12 @@
 
 if (document.getElementById("DefaultActions") && defaultHtml)
 	document.getElementById("DefaultActions").innerHTML = defaultHtml;
+if (document.getElementById("FormatValue") && formatHtml)
+	document.getElementById("FormatValue").innerHTML = formatHtml;
 if (document.getElementById("EncoderActions") && encoderHtml)
 	document.getElementById("EncoderActions").innerHTML = encoderHtml;
-
+if (document.getElementById("FontOptions") && fontHtml)
+	document.getElementById("FontOptions").innerHTML = fontHtml;
 
 var websocket = null,
 	uuid = null,
@@ -32,6 +35,16 @@ function fillImageSelectBox(values, elementID, configured) {
 		if (values[i] == configured)
 			option.selected = true;
 		document.getElementById(elementID).add(option);
+	}
+}
+
+function fillImagePreview(elementID) {
+	if (document.getElementById(elementID) && document.getElementById("Prev_" + elementID)) {
+		var img = document.getElementById(elementID).value;
+		document.getElementById("Prev_" + elementID).src = "../" + img;
+		var alt = img.replace(".png", "");
+		alt = alt.substring(alt.lastIndexOf("/") + 1);
+		document.getElementById("Prev_" + elementID).alt = alt;
 	}
 }
 
@@ -274,6 +287,43 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSw
 	}
 }
 
+function fillSelectBoxes() {
+	//Images
+	if (ImageFiles && ImageFiles != "") {
+		imageSelectBoxes.forEach((id) =>
+			fillImageSelectBox(ImageFiles, id, settingsModel[id])
+		);
+	}
+	if (KorryFiles && KorryFiles != "" && settingsModel.TopImage != null && settingsModel.BotImage != null) {
+		korrySelectBoxes.forEach((id) =>
+			fillImageSelectBox(KorryFiles, id, settingsModel[id])
+		);
+	}
+	updateImagePreviews();
+
+	//Fonts
+	if (FontNames && FontNames != "" && settingsModel.FontName != null) {
+		fillFontSelectBox(FontNames, 'FontName', settingsModel.FontName);
+	}
+	if (FontStyles && FontStyles != "" && settingsModel.FontStyle != null) {
+		fillTypeSelectBox(FontStyles, 'FontStyle', settingsModel.FontStyle);
+	}
+
+	//Gauge
+	if (GaugeOrientations && GaugeOrientations != "" && settingsModel.BarOrientation != null) {
+		fillTypeSelectBox(GaugeOrientations, 'BarOrientation', settingsModel.BarOrientation);
+	}
+}
+
+function updateImagePreviews() {
+	if (ImageFiles && ImageFiles != "") {
+		imageSelectBoxes.forEach((id) => fillImagePreview(id));
+	}
+	if (KorryFiles && KorryFiles != "" && settingsModel.TopImage != null && settingsModel.BotImage != null) {
+		korrySelectBoxes.forEach((id) => fillImagePreview(id));
+	}
+}
+
 function commonFormUpdate() {
 	//ENCODER ACTIONS
 	if (!settingsModel.IsEncoder) {
@@ -325,7 +375,11 @@ function commonFormUpdate() {
 	}
 	else if (document.getElementById("DefaultActions")) {
 		document.getElementById("DefaultActions").style.display = "none";
+		setPattern('Address', 5);
 	}
+
+	//PREVIEWS
+	updateImagePreviews();
 
 	//ACTION UPDATE
 	updateForm();

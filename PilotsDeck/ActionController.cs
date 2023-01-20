@@ -3,6 +3,7 @@ using Serilog;
 using StreamDeckLib;
 using StreamDeckLib.Messages;
 using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -62,7 +63,9 @@ namespace PilotsDeck
             if (currentActions != null && ipcManager != null && imgManager != null && manifestProfiles != null)
             {
                 SimConnector = new ConnectorDummy();
-                Log.Logger.Information($"ActionController successfully initialized. Poll-Time {AppSettings.pollInterval}ms / Wait-Ticks {waitTicks} / Redraw Always {redrawAlways}");
+                Logger.Log(LogLevel.Information, "ActionController:Init", "Configuration Parameters:");
+                foreach (string key in ConfigurationManager.AppSettings.AllKeys)
+                    Logger.Log(LogLevel.Information, "ActionController:Init", $"{key} = {ConfigurationManager.AppSettings[key]}");
             }
 
             dynamic manifest = JObject.Parse(File.ReadAllText(@"manifest.json"));
@@ -77,10 +80,11 @@ namespace PilotsDeck
                     }
                 }
             }
-            Log.Logger.Information($"Loaded {manifestProfiles.Count} StreamDeck Profiles from Manifest.");
+            Logger.Log(LogLevel.Information, "ActionController:Init", $"Loaded {manifestProfiles.Count} StreamDeck Profiles from Manifest.");
 
             AppSettings.SetLocale();
-            Log.Logger.Information($"Locale is set to \"{AppSettings.locale}\" - FontStyles: {AppSettings.fontDefault} / {AppSettings.fontBold} / {AppSettings.fontItalic}");
+            Logger.Log(LogLevel.Information, "ActionController:Init", $"Locale is set to '{AppSettings.locale}\'. (Default: {AppSettings.fontDefault}) (Bold: {AppSettings.fontBold}) (Italic: {AppSettings.fontItalic})");
+            Logger.Log(LogLevel.Information, "ActionController:Init", $"ActionController successfully initialized!");
         }
 
         public void Dispose()
@@ -88,7 +92,7 @@ namespace PilotsDeck
             ipcManager.Dispose();
             imgManager.Dispose();
             GC.SuppressFinalize(this);
-            Log.Logger.Information("ActionController and IPCManager Disposed");
+            Logger.Log(LogLevel.Information, "ActionController:Dispose", "ActionController and IPCManager Disposed");
         }
 
         public int Length => currentActions.Count;
@@ -151,12 +155,12 @@ namespace PilotsDeck
             //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
             //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, null);
 
-            Log.Logger.Information($"ActionController:OnDidReceiveGlobalSettings - Switching => {GlobalProfileSettings.EnableSwitching} | DeviceMappings => {GlobalProfileSettings?.DeviceMappings?.Count} | Installed => {GlobalProfileSettings.ProfilesInstalled}");
+            Logger.Log(LogLevel.Information, "ActionController:OnDidReceiveGlobalSettings", $"Received Configuration for Profile Switching. (Switching: {GlobalProfileSettings.EnableSwitching}) (DeviceMappings: {GlobalProfileSettings?.DeviceMappings?.Count}) (Installed: {GlobalProfileSettings.ProfilesInstalled})");
         }
 
         protected void OnApplicationDidLaunch(StreamDeckEventPayload args)
         {
-            Log.Logger.Debug($"ActionController:OnApplicationDidLaunchAsync {args.payload.application}");
+            Logger.Log(LogLevel.Information, "ActionController:OnApplicationDidLaunch", $"Exectuable '{args.payload.application}' launched.");
 
             SimConnector.Dispose();
             SimConnector = SimulatorConnector.CreateConnector(args.payload.application, tickCounter, ipcManager);
@@ -164,7 +168,7 @@ namespace PilotsDeck
 
         protected void OnApplicationDidTerminate(StreamDeckEventPayload args)
         {
-            Log.Logger.Debug($"ActionController:OnApplicationDidTerminateAsync {args.payload.application}");
+            Logger.Log(LogLevel.Information, "ActionController:OnApplicationDidTerminate", $"Exectuable '{args.payload.application}' terminated.");
 
             SimConnector.Close();
         }
@@ -180,10 +184,10 @@ namespace PilotsDeck
             if (!profileSwitcherActions.Contains(context))
             {
                 profileSwitcherActions.Add(context);
-                Log.Logger.Debug($"ActionController:RegisterProfileSwitcher ProfileSwitcher registered [{context}]");
+                Logger.Log(LogLevel.Debug, "ActionController:RegisterProfileSwitcher", $"ProfileSwitcher registered. (Context: {context})");
             }
             else
-                Log.Logger.Error($"ActionController:RegisterProfileSwitcher ProfileSwitcher already registered! [{context}]");
+                Logger.Log(LogLevel.Error, "ActionController:RegisterProfileSwitcher", $"ProfileSwitcher already registered! (Context: {context})");
         }
 
         public void DeregisterProfileSwitcher(string context)
@@ -191,10 +195,10 @@ namespace PilotsDeck
             if (profileSwitcherActions.Contains(context))
             {
                 profileSwitcherActions.Remove(context);
-                Log.Logger.Debug($"ActionController:DeregisterProfileSwitcher ProfileSwitcher deregistered [{context}]");
+                Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher deregistered. (Context: {context})");
             }
             else
-                Log.Logger.Error($"ActionController:DeregisterProfileSwitcher ProfileSwitcher not registered! [{context}]");
+                Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher not registered! (Context: {context})");
         }
 
         protected void SwitchProfiles()
@@ -222,7 +226,7 @@ namespace PilotsDeck
 
                 if (switchTo != "")
                 {
-                    Log.Logger.Information($"ActionController: Current Aircraft [{SimConnector.AicraftString}] matched -> switching to [{switchTo}] on StreamDeck [{deviceMapping.Name}]");
+                    Logger.Log(LogLevel.Information, "ActionController:SwitchProfiles", $"Current FSUIPC-Profile/Aircraft [{SimConnector.AicraftString}] matched! Switching to '{switchTo}' on StreamDeck '{deviceMapping.Name}'.");
                     _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deviceMapping.ID, switchTo);
                     if (!switchedDecks.Contains(deviceMapping.ID))
                         switchedDecks.Add(deviceMapping.ID);
@@ -238,7 +242,7 @@ namespace PilotsDeck
             {
                 foreach (var deck in switchedDecks)
                 {
-                    Log.Logger.Information($"ActionController: Switching back profile on Deck {deck}");
+                    Logger.Log(LogLevel.Information, "ActionController:SwitchToDefaultProfile", $"Switching back Profile on Deck {deck}.");
                     _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, null);
                 }
             }
@@ -265,7 +269,7 @@ namespace PilotsDeck
 
                 foreach (var deck in decksToInstall)
                 {
-                    Log.Logger.Information($"ActionController: Profile install on deck {deck}");
+                    Logger.Log(LogLevel.Information, "ActionController:LoadProfiles", $"Profile install on deck {deck}.");
                     DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, "Profiles/install");
                 }
 
@@ -300,9 +304,9 @@ namespace PilotsDeck
             {
                 waitCounter--;
                 if (waitCounter == 0)
-                    Log.Logger.Information($"ActionController: Wait ended");
+                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Wait ended.");
                 else if (waitCounter % 25 == 0)
-                    Log.Logger.Information($"ActionController: Waiting ...");
+                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Waiting ...");
             }          
 
             if (!SimConnector.IsRunning) //SIM not running
@@ -315,7 +319,7 @@ namespace PilotsDeck
                     isClosing = true;
 
                     waitCounter = waitTicks / 4;
-                    Log.Logger.Information($"ActionController: Sim changed to NOT running, waiting for {(waitCounter * 200) / 1000}s");
+                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to NOT running, waiting for {(waitCounter * 200) / 1000}s.");
                 }
                 else if (isClosing && waitCounter == 0)
                 {
@@ -340,11 +344,11 @@ namespace PilotsDeck
                     if (tickCounter > firstTick)
                     {
                         waitCounter = waitTicks;
-                        Log.Logger.Information($"ActionController: Sim changed to running, waiting for {(waitCounter * 200) / 1000}s");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to running, waiting for {(waitCounter * 200) / 1000}s.");
                     }
                     else
                     {
-                        Log.Logger.Information($"ActionController: Sim changed to running, directly connect");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to running, directly connect.");
                         SimConnector.Connect();
                     }
                 }
@@ -356,16 +360,16 @@ namespace PilotsDeck
                         CallOnAll(handler => handler.SetError());
                         redrawRequested = true;
                         waitCounter = waitTicks / 2;
-                        Log.Logger.Information($"ActionController: Sim changed to disconnected, waiting for {(waitCounter * 200) / 1000}s");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to disconnected, waiting for {(waitCounter * 200) / 1000}s.");
                     }
 
                     if (!SimConnector.Connect())
                     {
                         waitCounter = waitTicks;
-                        Log.Logger.Information($"ActionController: Sim Connection failed, waiting for {(waitCounter * 200) / 1000}s");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Connection failed, waiting for {(waitCounter * 200) / 1000}s.");
                     }
                     else
-                        Log.Logger.Information($"ActionController: Sim is connected");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is connected.");
                 }
                 else if (SimConnector.IsConnected) //CONNECTED
                 {
@@ -376,7 +380,7 @@ namespace PilotsDeck
                         if (tickCounter > firstTick)
                         {
                             waitCounter = waitTicks / 2;
-                            Log.Logger.Information($"ActionController: Sim changed to connected, waiting for {(waitCounter * 200) / 1000}s");
+                            Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to connected, waiting for {(waitCounter * 200) / 1000}s.");
                         }
                     }
 
@@ -394,18 +398,18 @@ namespace PilotsDeck
                                 if (wasPaused)
                                 {
                                     wasPaused = false;
-                                    Log.Logger.Information($"ActionController: Sim is unpaused");
+                                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is unpaused / Sim Process successful again.");
                                 }
                                 else
-                                    Log.Logger.Information($"ActionController: Process OK, force Redraw");
+                                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Process successful again, force Redraw.");
                             }
                         }
                         else
                         {
                             CallOnAll(handler => handler.SetError());
                             redrawRequested = true;
-                            waitCounter = waitTicks / 2;                            
-                            Log.Logger.Warning($"ActionController: Process failed, waiting for {(waitCounter * 200) / 1000}s");
+                            waitCounter = waitTicks / 2;
+                            Logger.Log(LogLevel.Warning, "ActionController:Run", $"Sim Process failed, waiting for {(waitCounter * 200) / 1000}s.");
                         }
                     }
                     else if (SimConnector.IsPaused)
@@ -415,7 +419,7 @@ namespace PilotsDeck
                             wasPaused = true;
                             CallOnAll(handler => handler.SetWait());
                             redrawRequested = true;
-                            Log.Logger.Information($"ActionController: Sim is paused");
+                            Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is paused.");
                         }
                     }
                     else if (!SimConnector.IsReady && waitCounter == 0)
@@ -425,14 +429,14 @@ namespace PilotsDeck
                         CallOnAll(handler => handler.SetWait());
                         redrawRequested = true;
                         wasPaused = true;
-                        Log.Logger.Information($"ActionController: Sim not ready, waiting for {(waitCounter * 200) / 1000}s");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim not ready, waiting for {(waitCounter * 200) / 1000}s.");
                     }
                 }
             }
 
             if (tickCounter % (waitTicks / 2) == 0 && SimConnector.IsReady && !SimConnector.IsPaused)
             {
-                Log.Logger.Information($"ActionController: Forcing Redraw");
+                Logger.Log(LogLevel.Debug, "ActionController:Run", $"Forcing Redraw on all Actions.");
                 redrawRequested = true;
                 forceRefresh = true;
             }
@@ -446,13 +450,13 @@ namespace PilotsDeck
             {
                 ipcManager.UnsubscribeUnusedAddresses();
                 imgManager.RemoveUnusedImages();
-                Log.Logger.Debug($"ActionController: Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. Registered Values: {ipcManager.Length}. Registered Actions: {currentActions.Count}.");
+                Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Images: {imgManager.Length})");
                 averageTime = 0;
             }
 
             if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(SimConnector.AicraftString) && lastAircraft != SimConnector.AicraftString && SimConnector.IsReady && waitCounter == 0)
             {
-                Log.Logger.Information($"ActionController: AircraftString changed to '{SimConnector.AicraftString}' -> Switch Profiles");
+                Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftString}', searching for matching Profiles ...");
                 SwitchProfiles();
             }
         }
@@ -467,9 +471,8 @@ namespace PilotsDeck
                 if (forceUpdate)
                     action.ForceUpdate = forceUpdate;
 
-                if (action.IsInitialized || redrawAlways)
-                    action.Refresh();
-                else if (!action.IsInitialized && action.DeckType.IsEncoder)
+                action.Refresh();
+                if (action.DeckType.IsEncoder)
                     action.RefreshTitle();
             }
         }
@@ -491,7 +494,7 @@ namespace PilotsDeck
 
                     if (action.Value.NeedRedraw || action.Value.ForceUpdate || redrawAlways || redrawRequested)
                     {
-                        //Log.Logger.Verbose($"RedrawAll: Needs Redraw [{action.Value.ActionID}] [{action.Key}] ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
+                        //Logger.Log(LogLevel.Verbose, "ActionController:RedrawAll", $"Action [{action.Key}] / [{action.Value.ActionID}]: Needs Redraw ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
                         ActionSendImage(action);
                     }
 
@@ -502,7 +505,7 @@ namespace PilotsDeck
             }
             catch (Exception ex)
             {
-                Log.Logger.Debug($"RedrawAll: Exception {ex.Message}");
+                Logger.Log(LogLevel.Critical, "ActionController:RedrawAll", $"Exception while Redrawing Actions! (Exception: {ex.GetType()})");
             }
         }
 
@@ -536,7 +539,7 @@ namespace PilotsDeck
             {
                 if (!SimConnector.IsConnected)
                 {
-                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    Logger.Log(LogLevel.Warning, "ActionController:OnButtonDown", $"Sim not connected! (Context: {context}) (ActionID: {currentActions[context]?.ActionID})");
                     return false;
                 }
 
@@ -546,13 +549,13 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:OnButtonDown", $"Could not find Context '{context}'.");
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:OnButtonDown", $"Exception on ButtonDown! (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
                 return false;
             }
         }
@@ -563,7 +566,7 @@ namespace PilotsDeck
             {
                 if (!SimConnector.IsConnected)
                 {
-                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    Logger.Log(LogLevel.Warning, "ActionController:OnButtonUp", $"Sim not connected! (Context: {context}) (ActionID: {currentActions[context]?.ActionID})");
                     return false;
                 }
 
@@ -573,13 +576,13 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:OnButtonUp", $"Could not find Context '{context}'.");
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:OnButtonUp", $"Exception on ButtonUp! (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
                 return false;
             }
         }
@@ -590,7 +593,7 @@ namespace PilotsDeck
             {
                 if (!SimConnector.IsConnected)
                 {
-                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    Logger.Log(LogLevel.Warning, "ActionController:OnDialRotate", $"Sim not connected! (Context: {context}) (ActionID: {currentActions[context]?.ActionID})");
                     return false;
                 }
 
@@ -600,13 +603,13 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:OnDialRotate", $"Could not find Context '{context}'.");
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:OnDialRotate", $"Exception on DialRotate! (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
                 return false;
             }
         }
@@ -617,7 +620,7 @@ namespace PilotsDeck
             {
                 if (!SimConnector.IsConnected)
                 {
-                    Log.Logger.Error($"RunAction: IPC not connected {context}");
+                    Logger.Log(LogLevel.Warning, "ActionController:OnTouchTap", $"Sim not connected! (Context: {context}) (ActionID: {currentActions[context]?.ActionID})");
                     return false;
                 }
 
@@ -627,13 +630,13 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RunAction: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:OnTouchTap", $"Could not find Context '{context}'.");
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"RunAction: Exception while running {context} | {currentActions[context]?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:OnTouchTap", $"Exception on TouchTap! (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
                 return false;
             }
         }
@@ -648,12 +651,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"SetTitleParameters: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:SetTitleParameters", $"Could not find Context '{context}'.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"SetTitleParameters: Exception while updating {context} | {currentActions[context]?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:SetTitleParameters", $"Exception while settint Title Params! (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
             }
         }
 
@@ -682,19 +685,19 @@ namespace PilotsDeck
                     value.Update();
                     SetActionState(value);                        
 
-                    if (!value.IsRawImage)
-                        imgManager.UpdateImage(value.DrawImage, value.DeckType);
+                    //if (!value.IsRawImage)
+                    //    imgManager.UpdateImage(value.DrawImage, value.DeckType);
 
                     redrawRequested = true;
                 }
                 else
                 {
-                    Log.Logger.Error($"UpdateAction: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:UpdateAction", $"Could not find Context '{context}'.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"UpdateAction: Exception while updating {context} | {currentActions[context]?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:UpdateAction", $"Exception while updating Action! (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
             }
         }
 
@@ -712,12 +715,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"RegisterAction: Context already registered! {context} | {currentActions[context].ActionID}");
+                    Logger.Log(LogLevel.Error, "ActionController:RegisterAction", $"Context already registered! (Context: {context}) (ActionID: {currentActions[context].ActionID})");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"RegisterAction: Exception while registering {context} | {handler?.ActionID}");
+                Logger.Log(LogLevel.Critical, "ActionController:RegisterAction", $"Exception while registering Action! (Context: {context}) (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
             }
         }
 
@@ -733,12 +736,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"DeregisterAction: Could not find Context {context}");
+                    Logger.Log(LogLevel.Error, "ActionController:DeregisterAction", $"Could not find Context '{context}'.");
                 }                   
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"DeregisterAction: Exception while deregistering {context}");
+                Logger.Log(LogLevel.Critical, "ActionController:DeregisterAction", $"Exception while deregistering Action! (Context: {context}) (ActionID: {currentActions[context]?.ActionID}) (Exception: {ex.GetType()})");
             }
         }
 

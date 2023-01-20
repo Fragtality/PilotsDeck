@@ -5,7 +5,9 @@ VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PilotsDeck", "PilotsDeck\PilotsDeck.csproj", "{1E1E1F8D-6C0A-440A-ACA7-2F6569C2E90D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportProfiles", "ImportProfiles\ImportProfiles.csproj", "{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportProfiles", "ImportProfiles\ImportProfiles.csproj", "{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "Installer\Installer.vdproj", "{3B41F80C-7596-43B0-AD79-772ABBBB9F53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,8 @@ Global
 		{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B41F80C-7596-43B0-AD79-772ABBBB9F53}.Debug|Any CPU.ActiveCfg = Debug
+		{3B41F80C-7596-43B0-AD79-772ABBBB9F53}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

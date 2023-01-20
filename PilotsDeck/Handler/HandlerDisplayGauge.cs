@@ -9,7 +9,7 @@ namespace PilotsDeck
         public new ModelDisplayGauge Settings { get; protected set; }
 
         public override string Address { get { return GaugeSettings.Address; } }
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayGauge] Read: {Address}"; } }
+        public override string ActionID { get { return $"(HandlerDisplayGauge) ({Title.Trim()}) {(GaugeSettings.IsEncoder ? "(Encoder) " : "")}(Read: {GaugeSettings.Address}) (HasAction: {HasAction}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
         public override bool UseFont { get { return true; } }
 
         protected bool IsArc = false;
@@ -76,7 +76,7 @@ namespace PilotsDeck
             base.Register(imgManager, ipcManager);
             
             if (GaugeSettings.UseColorSwitching)
-                ValueManager.RegisterValue("AddressColorOff", GaugeSettings.AddressColorOff);
+                ValueManager.AddValue(ID.GaugeColor, GaugeSettings.AddressColorOff);
             
             RenderDefaultImage();
         }
@@ -84,18 +84,22 @@ namespace PilotsDeck
         public override void Deregister()
         {
             if (GaugeSettings.UseColorSwitching)
-                ValueManager.DeregisterValue("AddressColorOff");
+                ValueManager.RemoveValue(ID.GaugeColor);
 
             base.Deregister();
         }
 
-        public override void Update()
+        public override void Update(bool skipActionUpdate = false)
         {
             HasAction = GaugeSettings.HasAction;
-            base.Update();
-            
-            if (GaugeSettings.UseColorSwitching)
-                ValueManager.UpdateValueAddress("AddressColorOff", GaugeSettings.AddressColorOff);
+            base.Update(skipActionUpdate);
+
+            if (GaugeSettings.UseColorSwitching && !ValueManager.Contains(ID.GaugeColor))
+                ValueManager.AddValue(ID.GaugeColor, GaugeSettings.AddressColorOff);
+            else if (!GaugeSettings.UseColorSwitching && ValueManager.Contains(ID.GaugeColor))
+                ValueManager.RemoveValue(ID.GaugeColor);
+            else if (GaugeSettings.UseColorSwitching)
+                ValueManager.UpdateValue(ID.GaugeColor, GaugeSettings.AddressColorOff);
 
             RenderDefaultImage();
             NeedRedraw = true;
@@ -153,13 +157,13 @@ namespace PilotsDeck
 
         protected override void Redraw()
         {
-            if (!ValueManager.IsChanged(ID.ControlState) && !ValueManager.IsChanged("AddressColorOff") && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Gauge) && !ValueManager.IsChanged(ID.GaugeColor) && !ForceUpdate)
                 return;
 
             //Stopwatch sw = new Stopwatch();
             //sw.Start();
 
-            string value = ValueManager[ID.ControlState];
+            string value = ValueManager[ID.Gauge];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -195,7 +199,7 @@ namespace PilotsDeck
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ModelBase.Compare(GaugeSettings.StateColorOff, ValueManager["AddressColorOff"]));
+            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager[ID.GaugeColor]) && ModelBase.Compare(GaugeSettings.StateColorOff, ValueManager[ID.GaugeColor]));
             Color drawColor;
             if (useOffColor)
                 drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColorOff);
@@ -220,7 +224,7 @@ namespace PilotsDeck
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
             float max = ModelDisplayText.GetNumValue(GaugeSettings.MaximumValue, 100);
 
-            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager["AddressColorOff"]) && ModelBase.Compare(GaugeSettings.StateColorOff, ValueManager["AddressColorOff"]));
+            bool useOffColor = GaugeSettings.UseColorSwitching && (!string.IsNullOrEmpty(ValueManager[ID.GaugeColor]) && ModelBase.Compare(GaugeSettings.StateColorOff, ValueManager[ID.GaugeColor]));
             Color drawColor;
             if (useOffColor)
                 drawColor = ColorTranslator.FromHtml(GaugeSettings.GaugeColorOff);

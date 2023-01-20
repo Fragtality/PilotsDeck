@@ -9,7 +9,7 @@ namespace PilotsDeck
         public override IModelSwitch SwitchSettings { get { return Settings; } }
         public new ModelDisplayRadio Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerDisplayRadio] Read1: {Settings.AddressRadioActiv} | Read2: {Settings.AddressRadioStandby} | Write: {SwitchSettings.AddressAction}"; } }
+        public override string ActionID { get { return $"(HandlerDisplayRadio) ({Title.Trim()}) {(TextSettings.IsEncoder ? "(Encoder) " : "")}(Active: {Settings.AddressRadioActiv} / Standby: {Settings.AddressRadioStandby}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
         public override string Address { get { return Settings.AddressRadioActiv; } }
 
         protected int ticksIndication = 0;
@@ -20,6 +20,7 @@ namespace PilotsDeck
         public HandlerDisplayRadio(string context, ModelDisplayRadio settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
+            TextSettings.HasIndication = true;
         }
 
         protected override bool InitializationTest()
@@ -31,30 +32,22 @@ namespace PilotsDeck
         {
             base.Register(imgManager, ipcManager);
 
-            ValueManager.RegisterValue(ID.Standby, Settings.AddressRadioStandby);
+            ValueManager.AddValue(ID.Standby, Settings.AddressRadioStandby);
         }
 
         public override void Deregister()
         {
             base.Deregister();
 
-            ValueManager.DeregisterValue(ID.Standby);
+            ValueManager.RemoveValue(ID.Standby);
         }
 
-        public override void Update()
+        public override void Update(bool skipActionUpdate = false)
         {
-            base.Update();
+            base.Update(skipActionUpdate);
 
-            ValueManager.UpdateValueAddress(ID.Standby, Settings.AddressRadioStandby);
+            ValueManager.UpdateValue(ID.Standby, Settings.AddressRadioStandby);
         }
-
-        //public override bool OnButtonUp(long tick)
-        //{
-        //    bool result = base.OnButtonUp(tick);
-        //    if (result)
-        //        wasPushed = true;
-        //    return result;
-        //}
 
         protected override void Redraw()
         {
@@ -66,8 +59,7 @@ namespace PilotsDeck
                 valueAct = ModelDisplay.ConvertFromBCD(valueAct);
             valueAct = Settings.ScaleValue(valueAct);
             valueAct = Settings.RoundValue(valueAct);
-            if (!IsEncoder)
-                valueAct = Settings.FormatValue(valueAct);
+            valueAct = Settings.FormatValue(valueAct);
 
             string valueStb = ValueManager[ID.Standby];
             if (Settings.DecodeBCD && !Settings.StbyHasDiffFormat || Settings.StbyHasDiffFormat && Settings.DecodeBCDStby)

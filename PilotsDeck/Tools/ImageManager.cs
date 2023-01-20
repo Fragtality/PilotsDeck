@@ -34,9 +34,9 @@ namespace PilotsDeck
             {
                 ImageBytes = File.ReadAllBytes(FileNameReal);
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageDefinition: Exception while reading Images Bytes! {ToString()}");
+                Logger.Log(LogLevel.Critical, "ImageDefinition:Load", $"Exception while reading Images Bytes! (Def: {ToString()}) (Exception: {ex.GetType()})");
             }
         }
 
@@ -163,6 +163,8 @@ namespace PilotsDeck
     {
         private Dictionary<string, ImageDefinition> cachedImages = new(); //realname -> obj
 
+        public int Length => cachedImages.Count;
+
         public ImageManager()
         {
 
@@ -184,19 +186,19 @@ namespace PilotsDeck
 
                     image.Registrations = 1;
                     cachedImages.Add(image.FileNameReal, image);
-                    Log.Logger.Debug($"ImageManager: Image added to Cache. {image}");
+                    Logger.Log(LogLevel.Debug, "ImageManager:AddImage", $"Image '{image}' added to Cache.");
                 }
                 else
                 {
                     cachedImages[image.FileNameReal].Registrations++;
-                    Log.Logger.Debug($"ImageManager: Registration added to Image. Registrations {cachedImages[image.FileNameReal].Registrations} - {image}");
+                    Logger.Log(LogLevel.Debug, "ImageManager:AddImage", $"Registration added to Image '{image}'. (Registrations: {cachedImages[image.FileNameReal].Registrations})");
                 }
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageManager: Exception during AddImage! {image}");
+                Logger.Log(LogLevel.Critical, "ImageManager:AddImage", $"Exception while adding Image '{image}'! (Exception: {ex.GetType()})");
                 return false;
             }
         }
@@ -212,25 +214,28 @@ namespace PilotsDeck
             {
                 if (!cachedImages.ContainsKey(image.FileNameReal))
                 {
-                    Log.Logger.Error($"ImageManager: Error during RemoveImage, Image does not exist! {image}");
+                    Logger.Log(LogLevel.Error, "ImageManager:RemoveImage", $"Image '{image}' does not exist in Cache!");
                     return;
                 }
 
                 if (cachedImages[image.FileNameReal].Registrations > 0)
                 {
                     cachedImages[image.FileNameReal].Registrations--;
-                    Log.Logger.Debug($"ImageManager: Registration removed from Image. {image} - Registrations {cachedImages[image.FileNameReal].Registrations}");
+                    Logger.Log(LogLevel.Debug, "ImageManager:RemoveImage", $"Registration removed from Image '{image}'. (Registrations: {cachedImages[image.FileNameReal].Registrations})");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageManager: Exception during RemoveImage! {image}");
+                Logger.Log(LogLevel.Critical, "ImageManager:RemoveImage", $"Exception while removing Image '{image?.ToString()}'! (Exception: {ex.GetType()})");
             }
         }
 
         public void RemoveUnusedImages()
         {
             var unusedImages = cachedImages.Where(v => v.Value.Registrations <= 0);
+
+            if (unusedImages.Any())
+                Logger.Log(LogLevel.Information, "ImageManager:RemoveUnusedImages", $"Removing {unusedImages.Count()} unused Images ...");
 
             string fileReal;
             foreach (var image in unusedImages)
@@ -239,7 +244,7 @@ namespace PilotsDeck
                 cachedImages[fileReal] = null;
                 cachedImages.Remove(fileReal);
 
-                Log.Logger.Debug($"RemoveUnusedImages: Removed Image {fileReal} from Cache");
+                Logger.Log(LogLevel.Debug, "ImageManager:RemoveUnusedImages", $"Removed Image {fileReal} from Cache.");
             }
         }
 
@@ -260,12 +265,12 @@ namespace PilotsDeck
                 else
                 {
                     cachedImages[image.FileNameReal].Load();
-                    Log.Logger.Debug($"ImageManager: Image reloaded. {image}");
+                    Logger.Log(LogLevel.Debug, "ImageManager:UpdateImage", $"Image '{image}' reloaded.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageManager: Exception during UpdateImage! {image}");
+                Logger.Log(LogLevel.Critical, "ImageManager:UpdateImage", $"Exception while updating Image '{image?.ToString()}'! (Exception: {ex.GetType()})");
             }
         }
 
@@ -280,14 +285,14 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Debug($"ImageManager: Could not find cached Image for GetImageBase64, added new Defintion. {imageDef}");
                     AddImage(imageDef);
+                    Logger.Log(LogLevel.Debug, "ImageManager:GetImageBase64", $"Could not find cached Image '{imageDef}' and added new Defintion to Cache.");
                     return cachedImages[imageDef.FileNameReal].GetImageBase64();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageManager: Exception during GetImageBase64! {image}");
+                Logger.Log(LogLevel.Critical, "ImageManager:GetImageBase64", $"Exception while getting Base64 for Image '{image?.ToString()}'! (Exception: {ex.GetType()})");
                 return "";
             }
         }
@@ -302,13 +307,13 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"ImageManager: Could not find Image File for LoadImageBase64: {image}");
+                    Logger.Log(LogLevel.Error, "ImageManager:LoadImageBase64", $"Could not find File for Image '{image}'!");
                     return "";
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageManager: Exception during LoadImageBase64! {image}");
+                Logger.Log(LogLevel.Critical, "ImageManager:LoadImageBase64", $"Exception while getting Base64 for Image '{image?.ToString()}'! (Exception: {ex.GetType()})");
                 return "";
             }
         }
@@ -324,14 +329,14 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"ImageManager: Could not find Image for ImageDefinition. {imageDef}");
                     AddImage(imageDef);
+                    Logger.Log(LogLevel.Debug, "ImageManager:GetImageDefinition", $"Could not find cached Image '{imageDef}' and added new Defintion to Cache.");
                     return imageDef;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ImageManager: Exception during GetImageObject! {image}");
+                Logger.Log(LogLevel.Critical, "ImageManager:GetImageDefinition", $"Exception while getting Definition for Image '{image?.ToString()}'! (Exception: {ex.GetType()})");
                 return null;
             }
         }

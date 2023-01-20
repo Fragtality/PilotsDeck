@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Collections.Generic;
 
 namespace PilotsDeck
 {
@@ -7,15 +8,16 @@ namespace PilotsDeck
         public ModelBase CommonSettings { get; protected set; }
         public abstract IModelSwitch SwitchSettings { get; }
 
-        public virtual string ActionID { get { return StreamDeckTools.TitleLog(Title); } }
+        public virtual string ActionID { get { return $"({Title.Trim()})"; } }
         public string Context { get; protected set; }
         public virtual StreamDeckType DeckType { get; protected set; }
         public virtual bool IsEncoder { get { return DeckType.IsEncoder; } }
 
         public abstract string Address { get; }
-        protected virtual AddressValueManager ValueManager { get; set; } = new AddressValueManager();
+        protected virtual ValueManager ValueManager { get; set; }
         protected virtual IPCManager IPCManager { get; set; }
         protected virtual ImageManager ImgManager { get; set; }
+        protected virtual Dictionary<int, string> imgRefs { get; set; } = new Dictionary<int, string>();
 
         public string DrawImage { get; protected set; } = "";
         public bool IsRawImage { get; protected set; } = false;
@@ -35,6 +37,12 @@ namespace PilotsDeck
 
         protected virtual StreamDeckTools.StreamDeckTitleParameters TitleParameters { get; set; }
 
+        public abstract bool OnButtonUp(long tick);
+        public abstract bool OnButtonDown(long tick);
+        public abstract bool OnDialRotate(int ticks);
+        public abstract bool OnTouchTap();
+
+        #region Initialization
         public HandlerBase(string context, ModelBase settings, StreamDeckType deckType)
         {
             Context = context;
@@ -49,91 +57,126 @@ namespace PilotsDeck
             }
         }
 
-        public abstract bool OnButtonUp(long tick);
+        protected virtual bool InitializationTest()
+        {
+            return !string.IsNullOrEmpty(Address);
+        }
 
-        public abstract bool OnButtonDown(long tick);
+        protected virtual void SetInitialization()
+        {
+            if (InitializationTest())
+                IsInitialized = true;
+            else
+                IsInitialized = false;
 
-        public abstract bool OnDialRotate(int ticks);
+            if (IsEncoder && !CommonSettings.IsEncoder)
+            {
+                CommonSettings.IsEncoder = true;
+                UpdateSettingsModel = true;
+            }
+        }
+        #endregion
 
-        public abstract bool OnTouchTap();
-
+        #region RegisterDeregister
         public virtual void Register(ImageManager imgManager, IPCManager ipcManager)
         {
             IPCManager = ipcManager;
             ImgManager = imgManager;
+            ValueManager = new(ipcManager);
 
             SetInitialization();
-            ValueManager.RegisterManager(IPCManager);
 
-            ImgManager.AddImage(DefaultImage, DeckType);
-            ImgManager.AddImage(ErrorImage, DeckType);
+            ImgManager.AddImage(CommonSettings.DefaultImage, DeckType);
+            imgRefs.Add(ID.Default, CommonSettings.DefaultImage);
+            ImgManager.AddImage(CommonSettings.ErrorImage, DeckType);
+            imgRefs.Add(ID.Error, CommonSettings.ErrorImage);
+            ImgManager.AddImage(CommonSettings.WaitImage, DeckType);
+            imgRefs.Add(ID.Wait, CommonSettings.WaitImage);
 
             if (HasAction)
-                RegisterAction();
+                RegisterActions();
         }
 
-        public virtual void RegisterAction()
+        public virtual void RegisterActions()
         {
-            if (IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
-                _ = ValueManager.RegisterValue(ID.SwitchState, SwitchSettings.AddressAction);
+            ValueManager.AddValue(ID.Switch, SwitchSettings.AddressAction, SwitchSettings.ActionType);
+            if (IPCTools.IsToggleableCommand(SwitchSettings.ActionType) && SwitchSettings.ToggleSwitch)
+                ValueManager.AddValue(ID.Monitor, SwitchSettings.AddressMonitor);
 
-            if (SwitchSettings.HasLongPress && IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
-                _ = ValueManager.RegisterValue(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
+            if (SwitchSettings.HasLongPress)
+                ValueManager.AddValue(ID.SwitchLong, SwitchSettings.AddressActionLong, SwitchSettings.ActionTypeLong);
 
-            if (CommonSettings.IsEncoder && IsActionReadable(SwitchSettings.ActionTypeLeft) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLeft))
-                _ = ValueManager.RegisterValue(ID.SwitchStateLeft, SwitchSettings.AddressActionLeft);
-
-            if (CommonSettings.IsEncoder && IsActionReadable(SwitchSettings.ActionTypeRight) && IPCTools.IsReadAddress(SwitchSettings.AddressActionRight))
-                _ = ValueManager.RegisterValue(ID.SwitchStateRight, SwitchSettings.AddressActionRight);
-
-            if (CommonSettings.IsEncoder && IsActionReadable(SwitchSettings.ActionTypeTouch) && IPCTools.IsReadAddress(SwitchSettings.AddressActionTouch))
-                _ = ValueManager.RegisterValue(ID.SwitchStateTouch, SwitchSettings.AddressActionTouch);
-
-            if (((ActionSwitchType)SwitchSettings.ActionType == ActionSwitchType.XPCMD || (ActionSwitchType)SwitchSettings.ActionType == ActionSwitchType.CONTROL) && SwitchSettings.ToggleSwitch && IPCTools.IsReadAddress(SwitchSettings.AddressMonitor))
-                _ = ValueManager.RegisterValue(ID.MonitorState, SwitchSettings.AddressMonitor);
+            if (CommonSettings.IsEncoder)
+            {
+                ValueManager.AddValue(ID.SwitchLeft, SwitchSettings.AddressActionLeft, SwitchSettings.ActionTypeLeft);
+                ValueManager.AddValue(ID.SwitchRight, SwitchSettings.AddressActionRight, SwitchSettings.ActionTypeRight);
+                ValueManager.AddValue(ID.SwitchTouch, SwitchSettings.AddressActionTouch, SwitchSettings.ActionTypeTouch);
+            }
         }
 
         public virtual void Deregister()
         {
-            ImgManager.RemoveImage(DefaultImage, DeckType);
-            ImgManager.RemoveImage(ErrorImage, DeckType);
+            ImgManager.RemoveImage(CommonSettings.DefaultImage, DeckType);
+            imgRefs.Remove(ID.Default);
+            ImgManager.RemoveImage(CommonSettings.ErrorImage, DeckType);
+            imgRefs.Remove(ID.Error);
+            ImgManager.RemoveImage(CommonSettings.WaitImage, DeckType);
+            imgRefs.Remove(ID.Wait);
 
             if (HasAction)
-                DeregisterAction();
+                DeregisterActions();
         }
 
-        public virtual void DeregisterAction()
+        public virtual void DeregisterActions()
         {
-            if (ValueManager.ContainsValue(ID.SwitchState))
-                ValueManager.DeregisterValue(ID.SwitchState);
+            ValueManager.RemoveValue(ID.Switch);
+            if (IPCTools.IsToggleableCommand(SwitchSettings.ActionType) && SwitchSettings.ToggleSwitch)
+                ValueManager.RemoveValue(ID.Monitor);
 
-            if (ValueManager.ContainsValue(ID.SwitchStateLong))
-                ValueManager.DeregisterValue(ID.SwitchStateLong);
+            if (SwitchSettings.HasLongPress)
+                ValueManager.RemoveValue(ID.SwitchLong);
 
-            if (ValueManager.ContainsValue(ID.SwitchStateLeft))
-                ValueManager.DeregisterValue(ID.SwitchStateLeft);
-
-            if (ValueManager.ContainsValue(ID.SwitchStateRight))
-                ValueManager.DeregisterValue(ID.SwitchStateRight);
-
-            if (ValueManager.ContainsValue(ID.SwitchStateTouch))
-                ValueManager.DeregisterValue(ID.SwitchStateTouch);
-
-            if (ValueManager.ContainsValue(ID.MonitorState))
-                ValueManager.DeregisterValue(ID.MonitorState);
+            if (CommonSettings.IsEncoder)
+            {
+                ValueManager.RemoveValue(ID.SwitchLeft);
+                ValueManager.RemoveValue(ID.SwitchRight);
+                ValueManager.RemoveValue(ID.SwitchTouch);
+            }
         }
+        #endregion
 
-        public virtual void Update()
+        #region Update
+        public virtual void Update(bool skipActionUpdate = false)
         {
             SetInitialization();
 
-            if (HasAction)
+            UpdateImages();
+
+            if (HasAction && !skipActionUpdate)
             {
                 UpdateActionSettings();
-                UpdateActionValues();
+                UpdateActions();
             }
 
             ForceUpdate = true;
+        }
+
+        protected void UpdateImage(string imgNew, int id)
+        {
+            if (imgNew != imgRefs[id])
+            {
+                ImgManager.RemoveImage(imgRefs[id], DeckType);
+                ImgManager.AddImage(imgNew, DeckType);
+            }
+
+            imgRefs[id] = imgNew;
+        }
+
+        protected virtual void UpdateImages()
+        {
+            UpdateImage(CommonSettings.DefaultImage, ID.Default);
+            UpdateImage(CommonSettings.ErrorImage, ID.Error);
+            UpdateImage(CommonSettings.WaitImage, ID.Wait);
         }
 
         public virtual void UpdateActionSettings()
@@ -141,53 +184,41 @@ namespace PilotsDeck
 
         }
 
-        public virtual void UpdateActionValues()
+        public virtual void UpdateActions()
         {
-            if (IPCTools.IsReadAddress(ValueManager.GetAddress(ID.SwitchState)) && !IsActionReadable(SwitchSettings.ActionType))
-                ValueManager.DeregisterValue(ID.SwitchState);
-            else if (IsActionReadable(SwitchSettings.ActionType) && IPCTools.IsReadAddress(SwitchSettings.AddressAction))
-                ValueManager.UpdateValueAddress(ID.SwitchState, SwitchSettings.AddressAction);
-
-            if (IPCTools.IsReadAddress(ValueManager.GetAddress(ID.SwitchStateLong)) && !IsActionReadable(SwitchSettings.ActionTypeLong))
-                ValueManager.DeregisterValue(ID.SwitchStateLong);
-            else if (SwitchSettings.HasLongPress && IsActionReadable(SwitchSettings.ActionTypeLong) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLong))
-                ValueManager.UpdateValueAddress(ID.SwitchStateLong, SwitchSettings.AddressActionLong);
-
-            if (IPCTools.IsReadAddress(ValueManager.GetAddress(ID.SwitchStateLeft)) && !IsActionReadable(SwitchSettings.ActionTypeLeft))
-                ValueManager.DeregisterValue(ID.SwitchStateLeft);
-            else if (CommonSettings.IsEncoder && IsActionReadable(SwitchSettings.ActionTypeLeft) && IPCTools.IsReadAddress(SwitchSettings.AddressActionLeft))
-                ValueManager.UpdateValueAddress(ID.SwitchStateLeft, SwitchSettings.AddressActionLeft);
-
-            if (IPCTools.IsReadAddress(ValueManager.GetAddress(ID.SwitchStateRight)) && !IsActionReadable(SwitchSettings.ActionTypeRight))
-                ValueManager.DeregisterValue(ID.SwitchStateRight);
-            else if (CommonSettings.IsEncoder && IsActionReadable(SwitchSettings.ActionTypeRight) && IPCTools.IsReadAddress(SwitchSettings.AddressActionRight))
-                ValueManager.UpdateValueAddress(ID.SwitchStateRight, SwitchSettings.AddressActionRight);
-
-            if (IPCTools.IsReadAddress(ValueManager.GetAddress(ID.SwitchStateTouch)) && !IsActionReadable(SwitchSettings.ActionTypeTouch))
-                ValueManager.DeregisterValue(ID.SwitchStateTouch);
-            else if (CommonSettings.IsEncoder && IsActionReadable(SwitchSettings.ActionTypeTouch) && IPCTools.IsReadAddress(SwitchSettings.AddressActionTouch))
-                ValueManager.UpdateValueAddress(ID.SwitchStateTouch, SwitchSettings.AddressActionTouch);
-
-            if (IPCTools.IsReadAddress(ValueManager.GetAddress(ID.MonitorState)) && !SwitchSettings.ToggleSwitch)
-                ValueManager.DeregisterValue(ID.MonitorState);
-            else if (SwitchSettings.ToggleSwitch && ((ActionSwitchType)SwitchSettings.ActionType == ActionSwitchType.XPCMD || (ActionSwitchType)SwitchSettings.ActionType == ActionSwitchType.CONTROL) && IPCTools.IsReadAddress(SwitchSettings.AddressMonitor))
-                ValueManager.UpdateValueAddress(ID.MonitorState, SwitchSettings.AddressMonitor);
-        }
-
-        public virtual void SetError()
-        {
-            if (IsInitialized) 
-            {
-                if (DrawImage != ErrorImage)
-                {
-                    DrawImage = ErrorImage;
-                    IsRawImage = false;
-                    NeedRedraw = true;
-                }
-            }
+            if (HasAction && !ValueManager.Contains(ID.Switch))
+                RegisterActions();
+            else if (!HasAction && ValueManager.Contains(ID.Switch))
+                DeregisterActions();
             else
             {
-                SetDefault();
+                ValueManager.UpdateValue(ID.Switch, SwitchSettings.AddressAction, SwitchSettings.ActionType);
+
+                if (SwitchSettings.HasLongPress && !ValueManager.Contains(ID.SwitchLong))
+                    ValueManager.AddValue(ID.SwitchLong, SwitchSettings.AddressActionLong, SwitchSettings.ActionTypeLong);
+                else if (!SwitchSettings.HasLongPress && ValueManager.Contains(ID.SwitchLong))
+                    ValueManager.RemoveValue(ID.SwitchLong);
+                else if (SwitchSettings.HasLongPress)
+                    ValueManager.UpdateValue(ID.SwitchLong, SwitchSettings.AddressActionLong, SwitchSettings.ActionTypeLong);
+
+                if (CommonSettings.IsEncoder)
+                {
+                    ValueManager.UpdateValue(ID.SwitchLeft, SwitchSettings.AddressActionLeft, SwitchSettings.ActionTypeLeft);
+                    ValueManager.UpdateValue(ID.SwitchRight, SwitchSettings.AddressActionRight, SwitchSettings.ActionTypeRight);
+                    ValueManager.UpdateValue(ID.SwitchTouch, SwitchSettings.AddressActionTouch, SwitchSettings.ActionTypeTouch);
+                }
+            }
+        }
+        #endregion
+
+        #region SetState
+        public virtual void SetError()
+        {
+            if (DrawImage != ErrorImage)
+            {
+                DrawImage = ErrorImage;
+                IsRawImage = false;
+                NeedRedraw = true;
             }
         }
 
@@ -203,7 +234,7 @@ namespace PilotsDeck
 
         public virtual void SetWait()
         {
-            if (IsInitialized && DrawImage != CommonSettings.WaitImage)
+            if (DrawImage != CommonSettings.WaitImage)
             {
                 if (!IsEncoder)
                 {
@@ -211,7 +242,7 @@ namespace PilotsDeck
                     IsRawImage = false;
                     NeedRedraw = true;
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(Title))
                 {
                     ImageRenderer render = new(ImgManager.GetImageDefinition(CommonSettings.WaitImage, DeckType));
                     DrawTitle(render);
@@ -222,7 +253,9 @@ namespace PilotsDeck
                 }
             }
         }
+        #endregion
 
+        #region DrawRefresh
         public virtual void ResetDrawState()
         {
             NeedRedraw = false;
@@ -231,10 +264,10 @@ namespace PilotsDeck
 
         public virtual void Refresh()
         {
-            if (!CanRedraw)
+            if (!CanRedraw && IsInitialized)
                 SetError();
-            else
-                Redraw();
+            
+            Redraw();
         }
 
         public virtual void RefreshTitle()
@@ -258,40 +291,12 @@ namespace PilotsDeck
             }
         }
 
-        protected virtual bool InitializationTest()
-        {
-            return !string.IsNullOrEmpty(Address);
-        }
-
-        protected virtual void SetInitialization()
-        {
-            if (InitializationTest())
-                IsInitialized = true;
-            else
-                IsInitialized = false;
-
-            if (IsEncoder && !CommonSettings.IsEncoder)
-            {
-                CommonSettings.IsEncoder = true;
-                UpdateSettingsModel = true;
-            }
-        }
-
         public virtual void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters)
         {
             Title = title;
             TitleParameters = titleParameters;
             ForceUpdate = true;
         }
-
-        public static bool IsActionReadable(int type)
-        {
-            return type == (int)ActionSwitchType.LVAR || type == (int)ActionSwitchType.OFFSET || type == (int)ActionSwitchType.XPWREF;
-        }
-
-        public static bool IsActionReadable(ActionSwitchType type)
-        {
-            return IsActionReadable((int)type);
-        }
+        #endregion
     }
 }

@@ -61,22 +61,7 @@ var settingsModel = {
 	RectCoord2: "7; 6; 60; 21"
 };
 
-// Fill Select Boxes for Actions here
-function fillSelectBoxes() {
-	if (ImageFiles && ImageFiles != "") {
-		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
-		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
-	}
-	if (FontNames && FontNames != "") {
-		fillFontSelectBox(FontNames, 'FontName', settingsModel.FontName);
-	}
-	if (FontStyles && FontStyles != "") {
-		fillTypeSelectBox(FontStyles, 'FontStyle', settingsModel.FontStyle);
-	}
-	if (GaugeOrientations && GaugeOrientations != "") {
-		fillTypeSelectBox(GaugeOrientations, 'BarOrientation', settingsModel.BarOrientation);
-	}
-}
+var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
@@ -85,8 +70,13 @@ function updateForm() {
 	setPattern('AddressColorOff', 5);
 
 	//CURRENT VALUE
+	settingsModel.SwitchOnCurrentValue = false;
 	document.getElementById('SwitchOnCurrentValue').checked = false;
 	toggleConfigItem(false, 'SwitchOnCurrentValue');
+
+	//FORMAT
+	toggleConfigItem(false, 'Format');
+	toggleConfigItem(false, 'ValueMappings');
 
 	//COLOR
 	toggleConfigItem(settingsModel.UseColorSwitching, 'AddressColorOff');
@@ -112,6 +102,7 @@ function updateForm() {
 
 	//FONT
 	toggleConfigItem(settingsModel.ShowText, 'Format');
+	toggleConfigItem(settingsModel.ShowText, 'ValueMappings');
 	toggleConfigItem(settingsModel.ShowText, 'UseWarnColors');
 	toggleConfigItem(settingsModel.ShowText, 'FontInherit');
 	toggleConfigItem(settingsModel.ShowText && !settingsModel.FontInherit, 'FontName');

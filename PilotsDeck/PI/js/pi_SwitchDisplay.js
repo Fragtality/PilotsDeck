@@ -29,21 +29,14 @@ var settingsModel = {
 	IndicationValueAny: false,
 	UseImageMapping: false,
 	ImageMap: ""
-  };
+};
 
-function fillSelectBoxes() {
-	if (ImageFiles && ImageFiles != "") {
-		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
-		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
-		fillImageSelectBox(ImageFiles, 'IndicationImage', settingsModel.IndicationImage);
-		fillImageSelectBox(ImageFiles, 'OnImage', settingsModel.OnImage);
-		fillImageSelectBox(ImageFiles, 'OffImage', settingsModel.OffImage);
-	}
-}
+var imageSelectBoxes = ["OnImage", "OffImage", "DefaultImage", "ErrorImage", "IndicationImage"];
 
 function updateForm() {
 	//SwitchOnCurrent
 	if ((settingsModel.ActionType != 3 && settingsModel.ActionType != 4 && settingsModel.ActionType != 11) || settingsModel.UseImageMapping) {
+		settingsModel.SwitchOnCurrentValue = false;
 		document.getElementById('SwitchOnCurrentValue').checked = false;
 		toggleConfigItem(false, 'SwitchOnCurrentValue');
 	}

@@ -62,9 +62,9 @@ namespace PilotsDeck
                 foreach (var dataRef in AddresstoIndex.Keys)
                     UnsubscribeAddress(dataRef);
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ConnectorXP: Exception while unsubscribing DataRefs");
+                Logger.Log(LogLevel.Critical, "ConnectorXP:Close", $"Exception while unsubscribing DataRefs! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
 
             if (senderSocket != null)
@@ -77,9 +77,9 @@ namespace PilotsDeck
                         if (!receiverTask.IsCompleted)
                             Task.WaitAll(new[] { receiverTask }, 50);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Log.Logger.Error($"ConnectorXP: Exception while waiting for receiverTask to end");
+                        Logger.Log(LogLevel.Critical, "ConnectorXP:Close", $"Exception while waiting for receiverTask to end! (Exception: {ex.GetType()}) (Message: {ex.Message})");
                     }
 
                     tokenSource.Dispose();
@@ -130,7 +130,8 @@ namespace PilotsDeck
                         catch (Exception ex)
                         {
                             if (!CloseRequested)
-                                Log.Logger.Error($"ConnectorXP: Exception while receiving Data from Socket! {ex.Message}");
+                                Logger.Log(LogLevel.Critical, "ConnectorXP:Connect", $"Exception while receiving Data from Socket! (Exception: {ex.GetType()}) (Message: {ex.Message})");
+
                             socketError = true;
                             break;
                         }
@@ -142,9 +143,9 @@ namespace PilotsDeck
 
                 result = XPDatagram.SendSubscribe(senderSocket, "sim/time/paused", 0);
             }
-            catch
+            catch (Exception exOuter)
             {
-                Log.Logger.Error("ConnectorXP: Exception while establishing Sockets!");
+                Logger.Log(LogLevel.Critical, "ConnectorXP:Connect", $"Exception while establishing Sockets! (Exception: {exOuter.GetType()}) (Message: {exOuter.Message})");
                 if (senderSocket != null)
                 {
                     if ((bool)senderSocket?.Client?.Connected)
@@ -187,12 +188,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Error($"ConnectorXP: Error while deregistering DataRef '{address}': not in dictionary!");
+                    Logger.Log(LogLevel.Error, "ConnectorXP:UnsubscribeAddress", $"DataRef '{address}' is not in dictionary!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ConnectorXP: Exception while deregistering DataRef '{address}'!");
+                Logger.Log(LogLevel.Critical, "ConnectorXP:UnsubscribeAddress", $"Exception while subscribing DataRef '{address}'! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
         }
 
@@ -243,12 +244,12 @@ namespace PilotsDeck
                 }
                 else
                 {
-                    Log.Logger.Warning($"ConnectorXP: Process() Call while not ready!");
+                    Logger.Log(LogLevel.Warning, "ConnectorXP:Process", $"Call while not ready!");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ConnectorXP: Exception while working subscription Queue!");
+                Logger.Log(LogLevel.Critical, "ConnectorXP:Process", $"Exception while working subscription Queue! (Count: {subscribeQueue?.Count}) (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
 
             return resultProcess;
@@ -273,7 +274,7 @@ namespace PilotsDeck
 
             if (success.Count > 0)
             {
-                Log.Logger.Information($"ConnectorXP: Subscribed {success.Count} DataRefs during Process()");
+                Logger.Log(LogLevel.Information, "ConnectorXP:SubscribeQueue", $"Subscribed {success.Count} DataRefs during Process.");
                 foreach (int remIndex in success)
                     subscribeQueue.Remove(remIndex);
             }
@@ -286,7 +287,7 @@ namespace PilotsDeck
                 if (!AddresstoIndex.ContainsKey(address))
                     SubscribeAddress(address);
             }
-            Log.Logger.Debug("ConnectorXP: Subscribed all IPCValues");
+            Logger.Log(LogLevel.Information, "ConnectorXP:SubscribeAllAddresses", $"Subscribed all IPCValues.");
         }
 
         public override void SubscribeAddress(string address)
@@ -304,9 +305,9 @@ namespace PilotsDeck
                         RegisterFloat(address);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ConnectorXP: Exception while subscribing DataRef '{address}'!");
+                Logger.Log(LogLevel.Critical, "ConnectorXP:SubscribeAddress", $"Exception while subscribing DataRef '{address}'! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
         }
 
@@ -320,7 +321,7 @@ namespace PilotsDeck
             {
                 subscribeQueue.Add(nextIndex);
                 nextIndex++;
-                Log.Logger.Warning($"ConnectorXP: Error while subscribing DataRef '{address}'! Added to Queue");
+                Logger.Log(LogLevel.Warning, "ConnectorXP:RegisterFloat", $"Not Ready / Error while subscribing DataRef '{address}'! Added to Queue.");
             }
         }
 
@@ -358,13 +359,13 @@ namespace PilotsDeck
                 if (!SubscribeMultiple(baseAddress, length, homeIndex))
                 {
                     subscribeQueue.Add(homeIndex);
-                    Log.Logger.Warning($"ConnectorXP: Error while subscribing DataRefString '{address}'! Added to Queue");
+                    Logger.Log(LogLevel.Warning, "ConnectorXP:RegisterString", $"Error while subscribing DataRef '{address}'! Added to Queue.");
                 }
             }
             else
             {
                 subscribeQueue.Add(homeIndex);
-                Log.Logger.Warning($"ConnectorXP: Registered DataRefString '{address}' while disconnected");
+                Logger.Log(LogLevel.Warning, "ConnectorXP:RegisterString", $"Not ready to subscribe DataRef '{address}'! Added to Queue.");
             }
         }
 
@@ -377,7 +378,7 @@ namespace PilotsDeck
                 case ActionSwitchType.XPWREF:
                     return XPDatagram.SetDataRef(senderSocket, Address, newValue);
                 default:
-                    Log.Logger.Error($"ConnectorXP: ActionType {actionType} not valid for Address {Address}");
+                    Logger.Log(LogLevel.Error, "ConnectorXP:RunAction", $"Action-Type '{actionType}' not valid for Address '{Address}'!");
                     return false;
             }
         }
@@ -402,7 +403,7 @@ namespace PilotsDeck
             }
             else
             {
-                Log.Logger.Error($"ConnectorXP: Command-Array has zero members! Address: {Address}");
+                Logger.Log(LogLevel.Error, "ConnectorXP:RunCommands", $"Command-Array has zero members! (Address: {Address})");
             }
 
             return result;
@@ -424,9 +425,9 @@ namespace PilotsDeck
                     if (!receiverTask.IsCompleted)
                         Task.WaitAll(new[] { receiverTask }, 50);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Log.Logger.Error($"ConnectorXP: Exception while waiting for receiverTask to end");
+                    Logger.Log(LogLevel.Critical, "ConnectorXP:Dispose", $"Exception while waiting for receiverTask to end! (Exception: {ex.GetType()}) (Message: {ex.Message})");
                 }
 
                 tokenSource.Dispose();
@@ -436,17 +437,17 @@ namespace PilotsDeck
                 {
                     senderSocket.Close();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Log.Logger.Error($"ConnectorXP: Exception while closing senderSocket");
+                    Logger.Log(LogLevel.Critical, "ConnectorXP:Dispose", $"Exception while closing senderSocket! (Exception: {ex.GetType()}) (Message: {ex.Message})");
                 }
                 try
                 {
                     receiverSocket.Close();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Log.Logger.Error($"ConnectorXP: Exception while closing receiverSocket");
+                    Logger.Log(LogLevel.Critical, "ConnectorXP:Dispose", $"Exception while closing receiverSocket! (Exception: {ex.GetType()}) (Message: {ex.Message})");
                 }
 
                 senderSocket.Dispose();
@@ -484,7 +485,7 @@ namespace PilotsDeck
                             if (receiverNotReady)
                             {
                                 receiverNotReady = value != 0.0f;
-                                Log.Logger.Debug($"ConnectorXP: simPaused received! (Ready {!receiverNotReady})");
+                                Logger.Log(LogLevel.Information, "ConnectorXP:ParseResponse", $"DataRef for 'simPaused' received! (Ready {!receiverNotReady})");
                             }
                             if (simPausedReceived <= (AppSettings.waitTicks / waitDivisor))
                                 simPausedReceived++;
@@ -505,7 +506,7 @@ namespace PilotsDeck
                                     if (ipcValue != null)
                                         ipcValue.FloatValue = value;
                                     else
-                                        Log.Logger.Error($"ConnectorXP: IPCValue at index '{index}' is Null! Address {AddresstoIndex.Where((k, v) => v == index).FirstOrDefault()}");
+                                        Logger.Log(LogLevel.Error, "ConnectorXP:ParseResponse", $"IPCValue at Index '{index}' is Null! (Address {AddresstoIndex.Where((k, v) => v == index).FirstOrDefault()})");
                                 }
                             }
                             else if (value != 0.0f)
@@ -524,14 +525,14 @@ namespace PilotsDeck
                         }
                         else
                         {
-                            Log.Logger.Error($"ConnectorXP: Received Index '{index}' is not in subscribed DataRefs!");
+                            Logger.Log(LogLevel.Error, "ConnectorXP:ParseResponse", $"Received Index '{index}' is not in subscribed DataRefs!");
                         }
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ConnectorXP: Exception while parsing response Buffer!");
+                Logger.Log(LogLevel.Critical, "ConnectorXP:ParseResponse", $"Exception while parsing response Buffer! (Exception: {ex.GetType()}) (Message: {ex.Message})");
             }
         }
     }

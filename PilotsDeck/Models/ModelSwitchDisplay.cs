@@ -18,16 +18,16 @@
         public virtual bool UseImageMapping { get; set; } = false;
         public virtual string ImageMap { get; set; } = "";
 
-        public virtual void ManageImageMap(ImageManager imgManager, StreamDeckType deckType, bool add = true)
+        public virtual void ManageImageMap(string map, ImageManager imgManager, StreamDeckType deckType, bool add = true)
         {
-            if (!UseImageMapping || string.IsNullOrEmpty(ImageMap))
+            if (string.IsNullOrEmpty(map))
                 return;
 
-            string[] parts = ImageMap.Split(':');
+            string[] parts = map.Split(':');
             foreach (var part in parts)
             {
                 string[] mapping = part.Split('=');
-                if (!string.IsNullOrEmpty(mapping[1]))
+                if (mapping.Length == 2 && !string.IsNullOrWhiteSpace(mapping[0]) && !string.IsNullOrEmpty(mapping[1]))
                 {
                     if (add)
                         imgManager.AddImage($"Images/{mapping[1]}.png", deckType);
@@ -35,6 +35,14 @@
                         imgManager.RemoveImage($"Images/{mapping[1]}.png", deckType);
                 }
             }
+        }
+
+        public virtual void ManageImageMap(ImageManager imgManager, StreamDeckType deckType, bool add = true)
+        {
+            if (!UseImageMapping || string.IsNullOrEmpty(ImageMap))
+                return;
+
+            ManageImageMap(ImageMap, imgManager, deckType, add);
         }
 
         public string GetValueMapped(string strValue)

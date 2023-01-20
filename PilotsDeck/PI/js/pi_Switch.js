@@ -20,15 +20,11 @@ var settingsModel = {
     SwitchOffStateLong: ""
   };
 
-function fillSelectBoxes() {
-	if (ImageFiles && ImageFiles != "") {
-		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
-		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
-	}
-}
+var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
 
 function updateForm() {
 	//SwitchOnCurrent
+	settingsModel.SwitchOnCurrentValue = false;
 	document.getElementById('SwitchOnCurrentValue').checked = false;
 	toggleConfigItem(false, 'SwitchOnCurrentValue');
 }

@@ -44,30 +44,30 @@ namespace PilotsDeck
                 FSUIPCConnection.Close();
 
             if (!FSUIPCConnection.IsOpen)
-                Log.Logger.Information("ConnectorMSFS: FSUIPC Closed");
+                Logger.Log(LogLevel.Information, "ConnectorMSFS:Close", $"FSUIPC Closed.");
             else
-                Log.Logger.Error("ConnectorMSFS: Failed to close FSUIPC");
+                Logger.Log(LogLevel.Error, "ConnectorMSFS:Close", $"Failed to close FSUIPC!");
 
             WASM.OnLogEntryReceived -= OnVariableServiceLogEvent;
             WASM.OnVariableListChanged -= OnVariableServiceListChanged;
             WASM.Stop();
             if (!WASM.IsRunning)
-                Log.Logger.Information("ConnectorMSFS: FSUIPC WASM Stopped");
+                Logger.Log(LogLevel.Information, "ConnectorMSFS:Close", $"WASM stopped.");
             else
-                Log.Logger.Warning("ConnectorMSFS: FSUIPC WASM still running!");
+                Logger.Log(LogLevel.Warning, "ConnectorMSFS:Close", $"WASM still running!");
 
             isWASMReady = false;
         }
 
         protected virtual void OnVariableServiceLogEvent(object sender, LogEventArgs e)
         {
-            Log.Logger.Information($"ConnectorMSFS: {e.LogEntry}");
+            Logger.Log(LogLevel.Debug, "ConnectorMSFS:WASMLOG", e.LogEntry);
         }
 
         protected virtual void OnVariableServiceListChanged(object sender, EventArgs e)
         {
             isWASMReady = true;
-            Log.Logger.Information($"ConnectorMSFS: VarListChanged");
+            Logger.Log(LogLevel.Information, "ConnectorMSFS:OnVariableServiceListChanged", $"VarListChanged Event received!");
         }
 
         public override bool Connect()
@@ -79,7 +79,7 @@ namespace PilotsDeck
 
                 if (FSUIPCConnection.IsOpen)
                 {
-                    Log.Logger.Information("ConnectorMSFS: FSUIPC Connected");
+                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"FSUIPC Connected. Starting WASM ...");
                     foreach (var addr in ipcManager.AddressList)
                         ipcManager[addr].Connect();
                 }
@@ -93,12 +93,12 @@ namespace PilotsDeck
                 WASM.Start();
                 if (WASM.IsRunning)
                 {
-                    Log.Logger.Information("ConnectorMSFS: FSUIPC WASM Running");
+                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"WASM running.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("ConnectorMSFS: Exception while opening FSUIPC");
+                Logger.Log(LogLevel.Critical, "ConnectorMSFS:Connect", $"Exception while opening FSUIPC! (Exception: {ex.GetType()})");
             }
 
             return IsConnected;
@@ -139,7 +139,7 @@ namespace PilotsDeck
                 FSUIPCConnection.Process(AppSettings.groupStringRead);
                 if (!IsReady)
                 {
-                    Log.Logger.Debug("ConnectorMSFS: NOT READY");
+                    Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"Not ready!");
                     resultProcess = false;
                 }
 
@@ -147,18 +147,18 @@ namespace PilotsDeck
                 {
                     if (!WASM.IsRunning)
                     {
-                        Log.Logger.Debug("ConnectorMSFS: WASM NOT READY - NOT RUNNING");
+                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"WASM not not Running!");
                         resultProcess = false;
                     }
                     else if (WASM.LVarsChanged.Count > 0 && WASM.LVars.Count > 0 && ticks > AppSettings.waitTicks)
                     {
-                        Log.Logger.Debug("ConnectorMSFS: WASM NOT READY - But Lvars changed, set to READY");
+                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"WASM not ready, but Lvars changed. Set to ready!");
                         isWASMReady = true;
                         resultProcess = true;
                     }
                     else
                     {
-                        Log.Logger.Debug($"ConnectorMSFS: WASM NOT READY (Vars Changed {WASM.LVarsChanged.Count} | Vars Total {WASM.LVars.Count} | Ticks {ticks})");
+                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"WASM not ready! (Changed: {WASM.LVarsChanged.Count}) (Variables: {WASM.LVars.Count}) (Ticks: {ticks})");
                         resultProcess = false;
                     }
                 }
@@ -170,9 +170,9 @@ namespace PilotsDeck
 
                 resultProcess = true;
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("ConnectorMSFS: Exception while process call to FSUIPC");
+                Logger.Log(LogLevel.Critical, "ConnectorMSFS:Process", $"Exception in Process Call! (Exception: {ex.GetType()})");
                 resultProcess = false;
             }
 
@@ -195,12 +195,12 @@ namespace PilotsDeck
             {
                 ipcManager[address].Connect();
             }
-            Log.Logger.Debug("ConnectorMSFS: Subscribed all IPCValues");
+            Logger.Log(LogLevel.Debug, "ConnectorMSFS:SubscribeAllAddresses", $"Subscribed all IPCValues. (Count: {ipcManager.AddressList.Count})");
         }
 
         protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
         {
-            bool result = IPCTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+            bool result = SimTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
             if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
             {
                 ipcManager[Address].SetValue(newValue);
@@ -214,21 +214,21 @@ namespace PilotsDeck
             switch (actionType)
             {
                 case ActionSwitchType.MACRO:
-                    return IPCTools.RunMacros(Address);
+                    return SimTools.RunMacros(Address);
                 case ActionSwitchType.SCRIPT:
-                    return IPCTools.RunScript(Address);
+                    return SimTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
                     return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
                 case ActionSwitchType.HVAR:
-                    return IPCTools.WriteHvar(Address);
+                    return SimTools.WriteHvar(Address);
                 case ActionSwitchType.CONTROL:
-                    return IPCTools.SendControls(Address, switchSettings.UseControlDelay);
+                    return SimTools.SendControls(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.OFFSET:
-                    return IPCTools.WriteOffset(Address, newValue);
+                    return SimTools.WriteOffset(Address, newValue);
                 case ActionSwitchType.CALCULATOR:
-                    return IPCTools.RunCalculatorCode(Address, ticks);
+                    return SimTools.RunCalculatorCode(Address, ticks);
                 default:
-                    Log.Logger.Error($"ConnectorMSFS: Action-Type {actionType} not valid for Address {Address}");
+                    Logger.Log(LogLevel.Error, "ConnectorMSFS:RunAction", $"Action-Type '{actionType}' not valid for Address '{Address}'!");
                     return false;
             }
         }

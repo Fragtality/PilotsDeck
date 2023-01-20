@@ -1,5 +1,6 @@
 ﻿using FSUIPC;
 using Serilog;
+using System;
 using System.Globalization;
 using WASM = FSUIPC.MSFSVariableServices;
 
@@ -32,9 +33,9 @@ namespace PilotsDeck
                 if (isChanged)
                     currentValue = result;
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"Exception while Reading LVar {Address} via {simType}");
+                Logger.Log(LogLevel.Critical, "IPCValueLvar:Process", $"Exception while Reading LVar! (Address: {Address}) (SimType: {simType}) (Exception: {ex.GetType()})");
             }
         }
 

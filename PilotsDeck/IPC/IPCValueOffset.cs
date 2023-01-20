@@ -164,9 +164,9 @@ namespace PilotsDeck
             {
                 return offset.GetValue<string>();
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"Exception while Reading String Offset {Address}, Size: {offset?.DataLength}");
+                Logger.Log(LogLevel.Critical, "IPCValueOffset:ReadOffsetString", $"Exception while Reading Offset! (Address: {Address}) (Size: {offset?.DataLength}) (Exception: {ex.GetType()})");
                 return null;
             }
         }
@@ -211,9 +211,9 @@ namespace PilotsDeck
                         return null;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"Exception while Reading Integer Offset {Address}, Size: {offset?.DataLength}, Signed: {IsSigned}");
+                Logger.Log(LogLevel.Critical, "IPCValueOffset:ReadOffsetInt", $"Exception while Reading Offset! (Address: {Address}) (Size: {offset?.DataLength}) (Signed: {IsSigned}) (Exception: {ex.GetType()})");
                 return null;
             }
         }
@@ -232,9 +232,9 @@ namespace PilotsDeck
                         return null;
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                Log.Logger.Error($"Exception while Reading Float Offset {Address}, Size: {offset?.DataLength}");
+                Logger.Log(LogLevel.Critical, "IPCValueOffset:ReadOffsetFloat", $"Exception while Reading Offset! (Address: {Address}) (Size: {offset?.DataLength}) (Exception: {ex.GetType()})");
                 return null;
             }
         }

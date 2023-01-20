@@ -39,6 +39,7 @@ var settingsModel = {
 	DecodeBCDStby: false,
 	ScalarStby: "1",
 	FormatStby: "",
+	HasIndication: true,
 	IndicationImage: "Images/ArrowBright.png",
     FontInherit: true,
 	FontName: "Arial",
@@ -49,17 +50,7 @@ var settingsModel = {
 	RectCoordStby: "3; 42; 64; 31"
 };
 
-// Fill Select Boxes for Actions here
-function fillSelectBoxes() {
-	if (ImageFiles && ImageFiles != "") {
-		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
-		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
-		fillImageSelectBox(ImageFiles, 'IndicationImage', settingsModel.IndicationImage);
-	}
-	if (FontNames && FontNames != "") {
-		fillFontSelectBox(FontNames, 'FontName', settingsModel.FontName);
-	}
-}
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage"];
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
@@ -68,6 +59,7 @@ function updateForm() {
 	setPattern('AddressRadioStandby', 5);
 
 	//CURRENT VALUE
+	settingsModel.SwitchOnCurrentValue = false;
 	document.getElementById('SwitchOnCurrentValue').checked = false;
 	toggleConfigItem(false, 'SwitchOnCurrentValue');
 
@@ -75,9 +67,11 @@ function updateForm() {
 	toggleConfigItem(!settingsModel.FontInherit, 'FontName');
 	toggleConfigItem(!settingsModel.FontInherit, 'FontSize');
 	toggleConfigItem(!settingsModel.FontInherit, 'FontColor');
+	toggleConfigItem(false, 'FontStyle');
 	toggleConfigItem(!settingsModel.FontInherit, 'FontColorStby');
 
 	//FORMAT
+	toggleConfigItem(false, 'ValueMappings');
 	toggleConfigItem(settingsModel.StbyHasDiffFormat, 'DecodeBCDStby');
 	toggleConfigItem(settingsModel.StbyHasDiffFormat, 'ScalarStby');
 	toggleConfigItem(settingsModel.StbyHasDiffFormat, 'FormatStby');

@@ -9,7 +9,7 @@ namespace PilotsDeck
         public override IModelSwitch SwitchSettings { get { return Settings; } }
         public virtual ModelSwitch Settings { get; protected set; }
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerSwitch] Write: {Address} | LongWrite: {BaseSettings.HasLongPress} - {BaseSettings.AddressActionLong}"; } }
+        public override string ActionID { get { return $"(HandlerSwitch) ({Title.Trim()}) {(BaseSettings.IsEncoder ? "(Encoder) " : "")}(Action: {(ActionSwitchType)BaseSettings.ActionType} / {Address}) (Long: {BaseSettings.HasLongPress} / {(ActionSwitchType)BaseSettings.ActionTypeLong} / {BaseSettings.AddressActionLong})"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
 
         public override bool HasAction { get; protected set; } = true;
@@ -29,7 +29,7 @@ namespace PilotsDeck
         public static bool RunButtonDown(IModelSwitch switchSettings)
         {
             if (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
-                return IPCTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, false);
+                return SimTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, false);
             else if (IPCTools.IsWriteAddress(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType))
                 return true;
             else
@@ -44,7 +44,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool RunButtonUp(IPCManager ipcManager, long ticks, AddressValueManager valueManager, IModelSwitch switchSettings)
+        public static bool RunButtonUp(IPCManager ipcManager, long ticks, ValueManager valueManager, IModelSwitch switchSettings)
         {
             bool result = false;
             bool longPress = ticks >= AppSettings.longPressTicks;
@@ -54,19 +54,19 @@ namespace PilotsDeck
                 if (ticks < 1)
                     Thread.Sleep(AppSettings.controlDelay);
 
-                result = IPCTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, true);
+                result = SimTools.VjoyClearSet((ActionSwitchType)switchSettings.ActionType, switchSettings.AddressAction, true);
             }
             else if (!longPress)
             {
-                string controlState = valueManager[ID.ControlState];
+                string currentState = valueManager[ID.Switch];
                 if (((ActionSwitchType)switchSettings.ActionType == ActionSwitchType.XPCMD || (ActionSwitchType)switchSettings.ActionType == ActionSwitchType.CONTROL) && switchSettings.ToggleSwitch)
-                    controlState = valueManager[ID.MonitorState];
+                    currentState = valueManager[ID.Monitor];
 
-                result = ipcManager.RunAction(switchSettings.AddressAction, switchSettings.AddressActionOff, (ActionSwitchType)switchSettings.ActionType, valueManager[ID.SwitchState], controlState, switchSettings.SwitchOnState, switchSettings.SwitchOffState, switchSettings);
+                result = ipcManager.RunAction(switchSettings.AddressAction, switchSettings.AddressActionOff, (ActionSwitchType)switchSettings.ActionType, currentState, switchSettings.SwitchOnState, switchSettings.SwitchOffState, switchSettings);
             }
             else if (longPress && switchSettings.HasLongPress && IPCTools.IsWriteAddress(switchSettings.AddressActionLong, (ActionSwitchType)switchSettings.ActionTypeLong))
             {
-                result = ipcManager.RunAction(switchSettings.AddressActionLong, null, (ActionSwitchType)switchSettings.ActionTypeLong, valueManager[ID.SwitchStateLong], valueManager[ID.ControlState], switchSettings.SwitchOnStateLong, switchSettings.SwitchOffStateLong, switchSettings);
+                result = ipcManager.RunAction(switchSettings.AddressActionLong, null, (ActionSwitchType)switchSettings.ActionTypeLong, valueManager[ID.SwitchLong], switchSettings.SwitchOnStateLong, switchSettings.SwitchOffStateLong, switchSettings);
             }
 
             return result;
@@ -77,11 +77,11 @@ namespace PilotsDeck
             int result = 0;
             if (IPCTools.IsVjoyAddress(address, type) && !IPCTools.IsVjoyToggle(address, type))
             {
-                if (!IPCTools.VjoyClearSet((ActionSwitchType)type, address, false))
+                if (!SimTools.VjoyClearSet((ActionSwitchType)type, address, false))
 
                     Thread.Sleep(AppSettings.controlDelay);
 
-                if (!IPCTools.VjoyClearSet((ActionSwitchType)type, address, true))
+                if (!SimTools.VjoyClearSet((ActionSwitchType)type, address, true))
                     result = -1;
                 else
                     result = 1;
@@ -95,7 +95,7 @@ namespace PilotsDeck
             return RunDialRotate(IPCManager, ticks, ValueManager, BaseSettings);
         }
 
-        public static bool RunDialRotate(IPCManager ipcManager, int ticks, AddressValueManager valueManager, IModelSwitch switchSettings)
+        public static bool RunDialRotate(IPCManager ipcManager, int ticks, ValueManager valueManager, IModelSwitch switchSettings)
         {          
             string address;
             int type;
@@ -108,7 +108,7 @@ namespace PilotsDeck
             {
                 address = switchSettings.AddressActionLeft;
                 type = switchSettings.ActionTypeLeft;
-                value = valueManager[ID.SwitchStateLeft];
+                value = valueManager[ID.SwitchLeft];
                 onState = switchSettings.SwitchOnStateLeft;
                 offState = switchSettings.SwitchOffStateLeft;
             }
@@ -116,7 +116,7 @@ namespace PilotsDeck
             {
                 address = switchSettings.AddressActionRight;
                 type = switchSettings.ActionTypeRight;
-                value = valueManager[ID.SwitchStateRight];
+                value = valueManager[ID.SwitchRight];
                 onState = switchSettings.SwitchOnStateRight;
                 offState = switchSettings.SwitchOffStateRight;
             }
@@ -138,7 +138,7 @@ namespace PilotsDeck
             }
             else
             {
-                result = ipcManager.RunAction(address, "", (ActionSwitchType)type, value, valueManager[ID.ControlState], onState, offState, switchSettings, true, ticks);
+                result = ipcManager.RunAction(address, "", (ActionSwitchType)type, value, onState, offState, switchSettings, true, ticks);
             }
 
             return result;
@@ -149,12 +149,12 @@ namespace PilotsDeck
             return RunTouchTap(IPCManager, ValueManager, BaseSettings);
         }
 
-        public static bool RunTouchTap(IPCManager ipcManager, AddressValueManager valueManager, IModelSwitch switchSettings)
+        public static bool RunTouchTap(IPCManager ipcManager, ValueManager valueManager, IModelSwitch switchSettings)
         {
             int result = RunVjoy(switchSettings.AddressActionTouch, switchSettings.ActionTypeTouch);
             if (result == 0)
             {
-                if (!ipcManager.RunAction(switchSettings.AddressActionTouch, "", (ActionSwitchType)switchSettings.ActionTypeTouch, valueManager[ID.SwitchStateTouch], valueManager[ID.ControlState], switchSettings.SwitchOnStateTouch, switchSettings.SwitchOffStateTouch, switchSettings, true))
+                if (!ipcManager.RunAction(switchSettings.AddressActionTouch, "", (ActionSwitchType)switchSettings.ActionTypeTouch, valueManager[ID.SwitchTouch], switchSettings.SwitchOnStateTouch, switchSettings.SwitchOffStateTouch, switchSettings, true))
                     return false;
                 else
                     return true;

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Serilog;
 using StreamDeckLib.Messages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -149,12 +150,14 @@ namespace PilotsDeck
             {
                 if (string.IsNullOrEmpty(deviceMapping.DefaultProfile))
                 {
-                    if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeck || deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckXL)
+                    if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeck || deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckXL || deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckPlus)
                     {
                         if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeck && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfile).Any())
                             deviceMapping.DefaultProfile = AppSettings.deckDefaultProfile;
                         else if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckXL && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfileXL).Any())
                             deviceMapping.DefaultProfile = AppSettings.deckDefaultProfileXL;
+                        else if (deviceMapping.Type == (int)StreamDeckTypeEnum.StreamDeckPlus && deviceMapping.Profiles.Where(p => p.Name == AppSettings.deckDefaultProfilePlus).Any())
+                            deviceMapping.DefaultProfile = AppSettings.deckDefaultProfilePlus;
                         else
                             deviceMapping.UseDefault = false;
                     }
@@ -180,9 +183,9 @@ namespace PilotsDeck
                 DeviceMappings.Clear();
                 DeviceMappings = jArray;
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ModelProfileSwitcher:LoadFromJson - Exception while parsing Profile-List! | {MappingsJson}");
+                Logger.Log(LogLevel.Critical, "ModelProfileSwitcher:LoadFromJson", $"Exception while parsing Profile-List! (Mappings: {MappingsJson}) (Exception: {ex.GetType()})");
             }
         }
 
@@ -192,9 +195,9 @@ namespace PilotsDeck
             {
                 MappingsJson = JsonConvert.SerializeObject(DeviceMappings);
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error($"ModelProfileSwitcher:ExportToJson - Exception while serializing Profile-List! | {DeviceMappings?.Count}");
+                Logger.Log(LogLevel.Critical, "ModelProfileSwitcher:ExportToJson", $"Exception while serializing Profile-List! (Count: {DeviceMappings?.Count}) (Exception: {ex.GetType()})");
             }
         }
 
@@ -207,7 +210,7 @@ namespace PilotsDeck
             for (int i = 0; i < profiles.Length; i++)
                 if (name.Contains(profiles[i]))
                 {
-                    Log.Logger.Debug($"ModelProfileSwitcher:IsInProfile - Profile-Mapping '{profiles[i]}' matched to '{name}'");
+                    Logger.Log(LogLevel.Information, "ModelProfileSwitcher:IsInProfile", $"Profile-Mapping '{profiles[i]}' matched to '{name}'.");
                     return true;
                 }
 

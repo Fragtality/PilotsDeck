@@ -10,9 +10,18 @@
     <Version>0.7.8.0</Version>
     <Authors>Fragtality</Authors>
     <Description>Directly control your FlightSim from your StreamDeck via FSUIPC!</Description>
-    <Copyright>Copyright ©  2023</Copyright>
+    <Copyright>Copyright © 2023</Copyright>
     <PackageIcon>PluginIcon.png</PackageIcon>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <IncludeSymbols>False</IncludeSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,7 +36,6 @@
 
   <ItemGroup>
     <Folder Include="Actions\" />
-    <Folder Include="Handler\" />
     <Folder Include="Images\category\" />
     <Folder Include="Images\korry\" />
     <Folder Include="lua\" />
@@ -45,32 +53,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSUIPCClientDLL" Version="3.3.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+    <PackageReference Include="FSUIPCClientDLL" Version="3.3.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Serilog" Version="2.12.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-    <PackageReference Include="System.Globalization" Version="4.3.0" />
+    <PackageReference Include="StreamDeckLib" Version="2301.20.1743" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="StreamDeckLib">
-      <HintPath>StreamDeckLib\StreamDeckLib.dll</HintPath>
-    </Reference>
     <Reference Include="vJoyInterfaceWrap">
       <HintPath>vJoyInterfaceWrap.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PublishReadyToRunExclude Include="vJoyInterface.dll" />
+	<PublishReadyToRunExclude Include="vJoyInterfaceWrap.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -794,9 +790,6 @@
     <None Update="layout-pilotsdeck.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="logsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="lua\PilotsDeck.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -810,6 +803,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PI\inc_DefaultActions.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PI\inc_FontOptions.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PI\inc_FormatValue.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PI\inc_EncoderActions.html">
@@ -882,117 +881,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="StreamDeckLib.deps.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="StreamDeckLib.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\McMaster.Extensions.CommandLineUtils.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.Abstractions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.Binder.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.CommandLine.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.EnvironmentVariables.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.FileExtensions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.Json.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Configuration.UserSecrets.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.DependencyInjection.Abstractions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.DependencyInjection.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.DependencyModel.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.FileProviders.Abstractions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.FileProviders.Physical.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.FileSystemGlobbing.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Hosting.Abstractions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Hosting.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.Abstractions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.Configuration.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.Console.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.Debug.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.EventLog.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Logging.EventSource.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Options.ConfigurationExtensions.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Options.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Microsoft.Extensions.Primitives.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Serilog.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Serilog.Extensions.Logging.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Serilog.Settings.Configuration.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\Serilog.Sinks.File.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\StreamDeckLib.deps.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\StreamDeckLib.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\System.Diagnostics.EventLog.dll">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="StreamDeckLib\System.Text.Json.dll">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="vJoyInterface.dll">
@@ -1004,7 +895,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="powershell -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)RegisterPluginAndStartStreamDeck.ps1&quot; $(ConfigurationName)" />
+    <Exec Command="powershell -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)BuildPlugin.ps1&quot; $(ConfigurationName)" />
   </Target>
 
 </Project>

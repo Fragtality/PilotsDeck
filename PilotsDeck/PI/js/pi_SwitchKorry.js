@@ -29,18 +29,10 @@ var settingsModel = {
 	BotImage: "Images/korry/A-ON-Blue.png",
 	TopRect: "9; 21; 54; 20",
 	BotRect: "9; 45; 54; 20"
-  };
+};
 
-function fillSelectBoxes() {
-	if (ImageFiles && ImageFiles != "") {
-		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
-		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
-	}
-	if (KorryFiles && KorryFiles != "") {
-		fillImageSelectBox(KorryFiles, 'TopImage', settingsModel.TopImage);
-		fillImageSelectBox(KorryFiles, 'BotImage', settingsModel.BotImage);
-	}
-}
+var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
+var korrySelectBoxes = ["TopImage", "BotImage"];
 
 function updateForm() {
 	//PATTERN
@@ -49,12 +41,17 @@ function updateForm() {
 
 	//only Top adr
 	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'AddressBot');
+	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'BotState');
+	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'BotImage');
+	setFormItem(!settingsModel.UseOnlyTopAddr, 'Prev_BotImage');
+	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'ShowBotNonZero');
 
 	//non-zero
 	toggleConfigItem(!settingsModel.ShowTopNonZero, 'TopState')
-	toggleConfigItem(!settingsModel.ShowBotNonZero, 'BotState')
+	toggleConfigItem(!settingsModel.UseOnlyTopAddr && !settingsModel.ShowBotNonZero, 'BotState')
 
 	//CURRENT VALUE
+	settingsModel.SwitchOnCurrentValue = false;
 	document.getElementById('SwitchOnCurrentValue').checked = false;
 	toggleConfigItem(false, 'SwitchOnCurrentValue');
 }

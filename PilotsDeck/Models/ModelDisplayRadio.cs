@@ -5,6 +5,7 @@
         public virtual string AddressRadioActiv { get; set; } = "";
         public virtual string AddressRadioStandby { get; set; } = "";
 
+        public override bool HasIndication { get; set; } = true;
         public virtual bool StbyHasDiffFormat { get; set; } = false;
         public virtual bool DecodeBCDStby { get; set; } = false;
         public virtual string ScalarStby { get; set; } = "1";

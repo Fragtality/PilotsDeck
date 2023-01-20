@@ -1,178 +1,169 @@
-﻿using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace PilotsDeck
 {
-    using ValuePair = KeyValuePair<string, IPCValue>;
-
-    public static class ID
+    public class ValueManager
     {
-        public static readonly string SwitchState = "SwitchState";
-        public static readonly string SwitchStateLong = "SwitchStateLong";
-        public static readonly string SwitchStateLeft = "SwitchStateLeft";
-        public static readonly string SwitchStateRight = "SwitchStateRight";
-        public static readonly string SwitchStateTouch = "SwitchStateTouch";
+        protected Dictionary<int, ManagedValue> ManagedValues = new();
+        protected IPCManager ipcManager;
 
-        public static readonly string ControlState = "ControlState";
-        public static readonly string MonitorState = "MonitorState";
-
-        public static readonly string Top = "ControlState";
-        public static readonly string Bot = "ControlStateBot";
-        
-        public static readonly string Active = "ControlState";
-        public static readonly string Standby = "ControlStateBot";
-
-        public static readonly string First = "ControlState";
-        public static readonly string Second = "ControlStateBot";
-    };
-
-    public class AddressValueManager
-    {
-        //ID (Current, Last, ...) => Address = Value
-        protected Dictionary<string, ValuePair> managedValues = new ();
-        protected IPCManager ipcManager = null;
-
-        public void RegisterManager(IPCManager manager)
+        public ValueManager(IPCManager m)
         {
-            if (ipcManager == null)
-                ipcManager = manager;
+            ipcManager = m;
         }
 
-        public bool RegisterValue(string id, string address)
+        #region Add/Remove/Update
+        public void AddValue(int id, string address, int type = 5)
         {
-            IPCValue value = ipcManager.RegisterAddress(address);
-            
-            if (value != null)
+            AddValue(id, address, (ActionSwitchType)type);
+        }
+
+        public void AddValue(int id, string address)
+        {
+            AddValue(id, address, ActionSwitchType.READVALUE);
+        }
+
+        public void AddValue(int id, string address, ActionSwitchType type = ActionSwitchType.READVALUE)
+        {
+            if (!ManagedValues.ContainsKey(id))
             {
-                if (!managedValues.ContainsKey(id))
+                var value = new ManagedValue(id, address, type);
+                IPCValue ipcValue;
+
+                if (IPCTools.IsActionReadable(type) && IPCTools.IsReadAddressForType(address, type))
                 {
-                    managedValues.Add(id, new ValuePair(address, value));
-                    return true;
+                    ipcValue = ipcManager.RegisterAddress(address);
+                    if (ipcValue != null)
+                    {
+                        value.Value = ipcValue;
+                        Logger.Log(LogLevel.Debug, "ValueManager:AddValue", $"The IPCValue for ID '{ID.str(id)}' was added. {Logger.ActionInfo(address, type)}");
+                    }
+                    else
+                        Logger.Log(LogLevel.Error, "ValueManager:AddValue", $"The IPCValue for ID '{ID.str(id)}' is a NULL-Reference! {Logger.ActionInfo(address, type)}");
                 }
-                else
+                ManagedValues.Add(id, value);
+                Logger.Log(LogLevel.Debug, "ValueManager:AddValue", $"The Value ID '{ID.str(id)}' is now managed. {Logger.ActionInfo(address, type)}");
+            }
+            else
+            {
+                Logger.Log(LogLevel.Error, "ValueManager:AddValue", $"The Value for ID '{ID.str(id)}' is already registered! {Logger.ActionInfo(address, type)}");
+            }
+        }
+
+        public void RemoveValue(int id)
+        {
+            if (ManagedValues.TryGetValue(id, out var value))
+            {
+                if (IPCTools.IsActionReadable(value.Type) && ipcManager.Contains(value.Address))
+                    ipcManager.DeregisterAddress(value.Address);
+                
+                ManagedValues.Remove(id);
+                Logger.Log(LogLevel.Debug, "ValueManager:RemoveValue", $"The Value for ID '{ID.str(id)}' was removed. {Logger.ActionInfo(value.Address, value.Type)}");
+            }
+            else
+            {
+                Logger.Log(LogLevel.Error, "ValueManager:RemoveValue", $"The Value for ID '{ID.str(id)}' does not exist!");
+            }
+        }
+
+        public void UpdateValue(int id, string newAddress, int newType = 5)
+        {
+            UpdateValue(id, newAddress, (ActionSwitchType)newType);
+        }
+
+        public void UpdateValue(int id, string newAddress)
+        {
+            UpdateValue(id, newAddress, ActionSwitchType.READVALUE);
+        }
+
+        public void UpdateValue(int id, string newAddress, ActionSwitchType newType = ActionSwitchType.READVALUE)
+        {
+            if (ManagedValues.TryGetValue(id, out var value))
+            {
+                bool updated = false;
+                if (value.Address == newAddress && value.Type == newType)
+                    return;
+
+                bool readOld = IPCTools.IsActionReadable(value.Type);
+                bool readNew = IPCTools.IsActionReadable(newType);
+                bool validOld = IPCTools.IsReadAddressForType(value.Address, value.Type);
+                bool validNew = IPCTools.IsReadAddressForType(newAddress, newType);
+
+                if ((!readOld && !readNew) || (readOld && !validOld && !validNew))
+                    return;
+
+                if (readOld && validOld)
                 {
-                    Log.Logger.Error($"ValueManager: Variable {id} already exists!");
+                    if (ipcManager.Contains(value.Address))
+                        ipcManager.DeregisterAddress(value.Address);
+                    value.Value = null;
+                    updated = true;
+                }
+
+                if ((readNew && validNew) || (!readOld && readNew && validNew))
+                {
+                    value.Value = ipcManager.RegisterAddress(newAddress);
+                    if (value.Value == null)
+                        Logger.Log(LogLevel.Error, "ValueManager:UpdateValue", $"The IPCValue for ID '{ID.str(id)}' is a NULL-Reference! {Logger.ActionInfo(newAddress, newType)}");
+                    updated = true;
+                }
+
+                if (updated)
+                {
+                    Logger.Log(LogLevel.Debug, "ValueManager:UpdateValue", $"The Value for ID '{ID.str(id)}' was updated. {Logger.ActionInfo(value.Address, value.Type)} -> {Logger.ActionInfo(newAddress, newType)}");
+                    value.Address = newAddress;
+                    value.Type = newType;
                 }
             }
             else
             {
-                Log.Logger.Error($"ValueManager: Could not Register Address {address} for Variable {id}!");
+                Logger.Log(LogLevel.Error, "ValueManager:UpdateValue", $"The Value for ID '{ID.str(id)}' does not exist!");
             }
+        }       
+        #endregion
 
-            return false;
-        }
-
-        protected bool UpdateIPC(string id, string newAddress)
+        #region Value Properties
+        public bool Contains(int id)
         {
-            if (managedValues[id].Key != newAddress)
-            {
-                ipcManager.DeregisterAddress(managedValues[id].Key);
-                IPCValue value = ipcManager.RegisterAddress(newAddress);
-
-                if (value != null)
-                {
-                    Log.Logger.Debug($"ValueManager: Updated Variable {id} with new Address {newAddress}. (Old: {managedValues[id].Key})");
-                    managedValues[id] = new ValuePair(newAddress, value);
-
-                    return true;
-                }
-                else
-                {
-                    Log.Logger.Error($"ValueManager: Udapte for Variable {id} failed! The new Address {newAddress} could not be registered!");
-                }
-            }
-
-            return false;
+            return ManagedValues.ContainsKey(id);
         }
 
-        public bool UpdateValueAddress(string id, string newAddress)
+        public bool HasRegisteredValue(int id)
         {
-            if (!string.IsNullOrEmpty(id))
-            {
-                if (managedValues.ContainsKey(id))
-                {
-                    if (managedValues[id].Key != newAddress)
-                        return UpdateIPC(id, newAddress);
-                }
-                else
-                {
-                    Log.Logger.Debug($"ValueManager: Variable {id} did not exist! Added new Registration to {newAddress}");
-                    return RegisterValue(id, newAddress);
-                }
-            }
-            else
-            {
-                Log.Logger.Error($"ValueManager: Variable {id} does not exist!");
-            }
-
-            return false;
+            return ManagedValues.TryGetValue(id, out var value) && value != null;
         }
+        #endregion
 
-        public bool DeregisterValue(string id)
-        {
-            if (!string.IsNullOrEmpty(id) && managedValues.TryGetValue(id, out ValuePair value))
-            {
-                ipcManager.DeregisterAddress(value.Key);
-                return true;
-            }
-            else
-            {
-                Log.Logger.Error($"ValueManager: Variable {id} does not exist!");
-            }
-
-            return false;
-        }
-
-        public bool ContainsValue(string id)
-        {
-            if (!string.IsNullOrEmpty(id))
-                return managedValues.ContainsKey(id);
-
-            return false;
-        }
-
-        public bool IsChanged(string id)
-        {
-            if (managedValues.TryGetValue(id, out ValuePair value))
-                return value.Value.IsChanged;
-            else
-                return false;
-        }
-
+        #region IPCValue
         public bool HasChangedValues()
         {
-            foreach (var val in managedValues.Values)
-            {
-                if (val.Value.IsChanged)
-                    return true;
-            }
-
-            return false;
+            return ManagedValues.Where(kv => kv.Value.Value.IsChanged).Any();
         }
 
-        public string GetAddress(string id)
+        public bool IsChanged(int id)
         {
-            if (managedValues.TryGetValue(id, out ValuePair value))
-                return value.Key;
-            else
-                return "";
+            return ManagedValues.TryGetValue(id, out var value) && value.Value != null && value.Value.IsChanged;
         }
 
-        protected string GetValue(string id)
+        public string GetValue(int id)
         {
-            if (managedValues.TryGetValue(id, out ValuePair value))
+            if (ManagedValues.TryGetValue(id, out var value) && value.Value != null)
                 return value.Value.Value;
             else
-            {
-                if (id != ID.SwitchState && id != ID.SwitchStateLong)
-                    Log.Logger.Debug($"ValueManager: Returning empty Value for Variable {id}");
                 return "";
-            }
         }
 
-        public string this[string id]
+        public void SetValue(int id, IPCValue value)
         {
-            get => (!string.IsNullOrEmpty(id) ? GetValue(id) : "");
+            if (ManagedValues.ContainsKey(id))
+                ManagedValues[id].Value = value;
         }
+
+        public string this[int id]
+        {
+            get { return GetValue(id); }
+        }
+        #endregion
     }
 }

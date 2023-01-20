@@ -10,7 +10,7 @@ namespace PilotsDeck
 
         public virtual string DefaultImageRender { get; set; }
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerSwitchKorry] ReadTop: {KorrySettings.AddressTop} | ReadBot: {KorrySettings.AddressBot} | Write: {BaseSettings.AddressAction}"; } }
+        public override string ActionID { get { return $"(HandlerSwitchKorry) ({Title.Trim()}) {(BaseSettings.IsEncoder ? "(Encoder) " : "")}(Top: {KorrySettings.AddressTop} / Bot: {KorrySettings.AddressBot}) (Action: {(ActionSwitchType)BaseSettings.ActionType} / {Address}) (Long: {BaseSettings.HasLongPress} / {(ActionSwitchType)BaseSettings.ActionTypeLong} / {BaseSettings.AddressActionLong})"; } }
         public override string Address { get { return KorrySettings.AddressTop; } }
 
 
@@ -29,25 +29,44 @@ namespace PilotsDeck
         {
             BaseSettings.SwitchOnCurrentValue = false;
             base.Register(imgManager, ipcManager);
+
+            imgManager.AddImage(KorrySettings.TopImage, DeckType);
+            imgRefs.Add(ID.Top, KorrySettings.TopImage);
+            imgManager.AddImage(KorrySettings.BotImage, DeckType);
+            imgRefs.Add(ID.Bottom, KorrySettings.BotImage);
+
             RenderDefaultImage();
 
-            ValueManager.RegisterValue(ID.Bot, KorrySettings.AddressBot); 
+            ValueManager.AddValue(ID.Bottom, KorrySettings.AddressBot); 
         }
 
         public override void Deregister()
         {
             base.Deregister();
 
-            ValueManager.DeregisterValue(ID.Bot); 
+            ImgManager.RemoveImage(KorrySettings.TopImage, DeckType);
+            imgRefs.Remove(ID.Top);
+            ImgManager.RemoveImage(KorrySettings.BotImage, DeckType);
+            imgRefs.Remove(ID.Bottom);
+
+            ValueManager.RemoveValue(ID.Bottom); 
         }
 
-        public override void Update()
+        public override void Update(bool skipActionUpdate = false)
         {
-            base.Update();
+            base.Update(skipActionUpdate);
             RenderDefaultImage();
             NeedRedraw = true;
 
-            ValueManager.UpdateValueAddress(ID.Bot, KorrySettings.AddressBot);
+            ValueManager.UpdateValue(ID.Bottom, KorrySettings.AddressBot);
+        }
+
+        protected override void UpdateImages()
+        {
+            base.UpdateImages();
+
+            UpdateImage(KorrySettings.TopImage, ID.ImgTop);
+            UpdateImage(KorrySettings.BotImage, ID.ImgBot);
         }
 
         public override void UpdateActionSettings()
@@ -80,13 +99,13 @@ namespace PilotsDeck
 
         protected override void Redraw()
         {
-            if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bot)  && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bottom)  && !ForceUpdate)
                 return;
 
             ImageRenderer render = new(ImgManager.GetImageDefinition(DefaultImage, DeckType));
 
             string top = ValueManager[ID.Top];
-            string bot = ValueManager[ID.Bot];
+            string bot = ValueManager[ID.Bottom];
 
             if (((ModelBase.Compare(KorrySettings.TopState, top) && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(top))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
                 render.DrawImage(ImgManager.GetImageDefinition(KorrySettings.TopImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());

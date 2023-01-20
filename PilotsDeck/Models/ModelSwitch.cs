@@ -1,21 +1,5 @@
 ﻿namespace PilotsDeck
 {
-    public enum ActionSwitchType
-    {
-        MACRO,
-        SCRIPT,
-        CONTROL,
-        LVAR,
-        OFFSET,
-        //5 is offset+lvar in PI
-        VJOY = 6, //FSUIPC vJoy
-        VJOYDRV = 7, //vJoy Driver
-        HVAR,
-        CALCULATOR,
-        XPCMD,
-        XPWREF
-    }
-
     public interface IModelSwitch
     {
         //Base Control

@@ -189,7 +189,7 @@
     }
   ],
   "Software": {
-    "MinimumVersion": "4.1"
+    "MinimumVersion": "6.0"
   },
   "ApplicationsToMonitor": {
     "windows": [

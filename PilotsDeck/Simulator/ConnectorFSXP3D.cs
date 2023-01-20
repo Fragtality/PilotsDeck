@@ -1,4 +1,5 @@
 ﻿using FSUIPC;
+using System;
 using Serilog;
 
 namespace PilotsDeck
@@ -25,9 +26,9 @@ namespace PilotsDeck
                 FSUIPCConnection.Close();
 
             if (!FSUIPCConnection.IsOpen)
-                Log.Logger.Information("ConnectorFSXP3D: FSUIPC Closed");
+                Logger.Log(LogLevel.Information, "ConnectorFSXP3D:Close", $"FSUIPC Closed.");
             else
-                Log.Logger.Error("ConnectorFSXP3D: Failed to close FSUIPC");
+                Logger.Log(LogLevel.Error, "ConnectorFSXP3D:Close", $"Failed to close FSUIPC!");
         }
 
         public override bool Connect()
@@ -38,14 +39,14 @@ namespace PilotsDeck
 
                 if (FSUIPCConnection.IsOpen)
                 {
-                    Log.Logger.Information("ConnectorFSXP3D: FSUIPC Connected");
+                    Logger.Log(LogLevel.Information, "ConnectorFSXP3D:Connect", $"FSUIPC Connected.");
                     foreach (var addr in ipcManager.AddressList)
                         ipcManager[addr].Connect();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("ConnectorFSXP3D: Exception while opening FSUIPC");
+                Logger.Log(LogLevel.Critical, "ConnectorFSXP3D:Connect", $"Exception while opening FSUIPC! (Exception: {ex.GetType()})");
             }
 
             return IsConnected;
@@ -86,15 +87,15 @@ namespace PilotsDeck
                 FSUIPCConnection.Process(AppSettings.groupStringRead);
                 if (!IsReady)
                 {
-                    Log.Logger.Debug("ConnectorFSXP3D: NOT READY");
+                    Logger.Log(LogLevel.Debug, "ConnectorFSXP3D:Process", $"Not ready!");
                     resultProcess = false;
                 }
                 resultProcess = true;
 
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Logger.Error("ConnectorFSXP3D: Exception while process call to FSUIPC");
+                Logger.Log(LogLevel.Critical, "ConnectorFSXP3D:Process", $"Exception in Process Call! (Exception: {ex.GetType()})");
                 resultProcess = false;
             }
 
@@ -117,12 +118,12 @@ namespace PilotsDeck
             {
                 ipcManager[address].Connect();
             }
-            Log.Logger.Debug("ConnectorFSXP3D: Subscribed all IPCValues");
+            Logger.Log(LogLevel.Debug, "ConnectorFSXP3D:SubscribeAllAddresses", $"Subscribed all IPCValues. (Count: {ipcManager.AddressList.Count})");
         }
 
         protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
         {
-            bool result = IPCTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+            bool result = SimTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
             if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
             {
                 ipcManager[Address].SetValue(newValue);
@@ -136,17 +137,17 @@ namespace PilotsDeck
             switch (actionType)
             {
                 case ActionSwitchType.MACRO:
-                    return IPCTools.RunMacros(Address);
+                    return SimTools.RunMacros(Address);
                 case ActionSwitchType.SCRIPT:
-                    return IPCTools.RunScript(Address);
+                    return SimTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
                     return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, false);
                 case ActionSwitchType.CONTROL:
-                    return IPCTools.SendControls(Address, switchSettings.UseControlDelay);
+                    return SimTools.SendControls(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.OFFSET:
-                    return IPCTools.WriteOffset(Address, newValue);
+                    return SimTools.WriteOffset(Address, newValue);
                 default:
-                    Log.Logger.Error($"ConnectorFSXP3D: Action-Type {actionType} not valid for Address {Address}");
+                    Logger.Log(LogLevel.Error, "ConnectorFSXP3D:RunAction", $"Action-Type '{actionType}' not valid for Address '{Address}'!");
                     return false;
             }
         }

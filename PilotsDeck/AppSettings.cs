@@ -10,6 +10,7 @@ namespace PilotsDeck
         public static readonly string groupStringWrite = "PilotsdeckWrite";
         public static readonly string deckDefaultProfile = "Profiles/PilotsDeck - Default";
         public static readonly string deckDefaultProfileXL = "Profiles/PilotsDeck - DefaultXL";
+        public static readonly string deckDefaultProfilePlus = "Profiles/PilotsDeck - DefaultPlus";
 
         public static readonly string waitImage = @"Images/Wait.png";
         public static readonly string hqImageSuffix = "@2x";

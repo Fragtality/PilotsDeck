@@ -7,7 +7,7 @@
         public new ModelSwitchDisplay Settings { get; protected set; }
         
 
-        public override string ActionID { get { return $"\"{StreamDeckTools.TitleLog(Title)}\" [HandlerSwitchDisplay] Write: {BaseSettings.AddressAction} | Read: {DisplaySettings.Address}"; } }
+        public override string ActionID { get { return $"(HandlerSwitchDisplay) ({Title.Trim()}) {(BaseSettings.IsEncoder ? "(Encoder) " : "")}(Read: {DisplaySettings.Address}) (Action: {(ActionSwitchType)BaseSettings.ActionType} / {Address}) (Long: {BaseSettings.HasLongPress} / {(ActionSwitchType)BaseSettings.ActionTypeLong} / {BaseSettings.AddressActionLong})"; } }
         public override string Address { get { return DisplaySettings.Address; } }
 
         public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings, StreamDeckType deckType) : base(context, settings, deckType)
@@ -19,13 +19,21 @@
         {
             base.Register(imgManager, ipcManager);
 
-            imgManager.AddImage(DisplaySettings.OnImage, DeckType);
-            imgManager.AddImage(DisplaySettings.OffImage, DeckType);
-            if (DisplaySettings.HasIndication)
-                imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
-            DisplaySettings.ManageImageMap(imgManager, DeckType, true);
+            if (this.GetType() == typeof(HandlerSwitchDisplay))
+            {
+                imgManager.AddImage(DisplaySettings.OnImage, DeckType);
+                imgRefs.Add(ID.On, DisplaySettings.OnImage);
+                imgManager.AddImage(DisplaySettings.OffImage, DeckType);
+                imgRefs.Add(ID.Off, DisplaySettings.OffImage);
+                if (DisplaySettings.HasIndication)
+                    imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
+                imgRefs.Add(ID.Indication, DisplaySettings.IndicationImage);
 
-            ValueManager.RegisterValue(ID.ControlState, DisplaySettings.Address);
+                DisplaySettings.ManageImageMap(imgManager, DeckType, true);
+                imgRefs.Add(ID.Map, DisplaySettings.ImageMap);
+            }
+
+            ValueManager.AddValue(ID.Control, DisplaySettings.Address);
             if (BaseSettings.SwitchOnCurrentValue)
             {
                 BaseSettings.SwitchOffState = DisplaySettings.OffState;
@@ -37,20 +45,47 @@
         {
             base.Deregister();
 
-            ImgManager.RemoveImage(DisplaySettings.OnImage, DeckType);
-            ImgManager.RemoveImage(DisplaySettings.OffImage, DeckType);
-            if (DisplaySettings.HasIndication)
-                ImgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
-            DisplaySettings.ManageImageMap(ImgManager, DeckType, false);
+            if (this.GetType() == typeof(HandlerSwitchDisplay))
+            {
+                ImgManager.RemoveImage(DisplaySettings.OnImage, DeckType);
+                imgRefs.Remove(ID.On);
+                ImgManager.RemoveImage(DisplaySettings.OffImage, DeckType);
+                imgRefs.Remove(ID.Off);
+                if (DisplaySettings.HasIndication)
+                    ImgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
+                imgRefs.Remove(ID.Indication);
 
-            ValueManager.DeregisterValue(ID.ControlState);
+                DisplaySettings.ManageImageMap(ImgManager, DeckType, false);
+                imgRefs.Remove(ID.Map);
+            }
+
+            ValueManager.RemoveValue(ID.Control);
         }
 
-        public override void Update()
+        public override void Update(bool skipActionUpdate = false)
         {
-            base.Update();
+            base.Update(skipActionUpdate);
 
-            ValueManager.UpdateValueAddress(ID.ControlState, Address);
+            ValueManager.UpdateValue(ID.Control, Address);
+        }
+
+        protected override void UpdateImages()
+        {
+            base.UpdateImages();
+
+            if (this.GetType() == typeof(HandlerSwitchDisplay))
+            {
+                UpdateImage(DisplaySettings.OnImage, ID.On);
+                UpdateImage(DisplaySettings.OffImage, ID.Off);
+                UpdateImage(DisplaySettings.IndicationImage, ID.Indication);
+
+                if (DisplaySettings.ImageMap != imgRefs[ID.Map])
+                {
+                    DisplaySettings.ManageImageMap(imgRefs[ID.Map], ImgManager, DeckType, false);
+                    DisplaySettings.ManageImageMap(ImgManager, DeckType, true);
+                    imgRefs[ID.Map] = DisplaySettings.ImageMap;
+                }
+            }
         }
 
         public override void UpdateActionSettings()
@@ -69,11 +104,11 @@
 
         protected override void Redraw()
         {
-            if (!ValueManager.IsChanged(ID.ControlState) && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Control) && !ForceUpdate)
                 return;
 
             string lastImage = DrawImage;
-            string currentValue = ValueManager[ID.ControlState];
+            string currentValue = ValueManager[ID.Control];
 
             if (!Settings.UseImageMapping)
             {

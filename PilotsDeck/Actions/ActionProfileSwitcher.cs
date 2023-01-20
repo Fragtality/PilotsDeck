@@ -19,7 +19,7 @@ namespace PilotsDeck
 
             SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
 
-            Log.Logger.Debug($"ActionProfileSwitcher:OnWillAppear {args.context}");
+            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnWillAppear", $"(Context: {args.context})");
         }
 
         public override Task OnWillDisappear(StreamDeckEventPayload args)
@@ -28,7 +28,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.DeregisterProfileSwitcher(args.context);
 
-            Log.Logger.Debug($"ActionProfileSwitcher:OnWillDisappear {args.context}");
+            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnWillDisappear", $"(Context: {args.context})");
             return Task.CompletedTask;
         }
 
@@ -51,7 +51,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.UpdateProfileSwitchers();
 
-            Log.Logger.Debug($"ActionProfileSwitcher:OnKeyUp {args.context}");
+            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnKeyUp", $"(Context: {args.context})");
             return Task.CompletedTask;
         }
 
@@ -68,7 +68,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.UpdateProfileSwitchers();
 
-            Log.Logger.Debug($"ActionProfileSwitcher:OnDidReceiveSettings {args.context}");
+            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnDidReceiveSettings", $"(Context: {args.context})");
             return Task.CompletedTask;
         }
 
@@ -79,7 +79,7 @@ namespace PilotsDeck
             SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
             Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
 
-            Log.Logger.Debug($"ActionProfileSwitcher:OnPropertyInspectorDidAppear {args.context}");
+            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnPropertyInspectorDidAppear", $"(Context: {args.context})");
             return Task.CompletedTask;
         }
 
@@ -91,7 +91,7 @@ namespace PilotsDeck
             SettingsModel.CopySettings(Plugin.ActionController.GlobalProfileSettings);
             Manager.SendToPropertyInspectorAsync(args.context, SettingsModel);
 
-            Log.Logger.Debug($"ActionProfileSwitcher:OnSendToPlugin {args.context}");
+            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnSendToPlugin", $"(Context: {args.context})");
             return Task.CompletedTask;
         }
     }

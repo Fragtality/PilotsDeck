@@ -85,23 +85,24 @@ namespace PilotsDeck
             {
                 case "Prepar3D.exe":
                     connector = new ConnectorFSXP3D();
-                    Log.Logger.Debug($"SimulatorConnector:CreateConnector - created Connector for FSX/P3D");
+                    Logger.Log(LogLevel.Debug, "SimulatorConnector:CreateConnector", $"Created Connector for FSX/P3D.");
                     break;
                 case "FlightSimulator.exe":
-                    connector = new ConnectorMSFS();
-                    Log.Logger.Debug($"SimulatorConnector:CreateConnector - created Connector for MSFS");
+                    connector = new ConnectorMSFS(); 
+                    Logger.Log(LogLevel.Debug, "SimulatorConnector:CreateConnector", $"Created Connector for MSFS.");
                     break;
                 case "X-Plane.exe":
                     connector = new ConnectorXP();
-                    Log.Logger.Debug($"SimulatorConnector:CreateConnector - created Connector for X-Plane");
+
+                    Logger.Log(LogLevel.Debug, "SimulatorConnector:CreateConnector", $"Created Connector for X-Plane.");
                     break;
                 case "fsx.exe":
                     connector = new ConnectorFSXP3D();
-                    Log.Logger.Debug($"SimulatorConnector:CreateConnector - created Connector for FSX/P3D");
+                    Logger.Log(LogLevel.Debug, "SimulatorConnector:CreateConnector", $"Created Connector for FSX/P3D.");
                     break;
                 default:
                     connector = new ConnectorDummy();
-                    Log.Logger.Debug($"SimulatorConnector:CreateConnector - created Dummy Connector");
+                    Logger.Log(LogLevel.Debug, "SimulatorConnector:CreateConnector", $"Created Dummy Connector.");
                     break;
             }
 

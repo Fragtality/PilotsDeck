@@ -26,20 +26,7 @@ var settingsModel = {
 	RectCoord: "-1; 0; 0; 0"
 };
 
-// Fill Select Boxes for Actions here
-function fillSelectBoxes() {
-	if (ImageFiles && ImageFiles != "") {
-		fillImageSelectBox(ImageFiles, 'DefaultImage', settingsModel.DefaultImage);
-		fillImageSelectBox(ImageFiles, 'ErrorImage', settingsModel.ErrorImage);
-		fillImageSelectBox(ImageFiles, 'IndicationImage', settingsModel.IndicationImage);
-	}
-	if (FontNames && FontNames != "") {
-		fillFontSelectBox(FontNames, 'FontName', settingsModel.FontName);
-	}
-	if (FontStyles && FontStyles != "") {
-		fillTypeSelectBox(FontStyles, 'FontStyle', settingsModel.FontStyle);
-	}
-}
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage"];
 
 // Show/Hide elements on Form (required function)
 function updateForm() {

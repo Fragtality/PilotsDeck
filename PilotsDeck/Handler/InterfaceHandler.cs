@@ -37,7 +37,7 @@
         void ResetDrawState();
         void Refresh();
         void RefreshTitle();
-        void Update();
+        void Update(bool skipActionUpdate = false);
         void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters);
     }
 }
