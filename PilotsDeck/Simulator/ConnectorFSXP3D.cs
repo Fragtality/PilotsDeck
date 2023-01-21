@@ -1,6 +1,5 @@
 ﻿using FSUIPC;
 using System;
-using Serilog;
 
 namespace PilotsDeck
 {

@@ -1,5 +1,4 @@
-﻿using Serilog;
-using StreamDeckLib;
+﻿using StreamDeckLib;
 using StreamDeckLib.Messages;
 using System.Threading.Tasks;
 

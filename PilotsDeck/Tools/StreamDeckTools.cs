@@ -1,5 +1,4 @@
-﻿using Serilog;
-using StreamDeckLib.Messages;
+﻿using StreamDeckLib.Messages;
 using System;
 using System.Drawing;
 using System.Drawing.Text;

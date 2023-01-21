@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Serilog;
 using StreamDeckLib.Messages;
 using System;
 using System.Collections.Generic;

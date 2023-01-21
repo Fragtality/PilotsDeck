@@ -1,5 +1,4 @@
-﻿using Serilog;
-using System.Linq;
+﻿using System.Linq;
 
 namespace PilotsDeck
 {
