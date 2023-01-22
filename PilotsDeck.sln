@@ -11,6 +11,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportProfiles", "ImportProfiles\ImportProfiles.csproj", "{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Installer", "Installer\Installer.csproj", "{4209EBB2-4567-47C9-A2C3-D4F1E9EA653B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1E1E1F8D-6C0A-440A-ACA7-2F6569C2E90D} = {1E1E1F8D-6C0A-440A-ACA7-2F6569C2E90D}
+		{6D7980E4-AA49-4FDF-9319-F80EF1C6DF03} = {6D7980E4-AA49-4FDF-9319-F80EF1C6DF03}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

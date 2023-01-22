@@ -9,6 +9,7 @@ Artwork/
 Releases/
 desktop.ini
 BuildPlugin.ps1
+CopyLatest.ps1
 build.lck
 Release.ps1
 RELEASE ORDER.txt
