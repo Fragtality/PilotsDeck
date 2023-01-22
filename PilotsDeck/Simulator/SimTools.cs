@@ -376,6 +376,43 @@ namespace PilotsDeck
             string code = "";
             string[] parts = template.Split(':');
 
+
+            if (parts[0].Length == 1 && parts[0] == "K")
+                code = BuildEventCode(parts, template, ticks);
+            else
+                code = BuildLvarCode(parts, template, ticks);
+
+            
+
+            Logger.Log(LogLevel.Information, "SimTools:BuildCalculatorCode", $"Resulting Calculator Code '{code}'");
+
+            return code;
+        }
+
+        public static string BuildEventCode(string[] parts, string template, int ticks)
+        {
+            string code = "";
+
+            string cmd = "";
+            if (parts.Length == 3 && double.TryParse(parts[2], new RealInvariantFormat(parts[2]), out _))
+                cmd = $"{parts[2]} (>K:{parts[1]})";
+            else if (parts.Length == 2)
+                cmd = $"(>K:{parts[1]})";
+
+            if (!string.IsNullOrWhiteSpace(cmd))
+                for (int i = 0; i < ticks; i++)
+                    code += " " + cmd;
+
+            return code;
+        }
+
+        public static string BuildLvarCode(string[] parts, string template, int ticks)
+        {
+            string code = "";
+
+            if (parts.Length < 2)
+                return code;
+
             bool increase = parts[1][0] != '-';
             if (parts[1][0] == '-' || parts[1][0] == '+')
                 parts[1] = parts[1][1..];
@@ -401,8 +438,6 @@ namespace PilotsDeck
                     code = $"({lvar}) {parts[2]} {limit} if{{ {code} }}";
                 }
             }
-
-            Logger.Log(LogLevel.Information, "SimTools:BuildCalculatorCode", $"Resulting Calculator Code '{code}'");
 
             return code;
         }

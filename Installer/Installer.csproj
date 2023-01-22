@@ -157,6 +157,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="PilotsDeck-release.zip" />
+    <None Include="CopyLatest.ps1" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -195,4 +196,7 @@
     <EmbeddedResource Include="FlagBlue.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)CopyLatest.ps1" $(ConfigurationName)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

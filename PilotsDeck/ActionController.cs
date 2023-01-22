@@ -449,7 +449,8 @@ namespace PilotsDeck
             {
                 ipcManager.UnsubscribeUnusedAddresses();
                 imgManager.RemoveUnusedImages();
-                Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Images: {imgManager.Length})");
+                if (SimConnector.IsRunning)
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Images: {imgManager.Length})");
                 averageTime = 0;
             }
 

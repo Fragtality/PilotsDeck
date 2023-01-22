@@ -31,9 +31,9 @@ namespace PilotsDeck
             base.Register(imgManager, ipcManager);
 
             imgManager.AddImage(KorrySettings.TopImage, DeckType);
-            imgRefs.Add(ID.Top, KorrySettings.TopImage);
+            imgRefs.Add(ID.ImgTop, KorrySettings.TopImage);
             imgManager.AddImage(KorrySettings.BotImage, DeckType);
-            imgRefs.Add(ID.Bottom, KorrySettings.BotImage);
+            imgRefs.Add(ID.ImgBot, KorrySettings.BotImage);
 
             RenderDefaultImage();
 
@@ -45,9 +45,9 @@ namespace PilotsDeck
             base.Deregister();
 
             ImgManager.RemoveImage(KorrySettings.TopImage, DeckType);
-            imgRefs.Remove(ID.Top);
+            imgRefs.Remove(ID.ImgTop);
             ImgManager.RemoveImage(KorrySettings.BotImage, DeckType);
-            imgRefs.Remove(ID.Bottom);
+            imgRefs.Remove(ID.ImgBot);
 
             ValueManager.RemoveValue(ID.Bottom); 
         }
