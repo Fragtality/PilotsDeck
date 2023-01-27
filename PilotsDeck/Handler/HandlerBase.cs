@@ -19,18 +19,20 @@ namespace PilotsDeck
         protected virtual ImageManager ImgManager { get; set; }
         protected virtual Dictionary<int, string> imgRefs { get; set; } = new Dictionary<int, string>();
 
-        public string DrawImage { get; protected set; } = "";
-        public bool IsRawImage { get; protected set; } = false;
-        public virtual string DefaultImage { get { return CommonSettings.DefaultImage; } }
-        public virtual string ErrorImage { get { return CommonSettings.ErrorImage; } }
+        public virtual string RenderImage64 { get; protected set; } = "";
+        public virtual string DefaultImage64 { get; protected set; } = "";
+        public virtual string WaitImage64 { get; protected set; } = "";
+        public virtual string ErrorImage64 { get; protected set; } = "";
+
         public string Title { get; set; } = "";
         public virtual bool UseFont { get { return false; } }
 
-        public bool ForceUpdate { get; set; } = false;
         public bool NeedRedraw { get; set; } = false;
+        public bool NeedRefresh { get; set; } = false;
         public virtual bool UpdateSettingsModel { get; set; } = false;
         protected virtual bool CanRedraw { get { return !string.IsNullOrEmpty(Address); } }
         public virtual bool IsInitialized { get; set; }
+        public virtual bool FirstLoad { get; set; } = true;
 
         public virtual bool HasAction { get; protected set; } = false;
         public virtual long TickDown { get; protected set; }
@@ -48,7 +50,6 @@ namespace PilotsDeck
             Context = context;
             CommonSettings = settings;
             DeckType = deckType;
-            DrawImage = DefaultImage;
 
             if (IsEncoder && !CommonSettings.IsEncoder)
             {
@@ -86,15 +87,20 @@ namespace PilotsDeck
 
             SetInitialization();
 
-            ImgManager.AddImage(CommonSettings.DefaultImage, DeckType);
+            DefaultImage64 = ImgManager.AddImage(CommonSettings.DefaultImage, DeckType).GetImageBase64();
             imgRefs.Add(ID.Default, CommonSettings.DefaultImage);
-            ImgManager.AddImage(CommonSettings.ErrorImage, DeckType);
+
+            ErrorImage64 = ImgManager.AddImage(CommonSettings.ErrorImage, DeckType).GetImageBase64();
             imgRefs.Add(ID.Error, CommonSettings.ErrorImage);
-            ImgManager.AddImage(CommonSettings.WaitImage, DeckType);
+
+            WaitImage64 = ImgManager.AddImage(CommonSettings.WaitImage, DeckType).GetImageBase64();
             imgRefs.Add(ID.Wait, CommonSettings.WaitImage);
 
             if (HasAction)
                 RegisterActions();
+
+            NeedRefresh = true;
+            NeedRedraw = true;
         }
 
         public virtual void RegisterActions()
@@ -158,25 +164,36 @@ namespace PilotsDeck
                 UpdateActions();
             }
 
-            ForceUpdate = true;
+            NeedRefresh = true;
+            NeedRedraw = true;
         }
 
-        protected void UpdateImage(string imgNew, int id)
+        protected void UpdateImage(string imgNew, int id, out ManagedImage image)
         {
             if (imgNew != imgRefs[id])
             {
                 ImgManager.RemoveImage(imgRefs[id], DeckType);
-                ImgManager.AddImage(imgNew, DeckType);
+                image = ImgManager.AddImage(imgNew, DeckType);
             }
+            else
+                image = null;
 
             imgRefs[id] = imgNew;
         }
 
         protected virtual void UpdateImages()
         {
-            UpdateImage(CommonSettings.DefaultImage, ID.Default);
-            UpdateImage(CommonSettings.ErrorImage, ID.Error);
-            UpdateImage(CommonSettings.WaitImage, ID.Wait);
+            UpdateImage(CommonSettings.DefaultImage, ID.Default, out ManagedImage image);
+            if (image != null)
+                DefaultImage64 = image.GetImageBase64();
+
+            UpdateImage(CommonSettings.ErrorImage, ID.Error, out image);
+            if (image != null)
+                ErrorImage64 = image.GetImageBase64();
+
+            UpdateImage(CommonSettings.WaitImage, ID.Wait, out image);
+            if (image != null)
+                WaitImage64 = image.GetImageBase64();
         }
 
         public virtual void UpdateActionSettings()
@@ -211,63 +228,16 @@ namespace PilotsDeck
         }
         #endregion
 
-        #region SetState
-        public virtual void SetError()
-        {
-            if (DrawImage != ErrorImage)
-            {
-                DrawImage = ErrorImage;
-                IsRawImage = false;
-                NeedRedraw = true;
-            }
-        }
-
-        public virtual void SetDefault()
-        {
-            if (DrawImage != DefaultImage)
-            {
-                DrawImage = DefaultImage;
-                IsRawImage = false;
-                NeedRedraw = true;
-            }
-        }
-
-        public virtual void SetWait()
-        {
-            if (DrawImage != CommonSettings.WaitImage)
-            {
-                if (!IsEncoder)
-                {
-                    DrawImage = CommonSettings.WaitImage;
-                    IsRawImage = false;
-                    NeedRedraw = true;
-                }
-                else if (!string.IsNullOrWhiteSpace(Title))
-                {
-                    ImageRenderer render = new(ImgManager.GetImageDefinition(CommonSettings.WaitImage, DeckType));
-                    DrawTitle(render);
-                    DrawImage = render.RenderImage64();
-                    render.Dispose();
-                    IsRawImage = true;
-                    NeedRedraw = true;
-                }
-            }
-        }
-        #endregion
-
         #region DrawRefresh
+        protected virtual void RenderDefaultImages()
+        {
+
+        }
+
         public virtual void ResetDrawState()
         {
             NeedRedraw = false;
-            ForceUpdate = false;
-        }
-
-        public virtual void Refresh()
-        {
-            if (!CanRedraw && IsInitialized)
-                SetError();
-            
-            Redraw();
+            NeedRefresh = false;
         }
 
         public virtual void RefreshTitle()
@@ -281,12 +251,11 @@ namespace PilotsDeck
             render.DrawTitle(Title, titleParam.GetFont(12), titleParam.GetColor(), rect);
         }
 
-        protected virtual void Redraw()
+        public virtual void Refresh()
         {
-            if (!IsInitialized && DrawImage != DefaultImage || ForceUpdate)
+            if (NeedRefresh)
             {
-                DrawImage = DefaultImage;
-                IsRawImage = false;
+                RenderImage64 = DefaultImage64;
                 NeedRedraw = true;
             }
         }
@@ -295,7 +264,8 @@ namespace PilotsDeck
         {
             Title = title;
             TitleParameters = titleParameters;
-            ForceUpdate = true;
+            RefreshTitle();
+            NeedRefresh = true;
         }
         #endregion
     }

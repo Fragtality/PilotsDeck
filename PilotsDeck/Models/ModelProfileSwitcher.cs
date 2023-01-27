@@ -7,28 +7,6 @@ using System.Linq;
 
 namespace PilotsDeck
 {
-    public enum StreamDeckTypeEnum
-    {
-        StreamDeck,
-        StreamDeckMini,
-        StreamDeckXL,
-        StreamDeckMobile,
-        CorsairGKeys,
-        StreamDeckPlus = 7
-    }
-
-    public class StreamDeckType
-    {
-        public StreamDeckType(StreamDeckTypeEnum type = StreamDeckTypeEnum.StreamDeck, bool isEncoder = false)
-        {
-            Type = type;
-            IsEncoder = isEncoder;
-        }
-
-        public StreamDeckTypeEnum Type { get; set; } = StreamDeckTypeEnum.StreamDeck;
-        public bool IsEncoder { get; set; } = false;
-    }
-
     public class StreamDeckProfile
     {
         public string Name { get; set; }

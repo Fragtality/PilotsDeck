@@ -78,7 +78,7 @@ namespace PilotsDeck
             if (GaugeSettings.UseColorSwitching)
                 ValueManager.AddValue(ID.GaugeColor, GaugeSettings.AddressColorOff);
             
-            RenderDefaultImage();
+            RenderDefaultImages();
         }
 
         public override void Deregister()
@@ -101,63 +101,57 @@ namespace PilotsDeck
             else if (GaugeSettings.UseColorSwitching)
                 ValueManager.UpdateValue(ID.GaugeColor, GaugeSettings.AddressColorOff);
 
-            RenderDefaultImage();
-            NeedRedraw = true;
-
             if (IsArc != GaugeSettings.DrawArc)
             {
                 GaugeSettings.ResetCoords();
                 IsArc = GaugeSettings.DrawArc;
                 UpdateSettingsModel = true;
+                NeedRefresh = true;
             }
+
+            RenderDefaultImages();
         }
 
-        protected override void RenderImages()
+        protected override void RenderDefaultImages()
         {
-            RenderDefaultImage();
-        }
+            //Default
+            ImageRenderer render = new (ImgManager.GetImage(GaugeSettings.DefaultImage, DeckType), DeckType);
 
-        protected virtual void RenderDefaultImage()
-        {
-            ImageRenderer render = new (ImgManager.GetImageDefinition(GaugeSettings.DefaultImage, DeckType));
-
-            if (GaugeSettings.DrawArc)
+            if(GaugeSettings.DrawArc)
             {
-                render.DrawArc(GaugeSettings.GetArc(), ColorTranslator.FromHtml(GaugeSettings.GaugeColor));
+                DrawText("0", render, true);
+                DrawArc("0", render, true);
             }
             else
             {
-                render.Rotate(GaugeSettings.BarOrientation, new PointF(0, 0));
-                render.DrawBar(ColorTranslator.FromHtml(GaugeSettings.GaugeColor), GaugeSettings.GetBar());
+                DrawBar("0", render, true);
+                DrawText("0", render, true);
             }
 
             if (IsEncoder)
                 DrawTitle(render);
 
-            DefaultImageRender = render.RenderImage64();
+            DefaultImage64 = render.RenderImage64();
             render.Dispose();
 
-            render = new(ImgManager.GetImageDefinition(TextSettings.ErrorImage, DeckType));
+            //Error
+            render = new(ImgManager.GetImage(GaugeSettings.ErrorImage, DeckType), DeckType);
             if (IsEncoder)
                 DrawTitle(render);
-            ErrorImageRender = render.RenderImage64();
+            ErrorImage64 = render.RenderImage64();
             render.Dispose();
-            IsRawImage = true;
+
+            //Wait
+            render = new(ImgManager.GetImage(GaugeSettings.WaitImage, DeckType), DeckType);
+            if (IsEncoder)
+                DrawTitle(render);
+            WaitImage64 = render.RenderImage64();
+            render.Dispose();
         }
 
-        public override void SetDefault()
+        public override void Refresh()
         {
-            if (DrawImage != DefaultImageRender)
-            {
-                DrawImage = DefaultImageRender;
-                IsRawImage = true;
-                NeedRedraw = true;
-            }
-        }
-
-        protected override void Redraw()
-        {
-            if (!ValueManager.IsChanged(ID.Gauge) && !ValueManager.IsChanged(ID.GaugeColor) && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Gauge) && !ValueManager.IsChanged(ID.GaugeColor) && !NeedRefresh)
                 return;
 
             //Stopwatch sw = new Stopwatch();
@@ -168,7 +162,7 @@ namespace PilotsDeck
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            ImageRenderer render = new (ImgManager.GetImageDefinition(GaugeSettings.DefaultImage, DeckType));
+            ImageRenderer render = new (ImgManager.GetImage(GaugeSettings.DefaultImage, DeckType), DeckType);
 
             if (GaugeSettings.DrawArc)
             {
@@ -184,16 +178,15 @@ namespace PilotsDeck
             if (IsEncoder)
                 DrawTitle(render);
 
-            DrawImage = render.RenderImage64();
+            RenderImage64 = render.RenderImage64();
             render.Dispose();
-            IsRawImage = true;
             NeedRedraw = true;
             
             //sw.Stop();
             //Log.Logger.Debug($"Time for Gauge-Frame: {sw.Elapsed.TotalMilliseconds}ms [{ActionID}]");
         }
 
-        protected virtual void DrawBar(string value, ImageRenderer render)
+        protected virtual void DrawBar(string value, ImageRenderer render, bool defaultImage = false)
         {
             Bar drawBar = GaugeSettings.GetBar();
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
@@ -218,7 +211,7 @@ namespace PilotsDeck
             render.DrawBarIndicator(drawBar, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
         }
 
-        protected virtual void DrawArc(string value, ImageRenderer render)
+        protected virtual void DrawArc(string value, ImageRenderer render, bool defaultImage = false)
         {
             Arc drawArc = GaugeSettings.GetArc();
             float min = ModelDisplayText.GetNumValue(GaugeSettings.MinimumValue, 0);
@@ -242,7 +235,7 @@ namespace PilotsDeck
             render.DrawArcIndicator(drawArc, ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, GaugeSettings.IndicatorFlip);
         }
 
-        protected virtual void DrawText(string value, ImageRenderer render)
+        protected virtual void DrawText(string value, ImageRenderer render, bool defaultImage = false)
         {
             if (GaugeSettings.ShowText)
             {

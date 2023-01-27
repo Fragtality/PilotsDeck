@@ -49,9 +49,9 @@ namespace PilotsDeck
             ValueManager.UpdateValue(ID.Standby, Settings.AddressRadioStandby);
         }
 
-        protected override void Redraw()
+        public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !ForceUpdate && ticksIndication == 0)
+            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !NeedRefresh && ticksIndication == 0)
                 return;
 
             string valueAct = ValueManager[ID.Active];
@@ -91,7 +91,7 @@ namespace PilotsDeck
                 firstLoad = false;
             }
 
-            if (lastText != valueAct + valueStb || ForceUpdate || wasPushed && ticksIndication < ticksActive)
+            if (NeedRefresh || wasPushed && ticksIndication < ticksActive)
             {
                 Font fontAct = GetFont(FontStyle.Bold);
                 Font fontStb = GetFont(FontStyle.Regular);
@@ -108,7 +108,7 @@ namespace PilotsDeck
                 else
                     colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
 
-                ImageRenderer render = new(ImgManager.GetImageDefinition(background, DeckType));
+                ImageRenderer render = new(ImgManager.GetImage(background, DeckType), DeckType);
 
                 render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
                 render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
@@ -116,32 +116,54 @@ namespace PilotsDeck
                 if (IsEncoder)
                     DrawTitle(render, new PointF(100, 51.0f));
 
-                DrawImage = render.RenderImage64();
-                IsRawImage = true;
+                RenderImage64 = render.RenderImage64();
                 NeedRedraw = true;
-                if (!wasPushed)
-                    lastText = valueAct + valueStb;
-                else
-                    lastText = "";
                 render.Dispose();
             }
         }
 
-        protected override void RenderImages()
+        protected override void RenderDefaultImages()
         {
-            if (IsEncoder)
-            {
-                ImageRenderer render = new(ImgManager.GetImageDefinition(TextSettings.DefaultImage, DeckType));
-                DrawTitle(render, new PointF(100, 51.0f));
-                DefaultImageRender = render.RenderImage64();
-                render.Dispose();
+            //Default
+            Font fontAct = GetFont(FontStyle.Bold);
+            Font fontStb = GetFont(FontStyle.Regular);
 
-                render = new(ImgManager.GetImageDefinition(TextSettings.ErrorImage, DeckType));
+            Color colorAct;
+            if (Settings.FontInherit && TitleParameters != null)
+                colorAct = ColorTranslator.FromHtml(TitleParameters.FontColor);
+            else
+                colorAct = ColorTranslator.FromHtml(Settings.FontColor);
+
+            Color colorStb;
+            if (Settings.FontInherit && TitleParameters != null)
+                colorStb = GetDarkenedColor(TitleParameters.FontColor);
+            else
+                colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
+
+            ImageRenderer render = new(ImgManager.GetImage(Settings.DefaultImage, DeckType), DeckType);
+
+            render.DrawText("0", fontAct, colorAct, Settings.GetRectangleText());
+            render.DrawText("0", fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
+
+            if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));
-                ErrorImageRender = render.RenderImage64();
-                render.Dispose();
-                IsRawImage = true;
-            }
+
+            DefaultImage64 = render.RenderImage64();
+            render.Dispose();
+
+            //Error
+            render = new(ImgManager.GetImage(Settings.ErrorImage, DeckType), DeckType);
+            if (IsEncoder)
+                DrawTitle(render, new PointF(100, 51.0f));
+            ErrorImage64 = render.RenderImage64();
+            render.Dispose();
+
+            //Wait
+            render = new(ImgManager.GetImage(Settings.WaitImage, DeckType), DeckType);
+            if (IsEncoder)
+                DrawTitle(render, new PointF(100, 51.0f));
+            WaitImage64 = render.RenderImage64();
+            render.Dispose();
         }
 
         public static Color GetDarkenedColor(string color, string subColor = "1f1f1f")

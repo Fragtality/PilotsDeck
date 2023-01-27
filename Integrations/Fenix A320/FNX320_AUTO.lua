@@ -571,6 +571,10 @@ end
 -----------------------------------------
 -- $$ MCDU
 
+function FNX_MCDU_AIRPORT1()
+	FNX_BTN_PRESS("S_CDU1_KEY_AIRPORT")
+end
+
 function FNX_MCDU_AOC1()
 	FNX_BTN_PRESS("S_CDU1_KEY_MENU")
 	ipc.sleep(100)
@@ -809,4 +813,5 @@ event.flag(101, "FNX_BARO_TGL")
 event.flag(102, "FNX_RMP1_XFER")
 event.flag(103, "FNX_RMP2_XFER")
 event.flag(104, "FNX_LT_LAND_SEQ")
+event.flag(105, "FNX_MCDU_AIRPORT1")
 event.flag(254, "FNX_INIT_AC")

@@ -11,6 +11,14 @@ using System.Threading;
 
 namespace PilotsDeck
 {
+    public enum ControllerState
+    {
+        Idle,
+        Ready,
+        Wait,
+        Error
+    }
+
     public class ActionController : IActionController
     {
         private Dictionary<string, IHandler> currentActions = null;
@@ -18,19 +26,15 @@ namespace PilotsDeck
         public ImageManager imgManager { get; protected set; } = null;
 
         public ConnectionManager DeckManager { get; set; }
-        public int Timing
-        {
-            get
-            {
-                return AppSettings.pollInterval;
-            }
-        }
+        public int Timing { get { return AppSettings.pollInterval; } }
         public SimulatorConnector SimConnector { get; set; }
 
         public long Ticks { get { return tickCounter; } }
         private long tickCounter = 0;
         private int waitCounter = 0;
 
+        private ControllerState currentState = ControllerState.Idle;
+        private ControllerState lastState = ControllerState.Idle;
         private bool wasPaused = false;
         private bool isClosing = false;
         private readonly int waitTicks = AppSettings.waitTicks;
@@ -38,7 +42,7 @@ namespace PilotsDeck
         private Stopwatch watchRefresh = new();
         private Stopwatch watchLoading = new();
         private double averageTime = 0;
-        private bool redrawRequested = false;
+        private int imageUpdates = 0;
         private bool redrawAlways = AppSettings.redrawAlways;
 
         public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
@@ -288,8 +292,6 @@ namespace PilotsDeck
         public void Run(CancellationToken token)
         {
             watchRefresh.Restart();
-            bool resultProcess = false;
-            bool forceRefresh = false;
             tickCounter++;
             SimConnector.TickCounter = tickCounter;
 
@@ -303,9 +305,22 @@ namespace PilotsDeck
             {
                 waitCounter--;
                 if (waitCounter == 0)
-                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Wait ended.");
+                {
+                    currentState = ControllerState.Ready;
+                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Wait ended (Delay Ended).");
+                }
                 else if (waitCounter % 25 == 0)
-                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Waiting ...");
+                {
+                    ipcManager.Process();
+                    if (!SimConnector.IsReady)
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Waiting ...");
+                    else
+                    {
+                        waitCounter = 0;
+                        currentState = ControllerState.Ready;
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Wait ended (Sim Ready).");
+                    }
+                }
             }          
 
             if (!SimConnector.IsRunning) //SIM not running
@@ -313,8 +328,7 @@ namespace PilotsDeck
                 if (SimConnector.LastStateApp()) //SIM changed to not running
                 {
                     SimConnector.Close();
-                    CallOnAll(handler => handler.SetError());
-                    redrawRequested = true;
+                    currentState = ControllerState.Error;
                     isClosing = true;
 
                     waitCounter = waitTicks / 4;
@@ -322,8 +336,7 @@ namespace PilotsDeck
                 }
                 else if (isClosing && waitCounter == 0)
                 {
-                    CallOnAll(handler => handler.SetDefault());
-                    redrawRequested = true;
+                    currentState = ControllerState.Idle;
                     isClosing = false;
 
                     lastAircraft = "";
@@ -331,13 +344,14 @@ namespace PilotsDeck
                     if (GlobalProfileSettings.EnableSwitching)
                         SwitchToDefaultProfile();
                 }
+                else if (!isClosing && waitCounter == 0)
+                    currentState = ControllerState.Idle;
             }
             else //SIM running
             {
                 if (!SimConnector.LastStateApp()) //SIM changed to running
                 {
-                    CallOnAll(handler => handler.SetWait());
-                    redrawRequested = true;
+                    currentState = ControllerState.Wait;
                     isClosing = false;
 
                     if (tickCounter > firstTick)
@@ -356,8 +370,7 @@ namespace PilotsDeck
                 {
                     if (SimConnector.LastStateConnect())
                     {
-                        CallOnAll(handler => handler.SetError());
-                        redrawRequested = true;
+                        currentState = ControllerState.Error;
                         waitCounter = waitTicks / 2;
                         Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to disconnected, waiting for {(waitCounter * 200) / 1000}s.");
                     }
@@ -365,6 +378,7 @@ namespace PilotsDeck
                     if (!SimConnector.Connect())
                     {
                         waitCounter = waitTicks;
+                        currentState = ControllerState.Wait;
                         Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Connection failed, waiting for {(waitCounter * 200) / 1000}s.");
                     }
                     else
@@ -374,84 +388,74 @@ namespace PilotsDeck
                 {
                     if (!SimConnector.LastStateConnect()) //changed to connected
                     {
-                        CallOnAll(handler => handler.SetWait());
-                        redrawRequested = true;
-                        if (tickCounter > firstTick)
+                        currentState = ControllerState.Wait;
+                        ipcManager.Process();
+                        if (tickCounter > firstTick && !SimConnector.IsReady)
                         {
                             waitCounter = waitTicks / 2;
                             Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to connected, waiting for {(waitCounter * 200) / 1000}s.");
                         }
                     }
 
-                    if (waitCounter == 0 && SimConnector.IsReady && !SimConnector.IsPaused) //process possible
+                    if (waitCounter == 0 && SimConnector.IsReady /*&& !SimConnector.IsPaused*/) //process possible
                     {
                         //if (tickCounter % 5 == 0)
                         //    Log.Logger.Debug("Process()");
-                        resultProcess = ipcManager.Process();
-                        if (resultProcess)
+                        if (ipcManager.Process())
                         {
-                            if (!SimConnector.LastStateProcess() || wasPaused)
+                            if (!SimConnector.LastStateProcess())
                             {
-                                redrawRequested = true;
-                                forceRefresh = true;
-                                if (wasPaused)
-                                {
-                                    wasPaused = false;
-                                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is unpaused / Sim Process successful again.");
-                                }
-                                else
-                                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Process successful again, force Redraw.");
+                                currentState = ControllerState.Ready;
+                                CallOnAll(handler => handler.NeedRefresh = true);
+                                Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Process successful again.");
+                            }
+
+                            if (wasPaused && !SimConnector.IsPaused)
+                            {
+                                currentState = ControllerState.Ready;
+                                CallOnAll(handler => handler.NeedRefresh = true);
+                                wasPaused = false;
+                                Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is unpaused.");
+                            }
+                            else if (!wasPaused && SimConnector.IsPaused)
+                            {
+                                currentState = ControllerState.Wait;
+                                wasPaused = true;
+                                Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is paused.");
                             }
                         }
                         else
                         {
-                            CallOnAll(handler => handler.SetError());
-                            redrawRequested = true;
+                            currentState = ControllerState.Error;
                             waitCounter = waitTicks / 2;
                             Logger.Log(LogLevel.Warning, "ActionController:Run", $"Sim Process failed, waiting for {(waitCounter * 200) / 1000}s.");
-                        }
-                    }
-                    else if (SimConnector.IsPaused)
-                    {
-                        if (!wasPaused)
-                        {
-                            wasPaused = true;
-                            CallOnAll(handler => handler.SetWait());
-                            redrawRequested = true;
-                            Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is paused.");
                         }
                     }
                     else if (!SimConnector.IsReady && waitCounter == 0)
                     {
                         waitCounter = waitTicks / 6;
                         SimConnector.Process();
-                        CallOnAll(handler => handler.SetWait());
-                        redrawRequested = true;
+                        currentState = ControllerState.Wait;
                         wasPaused = true;
                         Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim not ready, waiting for {(waitCounter * 200) / 1000}s.");
                     }
                 }
             }
 
-            if (tickCounter % (waitTicks / 2) == 0 && SimConnector.IsReady && !SimConnector.IsPaused)
-            {
-                Logger.Log(LogLevel.Debug, "ActionController:Run", $"Forcing Redraw on all Actions.");
-                redrawRequested = true;
-                forceRefresh = true;
-            }
-
-            RefreshActions(token, forceRefresh);
-            RedrawAll(token);
+            if (SimConnector.IsRunning)
+                RefreshActions(token);
+            UpdateImages(token);
 
             watchRefresh.Stop();
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
             if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
                 ipcManager.UnsubscribeUnusedAddresses();
-                imgManager.RemoveUnusedImages();
-                if (SimConnector.IsRunning)
-                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Images: {imgManager.Length})");
+                imgManager.RemoveUnused();
+                if (SimConnector.IsRunning || imageUpdates > 0)
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
+                imageUpdates = 0;
             }
 
             if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(SimConnector.AicraftString) && lastAircraft != SimConnector.AicraftString && SimConnector.IsReady && waitCounter == 0)
@@ -461,19 +465,13 @@ namespace PilotsDeck
             }
         }
 
-        protected void RefreshActions(CancellationToken token, bool forceUpdate = false)
+        protected void RefreshActions(CancellationToken token)
         {
             foreach (var action in currentActions.Values)
             {
                 if (token.IsCancellationRequested)
                     return;
-                
-                if (forceUpdate)
-                    action.ForceUpdate = forceUpdate;
-
                 action.Refresh();
-                if (action.DeckType.IsEncoder)
-                    action.RefreshTitle();
             }
         }
 
@@ -483,54 +481,55 @@ namespace PilotsDeck
                 method(action);
         }
 
-        protected void RedrawAll(CancellationToken token)
+        protected void UpdateImages(CancellationToken token)
         {
             try
             {
+                if (lastState != currentState)
+                    Logger.Log(LogLevel.Debug, "ActionController:UpdateImages", $"Sim State changed: {lastState} -> {currentState}");
+
                 foreach (var action in currentActions)
                 {
                     if (token.IsCancellationRequested)
                         return;
 
-                    if (action.Value.NeedRedraw || action.Value.ForceUpdate || redrawAlways || redrawRequested)
+                    if (action.Value.NeedRedraw || lastState != currentState || redrawAlways)
                     {
-                        //Logger.Log(LogLevel.Verbose, "ActionController:RedrawAll", $"Action [{action.Key}] / [{action.Value.ActionID}]: Needs Redraw ({action.Value.NeedRedraw}, {action.Value.ForceUpdate}): {(!action.Value.IsRawImage ? action.Value.DrawImage : "raw")}");
-                        ActionSendImage(action);
+                        imageUpdates++;
+                        //Logger.Log(LogLevel.Debug, "ActionController:UpdateImages", $"--REDRAW-- Action [{action.Value.ActionID}] | Needs Redraw, Refresh ({action.Value.NeedRedraw}, {action.Value.NeedRefresh})");
+                        if (action.Value.DeckType.IsEncoder)
+                        {
+                            _ = DeckManager.SetFeedbackItemImageRawAsync(AppSettings.targetImage, action.Key, ActionSendImage(action.Value));
+                            if (action.Value.FirstLoad)
+                            {
+                                _ = DeckManager.SetImageAsync(action.Key, "Images/category/Encoder.png");
+                                action.Value.FirstLoad = false;
+                            }
+                        }
+                        else
+                            _ = DeckManager.SetImageRawAsync(action.Key, ActionSendImage(action.Value));
                     }
-
-                    action.Value.ResetDrawState();
                 }
-
-                redrawRequested = false;
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "ActionController:RedrawAll", $"Exception while Redrawing Actions! (Exception: {ex.GetType()})");
+                Logger.Log(LogLevel.Critical, "ActionController:UpdateImages", $"Exception while Redrawing Actions! (Exception: {ex.GetType()})");
             }
+
+            CallOnAll(handler => handler.ResetDrawState());
+            lastState = currentState;
         }
 
-        public void ActionSendImage(KeyValuePair<string, IHandler> action)
+        public string ActionSendImage(IHandler action)
         {
-            if (action.Value.IsRawImage)
-            {
-                if (action.Value.DeckType.IsEncoder)
-                {
-                    _ = DeckManager.SetFeedbackItemImageRawAsync(AppSettings.targetImage, action.Key, action.Value.DrawImage);
-                    _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageDefinition("Images/Empty.png", action.Value.DeckType, true).GetImageBase64());
-                }
-                else
-                    _ = DeckManager.SetImageRawAsync(action.Key, action.Value.DrawImage);
-            }
-            else
-            {
-                if (action.Value.DeckType.IsEncoder)
-                {
-                    _ = DeckManager.SetFeedbackItemImageRawAsync(AppSettings.targetImage, action.Key, imgManager.GetImageBase64(action.Value.DrawImage, action.Value.DeckType));
-                    _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageDefinition("Images/Empty.png", action.Value.DeckType, true).GetImageBase64());
-                }
-                else
-                    _ = DeckManager.SetImageRawAsync(action.Key, imgManager.GetImageBase64(action.Value.DrawImage, action.Value.DeckType));
-            }
+            if (currentState == ControllerState.Idle)
+                return action.DefaultImage64;
+            if (currentState == ControllerState.Ready)
+                return action.RenderImage64;
+            if (currentState == ControllerState.Wait)
+                return action.WaitImage64;
+
+            return action.ErrorImage64;
         }
 
         public bool OnButtonDown(string context)
@@ -660,22 +659,6 @@ namespace PilotsDeck
             }
         }
 
-        protected void SetActionState(IHandler handler)
-        {
-            if (!SimConnector.IsRunning || !handler.IsInitialized)
-                handler.SetDefault();
-            else if (SimConnector.IsRunning && !SimConnector.IsConnected)
-                handler.SetError();
-            else if (SimConnector.IsRunning && (!SimConnector.IsReady || SimConnector.IsPaused))
-                handler.SetWait();
-            else
-            {
-                handler.ForceUpdate = true;
-            }
-
-            handler.NeedRedraw = true;
-        }
-
         public void UpdateAction(string context)
         {
             try
@@ -683,12 +666,6 @@ namespace PilotsDeck
                 if (currentActions.TryGetValue(context, out IHandler value))
                 {
                     value.Update();
-                    SetActionState(value);                        
-
-                    //if (!value.IsRawImage)
-                    //    imgManager.UpdateImage(value.DrawImage, value.DeckType);
-
-                    redrawRequested = true;
                 }
                 else
                 {
@@ -709,9 +686,6 @@ namespace PilotsDeck
                 {
                     currentActions.Add(context, handler);
                     handler.Register(imgManager, ipcManager);
-                    SetActionState(handler);
-
-                    redrawRequested = true;
                 }
                 else
                 {

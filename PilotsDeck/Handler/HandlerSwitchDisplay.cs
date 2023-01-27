@@ -39,6 +39,8 @@
                 BaseSettings.SwitchOffState = DisplaySettings.OffState;
                 BaseSettings.SwitchOnState = DisplaySettings.OnState;
             }
+
+            RenderDefaultImages();
         }
 
         public override void Deregister()
@@ -65,7 +67,7 @@
         public override void Update(bool skipActionUpdate = false)
         {
             base.Update(skipActionUpdate);
-
+            RenderDefaultImages();
             ValueManager.UpdateValue(ID.Control, Address);
         }
 
@@ -75,9 +77,9 @@
 
             if (this.GetType() == typeof(HandlerSwitchDisplay))
             {
-                UpdateImage(DisplaySettings.OnImage, ID.On);
-                UpdateImage(DisplaySettings.OffImage, ID.Off);
-                UpdateImage(DisplaySettings.IndicationImage, ID.Indication);
+                UpdateImage(DisplaySettings.OnImage, ID.On, out _);
+                UpdateImage(DisplaySettings.OffImage, ID.Off, out _);
+                UpdateImage(DisplaySettings.IndicationImage, ID.Indication, out _);
 
                 if (DisplaySettings.ImageMap != imgRefs[ID.Map])
                 {
@@ -102,43 +104,59 @@
             return !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(DisplaySettings.Address);
         }
 
-        protected override void Redraw()
+        protected override void RenderDefaultImages()
         {
-            if (!ValueManager.IsChanged(ID.Control) && !ForceUpdate)
+            if (!Settings.UseImageMapping)
+                DefaultImage64 = ImgManager.GetImage(DisplaySettings.OffImage, DeckType).GetImageBase64();
+            else
+            {
+                string mappedImage = Settings.GetValueMapped("0");
+                if (!string.IsNullOrEmpty(mappedImage))
+                    DefaultImage64 = ImgManager.GetImage(mappedImage, DeckType).GetImageBase64();
+                else
+                    DefaultImage64 = ImgManager.GetImage(DisplaySettings.DefaultImage, DeckType).GetImageBase64();
+            }
+        }
+
+        public override void Refresh()
+        {
+            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh)
                 return;
 
-            string lastImage = DrawImage;
+            string newImage;
             string currentValue = ValueManager[ID.Control];
 
             if (!Settings.UseImageMapping)
             {
-                if (ModelBase.Compare(Settings.OnState, currentValue))
+                if (!string.IsNullOrWhiteSpace(currentValue) && ModelBase.Compare(Settings.OnState, currentValue))
                 {
-                    DrawImage = Settings.OnImage;
+                    newImage = ImgManager.GetImage(Settings.OnImage, DeckType).GetImageBase64();
                 }
                 else if (ModelBase.Compare(Settings.OffState, currentValue))
                 {
-                    DrawImage = Settings.OffImage;
+                    newImage = ImgManager.GetImage(Settings.OffImage, DeckType).GetImageBase64();
                 }
                 else if (Settings.HasIndication)
                 {
                     if (Settings.IndicationValueAny || ModelBase.Compare(Settings.IndicationValue, currentValue))
-                        DrawImage = Settings.IndicationImage;
+                        newImage = ImgManager.GetImage(Settings.IndicationImage, DeckType).GetImageBase64();
                     else
-                        DrawImage = Settings.ErrorImage;
+                        newImage = ErrorImage64;
                 }
                 else
-                    DrawImage = Settings.ErrorImage;
+                    newImage = ErrorImage64;
             }
             else
             {
-                DrawImage = Settings.GetValueMapped(currentValue);
-                if (string.IsNullOrEmpty(DrawImage))
-                    DrawImage = Settings.ErrorImage;
+                string mappedImage = Settings.GetValueMapped(currentValue);
+                if (!string.IsNullOrEmpty(mappedImage))
+                    newImage = ImgManager.GetImage(mappedImage, DeckType).GetImageBase64();
+                else
+                    newImage = ErrorImage64;
             }
 
-            if (lastImage != DrawImage || ForceUpdate)
-                NeedRedraw = true;
+            RenderImage64 = newImage;
+            NeedRedraw = true;
         }
 
     }

@@ -8,9 +8,11 @@ namespace PilotsDeck
     {
         private static readonly string inMenuAddr = "3365:1";
         private static readonly string isPausedAddr = "0262:2";
+        private static readonly string pauseIndAddr = "0264:2";
         private static readonly string camReadyAddr = "026D:1";
         private IPCValueOffset inMenuValue;
         private IPCValueOffset isPausedValue;
+        private IPCValueOffset pauseIndValue;
         private IPCValueOffset camReadyValue;
         private bool wasmReloaded = false;
 
@@ -28,7 +30,7 @@ namespace PilotsDeck
         }
         public override bool IsReady { get { return inMenuValue?.Value == "0" && isPausedValue?.Value == "0" && IsConnected && IsCamReady(); } }
         public override bool IsRunning { get { return GetProcessRunning("FlightSimulator"); } }
-        public override bool IsPaused { get { return isPausedValue?.Value != "0"; } protected set { } }
+        public override bool IsPaused { get { return pauseIndValue?.Value != "0"; } protected set { } }
 
         protected static readonly string AircraftAddrString = "9540:64:s";
         protected IPCValueOffset AircraftValue = null;
@@ -114,6 +116,7 @@ namespace PilotsDeck
             ipcManager = manager;
             
             isPausedValue = new IPCValueOffset(isPausedAddr, AppSettings.groupStringRead, OffsetAction.Read);
+            pauseIndValue = new IPCValueOffset(pauseIndAddr, AppSettings.groupStringRead, OffsetAction.Read);
             inMenuValue = new IPCValueOffset(inMenuAddr, AppSettings.groupStringRead, OffsetAction.Read);
             camReadyValue = new IPCValueOffset(camReadyAddr, AppSettings.groupStringRead, OffsetAction.Read);
             AircraftValue = new IPCValueOffset(AircraftAddrString, AppSettings.groupStringRead, OffsetAction.Read);
@@ -130,6 +133,7 @@ namespace PilotsDeck
                 if (!firstProcessSuccess || !lastStateProcess)
                 {
                     isPausedValue.Connect();
+                    pauseIndValue.Connect();
                     inMenuValue.Connect();
                     camReadyValue.Connect();
                     AircraftValue.Connect();

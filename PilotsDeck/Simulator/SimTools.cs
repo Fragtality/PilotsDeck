@@ -373,14 +373,14 @@ namespace PilotsDeck
 
         public static string BuildCalculatorCode(string template, int ticks)
         {
-            string code = "";
+            string code;
             string[] parts = template.Split(':');
 
 
             if (parts[0].Length == 1 && parts[0] == "K")
-                code = BuildEventCode(parts, template, ticks);
+                code = BuildEventCode(parts, ticks);
             else
-                code = BuildLvarCode(parts, template, ticks);
+                code = BuildLvarCode(parts, ticks);
 
             
 
@@ -389,7 +389,7 @@ namespace PilotsDeck
             return code;
         }
 
-        public static string BuildEventCode(string[] parts, string template, int ticks)
+        public static string BuildEventCode(string[] parts, int ticks)
         {
             string code = "";
 
@@ -406,7 +406,7 @@ namespace PilotsDeck
             return code;
         }
 
-        public static string BuildLvarCode(string[] parts, string template, int ticks)
+        public static string BuildLvarCode(string[] parts, int ticks)
         {
             string code = "";
 

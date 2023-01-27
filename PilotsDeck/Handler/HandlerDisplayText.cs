@@ -12,16 +12,13 @@ namespace PilotsDeck
         public override string Address { get { return TextSettings.Address; } }
 
         public override bool UseFont { get { return true; } }
-        public virtual string DefaultImageRender { get; set; }
-        public virtual string ErrorImageRender { get; set; }
 
-        protected string lastText = "";
-        protected bool DrawBox = true;
+        protected bool DrawBoxLast = true;
 
         public HandlerDisplayText(string context, ModelDisplayText settings, StreamDeckType deckType) : base(context, settings, deckType)
         {
             Settings = settings;
-            DrawBox = settings.DrawBox;
+            DrawBoxLast = settings.DrawBox;
         }
 
         public override bool OnButtonDown(long tick)
@@ -49,11 +46,10 @@ namespace PilotsDeck
             base.Register(imgManager, ipcManager);
 
             if (TextSettings.HasIndication)
-                _ = imgManager.AddImage(TextSettings.IndicationImage, DeckType);
+                imgManager.AddImage(TextSettings.IndicationImage, DeckType);
             imgRefs.Add(ID.Indication, TextSettings.IndicationImage);
 
-            RenderImages();
-            NeedRedraw = true;
+            RenderDefaultImages();
 
             ValueManager.AddValue(ID.Control, Address);
         }
@@ -72,13 +68,12 @@ namespace PilotsDeck
         public override void Update(bool skipActionUpdate = false)
         {
             base.Update(skipActionUpdate);
-            RenderImages();
-            NeedRedraw = true;
+            RenderDefaultImages();
 
-            if (DrawBox != TextSettings.DrawBox)
+            if (DrawBoxLast != TextSettings.DrawBox)
             {
                 TextSettings.ResetRectText();
-                DrawBox = TextSettings.DrawBox;
+                DrawBoxLast = TextSettings.DrawBox;
                 UpdateSettingsModel = true;
             }
 
@@ -89,83 +84,62 @@ namespace PilotsDeck
         {
             base.UpdateImages();
 
-            UpdateImage(Settings.IndicationImage, ID.Indication);
+            UpdateImage(Settings.IndicationImage, ID.Indication, out _);
         }
 
-        protected virtual void RenderImages()
+        protected override void RenderDefaultImages()
         {
+            //Default
+            ImageRenderer render = new(ImgManager.GetImage(TextSettings.DefaultImage, DeckType), DeckType);
             if (TextSettings.DrawBox)
-            {
-                ImageRenderer render = new(ImgManager.GetImageDefinition(TextSettings.DefaultImage, DeckType));
                 render.DrawBox(ColorTranslator.FromHtml(TextSettings.BoxColor), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
-                if (IsEncoder)
-                    DrawTitle(render);
-                DefaultImageRender = render.RenderImage64();
-                render.Dispose();
+            
+            TextSettings.GetFontParameters(TitleParameters, out Font drawFont, out Color drawColor);
+            string text = TextSettings.GetValueMapped("0");
+            render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
 
-                render = new(ImgManager.GetImageDefinition(TextSettings.ErrorImage, DeckType));
-                render.DrawBox(ColorTranslator.FromHtml("#d70000"), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
-                if (IsEncoder)
-                    DrawTitle(render);
-                ErrorImageRender = render.RenderImage64();
-                render.Dispose();
-                IsRawImage = true;
-            }
-            else if (IsEncoder)
-            {
-                ImageRenderer render = new(ImgManager.GetImageDefinition(TextSettings.DefaultImage, DeckType));
+            if (IsEncoder)
                 DrawTitle(render);
-                DefaultImageRender = render.RenderImage64();
-                render.Dispose();
-                IsRawImage = true;
-            }
+
+            DefaultImage64 = render.RenderImage64();
+            render.Dispose();
+
+            //Error
+            render = new(ImgManager.GetImage(TextSettings.ErrorImage, DeckType), DeckType);
+            if (TextSettings.DrawBox)
+                render.DrawBox(ColorTranslator.FromHtml("#d70000"), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
+
+            if (IsEncoder)
+                DrawTitle(render);
+
+            ErrorImage64 = render.RenderImage64();
+            render.Dispose();
+
+            //Wait
+            render = new(ImgManager.GetImage(TextSettings.WaitImage, DeckType), DeckType);
+            if (TextSettings.DrawBox)
+                render.DrawBox(ColorTranslator.FromHtml(TextSettings.BoxColor), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
+
+            if (IsEncoder)
+                DrawTitle(render);
+
+            WaitImage64 = render.RenderImage64();
+            render.Dispose();
         }
 
         public override void RefreshTitle()
         {
-            if (!IsInitialized && DrawImage != DefaultImageRender)
+            if (IsEncoder)
             {
-                DrawImage = DefaultImageRender;
-                IsRawImage = true;
+                NeedRefresh = true;
                 NeedRedraw = true;
+                RenderDefaultImages();
             }
         }
 
-        public override void SetDefault()
+        public override void Refresh()
         {
-            if ((TextSettings.DrawBox || IsEncoder) && DrawImage != DefaultImageRender)
-            {
-                DrawImage = DefaultImageRender;
-                IsRawImage = true;
-                NeedRedraw = true;
-            }
-            else if (!TextSettings.DrawBox && DrawImage != DefaultImage)
-            {
-                DrawImage = DefaultImage;
-                IsRawImage = false;
-                NeedRedraw = true;
-            }
-        }
-
-        public override void SetError()
-        { 
-            if (TextSettings.DrawBox && DrawImage != ErrorImageRender)
-            {
-                DrawImage = ErrorImageRender;
-                IsRawImage = true;
-                NeedRedraw = true;
-            }
-            else if (!TextSettings.DrawBox && DrawImage != ErrorImage)
-            {
-                DrawImage = ErrorImage;
-                IsRawImage = false;
-                NeedRedraw = true;
-            }
-        }
-
-        protected override void Redraw()
-        {
-            if (!ValueManager.IsChanged(ID.Control) && !ForceUpdate)
+            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh)
                 return;
 
             string value = ValueManager[ID.Control];
@@ -176,7 +150,7 @@ namespace PilotsDeck
             value = TextSettings.RoundValue(value);
 
             //evaluate value and set indication
-            string background = DefaultImage;
+            string background = TextSettings.DefaultImage;
             TextSettings.GetFontParameters(TitleParameters, out Font drawFont, out Color drawColor);
             Color boxColor = ColorTranslator.FromHtml(TextSettings.BoxColor);
 
@@ -200,7 +174,7 @@ namespace PilotsDeck
             text = TextSettings.GetValueMapped(text);
 
 
-            ImageRenderer render = new(ImgManager.GetImageDefinition(background, DeckType));
+            ImageRenderer render = new(ImgManager.GetImage(background, DeckType), DeckType);
 
             if (TextSettings.DrawBox)
                 render.DrawBox(boxColor, ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
@@ -211,10 +185,8 @@ namespace PilotsDeck
             if (IsEncoder)
                 DrawTitle(render);
 
-            DrawImage = render.RenderImage64();
-            IsRawImage = true;
+            RenderImage64 = render.RenderImage64();
             NeedRedraw = true;
-            lastText = text;
             render.Dispose();
         }
     }

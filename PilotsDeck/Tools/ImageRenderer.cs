@@ -46,7 +46,6 @@ namespace PilotsDeck
     {
         public readonly static float nonSquareScale = 1.5f;
 
-        protected ImageDefinition imageDef;
         protected Bitmap background;
         protected Graphics render;
 
@@ -62,10 +61,10 @@ namespace PilotsDeck
             FormatFlags = StringFormatFlags.FitBlackBox
         };
 
-        public ImageRenderer(ImageDefinition image)
+        public ImageRenderer(ManagedImage image, StreamDeckType type)
         {
-            imageDef = image;
-            canvasSize = image.GetCanvasSize();
+            canvasSize = type.GetCanvasSize();
+            scalar = new(canvasSize.X / 72.0f, canvasSize.Y / 72.0f);
             background = new Bitmap((int)canvasSize.X, (int)canvasSize.Y);
             render = Graphics.FromImage(background);
 
@@ -76,18 +75,8 @@ namespace PilotsDeck
             render.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             render.PageUnit = GraphicsUnit.Pixel;
 
-            if (canvasSize.X == 200)
-            {
-                scalar = new(200.0f / 72.0f, 100.0f / 72.0f);
-            }
-            else
-            {
-                float btnScale = canvasSize.X / 72.0f;
-                scalar = new(btnScale, btnScale);
-            }
-
-            Image tmpImage = imageDef.GetImageObject();
-            render.DrawImage(tmpImage, GetImageDrawRectangle(ImageDefinition.GetImageSize(tmpImage)));
+            using Image tmpImage = image.GetImageObject();
+            render.DrawImage(tmpImage, GetImageDrawRectangle(image));
             tmpImage.Dispose();
         }
 
@@ -106,10 +95,12 @@ namespace PilotsDeck
             return new Font(font.Name, font.Size * scalar.Y, font.Style);
         }
 
-        public RectangleF GetImageDrawRectangle(PointF imgSize)
+        public RectangleF GetImageDrawRectangle(ManagedImage image)
         {
-            var center = GetCanvasCenter();
-            return new RectangleF(center.X - (imgSize.X / 2.0f), center.Y - (imgSize.Y / 2.0f), imgSize.X, imgSize.Y);
+            if (image.Size.X == image.Size.Y && !IsSquare)
+                return new RectangleF(canvasSize.X / 4, 0, canvasSize.Y, canvasSize.Y);
+            else
+                return new RectangleF(0, 0, canvasSize.X, canvasSize.Y);
         }
 
         public void DrawImage(Image image, RectangleF drawRectangle)

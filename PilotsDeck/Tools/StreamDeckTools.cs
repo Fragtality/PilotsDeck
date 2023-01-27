@@ -7,6 +7,43 @@ using System.Linq;
 
 namespace PilotsDeck
 {
+    public enum StreamDeckTypeEnum
+    {
+        StreamDeck,
+        StreamDeckMini,
+        StreamDeckXL,
+        StreamDeckMobile,
+        CorsairGKeys,
+        StreamDeckPlus = 7
+    }
+
+    public class StreamDeckType
+    {
+        public StreamDeckType(StreamDeckTypeEnum type = StreamDeckTypeEnum.StreamDeck, bool isEncoder = false)
+        {
+            Type = type;
+            IsEncoder = isEncoder;
+        }
+
+        public StreamDeckTypeEnum Type { get; set; } = StreamDeckTypeEnum.StreamDeck;
+        public bool IsEncoder { get; set; } = false;
+
+        public PointF GetCanvasSize()
+        {
+            if (IsEncoder)
+                return new PointF(200, 100);
+            else
+            {
+                if (Type == StreamDeckTypeEnum.StreamDeckXL)
+                    return new PointF(144, 144);
+                else if (Type == StreamDeckTypeEnum.StreamDeckPlus)
+                    return new PointF(144, 144);
+                else
+                    return new PointF(72, 72);
+            }
+        }
+    }
+
     public static class StreamDeckTools
     {
         public class ModelPropertyInspector

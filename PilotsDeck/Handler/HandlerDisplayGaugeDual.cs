@@ -40,7 +40,7 @@ namespace PilotsDeck
             ValueManager.UpdateValue(ID.GaugeSecond, Settings.Address2);
         }
 
-        protected override void DrawBar(string value, ImageRenderer render)
+        protected override void DrawBar(string value, ImageRenderer render, bool defaultImage = false)
         {
             if (GaugeSettings.BarOrientation == (int)GaugeOrientation.LEFT)
                 GaugeSettings.IndicatorFlip = false;
@@ -49,7 +49,8 @@ namespace PilotsDeck
 
             base.DrawBar(value, render);
 
-            value = ValueManager[ID.GaugeSecond];
+            if (!defaultImage)
+                value = ValueManager[ID.GaugeSecond];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -59,11 +60,12 @@ namespace PilotsDeck
             render.DrawBarIndicator(GaugeSettings.GetBar(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
         }
 
-        protected override void DrawArc(string value, ImageRenderer render)
+        protected override void DrawArc(string value, ImageRenderer render, bool defaultImage = false)
         {
             base.DrawArc(value, render);
 
-            value = ValueManager[ID.GaugeSecond];
+            if (!defaultImage)
+                value = ValueManager[ID.GaugeSecond];
             if (GaugeSettings.DecodeBCD)
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
@@ -74,13 +76,14 @@ namespace PilotsDeck
             render.DrawArcIndicator(GaugeSettings.GetArc(), ColorTranslator.FromHtml(GaugeSettings.IndicatorColor), ModelDisplayText.GetNumValue(GaugeSettings.IndicatorSize, 10), ModelDisplayText.GetNumValue(value, 0), min, max, !GaugeSettings.IndicatorFlip);
         }
 
-        protected override void DrawText(string value, ImageRenderer render)
+        protected override void DrawText(string value, ImageRenderer render, bool defaultImage = false)
         {
             base.DrawText(value, render);
 
             if (!GaugeSettings.DrawArc)
             {
-                value = ValueManager[ID.GaugeSecond];
+                if (!defaultImage)
+                    value = ValueManager[ID.GaugeSecond];
                 if (GaugeSettings.DecodeBCD)
                     value = ModelDisplay.ConvertFromBCD(value);
                 value = GaugeSettings.ScaleValue(value);

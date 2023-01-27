@@ -15,6 +15,7 @@ namespace PilotsDeck
         public static readonly string waitImage = @"Images/Wait.png";
         public static readonly string hqImageSuffix = "@2x";
         public static readonly string plusImageSuffix = "@3x";
+        public static readonly string plusHqImageSuffix = "@4x";
         public static readonly string targetImage = "canvas";
         public static readonly string targetTitle = "pdTitle";
 

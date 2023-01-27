@@ -53,9 +53,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSUIPCClientDLL" Version="3.3.2" />
+    <PackageReference Include="FSUIPCClientDLL" Version="3.3.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="StreamDeckLib" Version="2301.20.1743" />
+    <PackageReference Include="StreamDeckLib" Version="2301.27.1353" />
   </ItemGroup>
 
   <ItemGroup>
@@ -212,6 +212,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\category\category.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\category\Encoder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\category\PluginIcon.ico">

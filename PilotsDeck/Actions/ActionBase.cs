@@ -69,7 +69,7 @@ namespace PilotsDeck
                     _ = Manager.ShowAlertAsync(args.context);
                 }
                 else
-                    Plugin.ActionController[args.context].ForceUpdate = true;
+                    Plugin.ActionController[args.context].NeedRefresh = true;
             }
 
             return Task.CompletedTask;
@@ -87,7 +87,7 @@ namespace PilotsDeck
                     _ = Manager.ShowAlertAsync(args.context);
                 }
                 else
-                    Plugin.ActionController[args.context].ForceUpdate = true;
+                    Plugin.ActionController[args.context].NeedRefresh = true;
             }
 
             return Task.CompletedTask;
@@ -105,7 +105,7 @@ namespace PilotsDeck
                     _ = Manager.ShowAlertAsync(args.context);
                 }
                 else
-                    Plugin.ActionController[args.context].ForceUpdate = true;
+                    Plugin.ActionController[args.context].NeedRefresh = true;
             }
 
             return Task.CompletedTask;

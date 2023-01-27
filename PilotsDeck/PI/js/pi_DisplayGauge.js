@@ -72,6 +72,8 @@ var settingsModel = {
 };
 
 var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
+var firstLoad = true;
+var lastDrawArc = false;
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
@@ -87,6 +89,24 @@ function updateForm() {
 	toggleConfigItem(settingsModel.UseColorSwitching, 'AddressColorOff');
 	toggleConfigItem(settingsModel.UseColorSwitching, 'GaugeColorOff');
 	toggleConfigItem(settingsModel.UseColorSwitching, 'StateColorOff');
+
+	//ARC<>BAR
+	if (lastDrawArc != settingsModel.DrawArc && !firstLoad) {
+		if (settingsModel.DrawArc) {
+			settingsModel.RectCoord = "16; 27; 60; 21";
+			document.getElementById('RectCoord').value = "16; 27; 60; 21";
+			settingsModel.GaugeSize = "48; 6";
+			document.getElementById('GaugeSize').value = "48; 6";
+		}
+		else {
+			settingsModel.RectCoord = "7; 45; 60; 21";
+			document.getElementById('RectCoord').value = "7; 45; 60; 21";
+			settingsModel.GaugeSize = "58; 10";
+			document.getElementById('GaugeSize').value = "58; 10";
+		}
+	}
+	lastDrawArc = settingsModel.DrawArc;
+	firstLoad = false;
 
 	//ARC
 	toggleConfigItem(settingsModel.DrawArc, 'StartAngle');

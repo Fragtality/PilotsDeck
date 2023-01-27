@@ -8,17 +8,18 @@
 
         string Address { get; }
 
-        string DrawImage { get; }
-        bool IsRawImage { get; }
-        string DefaultImage { get; }
-        string ErrorImage { get; }
+        string RenderImage64 { get; }
+        string DefaultImage64 { get; }
+        string WaitImage64 { get; }
+        string ErrorImage64 { get; }
         string Title { get; set; }
         bool UseFont { get; }
 
-        bool ForceUpdate { get; set; }
         bool NeedRedraw { get; set; }
+        bool NeedRefresh { get; set; }
         bool UpdateSettingsModel { get; set; }
         bool IsInitialized { get; }
+        bool FirstLoad { get; set; }
 
         bool HasAction { get; }
         long TickDown { get; }
@@ -31,9 +32,6 @@
         void Register(ImageManager imgManager, IPCManager ipcManager);
         void Deregister();
 
-        void SetError();
-        void SetDefault();
-        void SetWait();
         void ResetDrawState();
         void Refresh();
         void RefreshTitle();
