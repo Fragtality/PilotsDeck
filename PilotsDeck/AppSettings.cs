@@ -37,6 +37,7 @@ namespace PilotsDeck
                     return new CultureInfo("de-DE").NumberFormat;
             }
         }
+        public static readonly bool preferrMobiWASM = Convert.ToBoolean(ConfigurationManager.AppSettings["preferrMobiWASM"]);
         public static readonly bool Fsuipc7LegacyLvars = Convert.ToBoolean(ConfigurationManager.AppSettings["Fsuipc7LegacyLvars"]);
         public static readonly string xpIP = Convert.ToString(ConfigurationManager.AppSettings["xpIP"]);
         public static readonly int xpPort = Convert.ToInt32(ConfigurationManager.AppSettings["xpPort"]);

@@ -18,7 +18,7 @@ namespace Installer
         public InstallerActionControl(string text = null, ActionIcon actionIcon = ActionIcon.None)
         {
             InitializeComponent();
-            
+
             if (text != null)
                 Message.Text = text;
             SetImage(actionIcon);

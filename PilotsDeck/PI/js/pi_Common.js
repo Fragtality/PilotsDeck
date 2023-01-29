@@ -277,6 +277,10 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSw
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
+	else if (actionType == 12 && !switchCurrent) { //avar
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
 	else if ((actionType == 2 || actionType == 10) && toggleSwitch) { //control/command & toggle
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);

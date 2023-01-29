@@ -12,3 +12,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0074:Verbundzuweisung verwenden")]
 [assembly: SuppressMessage("GeneratedRegex", "SYSLIB1045:In „GeneratedRegexAttribute“ konvertieren.")]
 [assembly: SuppressMessage("Performance", "CA1854:Methode „IDictionary.TryGetValue(TKey, out TValue)“ bevorzugen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.ValueManager.SetValue(System.Int32,PilotsDeck.IPCValue)")]
+[assembly: SuppressMessage("Performance", "CA1822:Member als statisch markieren", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.MobiSimConnect.SimConnect_OnException(Microsoft.FlightSimulator.SimConnect.SimConnect,Microsoft.FlightSimulator.SimConnect.SIMCONNECT_RECV_EXCEPTION)")]

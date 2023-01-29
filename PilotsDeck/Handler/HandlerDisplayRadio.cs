@@ -70,14 +70,12 @@ namespace PilotsDeck
 
             string background = Settings.DefaultImage;
 
-            bool wasPushed = false;
             if (lastActive != ValueManager[ID.Active] && ticksIndication < ticksActive && !firstLoad)
             {
                 ticksIndication++;
                 if (ticksIndication < ticksActive)
                 {
                     background = Settings.IndicationImage;
-                    wasPushed = true;
                 }
                 else
                 {
@@ -91,35 +89,32 @@ namespace PilotsDeck
                 firstLoad = false;
             }
 
-            if (NeedRefresh || wasPushed && ticksIndication < ticksActive)
-            {
-                Font fontAct = GetFont(FontStyle.Bold);
-                Font fontStb = GetFont(FontStyle.Regular);
+            Font fontAct = GetFont(FontStyle.Bold);
+            Font fontStb = GetFont(FontStyle.Regular);
 
-                Color colorAct;
-                if (Settings.FontInherit && TitleParameters != null)
-                    colorAct = ColorTranslator.FromHtml(TitleParameters.FontColor);
-                else
-                    colorAct = ColorTranslator.FromHtml(Settings.FontColor);
+            Color colorAct;
+            if (Settings.FontInherit && TitleParameters != null)
+                colorAct = ColorTranslator.FromHtml(TitleParameters.FontColor);
+            else
+                colorAct = ColorTranslator.FromHtml(Settings.FontColor);
 
-                Color colorStb;
-                if (Settings.FontInherit && TitleParameters != null)
-                    colorStb = GetDarkenedColor(TitleParameters.FontColor);
-                else
-                    colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
+            Color colorStb;
+            if (Settings.FontInherit && TitleParameters != null)
+                colorStb = GetDarkenedColor(TitleParameters.FontColor);
+            else
+                colorStb = ColorTranslator.FromHtml(Settings.FontColorStby);
 
-                ImageRenderer render = new(ImgManager.GetImage(background, DeckType), DeckType);
+            ImageRenderer render = new(ImgManager.GetImage(background, DeckType), DeckType);
 
-                render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
-                render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
+            render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
+            render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
-                if (IsEncoder)
-                    DrawTitle(render, new PointF(100, 51.0f));
+            if (IsEncoder)
+                DrawTitle(render, new PointF(100, 51.0f));
 
-                RenderImage64 = render.RenderImage64();
-                NeedRedraw = true;
+            RenderImage64 = render.RenderImage64();
+            NeedRedraw = true;
                 render.Dispose();
-            }
         }
 
         protected override void RenderDefaultImages()

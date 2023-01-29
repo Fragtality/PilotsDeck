@@ -60,7 +60,8 @@ namespace PilotsDeck
         HVAR = 8,
         CALCULATOR = 9,
         XPCMD = 10,
-        XPWREF = 11
+        XPWREF = 11,
+        AVAR = 12,
     }
 
     public class ManagedValue

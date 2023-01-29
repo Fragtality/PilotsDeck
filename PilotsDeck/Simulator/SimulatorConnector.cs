@@ -68,6 +68,7 @@ namespace PilotsDeck
         public abstract bool Process();
         public abstract void SubscribeAddress(string address);
         public abstract void UnsubscribeAddress(string address);
+        public virtual void UnsubscribeUnusedAddresses() { }
         public abstract void SubscribeAllAddresses();
         public abstract bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, bool ignoreLvarReset, string offValue = null, int ticks = 1);
 
@@ -120,8 +121,8 @@ namespace PilotsDeck
                 value = new IPCValueDataRefString(address);
             else if (IPCTools.rxDref.IsMatch(address))
                 value = new IPCValueDataRef(address);
-            else if (IPCTools.rxLvar.IsMatch(address))
-                value = new IPCValueLvar(address);
+            else if (IPCTools.rxLvar.IsMatch(address) || IPCTools.rxAvar.IsMatch(address))
+                value = new IPCValueSimVar(address);
 
             return value;
         }

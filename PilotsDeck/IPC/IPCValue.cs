@@ -38,5 +38,15 @@ namespace PilotsDeck
         {
 
         }
+
+        public virtual void SetValue(double value)
+        {
+
+        }
+
+        public virtual void ForceChanged()
+        {
+
+        }
     }
 }

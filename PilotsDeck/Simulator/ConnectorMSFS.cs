@@ -16,7 +16,7 @@ namespace PilotsDeck
         private IPCValueOffset camReadyValue;
         private bool wasmReloaded = false;
 
-        public override bool IsConnected { get { return FSUIPCConnection.IsOpen && WASM.IsRunning; } protected set { } }
+        public override bool IsConnected { get { return FSUIPCConnection.IsOpen && WASM.IsRunning && mobiConnect.IsConnected; } protected set { } }
         public virtual bool IsCamReady()
         {
             bool result = false;
@@ -28,7 +28,7 @@ namespace PilotsDeck
 
             return result;
         }
-        public override bool IsReady { get { return inMenuValue?.Value == "0" && isPausedValue?.Value == "0" && IsConnected && IsCamReady(); } }
+        public override bool IsReady { get { return inMenuValue?.Value == "0" && isPausedValue?.Value == "0" && IsConnected && IsCamReady() && mobiConnect.IsReady; } }
         public override bool IsRunning { get { return GetProcessRunning("FlightSimulator"); } }
         public override bool IsPaused { get { return pauseIndValue?.Value != "0"; } protected set { } }
 
@@ -38,9 +38,13 @@ namespace PilotsDeck
 
         protected bool isWASMReady = false;
         protected int ticks = 0;
+        protected MobiSimConnect mobiConnect = null;
+        protected bool mobiConnectRequested = false;
 
         public override void Close()
         {
+            mobiConnect.Disconnect();
+
             if (FSUIPCConnection.IsOpen)
                 FSUIPCConnection.Close();
 
@@ -96,6 +100,8 @@ namespace PilotsDeck
                 {
                     Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"WASM running.");
                 }
+
+                mobiConnectRequested = mobiConnect.Connect();
             }
             catch (Exception ex)
             {
@@ -114,6 +120,7 @@ namespace PilotsDeck
         {
             TickCounter = tickCounter;
             ipcManager = manager;
+            mobiConnect = new(manager);
             
             isPausedValue = new IPCValueOffset(isPausedAddr, AppSettings.groupStringRead, OffsetAction.Read);
             pauseIndValue = new IPCValueOffset(pauseIndAddr, AppSettings.groupStringRead, OffsetAction.Read);
@@ -138,6 +145,8 @@ namespace PilotsDeck
                     camReadyValue.Connect();
                     AircraftValue.Connect();
                 }
+                if (!mobiConnectRequested)
+                    mobiConnectRequested = mobiConnect.Connect();
 
                 FSUIPCConnection.Process(AppSettings.groupStringRead);
                 if (!IsReady)
@@ -145,6 +154,11 @@ namespace PilotsDeck
                     Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"Not ready!");
                     resultProcess = false;
                 }
+
+                if (mobiConnect.IsReady)
+                    mobiConnect.Process();
+                else
+                    Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnet not ready!");
 
                 if (!isWASMReady)
                 {
@@ -184,12 +198,23 @@ namespace PilotsDeck
 
         public override void SubscribeAddress(string address)
         {
-            
+            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars && AppSettings.preferrMobiWASM) || IPCTools.rxAvar.IsMatch(address))
+            {
+                mobiConnect.SubscribeAddress(address);
+            }
         }
 
         public override void UnsubscribeAddress(string address)
         {
+            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars && AppSettings.preferrMobiWASM) || IPCTools.rxAvar.IsMatch(address))
+            {
+                mobiConnect.UnsubscribeAddress(address);
+            }
+        }
 
+        public override void UnsubscribeUnusedAddresses()
+        {
+            mobiConnect.UnsubscribeUnusedAddresses();
         }
 
         public override void SubscribeAllAddresses()
@@ -199,12 +224,23 @@ namespace PilotsDeck
                 ipcManager[address].Connect();
             }
             Logger.Log(LogLevel.Debug, "ConnectorMSFS:SubscribeAllAddresses", $"Subscribed all IPCValues. (Count: {ipcManager.AddressList.Count})");
+            mobiConnect.SubscribeAllAddresses();
         }
 
         protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
         {
-            bool result = SimTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
-            if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
+            bool result;
+
+            if (IPCTools.rxLvar.IsMatch(Address) && (!AppSettings.preferrMobiWASM || AppSettings.Fsuipc7LegacyLvars))
+            {
+                result = SimTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+            }
+            else
+            {
+                result = SimTools.WriteSimVar(mobiConnect, Address, newValue, lvarReset, offValue);
+            }
+
+            if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null && !lvarReset)
             {
                 ipcManager[Address].SetValue(newValue);
             }
@@ -221,6 +257,8 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return SimTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
+                    return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
+                case ActionSwitchType.AVAR:
                     return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
                 case ActionSwitchType.HVAR:
                     return SimTools.WriteHvar(Address);

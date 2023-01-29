@@ -103,8 +103,7 @@ namespace PilotsDeck
         public ManagedImage AddImage(string file, StreamDeckType type)
         {
             string fileReal = GetRealFileName(file, type);
-            ManagedImage image;
-            if (imageCache.TryGetValue(fileReal, out image))
+            if (imageCache.TryGetValue(fileReal, out ManagedImage image))
             {
                 image.Registrations++;
                 Logger.Log(LogLevel.Debug, "ImageManager:AddImage", $"Registration added to cached Image. (Ref: {file}) (Real: {fileReal}) (Registrations: {image.Registrations}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");

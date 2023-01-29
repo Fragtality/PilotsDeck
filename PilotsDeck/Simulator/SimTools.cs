@@ -178,6 +178,25 @@ namespace PilotsDeck
             return result;
         }
 
+        public static bool WriteSimVar(MobiSimConnect mobiConnect, string address, string onValue, bool lvarReset, string offValue)
+        {
+            if (!double.TryParse(onValue, new RealInvariantFormat(onValue), out double dValue))
+                return false;
+
+            mobiConnect.SetSimVar(address, dValue);
+
+            if (lvarReset)
+            {
+                if (!double.TryParse(offValue, new RealInvariantFormat(offValue), out dValue))
+                    return false;
+
+                Thread.Sleep(AppSettings.controlDelay * 2);
+                mobiConnect.SetSimVar(address, dValue);
+            }
+
+            return true;
+        }
+
         public static bool SendControls(string address, bool useControlDelay)
         {
             if (!address.Contains('=') && address.Contains(':') && IPCTools.rxControlSeq.IsMatch(address))
@@ -426,7 +445,7 @@ namespace PilotsDeck
                 if (!lvar.StartsWith("L:"))
                     lvar = "L:" + lvar;
                 string op = increase ? "+" : "-";
-                string step = string.Format(AppSettings.numberFormat, "{0:G}", numStep * (double)ticks);
+                string step = string.Format(CultureInfo.InvariantCulture, "{0:G}", numStep * (double)ticks);
                 if (step.Contains(','))
                     step = step.Replace(',', '.');
 

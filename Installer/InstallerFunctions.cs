@@ -1,6 +1,7 @@
 ﻿using Extensions;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -118,10 +119,104 @@ namespace Installer
             }
         }
 
+        public static bool CheckPackageVersion(string packagePath, string packageName, string version)
+        {
+            try
+            {
+                string file = packagePath + "\\" + packageName + "\\manifest.json";
+                if (File.Exists(file))
+                {
+                    string[] lines = File.ReadAllLines(file);
+                    foreach (string line in lines)
+                    {
+                        if (Parameters.wasmRegex.IsMatch(line))
+                        {
+                            var matches = Parameters.wasmRegex.Matches(line);
+                            if (matches.Count == 1 && matches[0].Groups.Count >= 2 && matches[0].Groups[1].Value == version)
+                                return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during CheckPackageVersion", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return false;
+        }
+
+        public static bool CheckFSUIPC()
+        {
+            bool result = false;
+            try
+            {
+                string regVersion = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegValue, null);
+                if (!string.IsNullOrWhiteSpace(regVersion))
+                {
+                    var matches = Parameters.ipcRegexVersion.Matches(regVersion);
+                    foreach (Match match in matches)
+                    {
+                        if (!match.Success || match.Groups.Count != 5) continue;
+
+                        if (StringGreaterEqual(match.Groups[2].Value, Parameters.ipcMajor) && StringGreaterEqual(match.Groups[3].Value, Parameters.ipcMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.ipcPatch))
+                            result = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during CheckFSUIPC", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return result;
+        }
+
+        public static string FindPackagePath(string confFile)
+        {
+            string[] lines = File.ReadAllLines(confFile);
+            foreach (string line in lines)
+            {
+                if (line.StartsWith(Parameters.msStringPackage))
+                {
+                    return line.Replace("\"", "").Substring(Parameters.msStringPackage.Length) + "\\Community";
+                }
+            }
+
+            return "";
+        }
+
+        public static bool CheckInstalledMSFS(out string packagePath)
+        {
+            try
+            {
+                if (File.Exists(Parameters.msConfigStore))
+                {
+                    packagePath = FindPackagePath(Parameters.msConfigStore);
+                    return !string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath);
+                }
+                else if (File.Exists(Parameters.msConfigSteam))
+                {
+                    packagePath = FindPackagePath(Parameters.msConfigSteam);
+                    return !string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath);
+                }
+
+                packagePath = "";
+                return false;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during CheckInstalledMSFS", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            packagePath = "";
+            return false;
+        }
+
         public static bool CheckStreamDeckSW()
         {
             try
-            { 
+            {
                 string regVersion = (string)Registry.GetValue(Parameters.sdRegPath, Parameters.sdRegValue, null);
                 if (!string.IsNullOrWhiteSpace(regVersion) && regVersion.StartsWith(Parameters.sdVersion))
                     return true;
@@ -160,7 +255,7 @@ namespace Installer
         public static bool CheckDotNet()
         {
             try
-            { 
+            {
                 bool installedCore = false;
                 bool installedDesktop = false;
 

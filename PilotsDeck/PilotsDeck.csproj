@@ -59,19 +59,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Microsoft.FlightSimulator.SimConnect">
+      <HintPath>Microsoft.FlightSimulator.SimConnect.dll</HintPath>
+	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Reference>
     <Reference Include="vJoyInterfaceWrap">
       <HintPath>vJoyInterfaceWrap.dll</HintPath>
     </Reference>
   </ItemGroup>
   
   <ItemGroup>
+    <PublishReadyToRunExclude Include="Microsoft.FlightSimulator.SimConnect.dll" />
     <PublishReadyToRunExclude Include="vJoyInterface.dll" />
 	<PublishReadyToRunExclude Include="vJoyInterfaceWrap.dll" />
+	<PublishReadyToRunExclude Include="FSUIPC_WAPID.dll" />
+	<PublishSingleFileExclude Include="Microsoft.FlightSimulator.SimConnect.dll" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="FSUIPC_WAPID.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </None>
     <None Update="FSUIPC_WAPID.pdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -799,6 +807,10 @@
     <None Update="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Microsoft.FlightSimulator.SimConnect.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </None>
     <None Update="PI\css\property-inspector.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -883,6 +895,10 @@
     <None Update="Profiles\PilotsDeck - DefaultXL.streamDeckProfile">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="SimConnect.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </None>
     <None Update="StreamDeckLib.deps.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -891,6 +907,7 @@
     </None>
     <None Update="vJoyInterface.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </None>
     <None Update="vJoyInterfaceWrap.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

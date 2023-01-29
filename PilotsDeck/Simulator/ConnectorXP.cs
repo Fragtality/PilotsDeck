@@ -293,7 +293,7 @@ namespace PilotsDeck
         {
             try
             {
-                if (IPCTools.rxDref.IsMatch(address))
+                if (IPCTools.rxDref.IsMatch(address) && !AddresstoIndex.ContainsKey(address))
                 {
                     dataRefs.Add(nextIndex, ipcManager[address]);
                     AddresstoIndex.Add(address, nextIndex);
@@ -303,6 +303,10 @@ namespace PilotsDeck
                     else
                         RegisterFloat(address);
                 }
+                else if (!IPCTools.rxDref.IsMatch(address))
+                    Logger.Log(LogLevel.Error, "ConnectorXP:SubscribeAddress", $"The Address '{address}' is not valid!");
+                else
+                    Logger.Log(LogLevel.Error, "ConnectorXP:SubscribeAddress", $"The Address '{address}' is already subscribed!");
             }
             catch (Exception ex)
             {

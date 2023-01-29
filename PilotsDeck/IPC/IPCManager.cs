@@ -17,7 +17,7 @@ namespace PilotsDeck
         {
             get
             {
-                if (currentValues.TryGetValue(address, out IPCValue value))
+                if (currentValues.TryGetValue(FormatAddress(address), out IPCValue value))
                     return value;
                 else
                     return null;
@@ -32,7 +32,7 @@ namespace PilotsDeck
 
         public bool Contains(string address)
         {
-            return currentValues.ContainsKey(address);
+            return currentValues.ContainsKey(FormatAddress(address));
         }
 
         public List<string> AddressList { get { return currentValues.Keys.ToList(); } }
@@ -64,11 +64,48 @@ namespace PilotsDeck
             }
         }
 
+        public static string FormatAddress(string address, bool mobi = false)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+                return address;
+
+            if (IPCTools.rxOffset.IsMatch(address))
+            {
+                string[] parts = address.Split(':');
+                int idx = 0;
+                if (parts[0].StartsWith("0x"))
+                    idx = 2;
+                string sub = parts[0].Substring(idx, 4).ToUpper();
+                parts[0] = "0x" + sub;
+                address = string.Join(":", parts);
+            }
+            if (IPCTools.rxLvar.IsMatch(address) && !mobi && address.StartsWith("L:"))
+            {
+                address = address[2..];
+            }
+            if (IPCTools.rxLvar.IsMatch(address) && mobi)
+            {
+                if (!address.StartsWith("L:"))
+                    address = address.Insert(0, "L:");
+                address = $"({address})";
+                
+            }
+            if (IPCTools.rxAvar.IsMatch(address))
+            {
+                if (!address.StartsWith("(A:"))
+                    address = address.Insert(1, "A:");
+                address = address.Replace(", ", ",");
+            }
+
+            return address;
+        }
+
         public IPCValue RegisterAddress(string address)
         {
             IPCValue value = null;
             try
             {
+                address = FormatAddress(address);
                 if (currentValues.TryGetValue(address, out value))
                 {
                     currentRegistrations[address]++;
@@ -103,6 +140,7 @@ namespace PilotsDeck
         {
             try
             { 
+                address = FormatAddress(address);
                 if (!string.IsNullOrWhiteSpace(address) && currentValues.ContainsKey(address))
                 {
                     if (currentRegistrations[address] >= 1)
@@ -137,6 +175,7 @@ namespace PilotsDeck
 
                 Logger.Log(LogLevel.Debug, "IPCManager:UnsubscribeUnusedAddresses", $"Unsubscribed '{address.Key}' from managed Addresses.");
             }
+            SimConnector.UnsubscribeUnusedAddresses();
         }
 
         public bool Process()

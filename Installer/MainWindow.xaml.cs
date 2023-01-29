@@ -119,6 +119,59 @@ namespace Installer
             }
 
 
+            //Check MSFS Requirements
+            control = AddActionControl("Checking MSFS Requirements ...");
+            if (InstallerFunctions.CheckInstalledMSFS(out string packagePath) && !string.IsNullOrWhiteSpace(packagePath))
+            {
+                Hyperlink link = new Hyperlink(new Run("\r\nFSUIPC"))
+                {
+                    NavigateUri = new Uri("http://fsuipc.com/")
+                };
+                if (InstallerFunctions.CheckFSUIPC())
+                {
+                    if (InstallerFunctions.CheckPackageVersion(packagePath, Parameters.wasmIpcName, Parameters.wasmIpcVersion))
+                    {
+                        link = new Hyperlink(new Run("\r\nMobiFlight"))
+                        {
+                            NavigateUri = new Uri("https://github.com/MobiFlight/MobiFlight-WASM-Module/releases")
+                        };
+                        if (InstallerFunctions.CheckPackageVersion(packagePath, Parameters.wasmMobiName, Parameters.wasmMobiVersion))
+                        {
+                            control.SetImage(ActionIcon.OK);
+                            control.Message.Text = "All MSFS Requirements met!";
+                        }
+                        else
+                        {
+                            control.SetImage(ActionIcon.Error);
+                            control.Message.Text = $"The installed WASM Module from MobiFlight does not match the Minimum Version {Parameters.wasmMobiVersion}! Please install / update it.";
+                            control.Message.Inlines.Add(link);
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        control.SetImage(ActionIcon.Error);
+                        control.Message.Text = $"The installed WASM Module from FSUIPC does not match the Minimum Version {Parameters.wasmIpcVersion}! Please try to update it manually.";
+                        control.Message.Inlines.Add(link);
+                        return false;
+                    }
+                }
+                else
+                {
+                    control.SetImage(ActionIcon.Error);
+                    control.Message.Text = $"The installed FSUIPC Version does not match the Minimum Version {Parameters.ipcMajor}.{Parameters.ipcMinor}.{Parameters.ipcPatch}! Please install the latest Version.";
+                    control.Message.Inlines.Add(link);
+                    return false;
+                }
+            }
+            else
+            {
+                control.SetImage(ActionIcon.Notice);
+                control.Message.Text = "MSFS not found.";
+            }
+
+
+
             //Stop Deck
             control = AddActionControl("Stopping StreamDeck Software ...");
             if (InstallerFunctions.StopStreamDeck())
@@ -180,7 +233,7 @@ namespace Installer
                 if (oldDefault)
                     control.Message.Text += "The old default Profiles 'Whiskey', 'X-Ray', 'Yankee' or 'Zulu' seem to be installed. You can remove them, if you never used them.\r\n";
                 control.Message.Inlines.Add(importer);
-                
+
             }
             else if (oldDefault)
             {
