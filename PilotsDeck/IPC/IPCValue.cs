@@ -43,10 +43,5 @@ namespace PilotsDeck
         {
 
         }
-
-        public virtual void ForceChanged()
-        {
-
-        }
     }
 }

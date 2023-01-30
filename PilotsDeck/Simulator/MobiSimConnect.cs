@@ -205,7 +205,6 @@ namespace PilotsDeck
                         if (ipcValue != null)
                         {
                             ipcValue.SetValue(simData.data);
-                            //Logger.Log(LogLevel.Debug, "MobiSimConnect:SimConnect_OnClientData", $"Updated received for SimVar '{simVars[data.dwRequestID].Address}' with ID '{data.dwRequestID}': {simData.data}");
                         }
                         else
                             Logger.Log(LogLevel.Error, "MobiSimConnect:SimConnect_OnClientData", $"The Value for ID '{data.dwRequestID}' is NULL! (Data: {data})");
@@ -286,7 +285,8 @@ namespace PilotsDeck
 
         protected void SimConnect_OnException(SimConnect sender, SIMCONNECT_RECV_EXCEPTION data)
         {
-            Logger.Log(LogLevel.Critical, "MobiSimConnect:SimConnect_OnException", $"Exception received: (Exception: {data.dwException}) ({data})");
+            if (data.dwException != 3 && data.dwException != 29)
+                Logger.Log(LogLevel.Critical, "MobiSimConnect:SimConnect_OnException", $"Exception received: (Exception: {data.dwException})");
         }
 
         public void SubscribeAddress(string address)
@@ -317,7 +317,6 @@ namespace PilotsDeck
                 {
                     simVarUsed[index] = true;
                     simVars[index] = ipcManager[address];
-                    ipcManager[address].ForceChanged();
                 }
                 else
                     Logger.Log(LogLevel.Error, "MobiSimConnect:SubscribeAddress", $"The Address '{address}' is already subscribed!");
@@ -376,7 +375,6 @@ namespace PilotsDeck
             foreach (uint index in subscribeQueue)
             {
                 RegisterVariable(index, simVars[index].Address);
-                ipcManager[simVars[index].Address].ForceChanged();
             }
 
             if (subscribeQueue.Count > 0)
@@ -419,7 +417,7 @@ namespace PilotsDeck
             try
             {
                 var unusedIndices = simVarUsed.Where(flag => !flag.Value).ToList();
-                if (unusedIndices.Count < reorderTreshold)
+                if (unusedIndices.Count == 0)
                     return;
                 
                 Logger.Log(LogLevel.Information, "MobiSimConnect:ReorderRegistrations", $"Reordering Registrations with MobiFlight WASM Module... (Unused: {unusedIndices.Count})");                
@@ -460,7 +458,6 @@ namespace PilotsDeck
 
             address = address.Insert(1, ">");
             address = $"{string.Format(CultureInfo.InvariantCulture, "{0:G}", value)} {address}";
-            //Logger.Log(LogLevel.Debug, "MobiSimConnect:SetSimVar", $"Sending to Mobi: {address}");
             SendClientWasmCmd($"MF.SimVars.Set.{address}");
         }
     }

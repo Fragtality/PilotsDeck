@@ -69,10 +69,5 @@ namespace PilotsDeck
         {
             DoubleValue = value;
         }
-
-        public override void ForceChanged()
-        {
-            isChanged = true;
-        }
     }
 }

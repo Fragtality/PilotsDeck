@@ -21,7 +21,7 @@
         <div class="sdpi-heading">Read Value</div>
         <div class="sdpi-item" id="Config_Address">
             <div class="sdpi-item-label">Address</div>
-            <input id="Address" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
+            <input id="Address" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
         </div>
 
         <div class="sdpi-heading">Value Format</div>
@@ -54,7 +54,7 @@
         </div>
         <div class="sdpi-item" id="Config_AddressColorOff">
             <div class="sdpi-item-label" id="lblAddressColorOff">Address Color</div>
-            <input id="AddressColorOff" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or LVar" />
+            <input id="AddressColorOff" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
         </div>
         <div class="sdpi-item" id="Config_StateColorOff">
             <div class="sdpi-item-label" id="lblStateColorOff">Value</div>
@@ -153,7 +153,7 @@
         </div>
         <div class="sdpi-item" id="Config_Format">
             <div class="sdpi-item-label" id="lblFormat">Format</div>
-            <input id="Format" class="sdpi-item-value" type="text" pattern="(([0-9]{1,})|[0-9]{1,}:.*%s.*|^(:)?.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits:..%s..)" />
+            <input id="Format" class="sdpi-item-value" type="text" pattern="((([0-9]{1,}\.){0,1}[0-9]{1,})|(([0-9]{1,}\.){0,1}[0-9]{1,}){0,1}:.*%s.*|[^:]*.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits.digits:..%s..)" />
         </div>
         <div class="sdpi-item" id="Config_ValueMappings">
             <div class="sdpi-item-label" id="lblValueMappings">Mappings</div>

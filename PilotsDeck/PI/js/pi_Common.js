@@ -151,14 +151,15 @@ function setPattern(field, type) {
 	if (!document.getElementById(field))
 		return;
 
-	var regName = "[a-zA-Z0-9\x2D\x5F]+";
-	var regLvar = `^([^0-9]{1}(L:){0,1}${regName}){1}$`;
+	var regName = "[^:\\s][a-zA-Z0-9\x2D\x5F]+";
+	var regLvar = `^((L:){0,1}${regName}){1}$`;
 	var strHvar = `((H:){0,1}${regName}){1}`;
 	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
 	var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
 	var strPathXP = `(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
+	var regAvar = `^\\((A:){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w ]+\\)$`;
 	
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
@@ -170,8 +171,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regLvar;
 	else if (type == 4)  //offset
 		document.getElementById(field).pattern = regOffset;
-	else if (type == 5) //offset | lvar
-		document.getElementById(field).pattern = `${regOffset}|${regLvar}|${regDref}`;
+	else if (type == 5) //offset | lvar | dref | avar
+		document.getElementById(field).pattern = `${regOffset}|${regLvar}|${regDref}|${regAvar}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv
@@ -182,6 +183,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regCmdXP;
 	else if (type == 11) //XPWRef
 		document.getElementById(field).pattern = regDref;
+	else if (type == 12) //Avar
+		document.getElementById(field).pattern = regAvar;
 	else
 		document.getElementById(field).pattern = ".*";
 }

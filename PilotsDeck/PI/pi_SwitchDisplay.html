@@ -13,7 +13,7 @@
         <div class="sdpi-heading">Control Status Value</div>
         <div class="sdpi-item" id="Config_Address">
             <div class="sdpi-item-label">Address</div>
-            <input id="Address" class="sdpi-item-value" type="text" required pattern="((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}|((L:){0,1}[a-zA-Z0-9\x2D\x5F]+){1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of Offset or Name of LVar" />
+            <input id="Address" class="sdpi-item-value" type="text" required pattern="((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}|((L:){0,1}[a-zA-Z0-9\x2D\x5F]+){1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
         </div>
 
         <div class="sdpi-heading">Control States</div>
