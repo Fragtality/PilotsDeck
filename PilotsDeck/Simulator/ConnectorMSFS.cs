@@ -158,7 +158,7 @@ namespace PilotsDeck
                 if (mobiConnect.IsReady)
                     mobiConnect.Process();
                 else
-                    Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnet not ready!");
+                    Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnect not ready!");
 
                 if (!isWASMReady)
                 {

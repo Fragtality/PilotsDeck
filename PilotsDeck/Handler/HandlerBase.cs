@@ -211,6 +211,13 @@ namespace PilotsDeck
             {
                 ValueManager.UpdateValue(ID.Switch, SwitchSettings.AddressAction, SwitchSettings.ActionType);
 
+                if (SwitchSettings.ToggleSwitch && !ValueManager.Contains(ID.Monitor))
+                    ValueManager.AddValue(ID.Monitor, SwitchSettings.AddressMonitor);
+                else if (!SwitchSettings.ToggleSwitch && ValueManager.Contains(ID.Monitor))
+                    ValueManager.RemoveValue(ID.Monitor);
+                else
+                    ValueManager.UpdateValue(ID.Monitor, SwitchSettings.AddressMonitor);
+
                 if (SwitchSettings.HasLongPress && !ValueManager.Contains(ID.SwitchLong))
                     ValueManager.AddValue(ID.SwitchLong, SwitchSettings.AddressActionLong, SwitchSettings.ActionTypeLong);
                 else if (!SwitchSettings.HasLongPress && ValueManager.Contains(ID.SwitchLong))

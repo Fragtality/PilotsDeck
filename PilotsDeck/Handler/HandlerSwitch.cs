@@ -59,7 +59,7 @@ namespace PilotsDeck
             else if (!longPress)
             {
                 string currentState = valueManager[ID.Switch];
-                if (((ActionSwitchType)switchSettings.ActionType == ActionSwitchType.XPCMD || (ActionSwitchType)switchSettings.ActionType == ActionSwitchType.CONTROL) && switchSettings.ToggleSwitch)
+                if (IPCTools.IsToggleableCommand(switchSettings.ActionType) && switchSettings.ToggleSwitch)
                     currentState = valueManager[ID.Monitor];
 
                 result = ipcManager.RunAction(switchSettings.AddressAction, switchSettings.AddressActionOff, (ActionSwitchType)switchSettings.ActionType, currentState, switchSettings.SwitchOnState, switchSettings.SwitchOffState, switchSettings);

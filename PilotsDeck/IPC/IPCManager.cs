@@ -216,6 +216,7 @@ namespace PilotsDeck
                 else
                 {
                     string runAddress = addressOn;
+                    Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"offVale {offValue} State {currentState} Compare {ModelBase.Compare(offValue, currentState)}");
                     if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(addressOff) && ModelBase.Compare(offValue, currentState))
                     {
                         runAddress = addressOff;
