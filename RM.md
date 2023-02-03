@@ -3,14 +3,15 @@ Directly check & control the FlightSim from your StreamDeck!
 <br/><br/>
 
 ## Introduction
-PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially **reading & displaying** a Control's State on the StreamDeck as Text, Image, Bar or Arc. It is lean & mean and flexible. It does not do any fancy Stuff like a PFD - it does exactly what is needed to support smooth Flight Operations 😎<br/>
+PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially **reading & displaying** a Control's State on the StreamDeck as Text, Image, Bar or Arc. It is lean & mean, flexible, completely Open-Source and Free-to-Use. It does not do any fancy Stuff like a PFD - it does exactly what is needed to support smooth Flight Operations 😎<br/>
 
 StreamDeck-wise it behaves like any other StreamDeck Plugin: it runs alongside other Plugins and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the StreamDeck Software - so you can create, export and share Profiles with the Plugin's Actions.
 The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, **XL**, **Mobile** and **Plus**. Other Models might work, but an indented Support for Non-Display Models is not planned.<br/>
 
-Simulator-wise it supports all major Platforms on **Windows** - **MSFS2020**, **X-Plane 12/11** and **P3D/FSX**. For MS Platforms it connects through **FSUIPC** to the Simulator, for X-Plane it connects directly via UDP Sockets. All Values and Commands these Connections allow are usable with the Plugin.<br/>
+Simulator-wise it supports all major Platforms on **Windows** - **MSFS2020**, **X-Plane 12/11** and **P3D/FSX**. For MS Platforms it connects through **FSUIPC** to the Simulator, for X-Plane it connects directly via **UDP** Sockets. All Variables and Commands these Connections allow are usable with the Plugin. Not all Variables and Commands require a registered Version of FSUIPC, but a registered (bought) Copy of FSUIPC is recommended to use the full Potential. If you only fly in X-Plane, FSUIPC is not needed.<br/>
 It is designed for **advanced Sim-Users** which "know how to do Stuff": It does not explain an "Offset" or "DataRef" for Example. It does not tell you how to trigger the Beacon Lights for a specific Airplane or how to read the State of that Switch. But if you do know that, you can quickly define an Action for that on the Deck. So if you don't: be eager to read & learn and you'll be fine! 😉<br/>
-Predefined StreamDeck Profiles are available under [Integrations](Integrations/), but there are not much. Either your Plane is among these for direct Use or they can at least serve as Example:<br/><br/>
+
+Predefined StreamDeck Profiles are available under [Integrations](Integrations/), but there are not much. Either your Plane is among these for direct Use or they can at least serve as Example:<br/>
 <img src="img/ExampleLayout01.jpg" width="420"><br/>
 <img src="img/ExampleFNX03.jpg" width="420"><br/>
 <img src="img/ExampleFNX04.jpg" width="420">
@@ -20,17 +21,18 @@ Predefined StreamDeck Profiles are available under [Integrations](Integrations/)
 
 | Simulator | Supported | Tested | Requirement |
 | :-------------|:-------------:|:-----:|:-----|
-| **Flight Simulator 2020** | yes | yes | FSUIPC 7 & MobiFlight WASM |
+| **Flight Simulator 2020** | **yes** | **yes** | FSUIPC 7 & MobiFlight WASM |
 | Flight Simulator X | yes | no | FSUIPC4 |
 | Flight Simulator 2004 | yes | no | FSUIPC 3 |
-| **Prepar3D v5** | yes | yes | FSUIPC 6 |
+| **Prepar3D v5** | **yes** | **yes** | FSUIPC 6 |
 | Prepar3D v4 | yes | no | FSUIPC 5/6 |
 | Prepar3D v1-3 | yes | no | FSUIPC 4 |
-| **X-Plane 12** | yes | yes | None - does not use XUIPC |
-| **X-Plane 11** | yes | yes | None - does not use XUIPC |
+| **X-Plane 12** | **yes** | **yes** | None - does not use XUIPC |
+| X-Plane 11 | yes | yes | None - does not use XUIPC |
 | X-Plane <=10 | yes | no | None - does not use XUIPC |
 
-<br/>
+Supported is understood as "technical and basically supported by the Connection Method". Support in Terms of ensured Compatibility, Fixing Issues and giving Support exists only for the latest Version of the three Major Simulators: MSFS2020, X-Plane 12, P3D v5. I'm happy if it works for older Versions, but I won't make any Effort for them.
+<br/><br/>
 
 ### Included StreamDeck Actions
 All Actions work on Keypads (the normal/square StreamDeck Buttons). The Dial/Touchpad (aka Encoder) on the SD+ is only supported by some Actions (the ones which make the most Sense).<br/>
