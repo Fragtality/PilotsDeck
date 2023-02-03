@@ -70,7 +70,7 @@ namespace PilotsDeck
         public abstract void UnsubscribeAddress(string address);
         public virtual void UnsubscribeUnusedAddresses() { }
         public abstract void SubscribeAllAddresses();
-        public abstract bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, bool ignoreLvarReset, string offValue = null, int ticks = 1);
+        public abstract bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, int ticks = 1);
 
         public static bool GetProcessRunning(string name)
         {

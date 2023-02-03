@@ -9,6 +9,8 @@ namespace Installer
 {
     public static class Parameters
     {
+        public static readonly string pilotsDeckVersion = "Latest";
+
         public static readonly string sdPluginDir = @"\Elgato\StreamDeck\Plugins";
         public static readonly string pluginBinary = "PilotsDeck";
         public static readonly string pluginName = "com.extension.pilotsdeck.sdPlugin";

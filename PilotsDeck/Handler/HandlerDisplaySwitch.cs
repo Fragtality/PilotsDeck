@@ -29,7 +29,7 @@
         public override bool OnButtonDown(long tick)
         {
             TickDown = tick;
-            return HandlerSwitch.RunButtonDown(SwitchSettings);
+            return HandlerSwitch.RunButtonDown(IPCManager, SwitchSettings);
         }
 
         public override bool OnButtonUp(long tick)

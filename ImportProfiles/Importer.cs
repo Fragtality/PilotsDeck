@@ -21,7 +21,7 @@ namespace ImportProfiles
         protected readonly static string manifest = dir + @"\manifest.json";
         protected readonly static string savedProfileFile = dir + @"\Profiles\savedProfiles.txt";
         private static List<Profile> profilesManifest = new();
-        private static Dictionary<string, int> savedProfiles = new();
+        private readonly static Dictionary<string, int> savedProfiles = new();
 
         public static void Main()
         {

@@ -25,7 +25,7 @@ namespace PilotsDeck
             if (GaugeSettings.HasAction)
             {
                 TickDown = tick;
-                return HandlerSwitch.RunButtonDown(SwitchSettings);
+                return HandlerSwitch.RunButtonDown(IPCManager, SwitchSettings);
             }
             else
                 return false;

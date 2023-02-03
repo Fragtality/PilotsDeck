@@ -7,6 +7,7 @@
         public virtual string AddressActionOff { get; set; } = "";
         public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
         public virtual bool ToggleSwitch { get; set; } = false;
+        public virtual bool HoldSwitch { get; set; } = false;
         public override bool SwitchOnCurrentValue { get; set; } = true;
         public virtual bool UseControlDelay { get; set; } = false;
         public virtual bool UseLvarReset { get; set; } = false;

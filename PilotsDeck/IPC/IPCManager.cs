@@ -202,60 +202,148 @@ namespace PilotsDeck
             return result;
         }
 
-        public bool RunAction(string addressOn, string addressOff, ActionSwitchType actionType, string currentState, string onValue, string offValue, IModelSwitch switchSettings, bool ignoreLvarReset = false, int ticks = 1)
+        public bool RunActionDown(string addressOn, ActionSwitchType actionType, string onState, IModelSwitch switchSettings, bool ignoreBaseOptions = false)
         {
             bool result = false;
 
-            if (SimConnector.IsConnected && IPCTools.IsWriteAddress(addressOn, actionType))
+            if (IPCTools.IsWriteAddress(addressOn, actionType))
             {
-                if (actionType == ActionSwitchType.VJOY || actionType == ActionSwitchType.VJOYDRV)
+                //VJOYs
+                if (IPCTools.IsVjoyAddress(addressOn, actionType))
                 {
-                    Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"Running vJoy Toggle Action for '{addressOn}'. (Type: {actionType})");
-                    result = SimTools.VjoyToggle(actionType, addressOn);
+                    //Set
+                    if (!IPCTools.IsVjoyToggle(addressOn, actionType) && !ignoreBaseOptions)
+                    {
+                        Logger.Log(LogLevel.Debug, "IPCManager:RunActionDown", $"Running vJoy Set Action for '{addressOn}'. (Type: {actionType})");
+                        result = SimTools.VjoyClearSet(actionType, addressOn, false);
+                    }
+                    else
+                        result = true;
+                }
+                else if (SimConnector.IsConnected)
+                {
+                    //HOLD
+                    if (!ignoreBaseOptions && switchSettings.HoldSwitch && (IPCTools.IsHoldableValue(actionType) || IPCTools.IsHoldableCommand(actionType)))
+                    {
+                        Logger.Log(LogLevel.Debug, "IPCManager:RunActionDown", $"HoldSwitch down - Running Action {actionType} '{addressOn}' on Connector '{SimConnector.GetType().Name}' (Value: {onState})");
+                        result = SimConnector.RunAction(addressOn, actionType, onState, switchSettings);
+                    }
+                    else
+                        result = true;
                 }
                 else
-                {
-                    string runAddress = addressOn;
-                    Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"offVale {offValue} State {currentState} Compare {ModelBase.Compare(offValue, currentState)}");
-                    if (switchSettings.ToggleSwitch && !string.IsNullOrEmpty(addressOff) && ModelBase.Compare(offValue, currentState))
-                    {
-                        runAddress = addressOff;
-                    }
-                    
-                    string newValue = "";
-                    if (IPCTools.IsActionReadable(actionType))
-                    {
-                        if (!ignoreLvarReset && switchSettings.UseLvarReset && onValue[0] != '$')
-                            newValue = onValue;
-                        else
-                            newValue = ValueManipulator.CalculateSwitchValue(currentState, offValue, onValue, ticks);
-                    }
+                    Logger.Log(LogLevel.Error, "IPCManager:RunActionDown", $"Simulator not connected!");
+            }
+            else
+                Logger.Log(LogLevel.Error, "IPCManager:RunActionDown", $"Address '{addressOn}' is not valid! (IsConnected {SimConnector.IsConnected})");
 
-                    if (!IPCTools.IsActionReadable(actionType) && actionType != ActionSwitchType.CALCULATOR)
+            return result;
+        }
+
+        public bool RunActionUp(string addressOn, string addressOff, ActionSwitchType actionType, string currentState, string onState, string offState, IModelSwitch switchSettings, bool ignoreBaseOptions = false, int encTicks = 1, long downTicks = 1)
+        {
+            bool result = false;
+
+            if (IPCTools.IsWriteAddress(addressOn, actionType))
+            {
+                //VJOYs
+                if (IPCTools.IsVjoyAddress(addressOn, actionType))
+                {
+                    //Toggle
+                    if (IPCTools.IsVjoyToggle(addressOn, actionType))
                     {
                         int success = 0;
                         int i;
-                        for (i = 0; i < ticks; i++)
+                        for (i = 0; i < encTicks; i++)
                         {
-                            Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"Running Action {actionType} {i + 1}/{ticks} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
-                            if (SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, ignoreLvarReset, offValue))
+                            Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"Running vJoy Toggle Action {i + 1}/{encTicks} for '{addressOn}'. (Type: {actionType})");
+                            if (SimTools.VjoyToggle(actionType, addressOn))
                             {
                                 success++;
-                                if (actionType == ActionSwitchType.MACRO || actionType == ActionSwitchType.SCRIPT || actionType == ActionSwitchType.XPCMD)
-                                    Thread.Sleep(AppSettings.controlDelay / 2);
+                                if (encTicks > 1)
+                                    Thread.Sleep(AppSettings.controlDelay);
                             }
                         }
                         result = i == success;
                     }
+                    //Clear
                     else
                     {
-                        Logger.Log(LogLevel.Debug, "IPCManager:RunAction", $"Running Action {actionType} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
-                        result = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, ignoreLvarReset, offValue, ticks);
+                        Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"Running vJoy Clear Action for '{addressOn}'. (Type: {actionType})");
+                        if (downTicks < 1)
+                            Thread.Sleep(AppSettings.controlDelay);
+                        result = SimTools.VjoyClearSet(actionType, addressOn, true);
                     }
                 }
+                else if (SimConnector.IsConnected)
+                {
+                    string runAddress = addressOn;
+                    string newValue = onState;
+                    
+                    bool resetResult = true;
+
+                    //HOLD
+                    if (!ignoreBaseOptions && switchSettings.HoldSwitch && (IPCTools.IsHoldableValue(actionType) || IPCTools.IsHoldableCommand(actionType)))
+                    {
+                        if (IPCTools.IsHoldableCommand(actionType))
+                            runAddress = addressOff;
+                        newValue = offState;
+                    }
+                    //TOGGLE
+                    else if (!ignoreBaseOptions && switchSettings.ToggleSwitch && IPCTools.IsToggleableCommand(actionType) && !string.IsNullOrEmpty(addressOff))
+                    {
+                        if (ModelBase.Compare(offState, currentState))
+                        {
+                            Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"ToggleSwitch OffState matched - using Alternate Action. (offState: {offState}) (State: {currentState})");
+                            runAddress = addressOff;
+                            newValue = offState;
+                        }
+                        else
+                            Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"ToggleSwitch OffState not matched - using Normal Action. (offState: {offState}) (State: {currentState})");
+                    }
+                    //RESET                    
+                    else if (switchSettings.UseLvarReset && IPCTools.IsResetableValue(actionType)
+                        && !string.IsNullOrWhiteSpace(offState) && onState[0] != '$')
+                    {
+                        Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"ResetSwitch - Running Action {actionType} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                        resetResult = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings);
+                        Thread.Sleep(AppSettings.controlDelay * 2);
+                        newValue = offState;
+                    }
+                    //CALCULATE VALUE
+                    else if (IPCTools.IsActionReadable(actionType))
+                    {
+                        newValue = ValueManipulator.CalculateSwitchValue(currentState, offState, onState, encTicks);
+                    }
+
+
+                    if (!IPCTools.IsTickAction(actionType, runAddress, newValue))
+                    {
+                        int success = 0;
+                        int i;
+                        for (i = 0; i < encTicks; i++)
+                        {
+                            Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"Running Action {i + 1}/{encTicks} {actionType} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                            if (SimConnector.RunAction(runAddress, actionType, newValue, switchSettings))
+                            {
+                                success++;
+                                if (encTicks > 1 && IPCTools.IsHoldableCommand(actionType))
+                                    Thread.Sleep(AppSettings.controlDelay / 2);
+                            }
+                        }
+                        result = i == success && resetResult;
+                    }
+                    else
+                    {
+                        Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"Running Action {actionType} '{runAddress}' on Connector '{SimConnector.GetType().Name}' (Value: {newValue})");
+                        result = SimConnector.RunAction(runAddress, actionType, newValue, switchSettings, encTicks) && resetResult;
+                    }
+                }
+                else
+                    Logger.Log(LogLevel.Error, "IPCManager:RunActionUp", $"Simulator not connected!");
             }
             else
-                Logger.Log(LogLevel.Error, "IPCManager:RunAction", $"IPCManager: Address '{addressOn}' is not valid! (IsConnected {SimConnector.IsConnected})");
+                Logger.Log(LogLevel.Error, "IPCManager:RunActionUp", $"Address '{addressOn}' is not valid! (IsConnected {SimConnector.IsConnected})");
 
             return result;
         }

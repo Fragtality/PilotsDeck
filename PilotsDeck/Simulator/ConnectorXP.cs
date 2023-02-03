@@ -31,7 +31,7 @@ namespace PilotsDeck
 
         public bool CloseRequested { get; set; } = false;
 
-        public override bool IsConnected { get { return senderSocket != null && senderSocket.Client.Connected; } protected set { } }
+        public override bool IsConnected { get { return senderSocket != null && senderSocket.Client.Connected && !socketError; } protected set { } }
         public override bool IsReady { get { return IsConnected && !receiverNotReady && !socketError && simPausedReceived >= (AppSettings.waitTicks / waitDivisor); } }
 
         public override bool IsRunning { get { return GetProcessRunning("X-Plane"); } }
@@ -372,7 +372,7 @@ namespace PilotsDeck
             }
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, bool ignoreLvarReset, string offValue = null, int ticks = 1)
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, int ticks = 1)
         {
             switch (actionType)
             {

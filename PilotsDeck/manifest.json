@@ -12,7 +12,7 @@
       ],
       "SupportedInMultiActions": false,
       "PropertyInspectorPath": "PI/pi_Display.html",
-      "Tooltip": "Displays a Value as Text from an Offset, Lvar (or Script*) from the Sim",
+      "Tooltip": "Displays a Value as Text from an Offset, L-Var, A-Var or DataRef from the Sim",
       "UUID": "com.extension.pilotsdeck.action.display"
     },
     {

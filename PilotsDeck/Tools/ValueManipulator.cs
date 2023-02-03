@@ -10,27 +10,27 @@ namespace PilotsDeck
         protected string code;
         protected int factor;
 
-        public static string CalculateSwitchValue(string lastValue, string offState, string onState, int ticks)
+        public static string CalculateSwitchValue(string currentValue, string offState, string onState, int ticks)
         {
-            if (!string.IsNullOrWhiteSpace(onState) && onState[0] == '$' && double.TryParse(lastValue, NumberStyles.Number, new RealInvariantFormat(lastValue), out _))
+            if (!string.IsNullOrWhiteSpace(onState) && onState[0] == '$' && double.TryParse(currentValue, NumberStyles.Number, new RealInvariantFormat(currentValue), out _))
             {
                 ValueManipulator valueManipulator = new();
-                string newValue = valueManipulator.GetValue(lastValue, onState, ticks);
+                string newValue = valueManipulator.GetValue(currentValue, onState, ticks);
                 return newValue;
             }
             else
-                return ToggleSwitchValue(lastValue, offState, onState);
+                return ToggleSwitchValue(currentValue, offState, onState);
         }
 
-        public static string ToggleSwitchValue(string lastValue, string offState, string onState)
+        public static string ToggleSwitchValue(string currentValue, string offState, string onState)
         {
             string newValue;
-            if (lastValue == offState ||
-                (double.TryParse(lastValue, new RealInvariantFormat(lastValue), out double val) && double.TryParse(offState, new RealInvariantFormat(offState), out double off) && val == off))
+            if (currentValue == offState ||
+                (double.TryParse(currentValue, new RealInvariantFormat(currentValue), out double val) && double.TryParse(offState, new RealInvariantFormat(offState), out double off) && val == off))
                 newValue = onState;
             else
                 newValue = offState;
-            Logger.Log(LogLevel.Debug, "ValueManipulator:ToggleSwitchValue", $"Toggled Value '{lastValue}' -> '{newValue}'.");
+            Logger.Log(LogLevel.Debug, "ValueManipulator:ToggleSwitchValue", $"Toggled Value '{currentValue}' -> '{newValue}'.");
             return newValue;
         }
 
@@ -116,10 +116,10 @@ namespace PilotsDeck
                 if (!double.TryParse(parts[1], NumberStyles.Number, new RealInvariantFormat(parts[1]), out double limit))
                     return;
 
-                if (increase && value < limit)
+                if (increase && (value + step) <= limit)
                     value += step;
 
-                if (!increase && value > limit)
+                if (!increase && (value - step) >= limit)
                     value -= step;
             }
             else

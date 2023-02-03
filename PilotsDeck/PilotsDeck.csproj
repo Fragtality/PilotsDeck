@@ -77,10 +77,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="FSUIPC_WAPID.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </None>
     <None Update="FSUIPC_WAPID.pdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -484,6 +480,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\korry\A-ON-Blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\korry\A-ON-Green%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\korry\A-ON-Green.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\korry\A-ON-White%402x.png">

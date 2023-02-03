@@ -189,8 +189,10 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = ".*";
 }
 
-function isLongPressAllowed(actionType, address) {
-	return (actionType != 6 || (actionType == 6 && address.includes(":t"))) && (actionType != 7 || (actionType == 7 && address.includes(":t")));
+function isLongPressAllowed(actionType, address, settingsModel) {
+	return (actionType != 6 || (actionType == 6 && address.includes(":t")))
+		&& (actionType != 7 || (actionType == 7 && address.includes(":t")))
+		&& (!settingsModel.HoldSwitch);
 }
 
 function isActionTypeSelected(actionType, settingsModel) {
@@ -213,57 +215,121 @@ function isActionTypeSelected(actionType, settingsModel) {
 function toggleControlDelay(settingsModel) {
 	var delayField = "UseControlDelay";
 
-	if (isActionTypeSelected(2, settingsModel))
+	if (isActionTypeSelected(2, settingsModel))	//control - optional/last state
 		toggleConfigItem(true, delayField);
-	else if (isActionTypeSelected(10, settingsModel)) {
+	else if (isActionTypeSelected(10, settingsModel) || isActionTypeSelected(8, settingsModel)) { //xpcmd & hvar - default true
 		toggleConfigItem(true, delayField);
-		document.getElementById(delayField).checked = true;
 	}
 	else {
 		toggleConfigItem(false, delayField);
+		settingsModel.UseControlDelay = false;
 		document.getElementById(delayField).checked = false;
 	}
-}
 
-function toggleLvarReset(settingsModel) {
-	var resetField = "UseLvarReset";
-
-	if (settingsModel.ActionType == 3 || (settingsModel.HasLongPress && settingsModel.ActionTypeLong == 3))
-		toggleConfigItem(true, resetField);
-	else {
-		document.getElementById(resetField).checked = false;
-		toggleConfigItem(false, resetField);
-	}
+	return settingsModel;
 }
 
 function toggleSwitchToggle(settingsModel) {
-	var toggleField = "ToggleSwitch";
 	var currentValueField = "SwitchOnCurrentValue";
 	var monitorField = "AddressMonitor";
-	var actionType = settingsModel.ActionType;
+	var alternateField = "AddressActionOff";
 
-	if (actionType != 2 && actionType != 10) {
-		settingsModel.ToggleSwitch = false;
-		document.getElementById(toggleField).checked = false;
-		toggleConfigItem(false, toggleField);
-		toggleConfigItem(false, monitorField);
-		settingsModel.AddressActionOff = "";
-		document.getElementById("AddressActionOff").value = "";
-		if (actionType == 3 || actionType == 4 || actionType == 5)
-			toggleConfigItem(true, currentValueField);
-	}
-	else if (actionType == 2 || actionType == 10) {
-		toggleConfigItem(true, toggleField);
+	if (settingsModel.ToggleSwitch && isActionToggleable(settingsModel.ActionType)) {
+		toggleConfigItem(true, alternateField);
+		toggleConfigItem(true, monitorField);
 		toggleConfigItem(false, currentValueField);
 		settingsModel.SwitchOnCurrentValue = false;
 		document.getElementById(currentValueField).checked = false;
-		if (settingsModel.ToggleSwitch)
-			toggleConfigItem(true, monitorField);
-		else
-			toggleConfigItem(false, monitorField);
+	}	
+
+	return settingsModel;
+}
+
+function toggleSwitchHold(settingsModel) {
+	var currentValueField = "SwitchOnCurrentValue";
+	var alternateField = "AddressActionOff";
+
+	if (isActionHoldable(settingsModel.ActionType) && settingsModel.HoldSwitch) { //everything but vJoys
+		toggleConfigItem(!isActionHoldableValue(settingsModel.ActionType), alternateField)
+		toggleConfigItem(false, currentValueField);
+		settingsModel.SwitchOnCurrentValue = false;
+		document.getElementById(currentValueField).checked = false;
 	}
 
-	toggleConfigItem(settingsModel.ToggleSwitch, "AddressActionOff");
+	return settingsModel;
+}
+
+function isActionToggleable(actionType) {
+	return (actionType >= 0 && actionType <= 2) || (actionType >= 8 && actionType <= 10);
+}
+
+function isActionHoldable(actionType) {
+	return actionType != 6 && actionType != 7;
+}
+
+function isActionHoldableValue(actionType) {
+	return actionType != 6 && actionType != 7 && isActionResetable(actionType);
+}
+
+function isActionResetable(actionType) {
+	return (actionType >= 3 && actionType <= 5) || (actionType >= 11 && actionType <= 12);
+}
+
+function setSwitchOptions(settingsModel) {
+	var toggleField = "ToggleSwitch";
+	var holdField = "HoldSwitch";
+	var resetField = "UseLvarReset";
+	var actionType = settingsModel.ActionType;
+
+	if (settingsModel.ToggleSwitch && isActionToggleable(actionType)) {
+		settingsModel.HoldSwitch = false;
+		document.getElementById(holdField).checked = false;
+		toggleConfigItem(false, holdField);
+
+		settingsModel.UseLvarReset = false;
+		document.getElementById(resetField).checked = false;
+		toggleConfigItem(false, resetField);
+	}
+	else if (settingsModel.HoldSwitch && isActionHoldable(actionType)) {
+		settingsModel.ToggleSwitch = false;
+		document.getElementById(toggleField).checked = false;
+		toggleConfigItem(false, toggleField);
+
+		settingsModel.UseLvarReset = false;
+		document.getElementById(resetField).checked = false;
+		toggleConfigItem(false, resetField);
+	}
+	else if (settingsModel.UseLvarReset && isActionResetable(actionType)) {
+		settingsModel.ToggleSwitch = false;
+		document.getElementById(toggleField).checked = false;
+		toggleConfigItem(false, toggleField);
+
+		settingsModel.HoldSwitch = false;
+		document.getElementById(holdField).checked = false;
+		toggleConfigItem(false, holdField);
+	}
+	else {
+		settingsModel.ToggleSwitch = false;
+		document.getElementById(toggleField).checked = false;
+		toggleConfigItem(isActionToggleable(actionType), toggleField);
+
+		settingsModel.HoldSwitch = false;
+		document.getElementById(holdField).checked = false;
+		toggleConfigItem(isActionHoldable(actionType), holdField);
+
+		settingsModel.UseLvarReset = false;
+		document.getElementById(resetField).checked = false;
+		toggleConfigItem(isActionResetable(actionType), resetField);
+	}
+
+	toggleConfigItem(false, "AddressActionOff");
+	toggleConfigItem(false, "UseControlDelay");
+	toggleConfigItem(false, "SwitchOnCurrentValue");
+	toggleConfigItem(false, "AddressMonitor");
+	toggleConfigItem(false, "SwitchOnState");
+	toggleConfigItem(false, "SwitchOffState");	
+
+	return settingsModel;
 }
 
 function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSwitch = false) {
@@ -284,7 +350,7 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSw
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
-	else if ((actionType == 2 || actionType == 10) && toggleSwitch) { //control/command & toggle
+	else if (isActionToggleable(actionType) && toggleSwitch) { //control/command & toggle
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
@@ -364,12 +430,14 @@ function commonFormUpdate() {
 		}
 
 		//OPTIONS / ALTERNATIVE
-		toggleSwitchToggle(settingsModel);
-		toggleControlDelay(settingsModel);
-		toggleLvarReset(settingsModel);
+		settingsModel = setSwitchOptions(settingsModel);
+		settingsModel = toggleSwitchHold(settingsModel);
+		settingsModel = toggleSwitchToggle(settingsModel);
+		settingsModel = toggleControlDelay(settingsModel);
+		
 
 		//LONG
-		var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction);
+		var longAllowed = isLongPressAllowed(settingsModel.ActionType, settingsModel.AddressAction, settingsModel);
 		toggleOnOffState(settingsModel.ActionType, 'SwitchOnState', 'SwitchOffState', settingsModel.SwitchOnCurrentValue, settingsModel.ToggleSwitch);
 		if (settingsModel.HasLongPress && longAllowed)
 			toggleOnOffState(settingsModel.ActionTypeLong, 'SwitchOnStateLong', 'SwitchOffStateLong', false);
@@ -377,6 +445,10 @@ function commonFormUpdate() {
 			toggleOnOffState(-1, 'SwitchOnStateLong', 'SwitchOffStateLong');
 
 		toggleConfigItem(longAllowed, 'HasLongPress');
+		if (!longAllowed) {
+			settingsModel.HasLongPress = false;
+			document.getElementById('HasLongPress').checked = false;
+		}
 		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
 		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 	}

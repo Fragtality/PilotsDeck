@@ -124,9 +124,9 @@ namespace PilotsDeck
             Logger.Log(LogLevel.Debug, "ConnectorFSXP3D:SubscribeAllAddresses", $"Subscribed all IPCValues. (Count: {ipcManager.AddressList.Count})");
         }
 
-        protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
+        protected bool UpdateLvar(string Address, string newValue)
         {
-            bool result = SimTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+            bool result = SimTools.WriteLvar(Address, newValue);
             if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
             {
                 ipcManager[Address].SetValue(newValue);
@@ -135,7 +135,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, bool ignoreLvarReset, string offValue = null, int ticks = 1)
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, int ticks = 1)
         {
             switch (actionType)
             {
@@ -144,7 +144,7 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return SimTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
-                    return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, false);
+                    return UpdateLvar(Address, newValue);
                 case ActionSwitchType.CONTROL:
                     return SimTools.SendControls(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.OFFSET:

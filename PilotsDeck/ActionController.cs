@@ -313,7 +313,7 @@ namespace PilotsDeck
                 {
                     ipcManager.Process();
                     if (!SimConnector.IsReady)
-                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Waiting ...");
+                        Logger.Log(LogLevel.Debug, "ActionController:Run", $"Waiting ...");
                     else
                     {
                         waitCounter = 0;
@@ -397,7 +397,7 @@ namespace PilotsDeck
                         }
                     }
 
-                    if (waitCounter == 0 && SimConnector.IsReady /*&& !SimConnector.IsPaused*/) //process possible
+                    if (waitCounter == 0 && SimConnector.IsReady) //process possible
                     {
                         //if (tickCounter % 5 == 0)
                         //    Log.Logger.Debug("Process()");

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace PilotsDeck
 {
@@ -37,20 +37,6 @@ namespace PilotsDeck
     {
         DUMMY
     };
-
-    //public class SimVar
-    //{
-    //    public UInt32 ID { get; set; }
-    //    public String Name { get; set; }
-    //    public float Data { get; set; }
-
-    //    public SimVar(uint iD, string name, float data = 0.0f)
-    //    {
-    //        ID = iD;
-    //        Name = name;
-    //        Data = data;
-    //    }
-    //}
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ClientDataValue

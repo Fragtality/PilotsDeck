@@ -10,6 +10,7 @@ var settingsModel = {
 	SwitchOffState: "",
 	AddressMonitor: "",
 	ToggleSwitch: false,
+	HoldSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
 	SwitchOnCurrentValue: false,

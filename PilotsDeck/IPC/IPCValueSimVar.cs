@@ -1,7 +1,6 @@
 ﻿using FSUIPC;
 using System;
 using System.Globalization;
-using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
 {
@@ -22,16 +21,10 @@ namespace PilotsDeck
         {
             try
             {
-                //double result = 0;
-
-                if (simType == SimulatorType.FSX || simType == SimulatorType.P3D || (simType == SimulatorType.MSFS && AppSettings.Fsuipc7LegacyLvars))
+                if ((simType == SimulatorType.FSX || simType == SimulatorType.P3D || (simType == SimulatorType.MSFS && AppSettings.Fsuipc7LegacyLvars))
+                    && FSUIPCConnection.IsOpen)
                     SetValue(FSUIPCConnection.ReadLVar(Address));
-                else if (simType == SimulatorType.MSFS && !AppSettings.Fsuipc7LegacyLvars && !AppSettings.preferrMobiWASM && WASM.LVars.Exists(Address))
-                    SetValue(WASM.LVars[Address].Value);
 
-                //isChanged = currentValue != result;
-                //if (isChanged)
-                //    currentValue = result;
                 isChanged = lastValue != DoubleValue;
                 lastValue = DoubleValue;
             }
@@ -43,7 +36,7 @@ namespace PilotsDeck
 
         protected override string Read()
         {
-            string num = Convert.ToString(DoubleValue, CultureInfo.InvariantCulture.NumberFormat);
+            string num = Convert.ToString((float)DoubleValue, CultureInfo.InvariantCulture.NumberFormat);
 
             int idxE = num.IndexOf("E");
             if (idxE < 0)

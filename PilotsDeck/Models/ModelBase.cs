@@ -16,15 +16,26 @@ namespace PilotsDeck
             if (!string.IsNullOrEmpty(a) && !string.IsNullOrEmpty(b) && (a.Contains('<') || a.Contains('>')))
             {
                 bool greater = a.Contains('>');
+                bool withEquality = a.Contains(">=") || a.Contains("<=");
                 a = a.Replace("=","").Replace("<","").Replace(">","");
 
                 float fa = ModelDisplayText.GetNumValue(a, 0.0f);
                 float fb = ModelDisplayText.GetNumValue(b, 0.0f);
-                
-                if (greater)
+
+                if (withEquality)
+                {
+                    if (greater)
                         return fb >= fa;
                     else
-                    return fb <= fa;
+                        return fb <= fa;
+                }
+                else
+                {
+                    if (greater)
+                        return fb > fa;
+                    else
+                        return fb < fa;
+                }
             }
             else if (!string.IsNullOrEmpty(a) && float.TryParse(a, NumberStyles.Number, new RealInvariantFormat(a), out _) && float.TryParse(b, NumberStyles.Number, new RealInvariantFormat(b), out _))
             {

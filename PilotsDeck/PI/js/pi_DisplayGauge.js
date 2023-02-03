@@ -15,6 +15,7 @@ var settingsModel = {
 	ActionType: 0,
 	SwitchOnCurrentValue: false,
 	ToggleSwitch: false,
+	HoldSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
 	SwitchOnState: "",

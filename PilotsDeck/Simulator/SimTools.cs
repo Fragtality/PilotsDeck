@@ -3,7 +3,6 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
-using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
 {
@@ -11,7 +10,7 @@ namespace PilotsDeck
     {
         public static bool VjoyToggle(ActionSwitchType type, string address)
         {
-            if (!IPCTools.IsVjoyToggle(address, (int)type))
+            if (!IPCTools.IsVjoyToggle(address, type))
                 return false;
 
             if (type == ActionSwitchType.VJOYDRV)
@@ -99,6 +98,8 @@ namespace PilotsDeck
                 {
                     if (!RunMacro(macroFile + ":" + tokens[i]))
                         fails++;
+                    else
+                        Thread.Sleep(25);
                 }
                 if (fails == 0)
                     result = true;
@@ -126,7 +127,7 @@ namespace PilotsDeck
             return true;
         }
 
-        public static bool WriteLvar(string address, string newValue, bool lvarReset, string offValue, bool useWASM)
+        public static bool WriteLvar(string address, string newValue)
         {
             bool result = false;
             if (newValue?.Length < 1)
@@ -134,67 +135,44 @@ namespace PilotsDeck
 
             double value = Convert.ToDouble(newValue, new RealInvariantFormat(newValue));
             address = address.Replace("L:", "");
-            result = WriteLvar(address, value, useWASM);
-
-            if (!result)
-                return result;
-
-            if (lvarReset && !string.IsNullOrEmpty(offValue))
-            {
-                Thread.Sleep(AppSettings.controlDelay * 2);
-                value = Convert.ToDouble(offValue, new RealInvariantFormat(offValue));
-                result = WriteLvar(address, value, useWASM);
-            }
+            result = WriteLvar(address, value);
 
             return result;
         }
 
-        public static bool WriteLvar(string address, double value, bool useWASM)
+        public static bool WriteLvar(string address, double value)
         {
             bool result = false;
             try
             {
-                if (useWASM)
-                {
-                    if (WASM.LVars.Exists(address))
-                    {
-                        WASM.LVars[address].SetValue(value);
-                        result = true;
-                    }
-                    else
-                        Logger.Log(LogLevel.Error, "SimTools:WriteLvar", $"LVar '{address}' does not exist! (WASM)");
-                }
-                else
-                {
-                    FSUIPCConnection.WriteLVar(address, value);
-                    result = true;
-                }
+                FSUIPCConnection.WriteLVar(address, value);
+                result = true;
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "SimTools:WriteLvar", $"Exception while writing LVar '{address}' via FSUIPC! (Value: '{value}') (WASM: {useWASM}) (Exception: {ex.GetType()})");
+                Logger.Log(LogLevel.Critical, "SimTools:WriteLvar", $"Exception while writing LVar '{address}' via FSUIPC! (Value: '{value}') (Exception: {ex.GetType()})");
             }
 
             return result;
         }
 
-        public static bool WriteSimVar(MobiSimConnect mobiConnect, string address, string onValue, bool lvarReset, string offValue)
+        public static bool WriteSimVar(MobiSimConnect mobiConnect, string address, string onValue)
         {
-            if (!double.TryParse(onValue, new RealInvariantFormat(onValue), out double dValue))
+            try
+            {
+                if (!double.TryParse(onValue, new RealInvariantFormat(onValue), out double dValue))
                 return false;
 
-            mobiConnect.SetSimVar(address, dValue);
-
-            if (lvarReset)
-            {
-                if (!double.TryParse(offValue, new RealInvariantFormat(offValue), out dValue))
-                    return false;
-
-                Thread.Sleep(AppSettings.controlDelay * 2);
                 mobiConnect.SetSimVar(address, dValue);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "SimTools:WriteSimVar", $"Exception while writing SimVar '{address}' via Mobi! (Value: '{onValue}') (Exception: {ex.GetType()})");
             }
 
-            return true;
+            return false;
         }
 
         public static bool SendControls(string address, bool useControlDelay)
@@ -319,7 +297,7 @@ namespace PilotsDeck
             return true;
         }
 
-        public static bool WriteHvar(string Address)
+        public static bool WriteHvar(MobiSimConnect connection, string Address, bool useDelay)
         {
             bool result = false;
             string[] hVars = Address.Split(':');
@@ -330,14 +308,15 @@ namespace PilotsDeck
                 {
                     if (var.Length > 1)
                     {
-                        result = WriteSingleHvar(var);
-                        Thread.Sleep(AppSettings.controlDelay);
+                        result = WriteSingleHvar(connection, var);
+                        if (useDelay)
+                            Thread.Sleep(AppSettings.controlDelay);
                     }
                 }
             }
             else if ((hVars.Length == 2 && hVars[0] == "H") || (hVars.Length == 1 && hVars[0].Length > 1))
             {
-                result = WriteSingleHvar(Address);
+                result = WriteSingleHvar(connection, Address);
             }
             else
             {
@@ -347,7 +326,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool WriteSingleHvar(string name)
+        public static bool WriteSingleHvar(MobiSimConnect connection, string name)
         {
             bool result = false;
 
@@ -356,7 +335,7 @@ namespace PilotsDeck
 
             try
             {
-                WASM.ExecuteCalculatorCode($"(>{name})");
+                connection.ExecuteCode($"(>{name})");
                 result = true;
             }
             catch (Exception ex)
@@ -367,7 +346,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public static bool RunCalculatorCode(string code, int ticks = 1)
+        public static bool RunCalculatorCode(MobiSimConnect connection, string code, int ticks = 1)
         {
             bool result = false;
 
@@ -378,7 +357,7 @@ namespace PilotsDeck
             {
                 if (!string.IsNullOrEmpty(code))
                 {
-                    WASM.ExecuteCalculatorCode(code);
+                    connection.ExecuteCode(code);
                     result = true;
                 }
             }
@@ -399,7 +378,7 @@ namespace PilotsDeck
             if (parts[0].Length == 1 && parts[0] == "K")
                 code = BuildEventCode(parts, ticks);
             else
-                code = BuildLvarCode(parts, ticks);
+                code = BuildLvarCode(template, ticks);
 
             
 
@@ -420,14 +399,16 @@ namespace PilotsDeck
 
             if (!string.IsNullOrWhiteSpace(cmd))
                 for (int i = 0; i < ticks; i++)
-                    code += " " + cmd;
+                    code += (i > 0 ? " " : "") + cmd;
 
             return code;
         }
 
-        public static string BuildLvarCode(string[] parts, int ticks)
+        public static string BuildLvarCode(string template, int ticks)
         {
             string code = "";
+            template = template.Replace("$L:", "$");
+            string[] parts = template.Split(':');
 
             if (parts.Length < 2)
                 return code;
@@ -445,17 +426,21 @@ namespace PilotsDeck
                 if (!lvar.StartsWith("L:"))
                     lvar = "L:" + lvar;
                 string op = increase ? "+" : "-";
-                string step = string.Format(CultureInfo.InvariantCulture, "{0:G}", numStep * (double)ticks);
+                numStep *= (double)ticks;
+                string step = string.Format(CultureInfo.InvariantCulture, "{0:G}", numStep);
                 if (step.Contains(','))
                     step = step.Replace(',', '.');
 
-                code = $"({lvar}) {step} {op} ({lvar}) {step} {op} (>{lvar})";
+                code = $"({lvar}) {step} {op} (>{lvar})";
 
                 if (parts.Length == 3 && double.TryParse(parts[2], NumberStyles.Number, new RealInvariantFormat(parts[2]), out _))
                 {
-                    string limit = increase ? "<" : ">";
-                    code = $"({lvar}) {parts[2]} {limit} if{{ {code} }}";
-                }
+                    if (parts[2].Contains(','))
+                        parts[2] = parts[2].Replace(',', '.');
+
+                    string cmp = increase ? "<=" : ">=";
+                    code = $"({lvar}) {step} {op} {parts[2]} {cmp} if{{ {code} }}";
+                }                    
             }
 
             return code;

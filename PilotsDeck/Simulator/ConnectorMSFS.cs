@@ -1,6 +1,5 @@
 ﻿using FSUIPC;
 using System;
-using WASM = FSUIPC.MSFSVariableServices;
 
 namespace PilotsDeck
 {
@@ -14,9 +13,8 @@ namespace PilotsDeck
         private IPCValueOffset isPausedValue;
         private IPCValueOffset pauseIndValue;
         private IPCValueOffset camReadyValue;
-        private bool wasmReloaded = false;
 
-        public override bool IsConnected { get { return FSUIPCConnection.IsOpen && WASM.IsRunning && mobiConnect.IsConnected; } protected set { } }
+        public override bool IsConnected { get { return FSUIPCConnection.IsOpen && mobiConnect.IsConnected; } protected set { } }
         public virtual bool IsCamReady()
         {
             bool result = false;
@@ -36,8 +34,6 @@ namespace PilotsDeck
         protected IPCValueOffset AircraftValue = null;
         public override string AicraftString { get { return AircraftValue == null ? "" : AircraftValue.Value; } protected set { } }
 
-        protected bool isWASMReady = false;
-        protected int ticks = 0;
         protected MobiSimConnect mobiConnect = null;
         protected bool mobiConnectRequested = false;
 
@@ -52,53 +48,19 @@ namespace PilotsDeck
                 Logger.Log(LogLevel.Information, "ConnectorMSFS:Close", $"FSUIPC Closed.");
             else
                 Logger.Log(LogLevel.Error, "ConnectorMSFS:Close", $"Failed to close FSUIPC!");
-
-            WASM.OnLogEntryReceived -= OnVariableServiceLogEvent;
-            WASM.OnVariableListChanged -= OnVariableServiceListChanged;
-            WASM.Stop();
-            if (!WASM.IsRunning)
-                Logger.Log(LogLevel.Information, "ConnectorMSFS:Close", $"WASM stopped.");
-            else
-                Logger.Log(LogLevel.Warning, "ConnectorMSFS:Close", $"WASM still running!");
-
-            isWASMReady = false;
-        }
-
-        protected virtual void OnVariableServiceLogEvent(object sender, LogEventArgs e)
-        {
-            Logger.Log(LogLevel.Debug, "ConnectorMSFS:WASMLOG", e.LogEntry);
-        }
-
-        protected virtual void OnVariableServiceListChanged(object sender, EventArgs e)
-        {
-            isWASMReady = true;
-            Logger.Log(LogLevel.Information, "ConnectorMSFS:OnVariableServiceListChanged", $"VarListChanged Event received!");
         }
 
         public override bool Connect()
         {
             try
             {
-                ticks = 0;
                 FSUIPCConnection.Open();
 
                 if (FSUIPCConnection.IsOpen)
                 {
-                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"FSUIPC Connected. Starting WASM ...");
+                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"FSUIPC Connected.");
                     foreach (var addr in ipcManager.AddressList)
                         ipcManager[addr].Connect();
-                }
-
-                WASM.OnLogEntryReceived += OnVariableServiceLogEvent;
-                WASM.OnVariableListChanged += OnVariableServiceListChanged;
-                WASM.Init();
-                WASM.LVARUpdateFrequency = 0;
-                WASM.LogLevel = LOGLEVEL.LOG_LEVEL_INFO;
-
-                WASM.Start();
-                if (WASM.IsRunning)
-                {
-                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"WASM running.");
                 }
 
                 mobiConnectRequested = mobiConnect.Connect();
@@ -136,7 +98,6 @@ namespace PilotsDeck
             resultProcess = false;
             try
             {
-                ticks += 10;
                 if (!firstProcessSuccess || !lastStateProcess)
                 {
                     isPausedValue.Connect();
@@ -160,31 +121,6 @@ namespace PilotsDeck
                 else
                     Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnect not ready!");
 
-                if (!isWASMReady)
-                {
-                    if (!WASM.IsRunning)
-                    {
-                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"WASM not not Running!");
-                        resultProcess = false;
-                    }
-                    else if (WASM.LVarsChanged.Count > 0 && WASM.LVars.Count > 0 && ticks > AppSettings.waitTicks)
-                    {
-                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"WASM not ready, but Lvars changed. Set to ready!");
-                        isWASMReady = true;
-                        resultProcess = true;
-                    }
-                    else
-                    {
-                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"WASM not ready! (Changed: {WASM.LVarsChanged.Count}) (Variables: {WASM.LVars.Count}) (Ticks: {ticks})");
-                        resultProcess = false;
-                    }
-                }
-                else if (IsReady && !wasmReloaded)
-                {
-                    wasmReloaded = true;
-                    WASM.Reload();
-                }
-
                 resultProcess = true;
             }
             catch (Exception ex)
@@ -198,7 +134,7 @@ namespace PilotsDeck
 
         public override void SubscribeAddress(string address)
         {
-            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars && AppSettings.preferrMobiWASM) || IPCTools.rxAvar.IsMatch(address))
+            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address))
             {
                 mobiConnect.SubscribeAddress(address);
             }
@@ -206,7 +142,7 @@ namespace PilotsDeck
 
         public override void UnsubscribeAddress(string address)
         {
-            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars && AppSettings.preferrMobiWASM) || IPCTools.rxAvar.IsMatch(address))
+            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address))
             {
                 mobiConnect.UnsubscribeAddress(address);
             }
@@ -227,20 +163,20 @@ namespace PilotsDeck
             mobiConnect.SubscribeAllAddresses();
         }
 
-        protected bool UpdateLvar(string Address, string newValue, bool lvarReset, string offValue, bool useWASM)
+        protected bool UpdateLvar(string Address, string newValue)
         {
             bool result;
 
-            if (IPCTools.rxLvar.IsMatch(Address) && (!AppSettings.preferrMobiWASM || AppSettings.Fsuipc7LegacyLvars))
+            if (IPCTools.rxLvar.IsMatch(Address) && AppSettings.Fsuipc7LegacyLvars)
             {
-                result = SimTools.WriteLvar(Address, newValue, lvarReset, offValue, useWASM);
+                result = SimTools.WriteLvar(Address, newValue);
             }
             else
             {
-                result = SimTools.WriteSimVar(mobiConnect, Address, newValue, lvarReset, offValue);
+                result = SimTools.WriteSimVar(mobiConnect, Address, newValue);
             }
 
-            if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null && !lvarReset)
+            if (result && !string.IsNullOrEmpty(newValue) && newValue[0] != '$' && ipcManager[Address] != null)
             {
                 ipcManager[Address].SetValue(newValue);
             }
@@ -248,7 +184,7 @@ namespace PilotsDeck
             return result;
         }
 
-        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, bool ignoreLvarReset, string offValue = null, int ticks = 1)
+        public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, int ticks = 1)
         {
             switch (actionType)
             {
@@ -257,17 +193,17 @@ namespace PilotsDeck
                 case ActionSwitchType.SCRIPT:
                     return SimTools.RunScript(Address);
                 case ActionSwitchType.LVAR:
-                    return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
+                    return UpdateLvar(Address, newValue);
                 case ActionSwitchType.AVAR:
-                    return UpdateLvar(Address, newValue, !ignoreLvarReset && switchSettings.UseLvarReset, offValue, !AppSettings.Fsuipc7LegacyLvars);
+                    return UpdateLvar(Address, newValue);
                 case ActionSwitchType.HVAR:
-                    return SimTools.WriteHvar(Address);
+                    return SimTools.WriteHvar(mobiConnect, Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.CONTROL:
                     return SimTools.SendControls(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.OFFSET:
                     return SimTools.WriteOffset(Address, newValue);
                 case ActionSwitchType.CALCULATOR:
-                    return SimTools.RunCalculatorCode(Address, ticks);
+                    return SimTools.RunCalculatorCode(mobiConnect, Address, ticks);
                 default:
                     Logger.Log(LogLevel.Error, "ConnectorMSFS:RunAction", $"Action-Type '{actionType}' not valid for Address '{Address}'!");
                     return false;

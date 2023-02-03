@@ -13,6 +13,7 @@ var settingsModel = {
 	SwitchOffState: "",
 	SwitchOnCurrentValue: false,
 	ToggleSwitch: false,
+	HoldSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
 	HasLongPress: false,

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Globalization;
+﻿using Microsoft.FlightSimulator.SimConnect;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Microsoft.FlightSimulator.SimConnect;
 
 namespace PilotsDeck
 {
@@ -110,7 +110,7 @@ namespace PilotsDeck
                     if (isSimConnected && !isMobiConnected && ticks % (ulong)repeat == 0)
                     {
                         Logger.Log(LogLevel.Debug, "MobiSimConnect:SimConnect_ReceiveThread", $"Sending Ping to MobiFlight WASM Module.");
-                        SendMobiWasmCmd("Do nothing");
+                        SendMobiWasmCmd("MF.DummyCmd");
                         SendMobiWasmCmd("MF.Ping");
                     }
                 }
@@ -194,6 +194,7 @@ namespace PilotsDeck
                         CreateDataAreaClientChannel();
                         isMobiConnected = true;
                         SendClientWasmCmd("MF.SimVars.Clear");
+                        SendClientWasmCmd("MF.Config.MAX_VARS_PER_FRAME.Set.30");
                         Logger.Log(LogLevel.Information, "MobiSimConnect:SimConnect_OnClientData", $"MobiFlight WASM Client Connection opened.");
                     }
                 }
@@ -204,6 +205,7 @@ namespace PilotsDeck
                     {
                         if (ipcValue != null)
                         {
+                            //Logger.Log(LogLevel.Debug, "MobiSimConnect:SimConnect_OnClientData", $"ID: {data.dwRequestID} | Value: {simData.data}");
                             ipcValue.SetValue(simData.data);
                         }
                         else
@@ -273,6 +275,11 @@ namespace PilotsDeck
             SendWasmCmd(PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_CMD, (MOBIFLIGHT_CLIENT_DATA_ID)0, command);
         }
 
+        private void SendClientWasmDummyCmd()
+        {
+            SendWasmCmd(PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_CMD, (MOBIFLIGHT_CLIENT_DATA_ID)0, "MF.DummyCmd");
+        }
+
         private void SendMobiWasmCmd(string command)
         {
             SendWasmCmd(MOBIFLIGHT_CLIENT_DATA_ID.MOBIFLIGHT_CMD, (MOBIFLIGHT_CLIENT_DATA_ID)0, command);
@@ -336,7 +343,7 @@ namespace PilotsDeck
         {
             foreach (var address in ipcManager.AddressList)
             {
-                if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars && AppSettings.preferrMobiWASM) || IPCTools.rxAvar.IsMatch(address))
+                if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address))
                 {
                     SubscribeAddress(address);
                 }
@@ -459,6 +466,13 @@ namespace PilotsDeck
             address = address.Insert(1, ">");
             address = $"{string.Format(CultureInfo.InvariantCulture, "{0:G}", value)} {address}";
             SendClientWasmCmd($"MF.SimVars.Set.{address}");
+            SendClientWasmDummyCmd();
+        }
+
+        public void ExecuteCode(string code)
+        {
+            SendClientWasmCmd($"MF.SimVars.Set.{code}");
+            SendClientWasmDummyCmd();
         }
     }
 }

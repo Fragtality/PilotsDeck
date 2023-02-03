@@ -16,6 +16,7 @@ namespace Installer
             InitializeComponent();
 
             descLabel.Text = "This Tool will install the PilotsDeck StreamDeck Plugin on your System.\r\nYour StreamDeck Software will be stopped during the Installation-Process.\r\nAdded/Changed Profiles and added Images will stay intact.";
+            Title += $" ({Parameters.pilotsDeckVersion})";
         }
 
         private InstallerActionControl AddActionControl(string text = null, ActionIcon icon = ActionIcon.None)
@@ -129,29 +130,28 @@ namespace Installer
                 };
                 if (InstallerFunctions.CheckFSUIPC())
                 {
-                    if (InstallerFunctions.CheckPackageVersion(packagePath, Parameters.wasmIpcName, Parameters.wasmIpcVersion))
+                    if (InstallerFunctions.CheckPackageVersion(packagePath, Parameters.wasmMobiName, Parameters.wasmMobiVersion))
+                    {
+                        if (!InstallerFunctions.CheckPackageVersion(packagePath, Parameters.wasmIpcName, Parameters.wasmIpcVersion))
+                        {
+                            control.SetImage(ActionIcon.Notice);
+                            control.Message.Text = $"The installed WASM Module from FSUIPC does not match the Minimum Version {Parameters.wasmIpcVersion}! It is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.";
+                            control.Message.Inlines.Add(link);
+                        }
+                        else
+                        {
+                            control.SetImage(ActionIcon.OK);
+                            control.Message.Text = "All MSFS Requirements met!";
+                        }
+                    }
+                    else
                     {
                         link = new Hyperlink(new Run("\r\nMobiFlight"))
                         {
                             NavigateUri = new Uri("https://github.com/MobiFlight/MobiFlight-WASM-Module/releases")
                         };
-                        if (InstallerFunctions.CheckPackageVersion(packagePath, Parameters.wasmMobiName, Parameters.wasmMobiVersion))
-                        {
-                            control.SetImage(ActionIcon.OK);
-                            control.Message.Text = "All MSFS Requirements met!";
-                        }
-                        else
-                        {
-                            control.SetImage(ActionIcon.Error);
-                            control.Message.Text = $"The installed WASM Module from MobiFlight does not match the Minimum Version {Parameters.wasmMobiVersion}! Please install / update it.";
-                            control.Message.Inlines.Add(link);
-                            return false;
-                        }
-                    }
-                    else
-                    {
                         control.SetImage(ActionIcon.Error);
-                        control.Message.Text = $"The installed WASM Module from FSUIPC does not match the Minimum Version {Parameters.wasmIpcVersion}! Please try to update it manually.";
+                        control.Message.Text = $"The installed WASM Module from MobiFlight does not match the Minimum Version {Parameters.wasmMobiVersion}! Please install / update it.";
                         control.Message.Inlines.Add(link);
                         return false;
                     }

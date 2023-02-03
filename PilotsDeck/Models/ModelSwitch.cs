@@ -10,6 +10,7 @@
         string SwitchOnState { get; set; }
         string SwitchOffState { get; set; }
         bool ToggleSwitch { get; set; }
+        bool HoldSwitch { get; set; }
         bool SwitchOnCurrentValue { get; set; }
         bool UseControlDelay { get; set; }
         bool UseLvarReset { get; set; }
@@ -47,6 +48,7 @@
         public virtual string AddressActionOff { get; set; } = "";
         public virtual int ActionType { get; set; } = (int)ActionSwitchType.MACRO;
         public virtual bool ToggleSwitch { get; set; } = false;
+        public virtual bool HoldSwitch { get; set; } = false;
         public virtual bool UseControlDelay { get; set; } = false;
         public virtual bool UseLvarReset { get; set; } = false;
         public virtual string SwitchOnState { get; set; } = "";

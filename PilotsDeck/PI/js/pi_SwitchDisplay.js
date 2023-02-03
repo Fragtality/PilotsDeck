@@ -14,6 +14,7 @@ var settingsModel = {
 	SwitchOffState: "",
 	AddressMonitor: "",
 	ToggleSwitch: false,
+	HoldSwitch: false,
 	UseControlDelay: false,
 	UseLvarReset: false,
 	SwitchOnCurrentValue: true,
@@ -35,7 +36,7 @@ var imageSelectBoxes = ["OnImage", "OffImage", "DefaultImage", "ErrorImage", "In
 
 function updateForm() {
 	//SwitchOnCurrent
-	if ((settingsModel.ActionType != 3 && settingsModel.ActionType != 4 && settingsModel.ActionType != 11) || settingsModel.UseImageMapping) {
+	if ((settingsModel.ActionType != 3 && settingsModel.ActionType != 4 && settingsModel.ActionType != 11 && settingsModel.ActionType != 12) || settingsModel.UseImageMapping) {
 		settingsModel.SwitchOnCurrentValue = false;
 		document.getElementById('SwitchOnCurrentValue').checked = false;
 		toggleConfigItem(false, 'SwitchOnCurrentValue');
