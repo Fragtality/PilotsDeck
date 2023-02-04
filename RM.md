@@ -163,8 +163,10 @@ But for optimal Visual Results it is recommended to provide an Image in specific
 - The "Standard" Size of 72x72 Pixel, for Example called `myImage.png` - it will be used for the Mini, SD and Mobile.
 - The "HQ" Size of 144x144 Pixel with a `@2x` Suffix: `myImage@2x.png` - it will be used for XL, Plus Keypads.
 - The "Plus" Size of 200x100Pixel with a `@3x` Suffix: `myImage@3x.png` - it will be used for the Plus Encoders (Touch-Display). Make the Background transparent if possible/applicable.
-- The Image will be selectable as `myImage`
-
+- The Image will be selectable as `myImage` - the other Size-Variants are not visible in the UI.
+- So if add a "HQ" or "Plus" Image, you need to also add a File without Suffix!
+- 
+It is only really needed if you have multiple StreamDecks. For Example, if you have only have a XL and all your Icons are already 144px: just throw them in!
 
 You can also add new Images for the "Sub-Images" selectable in the **Korry Button** Action. These are stored in the `\korry` Sub-Folder of the above mentioned Path. These use the following Sizes (also PNG Format, preferrably with transparent Background):
 - The "Standard" Size is 54x20 Pixel with no Suffix.
@@ -176,8 +178,61 @@ Note that the Images itself are not stored in the StreamDeck Profile: if you wan
 
 <br/><br/>
 
-### 2.2.1 - Defining Commands & Variables
-One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So wether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address. A Variable only by the Address.
+### 2.2 - Defining Commands & Variables
+One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So wether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable only by the Address.<br/>
+Every Type needs a specific **Address Syntax** to be used since some Command/Variable require extra Parameters and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/>
+The Property Inspector UI has a Syntax-Check build in for every Type except for Calculator: When the Syntax is correct, you see a little :white_check_mark:
+
 <br/>
+
+#### 2.2.1 - Address Syntax
+
+| **MACRO** | Command | MSFS, P3D, FSX | `File:Macro(:Macro)*` |
+| --- | --- | --- | --- |
+- *File*: The Filename without Extension of the FSUIPC Macro-File.
+- *Macro*: One or more Macros from that File to be executed in sequence.
+
+*Examples*:
+- `QW787_MAIN:QW_ENG1_START` - Run Macro *QW_ENG1_START* from Macro-File *QW787_MAIN.MCRO*.
+- `FSLA3XX_MAIN:ACPACK1:ACPACK2` - Run Macro *ACPACK1* from Macro-File *FSLA3XX_MAIN.MCRO* and then *ACPACK2* from the same File
+
+*Background*: Macro Files are a rather "rudimentary and legacy" Way to Script Actions in FSUIPC. In my Profiles I only use them in Prepar3D for "Mouse-Macros" which are able to Click Controls that can only be triggered with the Mouse (Mouse-Macros are not supported on MSFS). So if you don't know and have Macros, your Time is better invested to look at Lua or RPN :wink:<br/>
+If you want to learn more about Macros, look at the "*FSUIPC7 for Advanced Users*" Document in your *My Documents\FSUIPC7* Folder!
+<br/><br/><br/>
+
+| **SCRIPT** | Command | MSFS, P3D, FSX | `(Lua\|LuaToggle\|LuaSet\|LuaClear\|LuaValue):File(:Flag)*` |
+| --- | --- | --- | --- |
+
+- *Lua...*: The different Lua Controls defined by FSUIPC, you need to define exactly one.
+- *File*: The Filename without Extension of the Lua-File known (!) to FSUIPC.
+- *Flag*: Zero or more optional numeric Parameters to pass to the Lua-Script in sequence (for Toggle, Set, Clear or Value)
+
+*Examples*:
+- `Lua:Baro_Toggle` - Run Lua-Script *Baro_Toggle.lua*
+- `LuaToggle:FNX320_AUTO:12` - Toggle Flag *12* for Script *FNX320_AUTO.lua*
+- `LuaValue:Pilotsdeck_FSL:271:1` - Send Value *271* to Script *Pilotsdeck_FSL.lua* and then send Value *1* to the same Script
+
+*Background*: The ability to run Lua Files is a Core-Feature of FSUIPC (at least for me!). Lua-Code is easier to write, understand and are more flexible than Things like Marcos or RPN for Calculator-Code. It greatly extends the Things you're able to do when pressing a Button on the StreamDeck - like automating GSX Calls or setting up your Aircraft from Cold & Dark for Example.<br/>
+It also extends the Things you are able to read: you can run a Script in the Background which writes Values to the FSUIPC Custom Offset Range - for Example the combined State of both Landing Lights or the Contents of the Barometer Display. The Plugin can then read and display this Offset - with the Value which you generated/calculated in Lua.<br/>
+If you want to learn more about Lua-Scripts, look at the "*FSUIPC Lua Plug-Ins*" and "*FSUIPC Lua Library*" Documents in your *My Documents\FSUIPC7* Folder (or \FSUIP6 for P3D)! Look at the Scripts that come with my Integrations or from other Users to understand how Lua can be used for different Things. Look at the *event.flag* and *event.param* Functions to understand how to use the LuaToggle and LuaValue Lua-Controls.<br/>
+
+*Note for X-Plane Users*: You can achieve the same (and sometimes more) with the FlyWithLua Plugin for X-Plane! The Lua-Scripts there can define "Custom Commands" and "Custom DataRefs" which then can be used from the Plugin like any other X-Plane Command or DataRef.
+<br/><br/><br/>
+
+| **CONTROL** | Command | MSFS, P3D, FSX | `Control=Parameter(:Parameter)*(:Control=Parameter(:Parameter)*)*` |
+| --- | --- | --- | --- |
+- *Control*: The numerical ID of the Control (aka Event-ID).
+- *Parameter*: Zero or more optional Parameters for that Control.
+
+*Examples*:
+- `66168:65567` - Send Control *66168* and then send Control *65567*
+- `66587=72476:72478` - Send Control *66587* with Parameter *72476* and then Control *66587* with Parameter *72478*
+- `67195=3:67191=3:4` - Send Control *67195* with Parameter *3* and then Send Control *67191* with Parameter *3* and after that with Parameter *4*
+
+
+*Background*: In Essence, these Control-Codes are the numerical ID of the standard SimEvents documented in the MSFS/P3D/FSX SDK. You can find their numerical Values in the "*Controls List...*" Text-File in your *My Documents\FSUIPC7* Folder (or \FSUIP6 for P3D)!<br/>
+It is often used for Planes which are controlled via *Rotorbrake-Codes* like FSLabs: you need to send specific Parameters to the standard Rotor-Brake Control (hence the Name) to trigger a Cockpit-Control. Like in the second Example: That is how a LeftClick & Release is done on the Beacon-Switch (on FSL).<br/>
+Note that these are the same as "K-Vars" or "K-Events" - So you can achieve the same with using Calculator-Code and the textual ID of that Event! It's two different Sides of the same Coin :wink:
+<br/><br/><br/>
 
 <br/><br/>
