@@ -99,3 +99,35 @@ If you want to install it manually (not recommened), just put the Contents of th
 When Updating manually, delete all Binaries/Libraries in the Plugin's Folder before unzipping.<br/>
 If you don't know what that means, what to do and what Software Versions you have installed: Use the Installer!!! 😅<br/>
 (Number 2 & 3 Reasons the Plugin is not working: Missing/outdated Requirements and wrong Location)
+
+<br/><br/><br/>
+## 2 - Action Configuration
+Since the Plugin is very flexible, there is a "little" Learning Curve 😳 In this Chapter you'll find:
+- The Options and Behavior common to all Actions.
+- How Commands & Variables are defined and configured.
+- How each Plugin Action can be configured and customized.
+
+<br/>
+
+### 2.1 - Common Syntax, Options and Behavior
+#### Common Syntax
+If a Field requires multiple numeric Values - like Sizes, Positions and Ranges - the Values must be separated by a semicolon. For Example: `0; 10` or `9; 14; 54; 20`<br/><br/>
+Mostly all Fields which accept numeric Values understand Float-Values also with either Decimal-Character independent of your System Locale (so `0,5` and `0.5` is the same for the Plugin). All Float-Values rendered by the Plugin will use a Decimal-Point **`.`** though!<br/><br/>
+If a Field/Syntax requires multiple Parameters, the Parameters are separated by colon **`:`**.<br/><br/>
+If a Field/Syntax requires a Mapping or Assignment it is defined by an equal-Sign **`=`**. Some allow even simple Value-Comparisons like **`<=`**, **`>=`**, **`<`** or **`>`**.
+- A single Comparison like **`>=5`** will be interpreted as "*if* the current Value is >= 5, *then* use/trigger this Option". Equality is automatically tested if just a Number is present (do not add the Equal-Sign for that).
+- A Comparison in a Mapping can only be with Equality (`<=` or `>=`) and a Comparison like **`5>=X`** will be interpreted as "*if* 5 is >= the current Value, *then* use/display X".
+
+<br/>
+
+#### Common Options
+
+<br/>
+
+#### Common Behavior
+
+<br/>
+
+#### Addresses
+One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So wether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is configured with its Type and Address. A Variable only by the Address. See under INSERTLINK for a detailed Description.
+<br/>
