@@ -5,12 +5,12 @@ Directly check & control the FlightSim from your StreamDeck!
 ## 1 - Introduction
 PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially reading & **displaying a Control's State** on the StreamDeck as Text, Image, Bar or Arc. It is lean & mean, flexible, completely Open-Source and Free-to-Use. It does not do any fancy Stuff like a PFD - it does exactly what is needed to support smooth Flight Operations 😎<br/>
 
-StreamDeck-wise it behaves like any other StreamDeck Plugin: it runs alongside other Plugins and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of StreamDeck UI and saved in the StreamDeck Profile. You can create, export and share Profiles with the Plugin's Actions to share their Configuration.<br/>
+StreamDeck-wise it behaves like any other StreamDeck Plugin: it runs alongside other Plugins and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI and saved in the StreamDeck Profile. You can create, export and share Profiles with the Plugin's Actions to share their Configuration.<br/>
 The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, **XL**, **Mobile** and **Plus**. Other Models might work, but an indented Support for Non-Display Models is not planned. The Plugin runs only on **Windows**. There no Plans for Linux or macOS Support (the first is not supported by StreamDeck at all, both do not run or support all Sims and some essential .NET Libraries are only available on Windows).<br/>
 
-Simulator-wise it supports all major Platforms on Windows - **MSFS2020**, **X-Plane 12/11** and **P3D/FSX**. For MS Platforms it connects through **FSUIPC** to the Simulator, for X-Plane it connects directly via **UDP** Sockets. All Variables and Commands these Connections allow are usable with the Plugin. You can can directly connect to another Sim without reconfiguring anything (but you can't run multiple Simulators in parallel).<br/>
+Simulator-wise it supports all major Platforms on Windows - **MS Flight Simulator**, **X-Plane** and **Prepar3D**. For MS Platforms it connects through **FSUIPC** to the Simulator, for X-Plane it connects directly via **UDP** Sockets. All Variables and Commands these Connections allow are usable with the Plugin. You can can directly connect to another Sim without reconfiguring anything (but you can't run multiple Simulators in parallel).<br/>
 Not all Variables and Commands require a registered Version of FSUIPC, but a registered (bought) Copy of FSUIPC is recommended to use the full Potential. If you only fly in X-Plane, FSUIPC is not needed at all.<br/>
-It is designed for **advanced Sim-Users** which "know how to do Stuff": it does not make any unnecessary complicated Stuff, but doesn't have Features allowing to do anything without knowing anything 😅 If you know how to read Control-States for your Plane and how to trigger these Controls, you can quickly define an Action for that on the StreamDeck. If you're eager to read & learn, you'll be fine! 😉<br/>
+It is designed for **advanced Sim-Users** which "know how to do Stuff": it does not make any unnecessary complicated Stuff, but doesn't have Features allowing to do anything without knowing anything 😅 If you know how to read Control-States for your Plane and how to trigger these Controls, you can quickly define an Action for that on the StreamDeck. If you don't: be eager to read & learn and you'll be fine! 😉<br/>
 
 Predefined StreamDeck Profiles are available under [Integrations](Integrations/), but there are not much. Either your Plane is among these for direct Use or they can at least serve as Example:<br/>
 <img src="img/ExampleLayout01.jpg" width="420"><br/>
@@ -56,7 +56,7 @@ How Commands and Variables are configured and the different Options how they can
 
 \* = MSFS does not support Mouse-Macros<br/>
 :grey_exclamation: Please mind that the Command Types Script, Macro, Lvar and vJoy can only work with a **registered** Version of FSUIPC!<br/>
-:grey_exclamation: Both **vJoy** Command Types are independent of each other and are two different Things! "VJOY" can only be assigned in FSUIPC (and not in the Simulator). The "VJOYDRV" can be assigned by anything which understands a Joystick Button (Simulator, FSUIPC, Addons, ...).
+:grey_exclamation: Both **vJoy** Command Types are independent of each other and are two different Things! "VJOY" can only be assigned within FSUIPC (and not in the Simulator). The "VJOYDRV" can be assigned by anything which understands a Joystick Button (Simulator, FSUIPC, Addons, ...).
 <br/><br/>
 
 ### 1.3 - Available StreamDeck Actions
@@ -140,7 +140,7 @@ If a Field/Syntax requires a Mapping or Assignment it is defined by an equal-Sig
 
 The Order in which these Options are applied: DecodeBCD -> Scale -> Round -> Format. If the Value is to be matched or mapped, it is done after Round and before Format.<br/>
 
-**Inherit Font**: Actions which render Text will default to inherit the Font Settings configured in the Title Settings. When disabled, you can specify the Font, Size, Color and Style separately! Note that the Plugin can use all Fonts installed on your System, so it offers way more Choices then the default Title Settings allow.<br/>
+**Inherit Font**: Actions which render Text will default to inherit the Font Settings configured in the Title Settings. When disabled, you can specify the Font, Size, Color and Style separately! Note that the Plugin can use **all Fonts** installed on your System, so it offers way more Choices then the default Title Settings allow.<br/>
 
 <br/>
 
