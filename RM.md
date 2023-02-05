@@ -37,7 +37,7 @@ Supported is understood as "technical and basically supported by the Connection 
 
 ### 1.2 - Supported Sim-Commands & -Variables
 Here a quick Overview of what you can send to the Simulator ("**Command**") or from what you can read Values from the Simulator ("**Variable**"). One of the Things which make the Plugin flexible: Variables can also be used as Commands. For Example to move a Cockpit-Control by writing a different Value to a Variable.<br/><br/>
-How Commands and Variables are configured and the different Options how they can be executed is described under INSERTLINK.<br/>
+How Commands and Variables are configured and the different Options how they can be executed is described under [Defining Commands & Variables](https://github.com/Fragtality/PilotsDeck/edit/master/RM.md#22---defining-commands--variables).<br/>
 
 | ID | Description | Command | Variable | Simulators               | 
 | :---: | :------------ | :---: | :---: | :-------------------- | 
@@ -180,7 +180,7 @@ Note that the Images itself are not stored in the StreamDeck Profile: if you wan
 
 ### 2.2 - Defining Commands & Variables
 One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable only by the Address.<br/>
-Every Type needs a specific [Address Syntax](#221---address-syntax) to be used since some Commands/Variables require extra Parameter and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/><br/>
+Every Type needs a specific [Address Syntax](#221---address-syntax) to be used in the **Command Address** Field. Some Commands/Variables require extra Parameter and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/><br/>
 The Property Inspector UI has a Syntax-Check build in for every Type except for Calculator: When the Syntax is correct, you see a little Check-Mark in the Input Field. Everything you enter will also checked more thourougly by the Plugin before it executes a Command (if possible/trackable).<br/>
 If a Command could not be executed by any Reason (invalid Syntax, Sim not connected) the Keypad will show an yellow Alert Sign briefly on the Display. On an Encoder the Touch-Display will shortly flash in red in that Case. (The standard StreamDeck Mechanic how Actions can show an Error/Warning)
 <br/><br/>
@@ -248,7 +248,7 @@ Note that these are the same as "K-Vars" or "Key-Events" - So you can achieve th
 - `I_OH_FUEL_CENTER_1_U` - Read from the L-Var *I_OH_FUEL_CENTER_1_U*.
 
 When used as **Command**, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable.<br/>
-In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under INSERTLINK for Details.<br/><br/>
+In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#222---command-options) for Details.<br/><br/>
 
 *Background*: Local Variables (sometimes "Local Gauge Variables") are created and updated by the Plane. There are no standard L-Vars which could be used on every Plane. There is also no communality if and which L-Vars a specific Plane has. For some Planes it is the official Way to Read and Trigger Cockpit-Controls (e.g. Fenix, QualityWings). For some it is only for Read (e.g. PMDG). For some they exist, but are not really supported or usable sometimes (e.g. FSLabs).<br/>
 But they are not only used by Planes. Some Addons like GSX also create and update L-Vars which can be used to interface with them! You can list all (up to 3066) currently used L-Vars in the **FSUIPC7 UI**.
@@ -270,7 +270,7 @@ But they are not only used by Planes. Some Addons like GSX also create and updat
 - `0x0D0C:2:b:1` - Read Bit *1* from the *2* Byte long Bitmask at Address *0D0C* (Nav Lights).
 
 Before you use an Offset as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable. Use only 1 or 0 for Bit-Offsets.<br/>
-In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under INSERTLINK for Details.<br/><br/>
+In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#222---command-options) for Details.<br/><br/>
 
 *Background*: These Offsets are the way how FSUIPC makes Simulator Variables (also known as A-Vars) accessible to outside Applications (like my Plugin for Example). FSUIPC sticks with that Concept for historical and compatibility Reasons. But not all Offsets are Simulator Variables: the Benefit of that System is that Applications can exchange Data through FSUIPC Offsets. For Example PMDG or Project Magenta use assigned Offset Ranges to share their Data. I use some of these Offset Ranges in my Integrations to exchange Data between Lua-Scripts and the Plugin.<br/>
 You can find the **full List** of available/official Offsets in the "*FSUIPC Offsets Status*" Document in your *My Documents\FSUIPC7* Folder (or \FSUIP6 for P3D)!<br/>
@@ -378,7 +378,7 @@ If you really want to go down the Rabbit Hole of using direct RPN-Code, start in
 - `FlyWithLua/TLS2PLD/fcuHdg:s8` - Reading a *String* of Length *8* from that Path.
 
 Before you use a DataRef as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable.<br/>
-In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under INSERTLINK for Details.<br/><br/>
+In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#222---command-options) for Details.<br/><br/>
 
 *Background*: Every Simulator Variable (called DataRef) in X-Plane - whether it is from the Simulator, Plane or other Addons - has an unique Path. DataRefs are Everthing and Everything is defined by DataRefs 😅<br/>
 You can lookup these Paths in the X-Plane SDK under [Datarefs](https://developer.x-plane.com/datarefs/). Or you can use the DataRefTool Plugin to explore all DataRefs (including Custom) currently known to the Simulator.
@@ -396,7 +396,7 @@ You can lookup these Paths in the X-Plane SDK under [Datarefs](https://developer
 - `(A:LIGHT POTENTIOMETER:13, percent over 100)` - Reading Index *13* of the A-Var *LIGHT POTENTIOMETER* as *Percent over 100* Value (0.0 - 1.0).
 
 Before you use an A-Var as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable. Use only 1 or 0 for Booleans.<br/>
-In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under INSERTLINK for Details.<br/><br/>
+In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#222---command-options) for Details.<br/><br/>
 
 *Background*: A-Var (or SimVars) are the standard Simulator Variables defined by Flight Simulator (2020 and Predecessors). There are no "custom" A-Vars. Default Planes normally only use A-Vars but complex and externally simulated Planes use/update only a Fraction of them. MSFS still sticks to the legacy System of many different and weird Units which have to be passed for Access to a Variable. You can look up these Units in the Flight Simulator SDK under [Simulation Variable Units](https://docs.flightsimulator.com/html/Programming_Tools/SimVars/Simulation_Variable_Units.htm).<br/>
 Since the Plugin can access all A-Vars, you can use Variables which are not exported as FSUIPC Offset without the Need of defining a myOffsets File for FSUIPC. Or even to completely circumvent FSUIPC Offsets at all if you prefer calling Things by their Name :wink:<br/>
@@ -404,6 +404,41 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 <br/><br/><br/>
 
 #### 2.2.2 - Command Options
+How the Commands you define can be executed by the Plugin in different Ways to adjust them for specific Use-Cases!<br/><br/>
 
+**On Value** / **Off Value**: This Fields are required for all Command & Variable Types. The Plugin will toggle between these two Values: when the current Value matches the Off Value, it will write the On Value. In every other Case the On Value will be written.<br/><br/>
+But the Plugin can also do simple **Value Manipulations** on the Variable to increase/decrease the Value or write a Sequence of Values. These Value Manipulations always start with a `$` Sign and need to be entered in the **On Value** Field (the Off Value Field is not used then).<br/>
+The Syntax for increasing/decreasing is `$Step(:Limit)`
+- `$1` - A simple Increment by *1*.
+- `$1:4` - Increment by *1* up to a Value of *4*.
+
+The Values in a Sequence are defined as `,` separated List. The Plugin will compare the current Value with the List - if the Value is matched, it will write the next Value from the List to the Variable. If there is no match, it will use the last Value in the List. One Value can optionally be defined as Default with a `=` in Front of it. A Sequence must contain at least two Values with an optional Default Value or exactly one Value defined as Default. All Values in the List must be unique with the Exception of the last one.<br/>
+A optional `<` at the End lets the Value "bounce off" - if the current Value is already the last one in the List, the previous Value is written.<br/>
+*Examples*
+- `$0,1,2<` - When the Control is in Position *0*, it will be moved to Position *1*. Then from *1* to *2*. When at *2*, it will go back to *1*. (e.g. for toggling Taxi Lights OFF>ON<>T.O.)
+- `$=4` - The Control is always moved to Postion *4*, regardless of the current Position. (e.g. for setting ND Mode to PLAN from any Position)
+- `$2,=3<` - The Control will toggle between Position *2* and *3*. If the Control is in any other Position it will default to *3*. (e.g. for toggling ND Mode between NAV<>ARC and go to ARC from any other Position)
+- `$0,1,2,3,1` - Moves the Control from Position *0* to *3*. When in Position *3* it starts over at Position *1*.
+
+<br/><br/>
+
+**Toggle Switch**: This Option is available for all Commands except Variables & both vJoys. It allows you to control/toggle a Switch with a second Command defined by the **Alternate Command Address** - for Example for Push/Pull or Left/Right. Both Commands need to be of the same Type. Which Command is used will be deciced by the Plugin based on the current Value of the Variable you define in the **Monitor Address** Field.<br/>
+When the current Value matches the configured **Off Value**, the Plugin will use the alternate Command. In every other case the normal Command will be used. You can specify a Comparison like `>5` which will be interpreted as "*if* the current Value is > 5, *then* use the alternate Command". The **On Value** Field is not used with this Option.<br/>
+Note that this Option is only available for the Command of the main Interaction - (short) Pressing the Keypad or Encoder.<br/>
+*Examples* when to use: Push/Pull Knobs like for Barometers or the Autopilot are a great Use-Case for that Option.
+<br/><br/><br/>
+
+
+**Hold Switch**: This Option is available for all Commands except both vJoys, because the Keypad or Encoder behaves like a (non-toggle) vJoy then! The Difference to a vJoy is: you can directly define which Command or Value is send in the StreamDeck UI. If it makes Sense for a specific Cockpit-Control: the Control needs to stay in Position (does not reset the Position itself) and needs to have two distinct Commands or Values for pressed and unpressed (click<>release, down<>up)!<br/>
+If you use it with a Command(-only) Type, you need to define an **Alternate Command Address**. The normal Command will be send on KeyDown and the alternate Command on KeyUp.<br/>
+If you use it with a Command & Variable Type, you need to define the **On Value** and the **Off Value**. Then On Value will be written on KeyDown and the Off Value on KeyUp. You can not use a Value Manipulation with that Option.<br/>
+Note that when Hold Switch is enabled, the Action can not have another Command for **Long Press**. It is also only available for the main Interaction.<br/>
+*Examples* when to use: Buttons you need to press & hold like Fire-Test or other Test Buttons are a great Use-Case for that Option.
+<br/><br/><br/>
+
+
+**Reset Switch**: This Option is only available for Command & Variable Types. When activated, the Plugin will write the **On Value** to the Variable and after 100ms (2 \* Control Delay) it will write the **Off Value** to the Variable. You can not use a Value Manipulation with that Option.<br/>
+*Examples* when to use: Buttons which do not reset their Position when being pressed (but should not stay pressed). Like the MCDU Keys of the Fenix Airbus for Example! Prefer a Reset Switch over an Hold Switch in such Cases (the Button just has to be pressed and unpressed shortly).
+<br/><br/><br/>
 
 <br/><br/><br/>
