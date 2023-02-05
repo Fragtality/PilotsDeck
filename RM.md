@@ -6,6 +6,7 @@ Directly check & control the FlightSim from your StreamDeck!
 PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially reading & **displaying a Control's State** on the StreamDeck as Text, Image, Bar or Arc. It is lean & mean, flexible, completely Open-Source and Free-to-Use. It does not do any fancy Stuff like a PFD - it does exactly what is needed to support smooth Flight Operations 😎<br/>
 
 StreamDeck-wise it behaves like any other StreamDeck Plugin: it runs alongside other Plugins and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI and saved in the StreamDeck Profile. You can create, export and share Profiles with the Plugin's Actions to share their Configuration.<br/>
+It can also switch StreamDeck Profiles based on the current Aircraft loaded (which is a bit tricky since not intended by the StreamDeck Software)<br/>
 The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, **XL**, **Mobile** and **Plus**. Other Models might work, but an indented Support for Non-Display Models is not planned. The Plugin runs only on **Windows**. There no Plans for Linux or macOS Support (the first is not supported by StreamDeck at all, both do not run or support all Sims and some essential .NET Libraries are only available on Windows).<br/>
 
 Simulator-wise it supports all major Platforms on Windows - **MS Flight Simulator**, **X-Plane** and **Prepar3D**. For MS Platforms it connects through **FSUIPC** to the Simulator, for X-Plane it connects directly via **UDP** Sockets. All Variables and Commands these Connections allow are usable with the Plugin. You can can directly connect to another Sim without reconfiguring anything (but you can't run multiple Simulators in parallel).<br/>
@@ -37,7 +38,7 @@ Supported is understood as "technical and basically supported by the Connection 
 
 ### 1.2 - Supported Sim-Commands & -Variables
 Here a quick Overview of what you can send to the Simulator ("**Command**") or from what you can read Values from the Simulator ("**Variable**"). One of the Things which make the Plugin flexible: Variables can also be used as Commands. For Example to move a Cockpit-Control by writing a different Value to a Variable.<br/><br/>
-How Commands and Variables are configured and the different Options how they can be executed is described under [Defining Commands & Variables](https://github.com/Fragtality/PilotsDeck/edit/master/RM.md#22---defining-commands--variables).<br/>
+How Commands and Variables are configured and the different Options how they can be executed is described under [2.2 - Defining Commands & Variables](#22---defining-commands--variables).<br/>
 
 | ID | Description | Command | Variable | Simulators               | 
 | :---: | :------------ | :---: | :---: | :-------------------- | 
@@ -63,7 +64,7 @@ How Commands and Variables are configured and the different Options how they can
 All Actions work on the **Keypads** (the normal/square StreamDeck Buttons). The Dial/Touchpad (aka **Encoder**) on the SD+ is only supported by some Actions (the ones which make the most Sense).<br/><br/>
 On Keypads you can assign **two** different Commands, based on how long you hold it: A **Short**/Normal and **Long** Press (>= 600ms). Only one of the available Actions can be put in StreamDeck Multi-Actions.<br/>
 On Encoders you can assign **five** different Commands for each Interaction: **Left** Turn, **Right** Turn, **Touch** Tap and a **Short** & **Long** Press on the Dial. The Actions can be put in StreamDeck Encoder-Stacks, but will then lose their Short/Long Press Function.<br/><br/>
-How these Actions can be configured and customized is described under INSERTLINK.<br/>
+How these Actions can be configured and customized is described under [2.3 - Customizing Actions](#23---customizing-actions).<br/>
 
 |  | Action Name | Keypad / Encoder | Description |
 | :---: | :-------------- | :---------: | :----------- |
@@ -104,9 +105,9 @@ If you don't know what that means, what to do and what Software Versions you hav
 <br/><br/><br/>
 ## 2 - Action Configuration
 Since the Plugin is very flexible, there is a "little" Learning Curve 😳 In this Chapter you'll find:
-- The Options and Behavior common to all Actions.
-- How Commands & Variables are defined and configured.
-- How each Plugin Action can be configured and customized.
+- The Options and Behavior [common](#21---common-syntax-options-and-behavior) to all Actions.
+- How [Commands & Variables](#22---defining-commands--variables) are defined and configured.
+- How each [individual Action](#23---customizing-actions) can be configured and customized.
 
 <br/>
 
@@ -124,9 +125,9 @@ If a Field/Syntax requires a Mapping or Assignment it is defined by an equal-Sig
 <br/>
 
 #### 2.1.2 - Common Options
-**Decode BCD**: If the Value is a binary coded decimal (BCD), the Plugin can decode it for you with that Checkbox!<br/>
+**Decode BCD**: If the Value is a binary coded decimal (BCD), the Plugin can decode it for you with that Checkbox!<br/><br/>
 
-**Scalar**: Multiply the Value by that Number to scale it, if it needs to be converted. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by "0.0625" (1/16) to have the right Value.<br/>
+**Scalar**: Multiply the Value by that Number to scale it, if it needs to be converted. Defaults to 1.<br/>One Example would be "Pressure QNH as millibars" - it is delivered as multiple of 16 (e.g. 1013 = 16208). So we would scale it by `0.0625` (1/16) to have the right Value.<br/><br/>
 
 **Format**: Add leading Zeros, Round the Value and/or add Text to it. Syntax: `Zeros.Fraction:Text %s Text`
   - *Zeros*: Leading Zeros will be added so that the Value has always the same number of integral Digits. Optional, but can only be specified together with *Fraction*.
@@ -138,9 +139,15 @@ If a Field/Syntax requires a Mapping or Assignment it is defined by an equal-Sig
     - `%s ft` Add "ft" after the Value, 300 will show as `300 ft`
     - `3.3`   The Value will have 3 Digits before and after the Decimal Point, a Value of 20.522534 will be displayed as `020.523`.
 
-The Order in which these Options are applied: DecodeBCD -> Scale -> Round -> Format. If the Value is to be matched or mapped, it is done after Round and before Format.<br/>
+The Order in which these Options are applied: DecodeBCD -> Scale -> Round -> Format. If the Value is to be matched or mapped, it is done after Round and before Format.<br/><br/>
 
-**Inherit Font**: Actions which render Text will default to inherit the Font Settings configured in the Title Settings. When disabled, you can specify the Font, Size, Color and Style separately! Note that the Plugin can use **all Fonts** installed on your System, so it offers way more Choices then the default Title Settings allow.<br/>
+**Font Settings**: Actions which render Text will default to inherit the Font Settings configured in the Title Settings. When the **Inherit Font** Checkbox is disabled, you can specify the **Font**, **Size**, **Color** and **Style** separately! Note that the Plugin can use **all Fonts** installed on your System, so it offers way more Choices then the default Title Settings allow.<br/><br/>
+
+**Background**:
+<br/><br/>
+
+**Tweak Position(s)**:
+<br/><br/>
 
 <br/>
 
@@ -179,10 +186,13 @@ Note that the Images itself are not stored in the StreamDeck Profile: if you wan
 <br/><br/>
 
 ### 2.2 - Defining Commands & Variables
-One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable only by the Address.<br/>
+One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable for reading only by the Address.<br/>
 Every Type needs a specific [Address Syntax](#221---address-syntax) to be used in the **Command Address** Field. Some Commands/Variables require extra Parameter and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/><br/>
 The Property Inspector UI has a Syntax-Check build in for every Type except for Calculator: When the Syntax is correct, you see a little Check-Mark in the Input Field. Everything you enter will also checked more thourougly by the Plugin before it executes a Command (if possible/trackable).<br/>
 If a Command could not be executed by any Reason (invalid Syntax, Sim not connected) the Keypad will show an yellow Alert Sign briefly on the Display. On an Encoder the Touch-Display will shortly flash in red in that Case. (The standard StreamDeck Mechanic how Actions can show an Error/Warning)
+<br/><br/>
+Actions on Keypads have a **Main Command** and an optional **Second Command** when pressed longer (>= 600ms).<br/>
+Actions on Encoders have the **Dial Left Command**, **Dial Right Command** and the **Touch Command** in Addition to Main and Second - these will be used when you press the Encoder.
 <br/><br/>
 
 #### 2.2.1 - Address Syntax
@@ -201,6 +211,7 @@ If a Command could not be executed by any Reason (invalid Syntax, Sim not connec
 *Background*: Macro Files are a rather "rudimentary and legacy" Way to Script Actions in FSUIPC. In my Profiles I only use them in Prepar3D for "Mouse-Macros" which are able to Click Controls that can only be triggered with the Mouse (Mouse-Macros are not supported on MSFS). So if you don't know and have Macros, your Time is better invested to look at Lua or RPN :wink:<br/>
 If you want to learn more about Macros, look at the "*FSUIPC7 for Advanced Users*" Document in your *My Documents\FSUIPC7* Folder (or \FSUIP6 for P3D)!
 <br/><br/><br/>
+
 
 | **SCRIPT** | Command | MSFS, P3D, FSX | `(Lua\|LuaToggle\|LuaSet\|LuaClear\|LuaValue):File(:Flag)*` |
 | --- | --- | --- | --- |
@@ -225,8 +236,8 @@ If you want to learn more about Lua-Scripts, look at the "*FSUIPC Lua Plug-Ins*"
 
 | **CONTROL** | Command | MSFS, P3D, FSX, FS9 | `Control=Parameter(:Parameter)*(:Control=Parameter(:Parameter)*)*` |
 | --- | --- | --- | --- |
-- *Control*: The numerical ID of the Control (aka Event-ID).
-- *Parameter*: Zero or more optional Parameters for that Control.
+- *Control*: The numerical ID of the Control (aka Event-ID). Multiple Controls can be separated with a `:` Sign.
+- *Parameter*: Zero or more optional Parameters for that Control. The first Parameter needs a preceding `=` and following Parameter are separated with `:` again.
 
 *Examples*:
 - `66168:65567` - Send Control *66168* and then send Control *65567*.
@@ -240,9 +251,10 @@ It is often used for Planes which are controlled via *Rotorbrake-Codes* like FSL
 Note that these are the same as "K-Vars" or "Key-Events" - So you can achieve the same with using Calculator-Code and the textual ID of that Event! It's two different Sides of the same Coin :wink:
 <br/><br/><br/>
 
+
 | **LVAR** | Variable, Command | MSFS, P3D, FSX | `(L:)Name` |
 | --- | --- | --- | --- |
-- *Name*: The Name of the L-Var with or without preceding "L:".
+- *Name*: The Name of the L-Var with or without preceding `L:`.
 
 *Examples*:
 - `I_OH_FUEL_CENTER_1_U` - Read from the L-Var *I_OH_FUEL_CENTER_1_U*.
@@ -254,12 +266,13 @@ In addition to writing plain Values, the Plugin can also do simple Operations li
 But they are not only used by Planes. Some Addons like GSX also create and update L-Vars which can be used to interface with them! You can list all (up to 3066) currently used L-Vars in the **FSUIPC7 UI**.
 <br/><br/><br/>
 
+
 | **OFFSET** | Variable, Command | MSFS, P3D, FSX, FS9 | `(0x)Address:Size(:Type:Signedness\|BitNum)` |
 | --- | --- | --- | --- |
-- *Address*: The Address of the FSUIPC Offset as 4-Digit Hexadecimal Number, as documented in FSUIPC. The Hex Prefix "0x" is Optional.
+- *Address*: The Address of the FSUIPC Offset as 4-Digit Hexadecimal Number, as documented in FSUIPC. The Hex Prefix `0x` is Optional.
 - *Size*: The Size of this Offset in Bytes. A 1-digit (Decimal) Number.
-- *Type*: Specify if the Offset is an Integer "**i**", Float/Double "**f**", Bit "**b**" or String "**s**". Defaults to ":i" for Integers if not specified.
-- *Signedness*: Specify if the Offset is Signed "**s**" or Unsigned "**u**". Defaults to ":u" for Unsigned if not specified and only relevant for Integers.
+- *Type*: Specify if the Offset is an Integer `i`, Float/Double `f`, Bit `b` or String `s`. Defaults to `:i` if not specified.
+- *Signedness*: Specify if the Offset is Signed `s` or Unsigned `u`. Defaults to `:u` if not specified (only relevant for Integers).
 - *BitNum*: Only for Offset-Type Bit, the Number/Index of the Bit to read from or write to.
 
 *Examples*:
@@ -277,6 +290,7 @@ You can find the **full List** of available/official Offsets in the "*FSUIPC Off
 Since most Offsets represent Simulator Variables, you can achieve the same Thing with the *AVAR* Type in MSFS. Not all Simulator Variables are exported by FSUIPC (like "FUELSYSTEM PUMP SWITCH" for Example) - in that Cases you need to read this Variable via *AVAR*.
 <br/><br/><br/>
 
+
 | **VJOY** | Command | MSFS, P3D, FSX | `Joystick:Button(:t)` |
 | --- | --- | --- | --- |
 - *Joystick*: The Number of the virtual Joystick to use, as documented in FSUIPC (Joystick 64 - 72).
@@ -292,6 +306,7 @@ The VJOY Command can also be used on the **Encoders** and the Touch-Display. On 
 
 *Background*: The virtual Joystick Facility of FSUIPC has nothing to do with the System Driver and can be used independently. So the Use-Cases are very narrow, but it can be a useful Feature. When you want to stick of doing your Mappings and Assignement mainly in the FSUIPC UI, you could use these vJoys to map the StreamDeck Keypads/Encoders.
 <br/><br/><br/>
+
 
 | **VJOYDRV** | Command | ALL | `Joystick:Button(:t)` |
 | --- | --- | --- | --- |
@@ -310,9 +325,10 @@ Note that this Command is also only executed when the Plugin is in the Ready Sta
 *Background*: Using virtual Joysticks is really a great Feature and Solution for specific Use-Cases! For Example when you want to **press and hold** Cockpit-Controls from the StreamDeck (e.g. Fire-Test Buttons). Or when the Simulator has Commands which can only be triggered with a Joystick-Mapping (e.g. Custom Cameras in MSFS). It is especially useful in X-Plane to circumvent the API-Limitation that X-Plane Commands can only be send as "command_once".
 <br/><br/><br/>
 
+
 | **HVAR** | Command | MSFS | `Name(:Name)*` |
 | --- | --- | --- | --- |
-- *Name*: The Name of the H-Var with or without preceding "H:". You can activate multiple H-Vars in a Sequence if you separate them with a **:** Sign.
+- *Name*: The Name of the H-Var with or without preceding `H:`. You can activate multiple H-Vars in a Sequence if you separate them with a `:` Sign.
 
 *Examples*
 - `A32NX_EFIS_L_CHRONO_PUSHED` - Activate the H-Var named *A32NX_EFIS_L_CHRONO_PUSHED*.
@@ -323,17 +339,18 @@ Note that this Command is also only executed when the Plugin is in the Ready Sta
 *Background*: H-Vars are a new Simulation Variable Type that came with MSFS and work roughly similiar like K-Vars - they trigger an Event but can not be read. Note that you don't need to configure and use the Hvar-Files from FSUIPC for the Plugin. You can use any known and existing H-Var from the Plugin directly.
 <br/><br/><br/>
 
+
 | **CALCULATOR** | Command | MSFS | `RPN-Code \| $Name:Step(:Limit) \| $K:Name(:Parameter)` |
 | --- | --- | --- | --- |
 - *RPN-Code*: The Code in normal RPN Syntax you want to run with the execute_calculator_code Function.
 
 For simple Tasks like increasing/decreasing a L-Var you can use the `$Name:Step(:Limit)` Template (the Plugin will build the right RPN-Code for that):
-- *Name*: The Name of the L-Var with or without preceding "L:".
+- *Name*: The Name of the L-Var with or without preceding `L:`.
 - *Step*: The positive/negative Number by which the Variable is increased/decreased. A Plus-Sing for a positive Number is optional.
 - *Limit*: The Variable will not be increased/decreased beyond that optional Limit.
 
 For simple Tasks like triggering a K-Var (Event) you can use the `$K:Name(:Parameter)` Template (the Plugin will build the right RPN-Code for that):
-- *Name*: The Name of the K-Var to trigger, you have to prefix it with "K:".
+- *Name*: The Name of the K-Var to trigger, you have to prefix it with `K:`.
 - *Parameter*: The optional numeric Parameter to send.
 
 *Examples*
@@ -355,7 +372,7 @@ If you really want to go down the Rabbit Hole of using direct RPN-Code, start in
 
 | **XPCMD** | Command | XP | `Path(:Path)*` |
 | --- | --- | --- | --- |
-- *Path*: The Path to the Command as published. You can send multiple Commands in a Sequence if you separate them with a **:** Sign.
+- *Path*: The Path to the Command as published. You can send multiple Commands in a Sequence if you separate them with a `:` Sign.
 
 *Examples*
 - `toliss_airbus/aircondcommands/Pack1Toggle` - Single Command
@@ -370,7 +387,7 @@ If you really want to go down the Rabbit Hole of using direct RPN-Code, start in
 | --- | --- | --- | --- |
 - *Path*: The Path to the DataRef as published.
 - *\[index\]*: (Optional) The Index to access, if the DataRef is an Array.
-- *:sNUM*: If the DataRef is a String, you need to add **:s** to the Path followed by the Number of Characters to read.
+- *:sNUM*: If the DataRef is a String, you need to add `:s` to the Path followed by the Number of Characters to read.
 
 *Examples*
 - `ckpt/lamp/74` - Reading a Value from a normal DataRef.
@@ -386,9 +403,9 @@ You can lookup these Paths in the X-Plane SDK under [Datarefs](https://developer
 
 | **AVAR** | Variable, Command | MSFS | `(A:Name(:index), Unit)` |
 | --- | --- | --- | --- |
-- *Name*: The Name of the A-Var as published. You have to prefix it with **A:** and the whole Expression must be enclosed by Parenthesis **( )**.
+- *Name*: The Name of the A-Var as published. You have to prefix it with `A:` and the whole Expression must be enclosed by Parenthesis `( )`.
 - *:index*: (Optional) The Index to access, if the A-Var is a Map/Enum/Mask.
-- *Unit*: The Unit of the A-Var as published separated by a **,** from the Name.
+- *Unit*: The Unit of the A-Var as published separated by a `,` from the Name.
 
 *Examples*
 - `(A:FUEL RIGHT QUANTITY, Gallons)` - Reading the A-Var *FUEL RIGHT QUANTITY* using *Gallons* as Unit.
@@ -404,7 +421,7 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 <br/><br/><br/>
 
 #### 2.2.2 - Command Options
-How the Commands you define can be executed by the Plugin in different Ways to adjust them for specific Use-Cases!<br/><br/>
+<br/>
 
 **On Value** / **Off Value**: This Fields are required for all Command & Variable Types. The Plugin will toggle between these two Values: when the current Value matches the Off Value, it will write the On Value. In every other Case the On Value will be written.<br/><br/>
 But the Plugin can also do simple **Value Manipulations** on the Variable to increase/decrease the Value or write a Sequence of Values. These Value Manipulations always start with a `$` Sign and need to be entered in the **On Value** Field (the Off Value Field is not used then).<br/>
@@ -440,5 +457,73 @@ Note that when Hold Switch is enabled, the Action can not have another Command f
 **Reset Switch**: This Option is only available for Command & Variable Types. When activated, the Plugin will write the **On Value** to the Variable and after 100ms (2 \* Control Delay) it will write the **Off Value** to the Variable. You can not use a Value Manipulation with that Option.<br/>
 *Examples* when to use: Buttons which do not reset their Position when being pressed (but should not stay pressed). Like the MCDU Keys of the Fenix Airbus for Example! Prefer a Reset Switch over an Hold Switch in such Cases (the Button just has to be pressed and unpressed shortly).
 <br/><br/><br/>
+
+### 2.3 - Customizing Actions
+This Chapter only describes the Options specific to an Action - the common Options are described in the previous Chapters.
+<br/><br/>
+
+<img src="PilotsDeck/Images/category/ActionDisplay@2x.png" width="40">
+
+#### Display Value / Display Value with Switch
+The only Difference between these two Actions are the Command Options already described, all others are same.<br/>
+Even though these two Actions are "only" Text-based, they can cover a wide Set of Cockpit-Controls and -Displays! What makes them so flexible is the fact that numeric Values can be mapped to Text (e.g. the different Positions of a ND Mode Switch) and that you can use any Font installed on your System (e.g. a nice Quartz- or LCD-Display-Font).<br/><br/>
+**Mappings**: In this Field you can map numeric Values to Text. You can have any number of Mappings and each Mapping is separated with a `:` Sign. A numeric Value is mapped to its Text with a `=` Sign. Comparisons are also allowed, but only with Equality: a Comparison like `5>=FOO` will be interpreted as "*if* 5 is >= the current Value, *then* display the Text FOO". Example:<br/>
+- `0=LS:1=VOR:2=NAV:3=ARC:4=PLAN` - Mapping the Positions of the ND Mode Switch to their Name (Fenix).
+
+<br/><br/>
+
+**Special Value Indication**: 
+
+<br/><br/>
+
+**Draw Frame**: 
+
+<br/><br/><br/>
+
+
+
+<img src="PilotsDeck/Images/category/ActionSwitch@2x.png" width="40">
+
+#### Simple Button
+Everything you can configure here is already described: You set a **Command** to be excecuted and the **Background** Image to show. This Action is great for Keyboards found on (M)CDUs, Transponders or some COM Radios.
+<br/><br/><br/>
+
+
+
+<img src="PilotsDeck/Images/category/ActionSwitchDisplay@2x.png" width="40">
+
+#### Dynamic Button
+
+<br/><br/><br/>
+
+
+
+<img src="PilotsDeck/Images/category/ActionSwitchKorry@2x.png" width="40">
+
+#### Korry Button
+
+<br/><br/><br/>
+
+
+
+<img src="PilotsDeck/Images/category/ActionRadio@2x.png" width="40">
+
+#### COM Radio
+
+<br/><br/><br/>
+
+
+
+<img src="PilotsDeck/Images/category/ActionGaugeBar@2x.png" width="40">
+
+#### Display Gauge
+
+<br/><br/><br/>
+
+
+
+<img src="PilotsDeck/Images/category/ActionGaugeBarDual@2x.png" width="40">
+
+#### Display Gauge (Dual)
 
 <br/><br/><br/>
