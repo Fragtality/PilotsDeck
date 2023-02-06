@@ -566,7 +566,10 @@ This Action is specialized for displaying COM Frequencies, but it could be used 
 
 **Font Settings**: Both Values will always use the same Font Settings. The **Style** can not be configured here: The Active Value is always drawn in Bold-Style and the Standby Value always in Regular-Style.<br/><br/> 
 
-**Background**: In Addtion to the *Default Image* used as Background, this Action has an Additional *Swap Image*. This Image will be shown for 3.2s after the Button was pressed. You could disable that Feature by using the same Image for Default and Swap.
+**Background**: In Addtion to the *Default Image* used as Background, this Action has an Additional *Swap Image*. This Image will be shown for 3.2s after the Button was pressed. You could disable that Feature by using the same Image for Default and Swap.<br/><br/> 
+
+If you want to use it on an Encoder so that you can both alter the Inner and Outer Knob with one Dial: Create an Encoder-Stack! Then configure the COM Radio Action as you want to use it and then copy & paste it in the same Stack. Configure the Commands for either the Outer and Inner Knob on the Left/Right Command and the Swap on the Touch Command. You can use the Format-Option on the Standby for Identification which Action (Knob) is currently selected - for Example with a ">" in Front for the Outer Knob and a "<" behind the Frequency for the Inner.<br/>
+You then can basically turn -> push -> turn -> tap to set and swap your Frequency on one Encoder!
 <br/><br/><br/><br/>
 
 
