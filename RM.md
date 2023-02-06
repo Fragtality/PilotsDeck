@@ -44,17 +44,17 @@ How Commands and Variables are configured and the different Options how they can
 | ID | Description | Command | Variable | Simulators               | 
 | :---: | :------------ | :---: | :---: | :-------------------- | 
 | [**MACRO**](#macro) | Execute any Macro known to FSUIPC | ✔️ | ✖️ | MSFS*, P3D, FSX |
-| **SCRIPT** | Run any Lua-Code known to FSUIPC | ✔️ | ✖️ | MSFS, P3D, FSX |
-| **CONTROL** | Send any SimEvent defined by its numerical ID (also known as FS-Controls, Control-Codes. Numerical Variant of a K-Variable/K-Event) | ✔️ | ✖️ | MSFS, P3D, FSX, FS9 |
-| **LVAR** | Read from / Write to any L-Var ("Local Variable") | ✔️ | ✔️ | MSFS, P3D, FSX |
-| **OFFSET** | Read from / Write to any FSUIPC Offset | ✔️ | ✔️ | MSFS, P3D, FSX, FS9 |
-| **VJOY** | Toggle/Clear/Set a Button of a virtual Joystick from *FSUIPC* | ✔️ | ✖️ | MSFS, P3D, FSX |
-| **VJOYDRV** | Toggle/Clear/Set a Button of a virtual Joystick from the known *vJoy Device Driver* (if installed) | ✔️ | ✖️ | ALL |
-| **HVAR** | Activate any H-Variable in the Simulator | ✔️ | ✖️ | MSFS |
-| **CALCULATOR** | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✖️ | MSFS |
-| **XPCMD** | Send any Command known to X-Plane | ✔️ | ✖️ | XP |
-| **XPWREF** | Read from / Write to any X-Plane DataRef | ✔️ | ✔️ | XP |
-| **AVAR** | Read from / Write to any Simulation Variable (also known as A-Var) | ✔️ | ✔️ | MSFS |
+| [**SCRIPT**](#script) | Run any Lua-Code known to FSUIPC | ✔️ | ✖️ | MSFS, P3D, FSX |
+| [**CONTROL**](#control) | Send any SimEvent defined by its numerical ID (also known as FS-Controls, Control-Codes. Numerical Variant of a K-Variable/K-Event) | ✔️ | ✖️ | MSFS, P3D, FSX, FS9 |
+| [**LVAR**](#lvar) | Read from / Write to any L-Var ("Local Variable") | ✔️ | ✔️ | MSFS, P3D, FSX |
+| [**OFFSET**](#offset) | Read from / Write to any FSUIPC Offset | ✔️ | ✔️ | MSFS, P3D, FSX, FS9 |
+| [**VJOY**](#vjoy) | Toggle/Clear/Set a Button of a virtual Joystick from *FSUIPC* | ✔️ | ✖️ | MSFS, P3D, FSX |
+| [**VJOYDRV**](#vjoydrv) | Toggle/Clear/Set a Button of a virtual Joystick from the known *vJoy Device Driver* (if installed) | ✔️ | ✖️ | ALL |
+| [**HVAR**](#hvar) | Activate any H-Variable in the Simulator | ✔️ | ✖️ | MSFS |
+| [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✖️ | MSFS |
+| [**XPCMD**](#xpcmd) | Send any Command known to X-Plane | ✔️ | ✖️ | XP |
+| [**XPWREF**](#xpwref) | Read from / Write to any X-Plane DataRef | ✔️ | ✔️ | XP |
+| [**AVAR**](#avar) | Read from / Write to any Simulation Variable (also known as A-Var) | ✔️ | ✔️ | MSFS |
 
 \* = MSFS does not support Mouse-Macros<br/>
 :grey_exclamation: Please mind that the Command Types Script, Macro, Lvar and vJoy can only work with a **registered** Version of FSUIPC!<br/>
@@ -71,12 +71,13 @@ How these Actions can be configured and customized is described under [2.3 - Act
 | :---: | :-------------- | :---------: | :----------- |
 | <img src="img/DisplayXpndr.png" width="188"> | [**Display Value**](#display-value--display-value-with-switch) | Keypad | Display a Sim Variable as Number or Text (display "ON" instead of "1"). You can scale/round/format the Value as needed and customize the Font-Settings. Only for Display. |
 | <img src="img/DisplaySwitchTcas.png" width="188"> | [**Display Value with Switch**](#display-value--display-value-with-switch) | Keypad / Encoder | Like before, but this Action also send Commands. |
-| <img src="img/SimpleButton.png" width="188"> | **Simple Button** | Keypad | Can only send Commands and always shows the same (configurable) Image. Supported in StreamDeck Multi-Actions! |
-| <img src="img/DynamicButtonLight.png" width="188"> | **Dynamic Button** | Keypad | This Action dynamically changes the displayed Image based on a Variable (in Addition to sending Commands). Different Values trigger different Images. |
-| <img src="img/DisplaySwitchKorry.png" width="188"> | **Korry Button** | Keypad | Intended for Korry-Switches in the Cockpit: the Action displays two "Sub-Images" independently of each other. They are shown/hidden based on their own Variable, but will not change the Image based on the Value. Can be adapted to other Use-Cases. |
-| <img src="img/ComRadio1.png" width="188"> | **COM Radio** | Keypad / Encoder | Intended for Com Frequencies: the Action shows two different Variables which can be independently scaled/rounded/formatted but share the same Font-Settings. Can be adapted to other Use-Cases. |
-| <img src="img/GaugeBarRudder.png" width="188"> | **Display Gauge** | Keypad / Encoder | This Actions renders the Value dynamically on a Bar or Arc. Size, Color, Position and Font-Settings can be tweaked. It can optionally send Commands. |
-| <img src="img/GaugeArcEng.png" width="188"> | **Display Gauge (Dual)** | Keypad | As before, but it renders two Values dynamically on the same Bar or Arc. |
+| <img src="img/SimpleButton.png" width="188"> | [**Simple Button**](#simple-button) | Keypad | Can only send Commands and always shows the same (configurable) Image. Supported in StreamDeck Multi-Actions! |
+| <img src="img/DynamicButtonLight.png" width="188"> | [**Dynamic Button**](#dynamic-button) | Keypad | This Action dynamically changes the displayed Image based on a Variable (in Addition to sending Commands). Different Values trigger different Images. |
+| <img src="img/DisplaySwitchKorry.png" width="188"> | [**Korry Button**](#korry-button) | Keypad | Intended for Korry-Switches in the Cockpit: the Action displays two "Sub-Images" independently of each other. They are shown/hidden based on their own Variable, but will not change the Image based on the Value. Can be adapted to other Use-Cases. |
+| <img src="img/ComRadio1.png" width="188"> | [**COM Radio**](#com-radio) | Keypad / Encoder | Intended for Com Frequencies: the Action shows two different Variables which can be independently scaled/rounded/formatted but share the same Font-Settings. Can be adapted to other Use-Cases. |
+| <img src="img/GaugeBarRudder.png" width="188"> | [**Display Gauge**](#display-gauge) | Keypad / Encoder | This Actions renders the Value dynamically on a Bar or Arc. Size, Color, Position and Font-Settings can be tweaked. It can optionally send Commands. |
+| <img src="img/GaugeArcEng.png" width="188"> | [**Display Gauge (Dual)**](#display-gauge-dual) | Keypad | As before, but it renders two Values dynamically on the same Bar or Arc. |
+| <img src="img/ProfileSwitcher.png" width="188"> | [**Profile Switcher**](#31---profile-switching) | Keypad | This not a "real" Action like the others, it is only there to map Profiles used for Switching. |
 
 <br/><br/>
 
@@ -106,7 +107,7 @@ If you don't know what that means, why there is a Percent-Sign in the Path or do
 <br/><br/><br/>
 # 2 - Action Configuration
 Since the Plugin is very flexible, there is a "little" Learning Curve 😳 So I tried to break it down into 3 Parts:
-- First of starting with the various Commands and Variables can be defined in [2.1 - Defining Commands & Variables](#21---defining-commands--variables). Since triggering Actions in the Sim and reading Values from it is the Foundation to get any Use out of the Plugin, I try to give some basic Examples, Tips and Background as a starting Point. But I can't give you a full basic 101-Course here!
+- First of starting with the various Commands and Variables that can be defined in [2.1 - Defining Commands & Variables](#21---defining-commands--variables). Since triggering Actions in the Sim and reading Values from it is the Foundation to get any Use out of the Plugin, I try to give some basic Examples, Tips and Background as a basic starting Point. But I can't give you a full basic 101-Course here!
 - The second Part [2.2 - Common Options](#22---common-options) describes the Common Options & Behavior which all or most Actions share. There you can also find how to add and use [Custom Images](#223---display-behavior--custom-images) with the Plugin.
 - In the third Part [2.3 - Action specific Options](#23---action-specific-options) you'll find a Description of each Action on how they work and how they can be customized with their specific Options
 
@@ -119,7 +120,7 @@ The Property Inspector UI has a Syntax-Check build in for every Type except for 
 If a Command could not be executed by any Reason (invalid Syntax, Sim not connected) the Keypad will show an yellow Alert Sign briefly on the Display. On an Encoder the Touch-Display will shortly flash in red in that Case. (The standard StreamDeck Mechanic how Actions can show an Error/Warning)
 <br/><br/>
 Actions on Keypads have a **Main Command** and an optional **Second Command** when pressed longer (>= 600ms).<br/>
-Actions on Encoders have the **Dial Left Command**, **Dial Right Command** and the **Touch Command** in Addition to Main and Second - these two will triggered when you press the Encoder.<br/>
+Actions on Encoders have the **Dial Left Command**, **Dial Right Command** and the **Touch Command** in Addition to Main and Second - these two will be used when you press the Encoder.<br/>
 The different Commands can each use a different Type, they don't need to be the same - the Main Command could be SCRIPT, the Left/Right Command could be CALCULATOR and the Touch Command LVAR for Example.
 <br/><br/>
 
@@ -157,7 +158,7 @@ If you want to learn more about Macros, look at the "*FSUIPC7 for Advanced Users
 
 <br/>
 
-*Background*: The ability to run Lua Files is a Core-Feature of FSUIPC (at least for me!). Lua-Code is easier to write, understand and are more flexible than Things like Marcos or RPN for Calculator-Code. It greatly extends the Things you're able to do when pressing a Button on the StreamDeck - like automating GSX Calls or setting up your Aircraft from Cold & Dark for Example.<br/>
+*Background*: The ability to run Lua Files is a Core-Feature of FSUIPC (at least for me!). Lua-Code is easier to write, understand and are more flexible than Marcos or RPN for Calculator-Code for Example. It greatly extends the Things you're able to do when pressing a Button on the StreamDeck - like automating GSX Calls or setting up your Aircraft from Cold & Dark for Example.<br/>
 It also extends the Things you are able to read: you can run a Script in the Background which writes Values to the FSUIPC Custom Offset Range - for Example the combined State of both Landing Lights or the Contents of the Barometer Display. The Plugin can then read and display this Offset - with the Value which you generated/calculated in Lua.<br/>
 If you want to learn more about Lua-Scripts, look at the "*FSUIPC Lua Plug-Ins*" and "*FSUIPC Lua Library*" Documents in your *My Documents\FSUIPC7* Folder (or \FSUIPC6 for P3D)! Look at the Scripts that come with my Integrations or from other Users to understand how Lua can be used for different Things. Look at the *event.flag* and *event.param* Functions to understand how to use the LuaToggle and LuaValue Lua-Controls.<br/>
 
@@ -612,9 +613,31 @@ All Options work the same here and are applied to both Values. *Flip* will swap 
 # 3 - Advanced Topics
 
 ## 3.1 - Profile Switching
-To understand and use that Feature you need to know what a StreamDeck Profile and what a FSUIPC Profile is. Because it allows you to map a Profile on the StreamDeck to  a FSUIPC Profile associated to an Aircraft. That means the Plugin can automatically change the Profile on your StreamDeck to the one you want for that Aircraft.<br/>
-For MS Platforms (MSFS/P3D/FNX) the matching is based on the Profile Name used in FSUIPC, so a specific Aircraft/Livery has to be associated in FSUIPC first. For X-Plane the matching is done on the Path of the current Aircraft/Livery (only works for Version 12)<br/>
+To use that Feature you need to know and understand what a StreamDeck Profile and what a FSUIPC Profile is. Because it allows you to map a Profile on the StreamDeck to  a FSUIPC Profile associated to an Aircraft. That means the Plugin can automatically change the Profile on your StreamDeck to the one you want for that Aircraft. It works on all supported StreamDeck Types (Mini, SD, XL, Plus, Mobile) and can switch multiple connected StreamDecks at once.<br/>
+For MS Platforms (MSFS/P3D/FSX) the matching is based on the currently loaded FSUIPC Profile (so a specific Aircraft/Livery has to be associated in FSUIPC first). For X-Plane the matching is done on the current Aircraft/Livery Path (and only works for Version 12). The matching is Case-Sensitive in both Cases.<br/><br/>
+Note that this is a bit Tricky, since the StreamDeck API does not allow just any Profile - the Profiles which can be used need to come with the Plugin. They have to be statically defined in the Plugin-Manifest and must be installed from the StreamDeck Software itself. So to use your own or any downloaded Profile for Switching, you have to follow these Steps:
+- Save/Export/Copy any Profile-File (.streamDeckProfile Extension) you want to use to this Sub-Directory of the Plugin: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\Profiles`
+- If a Profile is already installed, remove it from the Profile Management in the StreamDeck Software UI first. It does not have to be "finished" yet (in Fact it can be empty) - you can still edit the Profile afterwards without needing to do this Procedure again. Just be sure you have saved/exported the current State you want to use!
+  - This is only needed if a new Profile should added/enabled for Profile Switching! Profiles already added and configured for that do not need to be removed.
+- Stop the StreamDeck Software
+- Run the ImportProfiles Binary in the Plugin-Directory: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\ImportProfiles.exe`
+  - For each Profile found in the Profiles Directory, it will ask you for the associated StreamDeck Type the Profile should be later installed to. Enter the associated Number shown.
+  - Your Selections will be saved. When the Import Binary is run again, it will only ask for added Profiles.
+  - Profiles removed from the Directory will have their Association/Configuration removed. The Profile still exists in your StreamDeck Software, but it won't be useable for Switching anymore.
+  - If you use that Feature and updated the Plugin, make sure to run this Import Binary before you starting the StreamDeck Software (the Installer remembers you)!
+- Start the StreamDeck Software again
 <br/><br/>
+
+Only after these preparing Steps, you can use the **Profile Switcher** Action to configure the Switching. You can drag and drop it anywhere you want and you don't need to keep it after Configuration. The Configuration and Mappings are stored persistently in the global Plugin Settings (by the StreamDeck Software). But make sure to run the Import Binary after updating the Plugin, before you start it!
+- If you configure the Switching for the First Time, the Action will start the Profile Installation as soon as you open the Property Inspector. The StreamDeck Software will ask you in a Message Box if you want to install the Profiles. It can pop-up multiple times, especially when multiple StreamDecks are connected.
+  - To install newly added Profiles, uncheck *Profiles Installed* and it will reinstall all Profiles. Profiles that already exist will not be overwritten - StreamDeck will add "Copy" Profile instead. You can remove these Copy Profiles after that.
+- The Profile Switching is globally enabled or disabled with the *Enabled* Checkbox or by pressing the Keypad this Action is on.
+- The other Fields in the Property Inspector are dynamically added - based on the different StreamDeck Types connected and the installed Profiles for these Types.
+  - For every StreamDeck Type you can define a StreamDeck Profile which is used as default when *Use Default* is enabled. Provide the exact Filename of that Profile without Extenstion and prefixed with `Profiles/`. When enabled & configured this Profile will be used when no Match was found on the other Mappings. For Example for a Profile to use with Default Planes. The Plugin already comes with an empty Profile for the SD, XL and Plus to which it defaults here.
+  - For each Profile you have installed you can enter the FSUIPC Profile Name / X-Plane Path which is used for Matching. You can have multiple Entries when you separate them with a `:` Sign. Note that it is a Sub-String matching, you don't need to enter the full Name or Path here.
+  - For Example: If you want to match your FSUIPC Profile named `FSLabs-A3XX`, you can also just enter `A3XX` to map it to a StreamDeck Profile. Or if you want to match the ToLiss A321 to a StreamDeck Profile, you can just enter `ToLissA321`.
+<br/><br/>
+
 
 ## 3.2 - Lua Examples
 
@@ -658,7 +681,7 @@ Some of the Plugin Settings can be tweaked if really necessary in the File `Pilo
 ## 4 - License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
 Uses "StreamDeckToolkit" from FritzAndFriends, published under [MIT License](https://github.com/FritzAndFriends/StreamDeckToolkit/blob/dev/LICENSE)<br/>
-Uses "FSUIPC Client DLL for .NET" from Paul Henty \([License](http://fsuipc.paulhenty.com/index.html#licence))<br/>
+Uses "FSUIPC Client DLL for .NET" from Paul Henty \([License](http://fsuipc.paulhenty.com/index.html#licence)) and "FSUIPC" from Pete and John Dowson.<br/>
 Code for X-Plane Connection inspired by MaxFerretti's [XPlaneConnector](https://github.com/MaxFerretti/XPlaneConnector)<br/>
 Code for SimConnect / WASM Connection inspired by [MobiFlight](https://github.com/MaxFerretti/XPlaneConnector)<br/>
 Prepar3D is a Trademark or Registered Trademark of Lockheed Martin Corporation.<br/>
