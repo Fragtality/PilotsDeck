@@ -38,7 +38,6 @@
     <Folder Include="Actions\" />
     <Folder Include="Images\category\" />
     <Folder Include="Images\korry\" />
-    <Folder Include="lua\" />
     <Folder Include="Models\" />
     <Folder Include="Profiles\" />
     <Folder Include="PI\css\" />
@@ -801,9 +800,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="layout-pilotsdeck.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="lua\PilotsDeck.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="manifest.json">

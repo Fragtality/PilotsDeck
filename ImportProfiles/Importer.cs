@@ -132,14 +132,14 @@ namespace ImportProfiles
                 Console.Clear();
                 Console.WriteLine($"StreamDeck Type for Profile \"{file}\":");
                 Console.WriteLine("[0] = StreamDeck (15 Key)");
-                //Console.WriteLine("[1] = StreamDeck Mini");
+                Console.WriteLine("[1] = StreamDeck Mini");
                 Console.WriteLine("[2] = StreamDeck XL");
-                //Console.WriteLine("[3] = StreamDeck Mobile");
+                Console.WriteLine("[3] = StreamDeck Mobile");
                 Console.WriteLine("[7] = StreamDeck Plus");
                 Console.WriteLine("[9] = Ignore Profile");
                 Console.Write(">> ");
                 
-                if (int.TryParse(Console.ReadKey().KeyChar.ToString(), out int input) && (input == 0 || input == 2 || input == 7 || input == 9))
+                if (int.TryParse(Console.ReadKey().KeyChar.ToString(), out int input) && ((input >= 0 && input <= 2) || input == 7 || input == 9))
                 {
                     return input;
                 }  

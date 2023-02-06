@@ -12,13 +12,13 @@
 
         <div id="EncoderActions" class="hidden"></div>
 
-        <div class="sdpi-heading">Freq. Values</div>
+        <div class="sdpi-heading">Frequency Variables</div>
         <div class="sdpi-item" id="Config_AddressRadioActiv">
-            <div class="sdpi-item-label">Addr. Active</div>
+            <div class="sdpi-item-label">Address Active</div>
             <input id="AddressRadioActiv" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
         </div>
         <div class="sdpi-item" id="Config_AddressRadioStandby">
-            <div class="sdpi-item-label">Addr. Standby</div>
+            <div class="sdpi-item-label">Address Standby</div>
             <input id="AddressRadioStandby" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
         </div>
 
@@ -39,7 +39,7 @@
         </div>
         <div class="sdpi-item" id="Config_FormatStby">
             <div class="sdpi-item-label" id="lblFormatStby">Format</div>
-            <input id="FormatStby" class="sdpi-item-value" type="text" pattern="((([0-9]{1,}\.){0,1}[0-9]{1,})|(([0-9]{1,}\.){0,1}[0-9]{1,}){0,1}:.*%s.*|[^:]*.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits.digits:..%s..)" />
+            <input id="FormatStby" class="sdpi-item-value" type="text" pattern="((([0-9]{1,}\.){0,1}[0-9]{1,})|(([0-9]{1,}\.){0,1}[0-9]{1,}){0,1}:.*%s.*|[^:]*.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (zeros.fraction:..%s..)" />
         </div>
 
         <div class="sdpi-heading">Font Settings</div>
@@ -51,25 +51,25 @@
 
         <div class="sdpi-heading">Background</div>
         <div class="sdpi-item" id="Config_DefaultImage">
-            <div class="sdpi-item-label">Normal</div>
+            <div class="sdpi-item-label">Default Image</div>
             <img id="Prev_DefaultImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
         <div class="sdpi-item" id="Config_IndicationImage">
-            <div class="sdpi-item-label" id="lblIndicationImage">Swap</div>
+            <div class="sdpi-item-label" id="lblIndicationImage">Swap Image</div>
             <img id="Prev_IndicationImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
         <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error</div>
+            <div class="sdpi-item-label">Error Image</div>
             <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /> <select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
 
         <div class="sdpi-heading">Tweak Position</div>
         <div class="sdpi-item" id="Config_RectCoord">
-            <div class="sdpi-item-label" id="lblRectCoord">Rectangle Active</div>
+            <div class="sdpi-item-label" id="lblRectCoord">Active Rectangle</div>
             <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
         <div class="sdpi-item" id="Config_RectCoordStby">
-            <div class="sdpi-item-label" id="lblRectCoordStby">Rect. Standby</div>
+            <div class="sdpi-item-label" id="lblRectCoordStby">Standby Rectangle</div>
             <input id="RectCoordStby" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
     </div>

@@ -10,7 +10,7 @@
     <div class="sdpi-wrapper">
         <div id="DefaultActions" class="inline"></div>
 
-        <div class="sdpi-heading">Control Status Value</div>
+        <div class="sdpi-heading">Variable</div>
         <div class="sdpi-item" id="Config_Address">
             <div class="sdpi-item-label">Address</div>
             <input id="Address" class="sdpi-item-value" type="text" required pattern="((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}|((L:){0,1}[a-zA-Z0-9\x2D\x5F]+){1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
@@ -51,7 +51,7 @@
                 <label for="HasIndication"><span></span></label>
             </div>
             <div class="sdpi-item" id="Config_IndicationImage">
-                <div class="sdpi-item-label" id="lblIndicationImage">State Image</div>
+                <div class="sdpi-item-label" id="lblIndicationImage">Special Image</div>
                 <img id="Prev_IndicationImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
             </div>
             <div type="checkbox" class="sdpi-item" id="Config_IndicationValueAny">
@@ -65,15 +65,15 @@
             </div>
         </div>
 
-        <div class="sdpi-heading">Default Images</div>
-        <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error Image</div>
-            <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
+        <div class="sdpi-heading">Background</div>
         <div class="sdpi-item" id="Config_DefaultImage">
             <div class="sdpi-item-label">Default Image</div>
             <img id="Prev_DefaultImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
+        <div class="sdpi-item" id="Config_ErrorImage">
+            <div class="sdpi-item-label">Error Image</div>
+            <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>        
     </div>
     <script src="inc_DefaultActions.html"></script>
     <script src="js/pi_Common.js"></script>

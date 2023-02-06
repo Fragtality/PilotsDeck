@@ -77,7 +77,7 @@ namespace PilotsDeck
 
             if (!string.IsNullOrEmpty(KorrySettings.TopImage))
                 render.DrawImage(ImgManager.GetImage(KorrySettings.TopImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());
-            if (!string.IsNullOrEmpty(KorrySettings.BotImage))
+            if (!string.IsNullOrEmpty(KorrySettings.BotImage) && !KorrySettings.UseOnlyTopAddr)
                 render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
 
             DefaultImage64 = render.RenderImage64();

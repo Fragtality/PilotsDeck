@@ -12,7 +12,7 @@
 
         <div class="sdpi-heading">Top Half</div>
         <div class="sdpi-item" id="Config_AddressTop">
-            <div class="sdpi-item-label" id="lblAddressTop">Address</div>
+            <div class="sdpi-item-label" id="lblAddressTop">Top Address</div>
             <input id="AddressTop" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of LVar or Offset" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_ShowTopNonZero">
@@ -36,7 +36,7 @@
             <label for="UseOnlyTopAddr"><span></span></label>
         </div>
         <div class="sdpi-item" id="Config_AddressBot">
-            <div class="sdpi-item-label" id="lblAddressBot">Address</div>
+            <div class="sdpi-item-label" id="lblAddressBot">Bottom Address</div>
             <input id="AddressBot" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Address of LVar or Offset" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_ShowBotNonZero">
@@ -53,23 +53,23 @@
             <img id="Prev_BotImage" src="../Images/Wait.png" alt="Wait" height="16" /><select id="BotImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
 
-        <div class="sdpi-heading">Default Images</div>
-        <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error Image</div>
-            <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>
+        <div class="sdpi-heading">Background</div>
         <div class="sdpi-item" id="Config_DefaultImage">
             <div class="sdpi-item-label">Default Image</div>
             <img id="Prev_DefaultImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
+        <div class="sdpi-item" id="Config_ErrorImage">
+            <div class="sdpi-item-label">Error Image</div>
+            <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
 
         <div class="sdpi-heading">Tweak Position</div>
         <div class="sdpi-item" id="Config_TopRect">
-            <div class="sdpi-item-label" id="lblTopRect">Rectangle Top</div>
+            <div class="sdpi-item-label" id="lblTopRect">Top Rectangle</div>
             <input id="TopRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
         <div class="sdpi-item" id="Config_BotRect">
-            <div class="sdpi-item-label" id="lblBotRect">Rect. Bottom</div>
+            <div class="sdpi-item-label" id="lblBotRect">Bottom Rectangle</div>
             <input id="BotRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
         </div>
     </div>

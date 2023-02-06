@@ -1,11 +1,11 @@
 ﻿let encoderHtml = `
-<div class="sdpi-heading">Control (Dial Left)</div>
+<div class="sdpi-heading">Dial Left Command</div>
 <div class="sdpi-item" id="Config_ActionTypeLeft">
-    <div class="sdpi-item-label" id="lblActionTypeLeft">Left Action Type</div>
+    <div class="sdpi-item-label" id="lblActionTypeLeft">Left Command Type</div>
     <select id="ActionTypeLeft" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
 </div>
 <div class="sdpi-item" id="Config_AddressActionLeft">
-    <div class="sdpi-item-label" id="lblAddressActionLeft">Left Action Address</div>
+    <div class="sdpi-item-label" id="lblAddressActionLeft">Left Command Address</div>
     <input id="AddressActionLeft" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Action to execute on Left Turn" />
 </div>
 <div class="sdpi-item" id="Config_SwitchOnStateLeft">
@@ -17,13 +17,13 @@
     <input id="SwitchOffStateLeft" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value when Off" />
 </div>
 
-<div class="sdpi-heading">Control (Dial Right)</div>
+<div class="sdpi-heading">Dial Right Command</div>
 <div class="sdpi-item" id="Config_ActionTypeRight">
-    <div class="sdpi-item-label" id="lblActionTypeRight">Right Action Type</div>
+    <div class="sdpi-item-label" id="lblActionTypeRight">Right Command Type</div>
     <select id="ActionTypeRight" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
 </div>
 <div class="sdpi-item" id="Config_AddressActionRight">
-    <div class="sdpi-item-label" id="lblAddressActionRight">Right Action Address</div>
+    <div class="sdpi-item-label" id="lblAddressActionRight">Right Command Address</div>
     <input id="AddressActionRight" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Action to execute on Right Turn" />
 </div>
 <div class="sdpi-item" id="Config_SwitchOnStateRight">
@@ -35,9 +35,9 @@
     <input id="SwitchOffStateRight" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value when Off" />
 </div>
 
-<div class="sdpi-heading">Control (Touch)</div>
+<div class="sdpi-heading">Touch Command</div>
 <div class="sdpi-item" id="Config_ActionTypeTouch">
-    <div class="sdpi-item-label" id="lblActionTypeTouch">Touch Action Type</div>
+    <div class="sdpi-item-label" id="lblActionTypeTouch">Touch Command Type</div>
     <select id="ActionTypeTouch" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
 </div>
 <div class="sdpi-item" id="Config_AddressActionTouch">

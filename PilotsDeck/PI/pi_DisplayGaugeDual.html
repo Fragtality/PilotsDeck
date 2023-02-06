@@ -9,14 +9,14 @@
 <body>
     <div class="sdpi-wrapper">
         <div type="checkbox" class="sdpi-item" id="Config_HasAction">
-            <div class="sdpi-item-label" id="lblHasAction">Has Action</div>
+            <div class="sdpi-item-label" id="lblHasAction">Has Command</div>
             <input class="sdpi-item-value" id="HasAction" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
             <label for="HasAction"><span></span>Make this Button clickable</label>
         </div>
 
         <div id="DefaultActions" class="inline"></div>
 
-        <div class="sdpi-heading">Read Values</div>
+        <div class="sdpi-heading">Variables</div>
         <div class="sdpi-item" id="Config_Address">
             <div class="sdpi-item-label">1st Address</div>
             <input id="Address" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
@@ -41,12 +41,17 @@
         </div>
 
         <div class="sdpi-heading">Gauge Settings</div>
+        <div type="checkbox" class="sdpi-item" id="Config_DrawArc">
+            <div class="sdpi-item-label" id="lblDrawArc">Draw Arc</div>
+            <input class="sdpi-item-value" id="DrawArc" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="DrawArc"><span></span></label>
+        </div>
         <div class="sdpi-item" id="Config_GaugeSize">
             <div class="sdpi-item-label" id="lblGaugeSize">Size</div>
             <input id="GaugeSize" class="sdpi-item-value" type="text" pattern="[ ]*[+]?[0-9]+([,.][0-9]+)?[ ]*; [ ]*[+]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
         </div>
         <div class="sdpi-item" id="Config_GaugeColor">
-            <div class="sdpi-item-label" id="lblGaugeColor">Bar Color</div>
+            <div class="sdpi-item-label" id="lblGaugeColor">Gauge Color</div>
             <input id="GaugeColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
         </div>
         <div type="checkbox" class="sdpi-item" id="Config_UseColorSwitching">
@@ -71,11 +76,6 @@
             <select id="BarOrientation" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
 
-        <div type="checkbox" class="sdpi-item" id="Config_DrawArc">
-            <div class="sdpi-item-label" id="lblDrawArc">Draw Arc</div>
-            <input class="sdpi-item-value" id="DrawArc" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="DrawArc"><span></span></label>
-        </div>
         <div class="sdpi-item" id="Config_StartAngle">
             <div class="sdpi-item-label" id="lblStartAngle">Start Angle</div>
             <input id="StartAngle" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Start at Angle (in Degree)" />
@@ -139,7 +139,7 @@
             <input id="CriticalRange" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="from; to" />
         </div>
         <div class="sdpi-item" id="Config_WarnColor">
-            <div class="sdpi-item-label" id="lblWarnColor">Line Color</div>
+            <div class="sdpi-item-label" id="lblWarnColor">Warn Color</div>
             <input id="WarnColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
         </div>
         <div class="sdpi-item" id="Config_WarnRange">
@@ -155,7 +155,7 @@
         </div>
         <div class="sdpi-item" id="Config_Format">
             <div class="sdpi-item-label" id="lblFormat">Format</div>
-            <input id="Format" class="sdpi-item-value" type="text" pattern="((([0-9]{1,}\.){0,1}[0-9]{1,})|(([0-9]{1,}\.){0,1}[0-9]{1,}){0,1}:.*%s.*|[^:]*.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (digits.digits:..%s..)" />
+            <input id="Format" class="sdpi-item-value" type="text" pattern="((([0-9]{1,}\.){0,1}[0-9]{1,})|(([0-9]{1,}\.){0,1}[0-9]{1,}){0,1}:.*%s.*|[^:]*.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (zeros.fraction:..%s..)" />
         </div>
         <div class="sdpi-item" id="Config_ValueMappings">
             <div class="sdpi-item-label" id="lblValueMappings">Mappings</div>
@@ -179,11 +179,11 @@
 
         <div class="sdpi-heading">Background</div>
         <div class="sdpi-item" id="Config_DefaultImage">
-            <div class="sdpi-item-label">Normal</div>
+            <div class="sdpi-item-label">Default Image</div>
             <img id="Prev_DefaultImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
         <div class="sdpi-item" id="Config_ErrorImage">
-            <div class="sdpi-item-label">Error</div>
+            <div class="sdpi-item-label">Error Image</div>
             <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
         </div>
     </div>

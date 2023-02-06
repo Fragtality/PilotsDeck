@@ -66,8 +66,9 @@ hr2,
 	flex-basis: 100%;
 	align-items: center;
 	color: inherit;
-	font-size: 9pt;
-	margin: 8px 0px;
+	font-size: 10pt;
+	font-weight: 500;
+	margin: 18px 0px 8px 0px;
 }
 
 	.sdpi-heading::before,
@@ -78,7 +79,7 @@ hr2,
 		height: 1px;
 		font-size: 0px;
 		line-height: 0px;
-		margin: 0px 16px;
+		margin: 4px 4px;
 	}
 
 hr2 {
@@ -96,6 +97,7 @@ input,
 select,
 button {
 	font-size: 10pt;
+	min-height: 32px;
 	font-weight: var(--sdpi-fontweight);
 	letter-spacing: var(--sdpi-letterspacing);
 }
@@ -260,13 +262,14 @@ option {
 	flex-direction: row;
 	min-height: 32px;
 	align-items: center;
-	margin-top: 2px;
-	max-width: 344px;
+	vertical-align: central;
+	margin-top: 4px;
+	max-width: 100%;
 	/* -webkit-user-drag: none; */
 }
 
 	.sdpi-item:first-child {
-		margin-top: -1px;
+		margin-top: 0px;
 	}
 
 	.sdpi-item:last-child {
@@ -343,10 +346,14 @@ table > caption {
 }
 
 .sdpi-item-label {
-	text-align: right;
+	text-align: left;
+	align-items: center;
+	justify-content: center;
+	min-height: 32px;
 	flex: none;
-	width: 94px;
+	width: 96px;
 	padding-right: 4px;
+	margin-top: 4px;
 	font-weight: 600;
 	-webkit-user-select: none;
 }
@@ -371,7 +378,9 @@ table > caption {
   flex-shrink: 0; */
 	margin-right: 14px;
 	margin-left: 4px;
-	justify-content: space-evenly;
+	justify-content: center;
+	align-items: center;
+	min-height: 32px;
 }
 
 canvas.sdpi-item-value {
@@ -514,12 +523,15 @@ td {
 .sdpi-item-value > select {
 	margin-right: 13px;
 	margin-left: 4px;
+	min-height: 32px;
 }
 
 .sdpi-item-child,
 .sdpi-item-group > .sdpi-item > input[type="color"] {
 	margin-top: 0.4em;
 	margin-right: 4px;
+	margin-left: 0px;
+	padding-left: 0px;
 }
 
 	.full,
