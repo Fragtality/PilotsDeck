@@ -146,6 +146,7 @@ namespace PilotsDeck
             public int FontSize { get; set; }
             public int FontStyle { get; set; }
             public string FontColor { get; set; }
+            public bool ShowTitle { get; set; } = true;
 
             public Font GetFont(int size = -1)
             {
@@ -166,7 +167,8 @@ namespace PilotsDeck
             {
                 FontName = (titleParameters.fontFamily != "" ? titleParameters.fontFamily : "Arial"),
                 FontSize = titleParameters.fontSize,
-                FontColor = titleParameters.titleColor
+                FontColor = titleParameters.titleColor,
+                ShowTitle = titleParameters.showTitle
             };
 
             if (titleParameters.fontFamily != "")

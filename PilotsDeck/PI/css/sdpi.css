@@ -528,10 +528,8 @@ td {
 
 .sdpi-item-child,
 .sdpi-item-group > .sdpi-item > input[type="color"] {
-	margin-top: 0.4em;
-	margin-right: 4px;
-	margin-left: 0px;
-	padding-left: 0px;
+	margin: 0px;
+	padding: 0px;
 }
 
 	.full,
@@ -551,7 +549,8 @@ td {
 	}
 
 .sdpi-item-group > .sdpi-item > input[type="color"] {
-	margin-top: 0px;
+	margin: 0px;
+	padding: 0px;
 }
 
 ::-webkit-calendar-picker-indicator:focus,
@@ -936,7 +935,9 @@ input[type="color"] {
 	min-height: 32px;
 	width: 32px;
 	height: 32px;
-	padding: 0;
+	padding: 0px;
+	margin: 0px;
+	margin-left: -1px;
 	background-color: var(--sdpi-bgcolor);
 	flex: none;
 }

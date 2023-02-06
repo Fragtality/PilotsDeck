@@ -35,8 +35,7 @@ namespace PilotsDeck
 
             PilotsDeck.Logger.Log(LogLevel.Debug, "ActionBase:OnTitleParametersDidChange", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID}) (FontStyle: {args.payload.titleParameters.fontStyle.Replace("\n", "").Replace("\r", "").Replace("\t", "").Replace("\0", "")})");
 
-            if (Plugin.ActionController[args.context].DeckType.IsEncoder)
-                Plugin.ActionController[args.context].Update(true);
+            Plugin.ActionController[args.context].Update(true);
 
             return Task.CompletedTask;
         }

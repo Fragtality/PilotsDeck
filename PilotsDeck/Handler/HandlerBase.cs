@@ -255,7 +255,8 @@ namespace PilotsDeck
         protected void DrawTitle(ImageRenderer render, PointF? rect = null)
         {
             var titleParam = TitleParameters ?? new StreamDeckTools.StreamDeckTitleParameters();
-            render.DrawTitle(Title, titleParam.GetFont(12), titleParam.GetColor(), rect);
+            if (titleParam.ShowTitle)
+                render.DrawTitle(Title, titleParam.GetFont(12), titleParam.GetColor(), rect);
         }
 
         public virtual void Refresh()
