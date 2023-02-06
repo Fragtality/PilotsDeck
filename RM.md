@@ -43,7 +43,7 @@ How Commands and Variables are configured and the different Options how they can
 
 | ID | Description | Command | Variable | Simulators               | 
 | :---: | :------------ | :---: | :---: | :-------------------- | 
-| **MACRO** | Execute any Macro known to FSUIPC | ✔️ | ✖️ | MSFS*, P3D, FSX |
+| [**MACRO**](#macro) | Execute any Macro known to FSUIPC | ✔️ | ✖️ | MSFS*, P3D, FSX |
 | **SCRIPT** | Run any Lua-Code known to FSUIPC | ✔️ | ✖️ | MSFS, P3D, FSX |
 | **CONTROL** | Send any SimEvent defined by its numerical ID (also known as FS-Controls, Control-Codes. Numerical Variant of a K-Variable/K-Event) | ✔️ | ✖️ | MSFS, P3D, FSX, FS9 |
 | **LVAR** | Read from / Write to any L-Var ("Local Variable") | ✔️ | ✔️ | MSFS, P3D, FSX |
@@ -69,8 +69,8 @@ How these Actions can be configured and customized is described under [2.3 - Act
 
 |  | Action Name | Keypad / Encoder | Description |
 | :---: | :-------------- | :---------: | :----------- |
-| <img src="img/DisplayXpndr.png" width="188"> | **Display Value** | Keypad | Display a Sim Variable as Number or Text (display "ON" instead of "1"). You can scale/round/format the Value as needed and customize the Font-Settings. Only for Display. |
-| <img src="img/DisplaySwitchTcas.png" width="188"> | **Display Value with Switch** | Keypad / Encoder | Like before, but this Action also send Commands. |
+| <img src="img/DisplayXpndr.png" width="188"> | [**Display Value**](#display-value--display-value-with-switch) | Keypad | Display a Sim Variable as Number or Text (display "ON" instead of "1"). You can scale/round/format the Value as needed and customize the Font-Settings. Only for Display. |
+| <img src="img/DisplaySwitchTcas.png" width="188"> | [**Display Value with Switch**](#display-value--display-value-with-switch) | Keypad / Encoder | Like before, but this Action also send Commands. |
 | <img src="img/SimpleButton.png" width="188"> | **Simple Button** | Keypad | Can only send Commands and always shows the same (configurable) Image. Supported in StreamDeck Multi-Actions! |
 | <img src="img/DynamicButtonLight.png" width="188"> | **Dynamic Button** | Keypad | This Action dynamically changes the displayed Image based on a Variable (in Addition to sending Commands). Different Values trigger different Images. |
 | <img src="img/DisplaySwitchKorry.png" width="188"> | **Korry Button** | Keypad | Intended for Korry-Switches in the Cockpit: the Action displays two "Sub-Images" independently of each other. They are shown/hidden based on their own Variable, but will not change the Image based on the Value. Can be adapted to other Use-Cases. |
@@ -612,13 +612,16 @@ All Options work the same here and are applied to both Values. *Flip* will swap 
 # 3 - Advanced Topics
 
 ## 3.1 - Profile Switching
+To understand and use that Feature you need to know what a StreamDeck Profile and what a FSUIPC Profile is. Because it allows you to map a Profile on the StreamDeck to  a FSUIPC Profile associated to an Aircraft. That means the Plugin can automatically change the Profile on your StreamDeck to the one you want for that Aircraft.<br/>
+For MS Platforms (MSFS/P3D/FNX) the matching is based on the Profile Name used in FSUIPC, so a specific Aircraft/Livery has to be associated in FSUIPC first. For X-Plane the matching is done on the Path of the current Aircraft/Livery (only works for Version 12)<br/>
 <br/><br/>
 
 ## 3.2 - Lua Examples
+
 <br/><br/>
 
 ## 3.3 - Troubleshooting
-First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`<br/>
+First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`.<br/>
 <br/>
 Second, if you see the Actions but you can not configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
 One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell \(change \<USERNAME\> accordingly\):
@@ -632,6 +635,7 @@ If it still doesn't work, contact me on one of the Platforms or Forums! To help 
 - Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
 - Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me).
 - Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.
+ 
 
 <br/><br/>
 
@@ -655,6 +659,10 @@ Some of the Plugin Settings can be tweaked if really necessary in the File `Pilo
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
 Uses "StreamDeckToolkit" from FritzAndFriends, published under [MIT License](https://github.com/FritzAndFriends/StreamDeckToolkit/blob/dev/LICENSE)<br/>
 Uses "FSUIPC Client DLL for .NET" from Paul Henty \([License](http://fsuipc.paulhenty.com/index.html#licence))<br/>
+Code for X-Plane Connection inspired by MaxFerretti's [XPlaneConnector](https://github.com/MaxFerretti/XPlaneConnector)<br/>
+Code for SimConnect / WASM Connection inspired by [MobiFlight](https://github.com/MaxFerretti/XPlaneConnector)<br/>
 Prepar3D is a Trademark or Registered Trademark of Lockheed Martin Corporation.<br/>
+X-Plane is a Trademark or Registered Trademark of Laminar Research.<br/>
 StreamDeck is a Trademark or Registered Trademark of Elgato Systems and/or Corsair Gaming, Inc.<br/>
-Windows is a Trademark or Registered Trademark of Microsoft Corporation.<br/>
+Windows and Flight Simulator is a Trademark or Registered Trademark of Microsoft Corporation.<br/>
+All Rights belong to their respective owners.<br/>
