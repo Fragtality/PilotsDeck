@@ -1,12 +1,11 @@
-Pilot's Deck
----
+# Pilot's Deck
 Directly check & control the FlightSim from your StreamDeck!
 <br/><br/>
 
 # 1 - Introduction
-PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially reading & **displaying a Control's State** on the StreamDeck as Text, Image, Bar or Arc. It is lean & mean, flexible, completely Open-Source and Free-to-Use. It does not do any fancy Stuff like a PFD - it does exactly what is needed to support smooth Flight Operations 😎<br/>
+PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially reading & **displaying a Control's State** on the StreamDeck as Text, Image or even Bar/Arc. It is lean & mean, flexible, completely Open-Source and Free-to-Use. It does not do any fancy Stuff like a PFD - it does exactly what is needed to support smooth Flight Operations 😎<br/>
 
-StreamDeck-wise it behaves like any other StreamDeck Plugin: it runs alongside other Plugins and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI and saved in the StreamDeck Profile. You can create, export and share Profiles with the Plugin's Actions to share their Configuration.<br/>
+StreamDeck-wise it behaves like any other StreamDeck Plugin: it runs alongside other Plugins and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI and it is saved in the StreamDeck Profile. You can create, export and share Profiles with the Plugin's Actions to share their Configuration.<br/>
 It can also switch StreamDeck Profiles based on the current Aircraft loaded (which is a bit tricky since not intended by the StreamDeck Software).<br/>
 The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, **XL**, **Mobile** and **Plus**. Other Models might work, but an indented Support for Non-Display Models is not planned. The Plugin runs only on **Windows**. There no Plans for Linux or macOS Support (the first is not supported by StreamDeck at all, both do not run or support all Sims and some essential .NET Libraries are only available on Windows).<br/>
 
@@ -16,8 +15,9 @@ It is designed for **advanced Sim-Users** which "know how to do Stuff": it does 
 
 Predefined StreamDeck Profiles are available under [Integrations](Integrations/), but there are not much. Either your Plane is among these for direct Use or they can at least serve as Example:<br/>
 <img src="img/ExampleLayout01.jpg" width="420"><br/>
-<img src="img/ExampleFNX03.jpg" width="420"><br/>
-<img src="img/ExampleFNX04.jpg" width="420">
+<img src="img/ExampleLayout02.jpg" width="420"><br/>
+<img src="img/ExampleFNX04.jpg" width="420"><br/>
+Other Examples can be found under [here](#examples).<br/>
 <br/><br/><br/>
 
 ## 1.1 - Supported Simulator Versions
@@ -35,7 +35,7 @@ Predefined StreamDeck Profiles are available under [Integrations](Integrations/)
 | X-Plane <=10 | yes | no | None - does not use XUIPC |
 
 Supported is understood as "technical and basically supported by the Connection Method". Support in Terms of ensured Compatibility, Fixing Issues and giving Support exists only for the latest Version of the three Major Simulators: MSFS2020, X-Plane 12, P3D v5. I'm happy if it works for older Versions, but I won't make any Effort for them.
-<br/><br/>
+<br/><br/><br/>
 
 ## 1.2 - Supported Sim-Commands & -Variables
 Here a quick Overview of what you can send to the Simulator ("**Command**") or from what you can read Values from the Simulator ("**Variable**"). One of the Things which make the Plugin flexible: Variables can also be used as Commands. For Example to move a Cockpit-Control by writing a different Value to a Variable.<br/><br/>
@@ -82,7 +82,7 @@ How these Actions can be configured and customized is described under [2.3 - Act
 <br/><br/>
 
 ## 1.4 - Installation & Requirements
-The best Way to Install and Update the Plugin is via the **Installer**: Download, Execute and click Install! It will check the Requirements, informs & links what it missing and installs the Plugin in the correct Space if the Requirements are met (the StreamDeck Software will be automatically stopped).<br/>
+The best Way to Install and Update the Plugin is via the **Installer**: Download, Execute and click Install! It will check the Requirements, informs & links what it missing and installs the Plugin in the correct Location if the Requirements are met (the StreamDeck Software will be automatically stopped).<br/>
 It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues.<br/>
 If it still does not work right or at all, please check [3.3 - Troubleshooting](#33---troubleshooting).<br/><br/>
 The Requirements for the Plugin to run:
@@ -121,6 +121,7 @@ If a Command could not be executed by any Reason (invalid Syntax, Sim not connec
 <br/><br/>
 Actions on Keypads have a **Main Command** and an optional **Second Command** when pressed longer (>= 600ms).<br/>
 Actions on Encoders have the **Dial Left Command**, **Dial Right Command** and the **Touch Command** in Addition to Main and Second - these two will be used when you press the Encoder.<br/>
+Based on the current Experience, the best Command Types to use on the Encoder (Left/Right) are CONTROL, HVAR, XPCMD and CALCULATOR (one of the Templates). That does not mean the others won't work, but these 4 give the "smootest" or "direct" Feel when turning a Knob in the Cockpit (AP/FCU/MCP for Example).<br/>
 The different Commands can each use a different Type, they don't need to be the same - the Main Command could be SCRIPT, the Left/Right Command could be CALCULATOR and the Touch Command LVAR for Example.
 <br/><br/>
 
@@ -159,7 +160,7 @@ If you want to learn more about Macros, look at the "*FSUIPC7 for Advanced Users
 <br/>
 
 *Background*: The ability to run Lua Files is a Core-Feature of FSUIPC (at least for me!). Lua-Code is easier to write, understand and are more flexible than Marcos or RPN for Calculator-Code for Example. It greatly extends the Things you're able to do when pressing a Button on the StreamDeck - like automating GSX Calls or setting up your Aircraft from Cold & Dark for Example.<br/>
-It also extends the Things you are able to read: you can run a Script in the Background which writes Values to the FSUIPC Custom Offset Range - for Example the combined State of both Landing Lights or the Contents of the Barometer Display. The Plugin can then read and display this Offset - with the Value which you generated/calculated in Lua.<br/>
+It also extends the Things you are able to read: you can run a Script in the Background which writes Values to the FSUIPC Custom Offset Range - for Example the combined State of both Landing Lights or the Contents of the Barometer Display. The Plugin can then read and display this Offset - with the Value which you generated/calculated in Lua. You can find real-world Examples form my Integrations under [Lua Examples](#32---lua-examples).<br/>
 If you want to learn more about Lua-Scripts, look at the "*FSUIPC Lua Plug-Ins*" and "*FSUIPC Lua Library*" Documents in your *My Documents\FSUIPC7* Folder (or \FSUIPC6 for P3D)! Look at the Scripts that come with my Integrations or from other Users to understand how Lua can be used for different Things. Look at the *event.flag* and *event.param* Functions to understand how to use the LuaToggle and LuaValue Lua-Controls.<br/>
 
 *Note for X-Plane Users*: You can achieve the same (and sometimes more) with the FlyWithLua Plugin for X-Plane! The Lua-Scripts there can define "Custom Commands" and "Custom DataRefs" which then can be used from the Plugin like any other X-Plane Command or DataRef.
@@ -181,7 +182,7 @@ If you want to learn more about Lua-Scripts, look at the "*FSUIPC Lua Plug-Ins*"
 
 *Background*: In Essence, these Control-Codes are the numerical ID of the standard SimEvents documented in the MSFS/P3D/FSX SDK. You can find their numerical Values in the "*Controls List...*" Text-File in your *My Documents\FSUIPC7* Folder (or \FSUIPC6 for P3D)!<br/>
 It is often used for Planes which are controlled via *Rotorbrake-Codes* like FSLabs: you need to send specific Parameters to the standard Rotor-Brake Control (hence the Name) to trigger a Cockpit-Control. Like in the second Example: That is how a LeftClick & Release is done on the Beacon-Switch (on FSL).<br/>
-Note that these are the same as "K-Vars" or "Key-Events" - So you can achieve the same with using Calculator-Code and the textual ID of that Event! It's two different Sides of the same Coin :wink:
+Note that these are the same as "Simconnect Events", "K-Vars" or "Key-Events" - So you can achieve the same with using Calculator-Code and the textual ID of that Event! It's two different Sides of the same Coin :wink:
 <br/><br/><br/>
 
 
@@ -636,28 +637,123 @@ Only after these preparing Steps, you can use the **Profile Switcher** Action to
   - For every StreamDeck Type you can define a StreamDeck Profile which is used as default when *Use Default* is enabled. Provide the exact Filename of that Profile without Extenstion and prefixed with `Profiles/`. When enabled & configured this Profile will be used when no Match was found on the other Mappings. For Example for a Profile to use with Default Planes. The Plugin already comes with an empty Profile for the SD, XL and Plus to which it defaults here.
   - For each Profile you have installed you can enter the FSUIPC Profile Name / X-Plane Path which is used for Matching. You can have multiple Entries when you separate them with a `:` Sign. Note that it is a Sub-String matching, you don't need to enter the full Name or Path here.
   - For Example: If you want to match your FSUIPC Profile named `FSLabs-A3XX`, you can also just enter `A3XX` to map it to a StreamDeck Profile. Or if you want to match the ToLiss A321 to a StreamDeck Profile, you can just enter `ToLissA321`.
-<br/><br/>
+<br/><br/><br/>
 
 
 ## 3.2 - Lua Examples
+These Examples are only valid on MS Platforms (and require a registered Copy of FSUIPC)! For X-Plane you could use FlyWithLua and define own "Custom DataRefs" and "Custom Commands" in the Script which then can be used like any other DataRef/Command from the Plugin.<br/>
+### 3.2.1 - Using Values from Lua
+Sometimes you may have the Situation that you can read a Value/State from the Aircraft but you need to "enhance" it or convert it in a special Way (e.g. a Baro Display). Or you have two Controls and you want to display their combined State on one Button instead of two (e.g. Landing Lights Left/Right).<br/>
+Here a real-world Example from the FBW Integration (a small fraction, the full Script does more):
+```lua
+function FBW_SYNC()
+	FBW_SYNC_EXTPWR() -- 0x5800:1:i
+	FBW_SYNC_LIGHTS() -- 0x5801:1:i
+	FBW_SYNC_BARO()	-- 0x5802:5:s
+end
 
+function FBW_SYNC_EXTPWR()
+	local extAvail = ipc.readUB(0x07AA)
+	local extOn = ipc.readUB(0x07AB)
+	
+	if extAvail == 1 and extOn == 0 then
+		ipc.writeUB(0x5800, 1)
+	else
+		ipc.writeUB(0x5800, 0)
+	end
+end
+
+function FBW_SYNC_LIGHTS()
+	--Landing Lights
+	local pos = ipc.readLvar("LIGHTING_LANDING_2") + ipc.readLvar("LIGHTING_LANDING_3")
+	ipc.writeUB(0x5801,pos)
+end
+
+function FBW_SYNC_BARO()
+	--Main / EFIS Cp
+	local unitMode = ipc.readLvar("XMLVAR_Baro_Selector_HPA_1")
+	local pressure = ipc.readUW(0x0330)
+	local offset = 0x5802
+	local newvalue = "Std"
+
+	if ipc.readLvar("A32NX_OVHD_INTLT_ANN") == 0 then
+		newvalue = "8888"
+	elseif ipc.readLvar("XMLVAR_Baro1_Mode") ~= 3 then
+		if unitMode == 0 then
+			newvalue = string.format("%.0f", pressure * 0.1845585973546601)
+			newvalue = string.sub(newvalue, 0,2) .. "." .. string.sub(newvalue, 3)
+		else
+			newvalue = string.format("%.0f", pressure * 0.0625)
+		end
+	end
+	
+	ipc.writeSTR(offset, newvalue, 5)
+end
+
+event.timer(150, "FBW_SYNC")
+```
+What is happening here: When the Script was started, it will run the Function FBW_SYNC every 150ms. This Function then calls other Functions which then calculate some Values/Variables: a Baro Display that will correctly react to the Annunciation Test Switch, displays a "Std" when in Standard and will convert the current Barometer depending on the Mode (either hPa or inHg). It also creates the correct State of the "Avail" Light for the External Power Switch and writes a combined Value for both Landing Lights. Since it is continuously running in the Background, you can also use it to synchronize Cockpit-Controls between Captain- and FO-Side like the FD Switches for Example.<br/><br/>
+The calculated/finished Values which should be displayed on the StreamDeck are then written to an FSUIPC Offset. There are Offset Ranges which are "Free for general use" and some Ranges which are assigned to specific Addons (0x4000-5FFF). In that Example the Range 0x5400-5FFF is used which is assigned to Project Magenta and/or PMDG. You have to ensure that these are currently unused, at least when the Aircraft is loaded (like the FBW in this Example). But since these still act like any other Offset, you can then read the Value with the Plugin from the Offsets you used in that Script.<br/><br/>
+Note the "when the Script was started"! Just because a Lua-Script is saved in the FSUIPC (Application) Folder, does not mean it is run. You have to either start it manually (Assign a Joystick-Button to "Lua Filename" in the FSUIPC UI) or let it automatically start by FSUIPC with the global `[Auto]` or a FSUIPC Profile specific `[Auto.xxxx]` Section in your FSUIPC ini File. See the Document "*FSUIPC for Advanced Users*" in your My Documents Folder.
 <br/><br/>
 
+### 3.2.2 - Using LuaToggle (Lua Flags)
+Sometimes manipulating Controls for a specific Aircraft require more "Logic" than possible to configure with the Plugin. That is also a great Situation where Lua-Scripts can be used! The Control is manipulated by the Lua-Script and you run that Lua-Script from the Plugin. But it would not be easy, reasonable or recommended to write one Script for each Control of each Aircraft. So what to do?<br/>
+Here the "Lua Flags" from FSUIPC comes in handy! Each Lua-File can have up to 255 boolean Flags which can be set, cleared and toggled. But we are not interested in the State of the Flag. What is important here: you can pass a Number/Parameter (e.g. from the Plugin) to the Script so that only a specific Function is executed! See this real-world Example from the Fenix:<br/>
+```lua
+function FNX_TOGGLER(lvar, poson, posoff)
+	local pos = ipc.readLvar(lvar)
+
+	if pos == poson then
+		pos = posoff
+	else
+		pos = poson
+	end
+
+	ipc.writeLvar(lvar, pos)
+end
+
+function FNX_LT_LAND_ON_TGL()
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 1, 2)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 1, 2)
+end
+
+function FNX_LT_LAND_OFF_TGL()
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 0, 0)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 0, 0)
+end
+
+function FNX_LT_LAND_FULL_TGL()
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_L", 2, 0)
+	FNX_TOGGLER("S_OH_EXT_LT_LANDING_R", 2, 0)
+end
+
+
+event.flag(1, "FNX_LT_LAND_ON_TGL")
+event.flag(2, "FNX_LT_LAND_OFF_TGL")
+event.flag(3, "FNX_LT_LAND_FULL_TGL")
+```
+What is happening here: When the Script was started, Flags 1 to 3 of that Script are each associated to a specific Function in the Lua-Script. A Function will be executed whenever a LuaSet/LuaClear/LuaToggle is send to the Script for the associated Flag. In this Example, the Functions toggle both Landing Lights in specific Ways. Executing `LuaToggle:Scriptname:3` will do a "full" Toggle on the Landing-Lights (Retracted <> On).<br/><br/>
+Such Scripts are not limited to the StreamDeck only: You can also map such Functions in the FSUIPC UI to any Joystick Button or Key! Just select "LuaToggle Scriptname" in the UI and enter the according Number as Parameter there. This is the Way I use to bind/map my Airbus TCA Throttle for the Fenix (or any other non-X-Plane Aircraft).<br/><br/>
+As with *event.timer*, Scripts using *event.flag* must be also started first for them to react on these Lua-Controls (either manually or in the Auto-Section)! If you make such extensive Use of running Lua-Functions and need to go beyond 255 (been there): look at the *event.param* Library-Function (the Parameter has no Limit, but you have to build your own System to run a Function for its associated Number)!
+<br/><br/><br/>
+
+
 ## 3.3 - Troubleshooting
-First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`.<br/>
+**First**, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`.<br/>
 <br/>
-Second, if you see the Actions but you can not configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
+**Second**, if you see the Actions but you can not configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
 One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell \(change \<USERNAME\> accordingly\):
 ```powershell
 dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
 ```
-If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>
+If that is not the Culprit, check **your AV Scanner** and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>
 And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local Sockets (also the Connection to X-Plane).<br/><br/>
 If it still doesn't work, contact me on one of the Platforms or Forums! To help you I will need:
-- The Version of the Plugin you have downloaded
-- Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
-- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me).
-- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.
+- The **Version** of the Plugin you have downloaded
+- Your latest **StreamDeck Log File** (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
+- Your latest **PilotsDeck Log File** (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me).
+- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a **Screenshot** of the Output.
  
 
 <br/><br/>
@@ -666,24 +762,54 @@ If it still doesn't work, contact me on one of the Platforms or Forums! To help 
 Some of the Plugin Settings can be tweaked if really necessary in the File `PilotsDeck.dll.config`. Normally you don't need to do anything here. The available Settings and their Default:<br/>
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
-* **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
-* **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim. This Delay (times 2) is also used for the Reset Switch.
+* **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as Long Press when released (3 \* 200 = 600ms).
+* **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim. This Delay (times 2) is also used for the Reset Switch. Other Fractions of this Delay are also used when Commands for the Encoder are executed.
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw all Buttons on every Interval, even when the Value has not changed.
 * **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".
 * **Fsuipc7LegacyLvars**="false"	- With "true", the Plugin will fallback to the legacy Way of Reading L-Vars via Offset 0x0D70 on MSFS/FSUIPC7.
 * **xpIP**"="127.0.0.1" 		-  The IP (not Hostname) where X-Plane is running. Networked Installation currently not supported.
-* **xpPort**"="49000" 			-  The Port on which X-Plane is running.<br/><br/>
+* **xpPort**"="49000" 			-  The Port on which X-Plane is running.
+
+<br/>
+A Note on networked Installations with X-Plane: there is no Mechanic build in the Plugin to run in such a Setup. BUT you can 'trick' it and theoretically can run it in such a Setup. With the Trick being: just start & run any Executable named "X-Plane.exe" on the PC where the StreamDeck Software (the Plugin) is running. The Plugin will then try to establish a Connection to the Configured IP/Port.
+<br/><br/><br/>
+
+# 4 - Examples & "Tutorial"
+Sorry I've tricked you, there is no real Tutorial here 🤣 - but I can at least try to give some basic Guidance where to start with all that.<br/>
+The Thing is: there are so many different Aircrafts out there which each handle Things differently, even in the same Simulator, that there can be one or few Tutorials which could explain everything. Don't ask for Tutorial-Videos, they will not exist (at least from me): I don't specifically hate such Videos, I just strongly Belief that Reading is the Key to get a fundamental Understanding of any Topic. On that Fundament, other Mediums like a Video can be great Addition.<br/><br/>
+So *after Reading* this Document - where do you start? 😉<br/>
+Before you can really start with anything in the Plugin, you must have some kind of SDK/API/whatever Reference from anywhere for the Aircraft you want to create StreamDeck Actions for. You need to know how you can read the Control-States and how you manipulate them! Some Aircraft a purely based on L-Vars, others only for read, other not at all. Some use Custom Events, some use Rotor-Brake-Codes. Some things just can't be read. If you are lucky, it is a Default Plane or a Plane which reacts to Standard-Commands and -Variables. For such "defaulty" Planes, you can use the various References for Standard Commands and Variables I have linked in [Defining Commands and Variables](#21---defining-commands--variables).<br/><br/>
+Try to follow the KISS Principle. Don't start with Complex Controls or even Displays. Focus on the Cockpit-Controls with the greatest "discomfort" in a normal Simulator Session. Usually the ones where fiddling arround with the Mouse is just annoying. Things like the Aircraft-Lights, because you have to quickly control these when entering/leaving a Runway for Example. Being able to quickly control & check such Controls without loosing Focus on Flying/Taxiing the Aircraft will give you the most Benefit and greatly improves the Simulation Experience.<br/>
+Lights and Signs are a good starting Point (except on the FBW...) because the Variable to read can relatively easily be found. They only have 2 or 3 States and most of the Time you want to toggle them. That calls for a Dynamic Button! Enter the Command, enter the Variable, enter the Values for On/Off (and Special) and select the Light... Images. You have defined your first Light. Just copy and paste that Action for the next similar working Light and change the Command and Variable. Now you have your Light Panel on the StreamDeck!
 <br/><br/>
 
+## Examples
+<img src="img/ExampleFNX01.jpg" width="420"><br/>
+The essential Stuff from the A320 Overhead. Everything displayed here was done with the Korry Button Action. In Case of the Fenix everything is done with LVAR Variables and Commands. For the FBW it is mostly LVAR but also AVAR and CONTROL (they call them "MSFS Var" and "MSFS Event").<br/><br/>
 
+<img src="img/ExampleFNX04.jpg" width="420"><br/>
+The essential Stuff from the A320 Main Panel. The Korrys are again done with the Korry Button Action. The Anti-Skid Switch is done with the Display Value with Switch Action. The Display-Brightness and Brake-Pressure is done with the Display Gauge Action (yep, that is the same Action but with just a different Configuration!). The Clock is just a Display Value, Buttons for +/- are just Simple Buttons. The Clock-Display-Content is created by a Lua Script (it just concatenates the Standard Time-Variables for Hour, Minutes and Seconds).<br/><br/>
 
-## 4 - License
+<img src="img/Example01XL.jpg" width="420"><br/>
+A StreamDeck Folder with the most common Actions when in Flight. The Lights & Signs Switches are done with Dynamic Buttons, as well as the EFIS, FCU and ECAM Buttons. The EFIS ND Mode and Range are done with Display Value with Switch again (Text-Mappings!).<br/><br/>
+
+<img src="img/ExampleACP.jpg" width="420"><br/>
+A StreamDeck Folder for the ACP. The Buttons are Korry Buttons, just with an non-empty Background. The Volume-Displays are Display Gauge Actions. Increasing & Decreasing with Simple Buttons.<br/><br/>
+
+<img src="img/ExampleLayout02.jpg" width="420"><br/>
+A StreamDeck Page on the Plus for the FCU. The Encoders use the Display Value with Switch for showing the respective FCU Display and the Commands control the Associated Knob.<br/><br/>
+
+<img src="img/ExampleFNX02.jpg" width="420"><br/>
+A complete MCDU Keyboard, with Subpages for Numbers and Letters, on the XL. It is all Simple Buttons!
+<br/><br/><br/>
+
+## 5 - License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
 Uses "StreamDeckToolkit" from FritzAndFriends, published under [MIT License](https://github.com/FritzAndFriends/StreamDeckToolkit/blob/dev/LICENSE)<br/>
 Uses "FSUIPC Client DLL for .NET" from Paul Henty \([License](http://fsuipc.paulhenty.com/index.html#licence)) and "FSUIPC" from Pete and John Dowson.<br/>
-Code for X-Plane Connection inspired by MaxFerretti's [XPlaneConnector](https://github.com/MaxFerretti/XPlaneConnector)<br/>
-Code for SimConnect / WASM Connection inspired by [MobiFlight](https://github.com/MaxFerretti/XPlaneConnector)<br/>
+Code for X-Plane Connection inspired by MaxFerretti's [XPlaneConnector](https://github.com/MaxFerretti/XPlaneConnector).<br/>
+Code for SimConnect / WASM Connection inspired by [MobiFlight](https://github.com/MaxFerretti/XPlaneConnector).<br/>
 Prepar3D is a Trademark or Registered Trademark of Lockheed Martin Corporation.<br/>
 X-Plane is a Trademark or Registered Trademark of Laminar Research.<br/>
 StreamDeck is a Trademark or Registered Trademark of Elgato Systems and/or Corsair Gaming, Inc.<br/>
