@@ -83,7 +83,7 @@ How these Actions can be configured and customized is described under [2.3 - Act
 ## 1.4 - Installation & Requirements
 The best Way to Install and Update the Plugin is via the **Installer**: Download, Execute and click Install! It will check the Requirements, informs & links what it missing and installs the Plugin in the correct Space if the Requirements are met (the StreamDeck Software will be automatically stopped).<br/>
 It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues.<br/>
-If it still does not work right or at all, please check INSERTLINK.<br/><br/>
+If it still does not work right or at all, please check [3.3 - Troubleshooting](#33---troubleshooting).<br/><br/>
 The Requirements for the Plugin to run:
 - Windows **10** or **11** (updated)
 - [**StreamDeck Software v6**](https://www.elgato.com/downloads)
@@ -614,7 +614,28 @@ All Options work the same here and are applied to both Values. *Flip* will swap 
 ## 3.1 - Profile Switching
 <br/><br/>
 
-## 3.2 - Plugin Settings
+## 3.2 - Lua Examples
+<br/><br/>
+
+## 3.3 - Troubleshooting
+First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`<br/>
+<br/>
+Second, if you see the Actions but you can not configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
+One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell \(change \<USERNAME\> accordingly\):
+```powershell
+dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
+```
+If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>
+And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local Sockets (also the Connection to X-Plane).<br/><br/>
+If it still doesn't work, contact me on one of the Platforms or Forums! To help you I will need:
+- The Version of the Plugin you have downloaded
+- Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
+- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me).
+- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.
+
+<br/><br/>
+
+## 3.4 - Plugin Settings
 Some of the Plugin Settings can be tweaked if really necessary in the File `PilotsDeck.dll.config`. Normally you don't need to do anything here. The available Settings and their Default:<br/>
 * **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
@@ -628,21 +649,7 @@ Some of the Plugin Settings can be tweaked if really necessary in the File `Pilo
 * **xpPort**"="49000" 			-  The Port on which X-Plane is running.<br/><br/>
 <br/><br/>
 
-## 3.3 - Troubleshooting
-First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`<br/>
-<br/>
-Second, if you see the Actions but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in the Sim!<br/>
-One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell \(change \<USERNAME\> accordingly\):
-```powershell
-dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
-```
-If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local Sockets (also the Connection to X-Plane).<br/><br/>
-If it still doesn't work, contact me on one of the Platforms or Forums! To help you I'll need:
-- The Version of the Plugin you have downloaded
-- Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
-- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me - so I know you did not forget :laughing:).
-- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.<br/>
-<br/>
+
 
 ## 4 - License
 Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
