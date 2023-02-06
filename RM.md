@@ -121,7 +121,7 @@ If a Command could not be executed by any Reason (invalid Syntax, Sim not connec
 <br/><br/>
 Actions on Keypads have a **Main Command** and an optional **Second Command** when pressed longer (>= 600ms).<br/>
 Actions on Encoders have the **Dial Left Command**, **Dial Right Command** and the **Touch Command** in Addition to Main and Second - these two will be used when you press the Encoder.<br/>
-Based on the current Experience, the best Command Types to use on the Encoder (Left/Right) are CONTROL, HVAR, XPCMD and CALCULATOR (one of the Templates). That does not mean the others won't work, but these 4 give the "smootest" or "direct" Feel when turning a Knob in the Cockpit (AP/FCU/MCP for Example).<br/>
+Based on the current Experience, the best Command Types to use on the Encoder (Left/Right) are CONTROL, HVAR, XPCMD and CALCULATOR (one of the Templates). That does not mean the others won't work, but these 4 give the "smoothest" or "direct" Feel when turning a Knob in the Cockpit (AP/FCU/MCP for Example).<br/>
 The different Commands can each use a different Type, they don't need to be the same - the Main Command could be SCRIPT, the Left/Right Command could be CALCULATOR and the Touch Command LVAR for Example.
 <br/><br/>
 
