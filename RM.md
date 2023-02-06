@@ -124,7 +124,6 @@ The different Commands can each use a different Type, they don't need to be the 
 <br/><br/>
 
 ### 2.1.1 - Address Syntax
-<br/>
 
 #### MACRO
 | Command | MSFS, P3D, FSX | `File:Macro(:Macro)*` |
@@ -186,7 +185,7 @@ Note that these are the same as "K-Vars" or "Key-Events" - So you can achieve th
 
 
 #### LVAR
-| Variable, Command | MSFS, P3D, FSX | `(L:)Name` |
+| Command & Variable | MSFS, P3D, FSX | `(L:)Name` |
 | --- | --- | --- |
 - *Name*: The Name of the L-Var with or without preceding `L:`.
 
@@ -202,7 +201,7 @@ But they are not only used by Planes. Some Addons like GSX also create and updat
 
 
 #### OFFSET
-| Variable, Command | MSFS, P3D, FSX, FS9 | `(0x)Address:Size(:Type:Signedness\|BitNum)` |
+| Command & Variable | MSFS, P3D, FSX, FS9 | `(0x)Address:Size(:Type:Signedness\|BitNum)` |
 | --- | --- | --- |
 - *Address*: The Address of the FSUIPC Offset as 4-Digit Hexadecimal Number, as documented in FSUIPC. The Hex Prefix `0x` is Optional.
 - *Size*: The Size of this Offset in Bytes. A 1-digit (Decimal) Number.
@@ -325,7 +324,7 @@ If you really want to go down the Rabbit Hole of using direct RPN-Code, start in
 
 
 #### XPWREF
-| Variable, Command | XP | `Path([index]\|:sNUM)` |
+| Command & Variable | XP | `Path([index]\|:sNUM)` |
 | --- | --- | --- |
 - *Path*: The Path to the DataRef as published.
 - *\[index\]*: (Optional) The Index to access, if the DataRef is an Array.
@@ -345,7 +344,7 @@ You can lookup these Paths in the X-Plane SDK under [Datarefs](https://developer
 
 
 #### AVAR
-| Variable, Command | MSFS | `(A:Name(:index), Unit)` |
+| Command & Variable | MSFS | `(A:Name(:index), Unit)` |
 | --- | --- | --- |
 - *Name*: The Name of the A-Var as published. You have to prefix it with `A:` and the whole Expression must be enclosed by Parenthesis `( )`.
 - *:index*: (Optional) The Index to access, if the A-Var is a Map/Enum/Mask.
@@ -599,7 +598,7 @@ You can 'trick' the Plugin to show only one Range when you set both to the same 
 
 **Text Settings**: By Default this Action will also draw a Text-Representation of the current Value on the Display, but you can disable that. The Options you find here work exactly like in the Display Value Actions: you can *Format* it, have Value-to-Text *Mappings*, configure the *Font Settings* and change the Position with the *Draw Rectangle*. By Default the Option **Range Color** is checked: when the Warning Range Option is used and the Value is currently in one of the Ranges, the Text will use the Color configured there.
 
-<br/><br/><br/><br/>
+<br/><br/><br/>
 
 
 
@@ -609,3 +608,46 @@ You can 'trick' the Plugin to show only one Range when you set both to the same 
 This Action can be used when you have two different Values which share the same Range. For Example the Fuel in the Left/Right Tank or the Position of the Left/Right Aileron. The Variables to read from are configured in **1st Address** and **2nd Address**.<br/>
 All Options work the same here and are applied to both Values. *Flip* will swap the Position of both Values on the Bar/Arc. A Text-Representation will be drawn for both Values with a Bar but with an Arc only the first Value will also be displayed as Text.
 <br/><br/><br/><br/>
+
+# 3 - Advanced Topics
+
+## 3.1 - Profile Switching
+<br/><br/>
+
+## 3.2 - Plugin Settings
+Some of the Plugin Settings can be tweaked if really necessary in the File `PilotsDeck.dll.config`. Normally you don't need to do anything here. The available Settings and their Default:<br/>
+* **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
+* **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
+* **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as ["Long Press"](README.md#simple-button--display-value-with-button) when released.
+* **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim. This Delay (times 2) is also used for the Reset Switch.
+* **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
+* **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw all Buttons on every Interval, even when the Value has not changed.
+* **forceDecimalPoint**="true"		- This forces the Text Output to be always formatted with a "**.**" as Decimal Character, regardless of System Setting. Specifically, when "true" the CultureInfo is forced to "en-US" otherwise with "false" it is forced to "de-DE".
+* **Fsuipc7LegacyLvars**="false"	- With "true", the Plugin will fallback to the legacy Way of Reading L-Vars via Offset 0x0D70 on MSFS/FSUIPC7.
+* **xpIP**"="127.0.0.1" 		-  The IP (not Hostname) where X-Plane is running. Networked Installation currently not supported.
+* **xpPort**"="49000" 			-  The Port on which X-Plane is running.<br/><br/>
+<br/><br/>
+
+## 3.3 - Troubleshooting
+First, check if you see the Plugin's Actions in the StreamDeck GUI. If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`<br/>
+<br/>
+Second, if you see the Actions but you can not configure any Action because the Dropdown Inputs for e.g. Action Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in the Sim!<br/>
+One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell \(change \<USERNAME\> accordingly\):
+```powershell
+dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
+```
+If that is not the Culprit, check your AV Scanner and try if it works if you add an Exception for the Plugin. With Avast this is not neccessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local Sockets (also the Connection to X-Plane).<br/><br/>
+If it still doesn't work, contact me on one of the Platforms or Forums! To help you I'll need:
+- The Version of the Plugin you have downloaded
+- Your latest StreamDeck Log File (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
+- Your latest PilotsDeck Log File (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me - so I know you did not forget :laughing:).
+- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a Screenshot of the Output.<br/>
+<br/>
+
+## 4 - License
+Published under [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/>
+Uses "StreamDeckToolkit" from FritzAndFriends, published under [MIT License](https://github.com/FritzAndFriends/StreamDeckToolkit/blob/dev/LICENSE)<br/>
+Uses "FSUIPC Client DLL for .NET" from Paul Henty \([License](http://fsuipc.paulhenty.com/index.html#licence))<br/>
+Prepar3D is a Trademark or Registered Trademark of Lockheed Martin Corporation.<br/>
+StreamDeck is a Trademark or Registered Trademark of Elgato Systems and/or Corsair Gaming, Inc.<br/>
+Windows is a Trademark or Registered Trademark of Microsoft Corporation.<br/>
