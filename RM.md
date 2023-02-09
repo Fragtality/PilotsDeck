@@ -51,7 +51,7 @@ How Commands and Variables are configured and the different Options how they can
 | [**VJOY**](#vjoy) | Toggle/Clear/Set a Button of a virtual Joystick from *FSUIPC* | ✔️ | ✖️ | MSFS, P3D, FSX |
 | [**VJOYDRV**](#vjoydrv) | Toggle/Clear/Set a Button of a virtual Joystick from the known *vJoy Device Driver* (if installed) | ✔️ | ✖️ | ALL |
 | [**HVAR**](#hvar) | Activate any H-Variable in the Simulator | ✔️ | ✖️ | MSFS |
-| [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✖️ | MSFS |
+| [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator - either direct RPN Code or as Template for Increasing/Decreasing L-Vars or triggering K-Vars | ✔️ | ✖️ | MSFS |
 | [**XPCMD**](#xpcmd) | Send any Command known to X-Plane | ✔️ | ✖️ | XP |
 | [**XPWREF**](#xpwref) | Read from / Write to any X-Plane DataRef | ✔️ | ✔️ | XP |
 | [**AVAR**](#avar) | Read from / Write to any Simulation Variable (also known as A-Var) | ✔️ | ✔️ | MSFS |
