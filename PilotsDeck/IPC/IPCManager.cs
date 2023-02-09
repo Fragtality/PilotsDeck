@@ -314,6 +314,8 @@ namespace PilotsDeck
                     else if (IPCTools.IsActionReadable(actionType))
                     {
                         newValue = ValueManipulator.CalculateSwitchValue(currentState, offState, onState, encTicks);
+                        if (!string.IsNullOrEmpty(newValue) && (newValue.StartsWith('>') || newValue.StartsWith('<')))
+                            newValue = newValue.Replace("=", "").Replace("<", "").Replace(">", "");
                     }
 
 

@@ -29,6 +29,7 @@ namespace PilotsDeck
         protected bool isReceiveRunning = false;
         public bool IsConnected { get { return isSimConnected && isMobiConnected; } }
         public bool IsReady { get { return IsConnected && isReceiveRunning; } }
+        public bool HasReceiveError { get { return !isReceiveRunning; } }
 
         protected uint nextID = 1;
         protected const int reorderTreshold = 150;
@@ -117,7 +118,7 @@ namespace PilotsDeck
                 catch (Exception ex)
                 {
                     errors++;
-                    if (errors > 6)
+                    if (errors > 10)
                     {
                         isReceiveRunning = false;
                         Logger.Log(LogLevel.Critical, "MobiSimConnect:SimConnect_ReceiveThread", $"Maximum Errors reached, closing Receive Thread! (Exception: {ex.GetType()})");
@@ -379,14 +380,19 @@ namespace PilotsDeck
 
         protected void SubscribeQueue()
         {
+            int registered = 0;
             foreach (uint index in subscribeQueue)
             {
-                RegisterVariable(index, simVars[index].Address);
+                if (simVars.TryGetValue(index, out IPCValue value))
+                {
+                    RegisterVariable(index, value.Address);
+                    registered++;
+                }
             }
 
             if (subscribeQueue.Count > 0)
             {
-                Logger.Log(LogLevel.Information, "MobiSimConnect:SubscribeQueue", $"Subscribed {subscribeQueue.Count} SimVars from Queue.");
+                Logger.Log(LogLevel.Information, "MobiSimConnect:SubscribeQueue", $"Subscribed {registered} / {subscribeQueue.Count} SimVars from Queue.");
                 subscribeQueue.Clear();
             }
         }

@@ -1,0 +1,1010 @@
+[General]
+atc_type=BOEING
+atc_model=B789
+Category=airplane
+
+[vacuum_system]
+max_pressure=5.150000
+vacuum_type=2
+electric_backup_pressure=0.000000
+engine_map=0,0,0,0
+
+[pneumatic_system]
+max_pressure=18.000000
+bleed_air_scalar=1.000000
+
+[deice_system]
+structural_deice_type=1
+
+[WEIGHT_AND_BALANCE]
+reference_datum_position=  0.000, 0.000, 0.000
+empty_weight_CG_position=  1.000, 0.000, 0.000
+max_number_of_stations =10
+station_load.0=0, 40.0, 0.0, 0.0
+station_load.1=0, -24.0, 0.0, 0.0
+station_load.2=0, 28.0, 0.0, 0.0
+station_load.3=0, -35.0, 0.0, 0.0
+station_load.4=0, -48.0, 0.0, 0.0
+station_name.0 = "Business Class"
+station_name.1 = "Economy Class"
+station_name.2 = "Front Cargo"
+station_name.3 = "Aft Cargo"
+station_name.4 = "Bulk Cargo"
+empty_weight= 288021.000
+max_gross_weight= 561500.000
+empty_weight_pitch_MOI = 10055743.000
+empty_weight_roll_MOI = 9500873.000
+empty_weight_yaw_MOI = 10251035.000
+empty_weight_coupled_MOI = 1500
+
+[flight_tuning]
+cruise_lift_scalar     = 1.00
+parasite_drag_scalar   = 1.00
+induced_drag_scalar    = 1.00
+elevator_effectiveness = 1.00		
+aileron_effectiveness  = 1.00
+rudder_effectiveness   = 1.00		
+pitch_stability        = 1.00
+roll_stability         = 1.00
+yaw_stability          = 1.00
+elevator_trim_effectiveness = 1.00
+aileron_trim_effectiveness  = 1.00
+rudder_trim_effectiveness   = 1.00
+
+[pitot_static]
+vertical_speed_time_constant=999		
+pitot_heat=1.000000
+
+[jet_engine]
+thrust_scalar =1.000
+
+[fuel]
+LeftMain=   0.00, -35.00,  -40.00, 5737.00, 0.00
+RightMain=  0.00,  35.00,  -40.00, 5737.00, 0.00
+center1=    0.00,  0.00, -3.00, 23278.00, 0.00
+fuel_type= 2.00
+number_of_tank_selectors=2
+electric_pump=1
+
+[airplane_geometry]
+wing_area = 3504.801
+wing_span = 197.78
+wing_root_chord = 38.94
+wing_dihedral = 7
+wing_incidence = 0.0
+wing_twist = 0
+oswald_efficiency_factor = 0.7067
+wing_winglets_flag = 0
+wing_sweep = 33
+wing_pos_apex_lon = 40.90
+wing_pos_apex_vert = 7.20
+htail_area = 832.954
+htail_span = 65.04
+htail_pos_lon = -97.80
+htail_pos_vert = 5.78
+htail_incidence = 0.00
+htail_sweep = 36
+vtail_area = 427.963
+vtail_span = 30.31
+vtail_sweep = 40
+vtail_pos_lon = -88.76
+vtail_pos_vert = 11.09
+elevator_area = 137.0
+aileron_area = 76.5
+rudder_area = 232.0
+elevator_up_limit = 29.0
+elevator_down_limit = 29.0
+aileron_up_limit = 25.0
+aileron_down_limit = 25.0
+rudder_limit = 25.0
+elevator_trim_limit = 65.0
+spoiler_limit = 52.0
+aileron_to_spoileron_gain = 1.2
+spoiler_handle_available = 1
+min_ailerons_for_spoilerons = 8.0
+min_flaps_for_spoilerons = 0
+spoilerons_available = 1
+auto_spoiler_available=0
+spoiler_extension_time=1.200000
+positive_g_limit_flaps_up=2.608974
+positive_g_limit_flaps_down=1.709402
+negative_g_limit_flaps_up=-1.500000
+negative_g_limit_flaps_down=-0.858974
+
+[lights]
+light.0 = 4, 85.9, 0.0, 6.0, fx_QW787_VC_Dome	// VC Dome Light
+light.1 = 4, 83.7, 0.0, 8.5, fx_QW787_VC_Dome	// VC Dome Light
+
+[GeneralEngineData]
+fuel_flow_scalar = 1.000
+min_throttle_limit = -0.38
+engine.0 = 0.0, -33.583, -1.500
+engine.1 = 0.0,  33.583, -1.500
+engine_type=1
+
+[smokesystem]
+smoke.0 = 86.70,  0.00, 3.20, fx_QW787_VC_Ped_1			// VC Pedestal Light 1
+smoke.1 = 86.70,  0.00, 3.20, fx_QW787_VC_Ped_2			// VC Pedestal Light 2
+smoke.2 = 86.70,  0.00, 3.30, fx_QW787_VC_Ped_3			// VC Pedestal Light 3
+smoke.3 = 86.70,  0.00, 3.20, fx_QW787_VC_Ped_4			// VC Pedestal Light 4
+smoke.4 = 89.30, -3.05, 3.24, fx_QW787_VC_Main_1		// VC Main Panel Light 1
+smoke.5 = 89.30, -3.05, 3.24, fx_QW787_VC_Main_2		// VC Main Panel Light 2
+smoke.6 = 89.30, -3.05, 3.24, fx_QW787_VC_Main_3		// VC Main Panel Light 3
+smoke.7 = 89.30, -3.05, 3.24, fx_QW787_VC_Main_4		// VC Main Panel Light 4
+smoke.8 = 89.30,  3.05, 3.24, fx_QW787_VC_Main_1		// VC Main Panel Light 1
+smoke.9 = 89.30,  3.05, 3.24, fx_QW787_VC_Main_2		// VC Main Panel Light 2
+smoke.10 = 89.30, 3.05, 3.24, fx_QW787_VC_Main_3		// VC Main Panel Light 3
+smoke.11 = 89.30, 3.05, 3.24, fx_QW787_VC_Main_4		// VC Main Panel Light 4
+
+[GPWS]
+max_warning_height=0
+sink_rate_fpm=-10000
+excessive_sink_rate_fpm=-10000
+climbout_sink_rate_fpm=-10000
+flap_and_gear_sink_rate_fpm=-10000
+
+[TurbineEngineData]
+fuel_flow_gain= 0.0015
+inlet_area= 68.962
+rated_N2_rpm= 29920.000
+static_thrust= 74100.000
+afterburner_available= 0
+reverser_available= 1
+ThrustSpecificFuelConsumption = 0.42
+
+[Reference Speeds]
+cruise_speed= 485.00
+max_indicated_speed=450.000000
+max_mach=0.900020
+flaps_up_stall_speed=188.000000
+full_flaps_stall_speed=100.400000
+
+[keyboard_response]
+elevator= 100.000, 200.000
+aileron= 100.000, 200.000
+rudder= 100.000, 200.000
+
+[Views]
+eyepoint=86.70, -1.8, 5.20
+
+[autopilot]
+autopilot_available= 0
+flight_director_available= 1
+default_vertical_speed= 800.000
+autothrottle_available= 1
+autothrottle_arming_required= 1
+autothrottle_takeoff_ga= 1
+autothrottle_max_rpm= 110.000
+pitch_takeoff_ga= 0.000
+max_pitch=18.000000
+max_pitch_acceleration=2.000000
+max_pitch_velocity_lo_alt=2.000000
+max_pitch_velocity_hi_alt=1.300000
+max_pitch_velocity_lo_alt_breakpoint=20000.000000
+max_pitch_velocity_hi_alt_breakpoint=24000.000000
+max_bank=30.000000
+max_bank_acceleration=2.200000
+max_bank_velocity=2.000000
+max_throttle_rate=0.030000
+nav_proportional_control=11.000000
+nav_integrator_control=0.170000
+nav_derivative_control=0.000000
+nav_integrator_boundary=2.500000
+nav_derivative_boundary=0.000000
+gs_proportional_control=19.520000
+gs_integrator_control=0.53000
+gs_derivative_control=0.000000
+gs_integrator_boundary=0.700000
+gs_derivative_boundary=0.000000
+yaw_damper_gain=1.000000
+default_pitch_mode=0
+
+[Radios]
+Audio.1=1
+Com.1=1, 1
+Com.2=1, 1
+Nav.1=1, 1, 1
+Nav.2=1, 1, 0
+Adf.1=1
+Adf.2=1
+Transponder.1=1
+Marker.1=1
+
+[flaps.0]      
+type             = 1                                   
+span-outboard    = 0.2                                 
+extending-time   = 41                                   
+flaps-position.0 = 0		// F UP               
+flaps-position.1 = 0		// F 1                              
+flaps-position.2 = 15.0		// F 5
+flaps-position.3 = 17.0		// F 10 (-9)               
+flaps-position.4 = 20.0		// F 15                        
+flaps-position.5 = 24.0		// F 17 (-9)                            
+flaps-position.6 = 26.0		// F 18 (-9)                                 
+flaps-position.7 = 30.0		// F 20                                   
+flaps-position.8 = 30.0		// F 25
+flaps-position.9 = 37.5		// F 30                                   
+damaging-speed   = 260                                  
+blowout-speed    = 300                                  
+lift_scalar = 0.00
+drag_scalar = 0.00
+system_type = 1                                         
+
+[flaps.1]    
+type             = 1                                       
+span-outboard    = 0.8                                 
+extending-time   = 41                                   
+flaps-position.0 = 0		// F UP               
+flaps-position.1 = 0		// F 1                              
+flaps-position.2 = 15.0		// F 5
+flaps-position.3 = 17.0		// F 10 (-9)               
+flaps-position.4 = 20.0		// F 15                        
+flaps-position.5 = 24.0		// F 17 (-9)                            
+flaps-position.6 = 26.0		// F 18 (-9)                                 
+flaps-position.7 = 30.0		// F 20                                   
+flaps-position.8 = 30.0		// F 25
+flaps-position.9 = 37.5		// F 30   
+damaging-speed   = 260                                  
+blowout-speed    = 300                                 
+lift_scalar = 1.00
+drag_scalar = 0.90
+pitch_scalar= 0.65
+system_type = 1                                         
+
+[flaps.2]    
+type             = 2                                    
+span-outboard    = 0.15                                  
+extending-time   = 19                                                       
+flaps-position.0 = 0		// F UP               
+flaps-position.1 = 19.5		// F 1                              
+flaps-position.2 = 19.5		// F 5
+flaps-position.3 = 19.5		// F 10 (-9)               
+flaps-position.4 = 19.5		// F 15                        
+flaps-position.5 = 19.5		// F 17 (-9)                            
+flaps-position.6 = 19.5		// F 18 (-9)                                 
+flaps-position.7 = 19.5		// F 20                                   
+flaps-position.8 = 23.0		// F 25
+flaps-position.9 = 23.0		// F 30   
+damaging-speed   = 260                                   
+blowout-speed    = 300                                  
+lift_scalar = 0.20
+drag_scalar = 0.35
+pitch_scalar= 0.50
+system_type = 1                                          
+
+[flaps.3]   
+type             = 2                                     
+span-outboard    = 0.65                                  
+extending-time   = 19                                   
+flaps-position.0 = 0		// F UP               
+flaps-position.1 = 23.2		// F 1                              
+flaps-position.2 = 0		// F 5
+flaps-position.3 = 0		// F 10 (-9)               
+flaps-position.4 = 0		// F 15                        
+flaps-position.5 = 0		// F 17 (-9)                            
+flaps-position.6 = 0		// F 18 (-9)                                 
+flaps-position.7 = 0		// F 20                                   
+flaps-position.8 = 0		// F 25
+flaps-position.9 = 0		// F 30   
+damaging-speed   = 260                              
+blowout-speed    = 300                               
+lift_scalar = -0.25
+drag_scalar = 0.00
+pitch_scalar= 0.00
+system_type = 1                                     
+
+[direction_indicators]
+direction_indicator.0=3,0
+
+[contact_points]
+static_pitch = -0.81
+static_cg_height = 13.50
+tailwheel_lock = 0
+gear_system_type = 1
+max_number_of_points = 28
+point.0 = 1,  78.87,  0.0,  -12.62, 1100, 0, 3.58, 70, 0.44, 1.1, .95,  10.0, 13, 0, 270, 285
+point.1 = 1, -9.0,  -15.833, -13.92, 1100, 1, 4.55, 0,  0.48, 1.04,  1.15,   13.9, 16.9, 2, 270, 285
+point.2 = 1, -9.0,  15.833, -13.92, 1100, 2, 4.55, 0,  0.48, 1.04, 1.15,   14.1, 17.1, 2, 270, 285
+
+[forcefeedback]
+gear_bump_nose_magnitude=100           ; 0 - 10000
+gear_bump_nose_direction=18000          ; 0 - 35999 degrees
+gear_bump_nose_duration=250000          ; in microseconds
+gear_bump_left_magnitude=700           ; 0 - 10000
+gear_bump_left_direction=15500          ; 0 - 35999 degrees
+gear_bump_left_duration=250000          ; in microseconds
+gear_bump_right_magnitude=700          ; 0 - 10000
+gear_bump_right_direction=15500         ; 0 - 35999 degrees
+gear_bump_right_duration=250000         ; in microseconds
+ground_bumps_magnitude1= 300            ; 0 - 10000
+ground_bumps_angle1=08900               ; 0 - 35999 degrees
+ground_bumps_intercept1=3.0
+ground_bumps_slope1=0.20
+ground_bumps_magnitude2=200             ; 0 - 10000
+ground_bumps_angle2=09100               ; 0 - 35999 degrees
+ground_bumps_intercept2=1.075
+ground_bumps_slope2=0.035
+crash_magnitude1=10000                  ; 0 - 10000
+crash_direction1=01000                  ; 0 - 35999 degrees
+crash_magnitude2=10000                  ; 0 - 10000
+crash_direction2=9000                   ; 0 - 35999 degrees
+crash_peri32=75000                     ; in microseconds
+crash_duration2=2500000                 ; in microseconds
+
+[brakes]
+toe_brakes_scale=.81
+parking_brake=1
+auto_brakes=5
+hydraulic_system_scalar=.75
+
+[hydraulic_system]
+electric_pumps=1
+engine_map=1,1,0,0
+normal_pressure=5000.000000
+
+[stall_warning]
+type=1
+stick_shaker=1
+
+[attitude_indicators]
+attitude_indicator.0=1
+
+[turn_indicators]
+turn_indicator.0=1,0
+
+[gear_warning_system]
+gear_warning_available=0
+pct_throttle_limit=0.099976
+flap_limit_power=25.496622
+flap_limit_idle=5.042029
+
+[EFFECTS]
+wake=fx_wake
+water=fx_spray
+dirt=fx_tchdrt
+touchdown=fx_tchdwn, 1
+SkidPavement=fx_dummy
+
+[TailHook]    // For opening cargo door.
+tailhook_length=1                               ;(feet)
+tailhook_position = 0.0, 0.0, 0.0            ;(feet) longitudinal, lateral, vertical positions from datum
+
+[folding_wings]  // For opening main deck cargo door.
+wing_fold_system_type = 4                       ;0=None
+fold_rates = 0.05,1.00                    ;Percent per second
+
+[exits]
+number_of_exits = 4
+exit.0 = 0.2, 76.00, -8.5, 9.5, 0	; L1
+exit.1 = 0.2, 45.00, -8.5, 9.5, 0	; L2
+exit.2 = 0.2, 76.00,  8.5, 9.5, 0	; R1
+exit.3 = 0.2, 60.00,  8.5, -3.9, 1	; Cargo Front
+//exit_rate.0 = 0.10                               ;Percent per second
+//exit_rate.1 = 0.08                               ;Percent per second
+//exit_rate.2 = 0.10                               ;Percent per second
+//exit_rate.3 = 0.10                               ;Percent per second
+
+[electrical]
+                ;BusType, MaxAmpLoad, MinVoltage       BusTypes:0=MainBus,1=AvionicsBus,2=BatteryBus,3=HotBatteryBus,4-7=Generator/AlternatorBus(1-4)
+max_battery_voltage = 96
+electric_always_available = 1
+flap_motor         = 0, 5 , 0.0
+gear_motor         = 0, 5 , 0.0
+autopilot          = 0, 5 , 0.0
+avionics_bus       = 0, 5 , 0.0
+avionics           = 0, 5 , 0.0
+pitot_heat         = 0, 2 , 0.0
+additional_system  = 0, 2 , 0.0
+marker_beacon      = 1, 2 , 0.0
+gear_warning       = 0, 2 , 0.0
+fuel_pump          = 0, 5 , 0.0
+starter1           = 0, 20, 0.0
+starter2           = 0, 20, 0.0
+light_nav          = 0, 5 , 0.0
+light_beacon       = 0, 5 , 0.0
+light_landing      = 0, 5 , 0.0
+light_taxi         = 0, 5 , 0.0
+light_strobe       = 0, 5 , 0.0
+light_panel        = 0, 5 , 0.0
+
+
+[CameraDefinition.0]
+Title = Right Wing
+Guid = {6b4209b4-3fb6-46af-af6f-f24d5aa185ce}
+Description = View of the right wing
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 2.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = TRUE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 1.45, 1.75, -8.0
+InitialPbh = 10.0, 0.0, 94.0
+ClipMode=Normal
+NearClipOverride=1.5
+
+[CameraDefinition.1]
+Title = Left Wing
+Guid = {EDCE7E11-8208-4EF2-8FDD-E36FDEFEB3D2}
+Description = View of the left wing
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 2.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = TRUE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = -1.45, 1.75, -8.0
+InitialPbh = 10.0, 0.0, -94.0
+ClipMode=Normal
+NearClipOverride=1.5
+
+[CameraDefinition.2]
+Title = Right Engine
+Guid = {0b68c1bf-dec0-46ab-950b-e778d2d4ba92}
+Description = View of the right engine
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 2.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = TRUE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 2.25, 1.75, 16.0
+InitialPbh = 16.0, 0.0, 121.0
+ClipMode=Normal
+NearClipOverride=1.5
+
+[CameraDefinition.3]
+Title = Left Engine
+Guid = {5BCE9A77-F69B-4879-BE27-13A3BFDFC7F4}
+Description = View of the left engine
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 2.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = TRUE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = -2.25, 1.75, 16.0
+InitialPbh = 16.0, 0.0, -121.0
+ClipMode=Normal
+NearClipOverride=1.5
+
+[CameraDefinition.4]
+Title = Right Overwing
+Guid = {2186b67e-df2d-4004-b885-b5a137f5b3bd}
+Description = View over the right wing
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 2.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = TRUE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 2.1, 2.0, 0.0
+InitialPbh = 7.0, 0.0, 59.0
+ClipMode=Normal
+NearClipOverride=1.5
+
+[CameraDefinition.5]
+Title = Left Overwing
+Guid = {B12822DC-D68D-4692-A824-4AFF479BD428}
+Description = View over the left wing
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 2.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = TRUE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = -2.1, 2.0, 0.0
+InitialPbh = 7.0, 0.0, -59.0
+ClipMode=Normal
+NearClipOverride=1.5
+
+[CameraDefinition.6]
+Title = Right Wingtip
+Guid = {9B5F439E-A104-47DF-93BA-7340FDE1D0ED}
+Description = View of the forward fuselage from the right wingtip
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.7
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 33.0, 6.0, -18.0
+InitialPbh = 12.0, 0, -60.0
+ClipMode=Minimum
+
+[CameraDefinition.7]
+Title = Landing Gear
+Guid = {E7EF6920-2A29-4EB8-8410-0F3F6AD53253}
+Description = View of the Landing Gear
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.7
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = -9.0, -0.4, -14.973311424255371
+InitialPbh = 3.0, 0, 35.0
+ClipMode=Minimum
+
+[CameraDefinition.8]
+Title = Flaps
+Guid = {B5595C02-39F0-483A-8A06-11C7C745EB7C}
+Description = View of the Lower Wing
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.7
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 21.2, -0.4, -10.9
+InitialPbh = 3.0, 0, -51.0
+ClipMode=Minimum
+
+[CameraDefinition.9]
+Title = Left Side Nose
+Guid = {C4207B9C-06F7-4A07-9CC6-1CCDB9ADBBAD}
+Description = View of the forward fuselage
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.7
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = -20.0, -1.8, 34.0
+InitialPbh = -4.2300558090209961, 0, 122.99427795410156
+ClipMode=Minimum
+
+[CameraDefinition.10]
+Title = Right Side Nose
+Guid = {E5BD01F6-F0F0-43E4-9F23-D59190C3950A}
+Description = View of the forward fuselage
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.7
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Aircraft
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 20.0, -1.8, 34.0
+InitialPbh = -4.2300558090209961, 0, -122.99427795410156
+ClipMode=Minimum
+
+
+[CameraDefinition.11]
+Title = Tail Camera
+Guid = {0a31168c-0f09-42ca-92fb-80cd00c83e8f}
+Description = View from fictional tail camera
+Origin = Center
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = YES
+AllowZoom = TRUE
+InitialZoom = 0.5
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Outside
+PitchPanRate = 20
+HeadingPanRate = 60
+InitialXyz = 0.0, 12.0, -27.0
+InitialPbh = 20.0, 0.0, 0.0
+ClipMode=Minimum
+
+[CameraDefinition.12]
+Title = Captain
+Guid = {b3df6031-921c-4cd1-a7f6-36629fed5cd2}
+Origin = Virtual Cockpit
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = NO
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Cockpit
+PitchPanRate = 20
+HeadingPanRate = 60
+PanAcceleratorTime = 0
+InitialXyz = 0.04, 0, 0
+InitialPbh = 14.52593159675603, 0, 0
+ClipMode=Minimum
+HotKeySelect = 1
+
+[CameraDefinition.13]
+Title = Overhead Panel
+Guid = {09bfff3b-3c10-444a-aa43-611226b8f809}
+Origin = Virtual Cockpit
+MomentumEffect = No
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = NO
+AllowZoom = TRUE
+InitialZoom = 0.4
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Cockpit
+PitchPanRate = 20
+HeadingPanRate = 60
+PanAcceleratorTime = 0
+InitialXyz = 0.49587467312812805, -0.23298850655555725, -0.32538944482803345
+InitialPbh = -45.676582336425781, 0, 0.4244021475315094
+ClipMode=Minimum
+HotKeySelect = 2
+
+[CameraDefinition.14]
+Title = CDU MFD and FCU
+Guid = {03bee302-09e3-4089-b213-91d56ec4be43}
+Origin = Virtual Cockpit
+MomentumEffect = No
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = NO
+AllowZoom = TRUE
+InitialZoom = 0.59
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Cockpit
+PitchPanRate = 20
+HeadingPanRate = 60
+PanAcceleratorTime = 0
+InitialXyz = 0.51415169239044189, 0.18891382217407227, -0.10326537489891052
+InitialPbh = 38.432365417480469, 0, 0
+ClipMode=Minimum
+HotKeySelect = 3
+
+[CameraDefinition.15]
+Title = Pedestal
+Guid = {03bee302-09e3-4089-b213-91d56ec4be44}
+Origin = Virtual Cockpit
+MomentumEffect = No
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = NO
+AllowZoom = TRUE
+InitialZoom = 0.50
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Cockpit
+PitchPanRate = 20
+HeadingPanRate = 60
+PanAcceleratorTime = 0
+InitialXyz = 0.51415169239044189, 0.18891382217407227, -0.27049353718757652
+InitialPbh = 65.886566162109369, 0, 0
+ClipMode=Minimum
+HotKeySelect = 4
+
+[CameraDefinition.16]
+Title = First Officer
+Guid = {b3df6031-921c-4cd1-a7f6-36629fed5cd1}
+Origin = Virtual Cockpit
+MomentumEffect = Yes
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = NO
+AllowZoom = TRUE
+InitialZoom = 0.5
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Cockpit
+PitchPanRate = 20
+HeadingPanRate = 60
+PanAcceleratorTime = 0
+InitialXyz = 1.0629815742373466, -0.0064166011288762093, 0.
+InitialPbh = 13.554689407348633, 0, -0.47092637419700623
+ClipMode=Minimum
+
+[CameraDefinition.17]
+Title = Flightdeck
+Guid = {03bee302-09e3-4089-b213-91d56ec4be45}
+Origin = Virtual Cockpit
+MomentumEffect = No
+SnapPbhAdjust = Swivel
+SnapPbhReturn = False
+PanPbhAdjust = Swivel
+PanPbhReturn = False
+Track = None
+ShowAxis = NO
+AllowZoom = TRUE
+InitialZoom = 0.30
+SmoothZoomTime = 2.0
+ZoomPanScalar = 1.0
+ShowWeather = Yes
+XyzAdjust = TRUE
+ShowLensFlare = FALSE
+Category = Cockpit
+PitchPanRate = 20
+HeadingPanRate = 60
+PanAcceleratorTime = 0
+InitialXyz = 0.51415169239044189, 0.12240332365036007, -1.36070010066032052
+InitialPbh = 12.090082168579069, 0, 0
+ClipMode=Minimum
+
+[fltsim.0]
+title=QualityWings 787-9 House (RR)
+sim=Boeing 787-9 RR
+model=RR
+panel=hires
+sound=rr
+texture=qw
+checklists=
+ui_manufacturer=Boeing-QWSim
+ui_type=Boeing 787-9
+ui_variation=QW House RR
+atc_heavy=1
+atc_id=N787QW
+atc_airline=Boeing
+atc_flight=787
+atc_type=Boeing
+atc_model=B787
+atc_parking_codes=BCY
+atc_parking_types=GATE, RAMP
+visual_damage=0
+atc_id_color=0000000000
+ui_typerole= Commercial Airliner
+ui_createdby=QualityWings Simulations
+description=QualityWings Simulations Boeing 787-9
+
+[fltsim.1]
+title=QualityWings 787-9 House (GE)
+sim=Boeing 787-9 GE
+model=GE
+panel=hires
+sound=ge
+texture=qw
+checklists=
+ui_manufacturer=Boeing-QWSim
+ui_type=Boeing 787-9
+ui_variation=QW House GE
+atc_heavy=1
+atc_id=N787QW
+atc_airline=Boeing
+atc_flight=787
+atc_type=Boeing
+atc_model=B787
+atc_parking_codes=BCY
+atc_parking_types=GATE, RAMP
+visual_damage=0
+atc_id_color=0000000000
+ui_typerole= Commercial Airliner
+ui_createdby=QualityWings Simulations
+description=QualityWings Simulations Boeing 787-9
+[fltsim.2]
+title=QualityWings 787-9 American Airlines -SATCOM
+sim=Boeing 787-9 GE
+model=ge
+panel=hires
+sound=ge
+texture=aal
+kb_checklists=
+ui_manufacturer=Boeing-QWSim
+ui_type=Boeing 787-9
+ui_variation=American Airlines
+atc_heavy=1
+atc_id=N821AN
+atc_airline=AMERICAN
+atc_type=BOEING
+atc_model=B787
+atc_flight_number=787
+atc_parking_codes=AAL
+atc_parking_types=GATE, RAMP
+visual_damage=0
+atc_id_color=0000000000
+ui_typerole=Commercial Airliner
+ui_createdby=QualityWings Simulations
+description=QualityWings Boeing 787-9
+[fltsim.3]
+title=QualityWings 787-9 Norwegian Air Shuttle
+sim=Boeing 787-9 RR
+model=rr
+panel=hires
+sound=rr
+texture=nax
+kb_checklists=
+ui_manufacturer=Boeing-QWSim
+ui_type=Boeing 787-9
+ui_variation=Norwegian Air Shuttle
+atc_heavy=1
+atc_id=G-CIXO
+atc_airline=NORSEMAN
+atc_type=BOEING
+atc_model=B787
+atc_flight_number=787
+atc_parking_codes=NAX
+atc_parking_types=GATE, RAMP
+visual_damage=0
+atc_id_color=0000000000
+ui_typerole=Commercial Airliner
+ui_createdby=QualityWings Simulations
+description=QualityWings Boeing 787-9
+[fltsim.4]
+title=QualityWings 787-9 United Airlines -SATCOM
+sim=Boeing 787-9 GE
+model=ge
+panel=hires
+sound=ge
+texture=ual
+kb_checklists=
+ui_manufacturer=Boeing-QWSim
+ui_type=Boeing 787-9
+ui_variation=United Airlines
+atc_heavy=1
+atc_id=N38950
+atc_airline=UNITED
+atc_type=BOEING
+atc_model=B787
+atc_flight_number=787
+atc_parking_codes=UAL
+atc_parking_types=GATE, RAMP
+visual_damage=0
+atc_id_color=0000000000
+ui_typerole=Commercial Airliner
+ui_createdby=QualityWings Simulations
+description=QualityWings Boeing 787-9

@@ -36,10 +36,12 @@ namespace PilotsDeck
 
         protected MobiSimConnect mobiConnect = null;
         protected bool mobiConnectRequested = false;
+        protected bool forceSubscribeAll = false;
 
         public override void Close()
         {
             mobiConnect.Disconnect();
+            forceSubscribeAll = false;
 
             if (FSUIPCConnection.IsOpen)
                 FSUIPCConnection.Close();
@@ -54,7 +56,8 @@ namespace PilotsDeck
         {
             try
             {
-                FSUIPCConnection.Open();
+                if (!FSUIPCConnection.IsOpen)
+                    FSUIPCConnection.Open();
 
                 if (FSUIPCConnection.IsOpen)
                 {
@@ -83,7 +86,8 @@ namespace PilotsDeck
             TickCounter = tickCounter;
             ipcManager = manager;
             mobiConnect = new(manager);
-            
+            forceSubscribeAll = false;
+
             isPausedValue = new IPCValueOffset(isPausedAddr, AppSettings.groupStringRead, OffsetAction.Read);
             pauseIndValue = new IPCValueOffset(pauseIndAddr, AppSettings.groupStringRead, OffsetAction.Read);
             inMenuValue = new IPCValueOffset(inMenuAddr, AppSettings.groupStringRead, OffsetAction.Read);
@@ -120,6 +124,21 @@ namespace PilotsDeck
                     mobiConnect.Process();
                 else
                     Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnect not ready!");
+
+                if (mobiConnect.IsReady && forceSubscribeAll && !mobiConnect.HasReceiveError)
+                {
+                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Process", $"Resubscribe all Addresses via MobiConnect ...");
+                    mobiConnect.SubscribeAllAddresses();
+                    forceSubscribeAll = false;
+                }
+
+                if (mobiConnect.HasReceiveError)
+                {
+                    Logger.Log(LogLevel.Information, "ConnectorMSFS:Process", $"MobiConnect has receive Error! Trying Disconnect & Connect");
+                    mobiConnect.Disconnect();
+                    mobiConnectRequested = mobiConnect.Connect();
+                    forceSubscribeAll = true;
+                }
 
                 resultProcess = true;
             }
