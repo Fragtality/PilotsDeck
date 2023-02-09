@@ -527,11 +527,18 @@ Everything you can configure here is already described: You set a **Command** to
 ### Dynamic Button
 The Basic Idea of this Action is simple: it changes the whole Image based on the current Value of the *Variable* configured! This Action is great for Multi-State-Switches where a visual Representation is more suited or preferred - like Light-Switches for example.<br/>
 It has two basic Modes how you can define the **Control States**: You can select 2 to 3 different Images for the On, Off and Special State. Or instead you can define a Mapping to assign Values to Images. Useful if a Control has more than 3 States and you want a different Image for each State.<br/><br/>
+
+**Use Status Value**: The Dynamic Button has an additional Command Option when a Variable-based Type is selected (and Image Mapping is not used): when this Option is enabled, the Plugin uses the On/Off Value from the On/Off Image. Useful to save some Work when you are reading/writing to the same Variable.<br/><br/>
+
 **On Image / On Value**: Select the Image to be shown when the current Value matches the On Value (required). You can use a Comparison here.<br/><br/>
+
 **Off Image / Off Value**: Select the Image to be shown when the current Value matches the Off Value (required). You can use a Comparison here.<br/><br/>
+
 **Special State**: You can define an optional third State which shows its own *Special Image*. You either use a plain Value or a Comparison used for matching. Alternatively you can enable *Any Value* which will use this State for any Value which is not On or Off.<br/><br/>
+
 The Order the Value matching is done is: On Value -> Off Value -> Special Value. So watch out when using Comparisons.
 <br/><br/><br/>
+
 **Image Mapping**: Enable that Option to provide an **Image Map** instead of the On/Off/Special States. The Mapping is similiar to the Text-Mapping in the Display Value Actions. You write the Number and assign it with `=` to the Image's Filename (without Extention). Comparisons can also be used (with Equality). Each Mapping is then separated by a `:` and you can have as many you want. Example:
 - `0=IRS_off:1=IRS_nav:2=IRS_att` - Assigning each different Position of the IRS Switch (0, 1, 2) to its specific Image.
 
