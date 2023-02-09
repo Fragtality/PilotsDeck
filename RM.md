@@ -34,7 +34,7 @@ Other Examples can be found under [here](#examples).<br/>
 | X-Plane 11 | yes | yes | None - does not use XUIPC |
 | X-Plane <=10 | yes | no | None - does not use XUIPC |
 
-Supported is understood as "technical and basically supported by the Connection Method". Support in Terms of ensured Compatibility, Fixing Issues and giving Support exists only for the latest Version of the three Major Simulators: MSFS2020, X-Plane 12, P3D v5. I'm happy if it works for older Versions, but I won't make any Effort for them.
+Supported is understood as "technical and basically supported by the Connection Method". Support in Terms of ensured Compatibility, Fixing Issues and giving Support exists only for the latest Version of the three Major Simulators: MSFS2020, X-Plane 12, P3D v5. I'm happy if it works for older Versions, but I won't make any Effort for them. It is time to go back to the Future! 😅
 <br/><br/><br/>
 
 ## 1.2 - Supported Sim-Commands & -Variables
