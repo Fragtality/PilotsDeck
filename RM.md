@@ -65,7 +65,7 @@ How Commands and Variables are configured and the different Options how they can
 All Actions work on the **Keypads** (the normal/square StreamDeck Buttons). The Dial/Touchpad (aka **Encoder**) on the SD+ is only supported by some Actions (the ones which make the most Sense).<br/><br/>
 On Keypads you can assign **two** different Commands, based on how long you hold it: A **Short**/Normal and **Long** Press (>= 600ms). Only one of the available Actions can be put in StreamDeck Multi-Actions.<br/>
 On Encoders you can assign **five** different Commands for each Interaction: **Left** Turn, **Right** Turn, **Touch** Tap and a **Short** & **Long** Press on the Dial. The Actions can be put in StreamDeck Encoder-Stacks, but will then lose their Short/Long Press Function.<br/><br/>
-How these Actions can be configured and customized is described under [2.3 - Action specific Options](#23---action-specific-options).<br/>
+How these Actions can be configured and customized is described under [2.3 - Action specific Options](#23---action-specific-options). How to add Custom Images is described under [2.2.3 - Display Behavior & Custom Images](#223---display-behavior--custom-images)<br/>
 
 |  | Action Name | Keypad / Encoder | Description |
 | :---: | :-------------- | :---------: | :----------- |
@@ -465,6 +465,7 @@ The Plugin **includes a basic Set** of Images with a more "iconograpic" Look for
  > %appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\Images
 
 You don't have to restart the Plugin, every new Image will be selectable/usable when you open the next Property Inspector. When an Image is updated, it needs to be "uncached" before the new File is read - make sure it is not used or configured in any Action currently visible and wait 30s (or just restart the StreamDeck Software in that Case).<br/>
+The included Images can also be changed or even deleted (except Wait.png!) - but these Changes will be overwritten when the Plugin is updated.<br/>
 To be usable the Image needs to be in **PNG** Format and must be **"square"** - having the same Height and Width. It will be automatically scaled to fit (but not stretched on an Encoder). For Encoders the Image should be "rectangular" - having a higher Width than Height.<br/><br/>
 
 But for optimal Visual Results it is recommended to provide an Image in specific and multiple **Sizes**. The Plugin will then automatically select the Image-Size which is optimal for the StreamDeck an Action is on. These are:
