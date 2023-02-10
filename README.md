@@ -115,7 +115,7 @@ Since the Plugin is very flexible, there is a "little" Learning Curve 😳 So I 
 
 ## 2.1 - Defining Commands & Variables
 One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable for reading only by the Address.<br/>
-Every Type needs a specific [Address Syntax](#221---address-syntax) to be used in the **Command Address** Field. Some Commands/Variables require extra Parameter and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/><br/>
+Every Type needs a specific [Address Syntax](#211---address-syntax) to be used in the **Command Address** Field. Some Commands/Variables require extra Parameter and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/><br/>
 The Property Inspector UI has a Syntax-Check build in for every Type except for Calculator: When the Syntax is correct, you see a little Check-Mark in the Input Field. Everything you enter will also checked more thourougly by the Plugin before it executes a Command (if possible/trackable).<br/>
 If a Command could not be executed by any Reason (invalid Syntax, Sim not connected) the Keypad will show an yellow Alert Sign briefly on the Display. On an Encoder the Touch-Display will shortly flash in red in that Case. (The standard StreamDeck Mechanic how Actions can show an Error/Warning)
 <br/><br/>
