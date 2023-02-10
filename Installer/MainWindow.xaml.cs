@@ -229,7 +229,7 @@ namespace Installer
             if (InstallerFunctions.HasCustomProfiles(out bool oldDefault))
             {
                 control.SetImage(ActionIcon.Warn);
-                control.Message.Text = $"Custom Profiles where detected. They need to be imported to be used for Profile Switching!\r\n";
+                control.Message.Text = $"Custom Profiles where detected - Run the Importer before you start the StreamDeck Software again!\r\n";
                 if (oldDefault)
                     control.Message.Text += "The old default Profiles 'Whiskey', 'X-Ray', 'Yankee' or 'Zulu' seem to be installed. You can remove them, if you never used them.\r\n";
                 control.Message.Inlines.Add(importer);
