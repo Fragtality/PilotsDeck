@@ -152,7 +152,8 @@ function setPattern(field, type) {
 		return;
 
 	var regName = "[^:\\s][a-zA-Z0-9\x2D\x5F]+";
-	var regLvar = `^((L:){0,1}${regName}){1}$`;
+	var regLVarName = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2E\x3A]+";
+	var regLvar = `^((L:){0,1}${regLVarName}){1}$`;
 	var strHvar = `((H:){0,1}${regName}){1}`;
 	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
 	var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;

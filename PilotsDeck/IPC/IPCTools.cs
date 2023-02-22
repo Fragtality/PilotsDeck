@@ -10,13 +10,15 @@ namespace PilotsDeck
         //2D => -
         //2F => /
         //5F => _
-        //public static readonly string validName = @"[a-zA-Z0-9\x2D\x5F]+";
+        //2E => .
+        //3A => :
         public static readonly string validName = @"[^:\s][a-zA-Z0-9\x2D\x5F]+";
+        public static readonly string validLVarName = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2E\x3A]+";
         public static readonly Regex rxMacro = new($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
         public static readonly Regex rxScript = new($"^(Lua(Set|Clear|Toggle|Value)?:){{1}}{validName}(:[0-9]{{1,4}})*$", RegexOptions.Compiled);
         public static readonly Regex rxControlSeq = new(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         public static readonly Regex rxControl = new(@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
-        public static readonly Regex rxLvar = new($"^((L:){{0,1}}{validName}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxLvar = new($"^((L:){{0,1}}{validLVarName}){{1}}$", RegexOptions.Compiled);
         public static readonly string validHvar = $"((H:){{0,1}}{validName}){{1}}";
         public static readonly Regex rxHvar = new($"^({validHvar}){{1}}(:{validHvar})*$", RegexOptions.Compiled);
         public static readonly Regex rxOffset = new(@"^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled);
@@ -26,7 +28,7 @@ namespace PilotsDeck
         public static readonly string validPathXP = $"({validName}[\\x2F]){{1}}({validName}[\\x2F])*({validName}){{1}}";
         public static readonly Regex rxCmdXP = new($"^({validPathXP}){{1}}(:{validPathXP})*$", RegexOptions.Compiled);
         public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}[\w][\w ]+\)$", RegexOptions.Compiled);
-        public static readonly Regex rxLvarMobi = new($"^\\(L:({validName}){{1}}\\)$", RegexOptions.Compiled);
+        public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}}\\)$", RegexOptions.Compiled);
         #endregion
 
         #region Test-Functions
