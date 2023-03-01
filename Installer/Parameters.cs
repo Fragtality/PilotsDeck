@@ -41,11 +41,11 @@ namespace Installer
         public static readonly Regex ipcRegexVersion = new Regex(@"^v((\d+)\.(\d+)\.(\d+))$", RegexOptions.Compiled);
         public static readonly int ipcMajor = 7;
         public static readonly int ipcMinor = 3;
-        public static readonly int ipcPatch = 16;
+        public static readonly int ipcPatch = 17;
 
         public static readonly Regex wasmRegex = new Regex("^\\s*\"package_version\":\\s*\"([0-9\\.]+)\"\\s*,\\s*$", RegexOptions.Compiled);
         public static readonly string wasmIpcName = "fsuipc-lvar-module";
-        public static readonly string wasmIpcVersion = "0.9.1";
+        public static readonly string wasmIpcVersion = "1.0.0";
         public static readonly string wasmMobiName = "mobiflight-event-module";
         public static readonly string wasmMobiVersion = "0.6.0";
 
