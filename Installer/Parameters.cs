@@ -32,7 +32,7 @@ namespace Installer
 
         public static readonly string sdRegPath = @"HKEY_CURRENT_USER\SOFTWARE\Elgato Systems GmbH\StreamDeck";
         public static readonly string sdRegValue = "last_started_streamdeck_version";
-        public static readonly string sdVersion = "6.0";
+        public static readonly string sdVersion = "6";
         public static readonly string sdProfilePattern = "*.streamDeckProfile";
         public static readonly string sdBinary = "StreamDeck";
 
