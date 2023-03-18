@@ -159,7 +159,7 @@ namespace Installer
                 else
                 {
                     control.SetImage(ActionIcon.Error);
-                    control.Message.Text = $"The installed FSUIPC Version does not match the Minimum Version {Parameters.ipcMajor}.{Parameters.ipcMinor}.{Parameters.ipcPatch}! Please install the latest Version.";
+                    control.Message.Text = $"The installed FSUIPC Version does not match the Minimum Version {Parameters.ipcVersion}! Please install the latest Version.";
                     control.Message.Inlines.Add(link);
                     return false;
                 }

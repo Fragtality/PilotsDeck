@@ -118,6 +118,57 @@ namespace Installer
             }
         }
 
+        public static bool CheckVersion(string versionInstalled, string versionRequired, bool majorEqual, bool ignoreBuild)
+        {
+            bool majorMatch = false;
+            bool minorMatch = false;
+            bool patchMatch = false;
+
+            string[] strInst = versionInstalled.Split('.');
+            string[] strReq = versionRequired.Split('.');
+            int vInst;
+            int vReq;
+            bool prevWasEqual = false;
+
+            //Major
+            if (int.TryParse(strInst[0], out vInst) && int.TryParse(strReq[0], out vReq))
+            {
+                if (majorEqual)
+                    majorMatch = vInst == vReq;
+                else
+                    majorMatch = vInst >= vReq;
+
+                prevWasEqual = vInst == vReq;
+            }
+
+            //Minor
+            if (int.TryParse(strInst[1], out vInst) && int.TryParse(strReq[1], out vReq))
+            {
+                if (prevWasEqual)
+                    minorMatch = vInst >= vReq;
+                else
+                    minorMatch = true;
+
+                prevWasEqual = vInst == vReq;
+            }
+
+            //Patch
+            if (!ignoreBuild)
+            {
+                if (int.TryParse(strInst[2], out vInst) && int.TryParse(strReq[2], out vReq))
+                {
+                    if (prevWasEqual)
+                        patchMatch = vInst >= vReq;
+                    else
+                        patchMatch = true;
+                }
+            }
+            else
+                patchMatch = true;
+
+            return majorMatch && minorMatch && patchMatch;
+        }
+
         public static bool CheckPackageVersion(string packagePath, string packageName, string version)
         {
             try
@@ -131,8 +182,8 @@ namespace Installer
                         if (Parameters.wasmRegex.IsMatch(line))
                         {
                             var matches = Parameters.wasmRegex.Matches(line);
-                            if (matches.Count == 1 && matches[0].Groups.Count >= 2 && matches[0].Groups[1].Value == version)
-                                return true;
+                            if (matches.Count == 1 && matches[0].Groups.Count >= 2)
+                                return CheckVersion(matches[0].Groups[1].Value, version, false, false);
                         }
                     }
                 }
@@ -153,14 +204,16 @@ namespace Installer
                 string regVersion = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegValue, null);
                 if (!string.IsNullOrWhiteSpace(regVersion))
                 {
-                    var matches = Parameters.ipcRegexVersion.Matches(regVersion);
-                    foreach (Match match in matches)
-                    {
-                        if (!match.Success || match.Groups.Count != 5) continue;
+                    regVersion = regVersion.Substring(1);
+                    result = CheckVersion(regVersion, Parameters.ipcVersion, true, false);
+                    //var matches = Parameters.ipcRegexVersion.Matches(regVersion);
+                    //foreach (Match match in matches)
+                    //{
+                    //    if (!match.Success || match.Groups.Count != 5) continue;
 
-                        if (StringGreaterEqual(match.Groups[2].Value, Parameters.ipcMajor) && StringGreaterEqual(match.Groups[3].Value, Parameters.ipcMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.ipcPatch))
-                            result = true;
-                    }
+                    //    if (StringGreaterEqual(match.Groups[2].Value, Parameters.ipcMajor) && StringGreaterEqual(match.Groups[3].Value, Parameters.ipcMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.ipcPatch))
+                    //        result = true;
+                    //}
                 }
             }
             catch (Exception e)
@@ -217,7 +270,7 @@ namespace Installer
             try
             {
                 string regVersion = (string)Registry.GetValue(Parameters.sdRegPath, Parameters.sdRegValue, null);
-                if (!string.IsNullOrWhiteSpace(regVersion) && regVersion.StartsWith(Parameters.sdVersion))
+                if (!string.IsNullOrWhiteSpace(regVersion) && CheckVersion(regVersion, Parameters.sdVersion, true, true))
                     return true;
                 else
                     return false;
