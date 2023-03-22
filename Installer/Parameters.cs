@@ -2,14 +2,14 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-[assembly: AssemblyVersion("0.7.8.0")]
-[assembly: AssemblyFileVersion("0.7.8.0")]
+[assembly: AssemblyVersion("0.7.9.0")]
+[assembly: AssemblyFileVersion("0.7.9.0")]
 
 namespace Installer
 {
     public static class Parameters
     {
-        public static readonly string pilotsDeckVersion = "latest";
+        public static readonly string pilotsDeckVersion = "0.7.9";
 
         public static readonly string sdPluginDir = @"\Elgato\StreamDeck\Plugins";
         public static readonly string pluginBinary = "PilotsDeck";
@@ -39,7 +39,7 @@ namespace Installer
         public static readonly string ipcRegPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FSUIPC7";
         public static readonly string ipcRegValue = "DisplayVersion";
         public static readonly Regex ipcRegexVersion = new Regex(@"^v((\d+)\.(\d+)\.(\d+))$", RegexOptions.Compiled);
-        public static readonly string ipcVersion = "7.3.18";
+        public static readonly string ipcVersion = "7.3.19";
 
         public static readonly Regex wasmRegex = new Regex("^\\s*\"package_version\":\\s*\"([0-9\\.]+)\"\\s*,\\s*$", RegexOptions.Compiled);
         public static readonly string wasmIpcName = "fsuipc-lvar-module";

@@ -140,8 +140,8 @@ namespace Installer
                         }
                         else
                         {
-                            control.SetImage(ActionIcon.OK);
-                            control.Message.Text = "All MSFS Requirements met!";
+                            control.SetImage(ActionIcon.Notice);
+                            control.Message.Text = "All MSFS Requirements met! It is advisable to add NumberOfPumps=0 to the [General] Section to avoid Stutters!";
                         }
                     }
                     else
