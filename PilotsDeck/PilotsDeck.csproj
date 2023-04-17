@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
     <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
-    <Version>0.7.9.0</Version>
+    <Version>0.7.10</Version>
     <Authors>Fragtality</Authors>
     <Description>Directly control your FlightSim from your StreamDeck via FSUIPC!</Description>
     <Copyright>Copyright © 2023</Copyright>

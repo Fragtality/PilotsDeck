@@ -152,12 +152,13 @@ function setPattern(field, type) {
 		return;
 
 	var regName = "[^:\\s][a-zA-Z0-9\x2D\x5F]+";
+	var regNameMultiple = "[a-zA-Z0-9\x2D\x5F]+";
 	var regLVarName = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2E\x3A]+";
 	var regLvar = `^((L:){0,1}${regLVarName}){1}$`;
 	var strHvar = `((H:){0,1}${regName}){1}`;
 	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
-	var regDref = `^(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
-	var strPathXP = `(${regName}[\x2F]){1}(${regName}[\x2F])*(${regName}){1}`;
+	var regDref = `^(${regName}[\x2F]){1}(${regNameMultiple}[\x2F])*(${regNameMultiple}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
+	var strPathXP = `(${regName}[\x2F]){1}(${regNameMultiple}[\x2F])*(${regNameMultiple}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	var regAvar = `^\\((A:){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w ]+\\)$`;
