@@ -153,7 +153,7 @@ namespace PilotsDeck
 
         public override void SubscribeAddress(string address)
         {
-            if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address))
+            if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
             {
                 mobiConnect.SubscribeAddress(address);
             }

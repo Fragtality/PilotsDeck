@@ -344,7 +344,7 @@ namespace PilotsDeck
         {
             foreach (var address in ipcManager.AddressList)
             {
-                if ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address))
+                if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
                 {
                     SubscribeAddress(address);
                 }
