@@ -87,15 +87,15 @@ namespace Installer
             else
             {
                 control.SetImage(ActionIcon.Error);
-                control.Message.Text = $"The installed .NET Runtime does not match the Minimum Version {Parameters.netVersion}!\r\nPlease install the following Packages:\r\n";
+                control.Message.Text = $"The installed .NET Runtime does not match the Minimum Version {Parameters.netVersion}!\r\nPlease install the following Packages and Reboot:\r\n";
                 Hyperlink link = new Hyperlink(new Run(".NET Runtime\r\n"))
                 {
-                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/7e842a78-9877-4b82-8450-f3311b406a6f/83352282a0bdf1e5f9dfc5fcc88dc83f/dotnet-runtime-7.0.4-win-x64.exe"),
+                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/4b99bbc8-917a-417c-907b-d408341726a5/78b225344fbb9b80d3da3681e1d20d68/dotnet-runtime-7.0.5-win-x64.exe\r\n"),
                 };
                 control.Message.Inlines.Add(link);
                 link = new Hyperlink(new Run(".NET Desktop Runtime"))
                 {
-                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/b6a55627-12de-482a-aea8-17d635f4b775/d8798c0c796a945c657d04438cf9b84d/windowsdesktop-runtime-7.0.4-win-x64.exe\r\n")
+                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/dffb1939-cef1-4db3-a579-5475a3061cdd/578b208733c914c7b7357f6baa4ecfd6/windowsdesktop-runtime-7.0.5-win-x64.exe\r\n\r\n")
                 };
                 control.Message.Inlines.Add(link);
 
