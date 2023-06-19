@@ -2,14 +2,14 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-[assembly: AssemblyVersion("0.7.10.0")]
-[assembly: AssemblyFileVersion("0.7.10.0")]
+[assembly: AssemblyVersion("0.7.11.0")]
+[assembly: AssemblyFileVersion("0.7.11.0")]
 
 namespace Installer
 {
     public static class Parameters
     {
-        public static readonly string pilotsDeckVersion = "0.7.10";
+        public static readonly string pilotsDeckVersion = "latest";
 
         public static readonly string sdPluginDir = @"\Elgato\StreamDeck\Plugins";
         public static readonly string pluginBinary = "PilotsDeck";

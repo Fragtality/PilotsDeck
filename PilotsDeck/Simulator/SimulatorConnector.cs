@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Diagnostics;
 
 namespace PilotsDeck
 {
@@ -74,7 +75,8 @@ namespace PilotsDeck
 
         public static bool GetProcessRunning(string name)
         {
-            return System.Diagnostics.Process.GetProcessesByName(name).FirstOrDefault() != null;
+            Process proc = System.Diagnostics.Process.GetProcessesByName(name).FirstOrDefault();
+            return proc != null && proc.ProcessName == name;
         }
 
         public static SimulatorConnector CreateConnector(string appString, long tickCounter, IPCManager ipcManager)

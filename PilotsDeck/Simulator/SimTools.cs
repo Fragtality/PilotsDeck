@@ -407,7 +407,8 @@ namespace PilotsDeck
         public static string BuildLvarCode(string template, int ticks)
         {
             string code = "";
-            template = template.Replace("$L:", "$");
+            template = template.Replace("$L:", "L:");
+            template = template.Replace("L:", "");
             string[] parts = template.Split(':');
 
             if (parts.Length < 2)

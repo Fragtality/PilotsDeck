@@ -1,6 +1,7 @@
 ﻿using Extensions;
 using Microsoft.Win32;
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -14,30 +15,36 @@ namespace Installer
 {
     public static class InstallerFunctions
     {
+        public static bool GetProcessRunning(string name)
+        {
+            Process proc = Process.GetProcessesByName(name).FirstOrDefault();
+            return proc != null && proc.ProcessName == name;
+        }
+
         #region Install Actions
         public static bool StopStreamDeck()
         {
             try
             {
                 bool isOpen = false;
-                var procDeck = Process.GetProcessesByName(Parameters.sdBinary);
-                var procPlugin = Process.GetProcessesByName(Parameters.pluginBinary);
+                var procDeck = Process.GetProcessesByName(Parameters.sdBinary).FirstOrDefault();
+                var procPlugin = Process.GetProcessesByName(Parameters.pluginBinary).FirstOrDefault();
 
-                if (procDeck != null && procDeck.Length >= 1)
+                if (GetProcessRunning(Parameters.sdBinary))
                 {
-                    procDeck[0].Kill();
+                    procDeck.Kill();
                 }
-                if (procPlugin != null && procPlugin.Length >= 1)
+                if (GetProcessRunning(Parameters.pluginBinary))
                 {
                     isOpen = true;
-                    procPlugin[0].Kill();
+                    procPlugin.Kill();
                 }
 
                 if (isOpen)
                 {
                     do
-                        procPlugin = Process.GetProcessesByName(Parameters.pluginBinary);
-                    while (procPlugin != null && procPlugin.Length >= 1);
+                        Thread.Sleep(250);
+                    while (GetProcessRunning(Parameters.pluginBinary));
                     Thread.Sleep(2000);
                 }
 
