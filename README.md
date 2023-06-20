@@ -189,7 +189,7 @@ Note that these are the same as "Simconnect Events", "K-Vars" or "Key-Events" - 
 #### LVAR
 | Command & Variable | MSFS, P3D, FSX | `(L:)Name` |
 | --- | --- | --- |
-- *Name*: The Name of the L-Var with or without preceding `L:`.
+- *Name*: The Name of the L-Var with or without preceding `L:`. The L-Var Name can also contain Numbers (0-9), Dashes (-), Underscores (_) and Colons (:) as long as these are not the first Character in the Name. Please Note that **Space** is not allowed. Even though it seems technically possible, it is a very Bad Practice to have Variable Names with Spaces. Therefore Spaces will never be added. You can try if Calculator works for you as Work-Arround.
 
 *Examples*:
 - `I_OH_FUEL_CENTER_1_U` - Read from the L-Var *I_OH_FUEL_CENTER_1_U*.
