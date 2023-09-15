@@ -213,14 +213,29 @@ namespace Installer
                 {
                     regVersion = regVersion.Substring(1);
                     result = CheckVersion(regVersion, Parameters.ipcVersion, true, false);
-                    //var matches = Parameters.ipcRegexVersion.Matches(regVersion);
-                    //foreach (Match match in matches)
-                    //{
-                    //    if (!match.Success || match.Groups.Count != 5) continue;
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during CheckFSUIPC", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-                    //    if (StringGreaterEqual(match.Groups[2].Value, Parameters.ipcMajor) && StringGreaterEqual(match.Groups[3].Value, Parameters.ipcMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.ipcPatch))
-                    //        result = true;
-                    //}
+            return result;
+        }
+
+        public static bool CheckFSUIPC7Pumps()
+        {
+            bool result = false;
+
+            try
+            { 
+                string regPath = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegInstallDirValue, null) + "\\" + "FSUIPC7.ini";
+
+                if (File.Exists(regPath))
+                {
+                    string fileContent = File.ReadAllText(regPath);
+                    if (fileContent.Contains("NumberOfPumps=0"))
+                        result = true;
                 }
             }
             catch (Exception e)

@@ -15,7 +15,13 @@ namespace Installer
         {
             InitializeComponent();
 
-            descLabel.Text = "This Tool will install the PilotsDeck StreamDeck Plugin on your System.\r\nYour StreamDeck Software will be stopped during the Installation-Process.\r\nAdded/Changed Profiles and added Images will stay intact.";
+            descLabel.Text = "This Tool will install the PilotsDeck StreamDeck Plugin on your System.\r\nYour StreamDeck Software will be stopped during the Installation-Process.\r\nAdded/Changed Profiles and added Images will stay intact.\r\n\r\nNote: PilotsDeck is 100% free and Open-Source. The Software and the Developer do not have any Affiliation to Flight Panels. Buying from Flight Panels does not support my Work in any Way.\r\nCreating own Profiles is something anyone (knowing how a Plane can be interfaced) can do!";
+            Hyperlink link = new Hyperlink(new Run("\r\nPilotsDeck on GitHub"))
+            {
+                NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck")
+            };
+            descLabel.Inlines.Add(link);
+            descLabel.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(RequestNavigateHandler));
             Title += $" ({Parameters.pilotsDeckVersion})";
         }
 
@@ -90,12 +96,12 @@ namespace Installer
                 control.Message.Text = $"The installed .NET Runtime does not match the Minimum Version {Parameters.netVersion}!\r\nPlease install the following Packages and Reboot:\r\n";
                 Hyperlink link = new Hyperlink(new Run(".NET Runtime\r\n"))
                 {
-                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/4b99bbc8-917a-417c-907b-d408341726a5/78b225344fbb9b80d3da3681e1d20d68/dotnet-runtime-7.0.5-win-x64.exe\r\n"),
+                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/3811bb07-e655-45c7-9817-7faaba076977/6bdd137ea2e7f9c42e427a5216539fbc/dotnet-runtime-7.0.10-win-x64.exe\r\n\r\n"),
                 };
                 control.Message.Inlines.Add(link);
                 link = new Hyperlink(new Run(".NET Desktop Runtime"))
                 {
-                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/dffb1939-cef1-4db3-a579-5475a3061cdd/578b208733c914c7b7357f6baa4ecfd6/windowsdesktop-runtime-7.0.5-win-x64.exe\r\n\r\n")
+                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/747f4a98-2586-4bc6-b828-34f35e384a7d/44225cfd9d365855ec77d00c4812133c/windowsdesktop-runtime-7.0.10-win-x64.exe\r\n\r\n\r\n")
                 };
                 control.Message.Inlines.Add(link);
 
@@ -122,7 +128,7 @@ namespace Installer
 
             //Check MSFS Requirements
             control = AddActionControl("Checking MSFS Requirements ...");
-            if (InstallerFunctions.CheckInstalledMSFS(out string packagePath) && !string.IsNullOrWhiteSpace(packagePath))
+            if (!App.argIgnoreMSFS && InstallerFunctions.CheckInstalledMSFS(out string packagePath) && !string.IsNullOrWhiteSpace(packagePath))
             {
                 Hyperlink link = new Hyperlink(new Run("\r\nFSUIPC"))
                 {
@@ -138,10 +144,15 @@ namespace Installer
                             control.Message.Text = $"The installed WASM Module from FSUIPC does not match the Minimum Version {Parameters.wasmIpcVersion}! It is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.";
                             control.Message.Inlines.Add(link);
                         }
-                        else
+                        else if (!InstallerFunctions.CheckFSUIPC7Pumps())
                         {
                             control.SetImage(ActionIcon.Notice);
-                            control.Message.Text = "All MSFS Requirements met! It is advisable to add NumberOfPumps=0 to the [General] Section to avoid Stutters!";
+                            control.Message.Text = "All MSFS Requirements met! But the FSUIPC7.ini is missing the NumberOfPumps=0 Entry in the [General] Section (which helps to avoid Stutters)!";
+                        }
+                        else
+                        {
+                            control.SetImage(ActionIcon.OK);
+                            control.Message.Text = "All MSFS Requirements met!";
                         }
                     }
                     else
@@ -163,6 +174,11 @@ namespace Installer
                     control.Message.Inlines.Add(link);
                     return false;
                 }
+            }
+            else if (App.argIgnoreMSFS)
+            {
+                control.SetImage(ActionIcon.Notice);
+                control.Message.Text = "MSFS Validation was skipped as per User Request. Don't be suprised when the Plugin does not work for MSFS ;)";
             }
             else
             {

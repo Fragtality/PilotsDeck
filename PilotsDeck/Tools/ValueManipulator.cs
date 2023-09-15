@@ -122,6 +122,24 @@ namespace PilotsDeck
                 if (!increase && (value - step) >= limit)
                     value -= step;
             }
+            else if (parts.Length == 3)
+            {
+                if (!double.TryParse(parts[1], NumberStyles.Number, new RealInvariantFormat(parts[1]), out double limit))
+                    return;
+
+                if (!double.TryParse(parts[2], NumberStyles.Number, new RealInvariantFormat(parts[1]), out double reset))
+                    return;
+
+                if (increase && (value + step) < limit)
+                    value += step;
+                else if (increase && (value + step) >= limit)
+                    value = reset;
+
+                if (!increase && (value - step) > limit)
+                    value -= step;
+                else if (!increase && (value - step) <= limit)
+                    value = reset;
+            }
             else
             {
                 if (increase)

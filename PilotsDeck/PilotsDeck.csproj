@@ -52,9 +52,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSUIPCClientDLL" Version="3.3.6" />
+    <PackageReference Include="FSUIPCClientDLL" Version="3.3.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="StreamDeckLib" Version="2302.6.2128" />
+    <PackageReference Include="StreamDeckLib" Version="2309.15.1958" />
   </ItemGroup>
 
   <ItemGroup>

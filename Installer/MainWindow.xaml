@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Installer"
         mc:Ignorable="d"
-        Title="PilotsDeck Installer" Height="700" Width="640" ResizeMode="NoResize">
+        Title="PilotsDeck Installer" MinHeight="700" Width="640" ResizeMode="NoResize" SizeToContent="Height">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="96" />
+            <RowDefinition Height="192" />
             <RowDefinition Height="*" />
             <RowDefinition Height="64" />
         </Grid.RowDefinitions>

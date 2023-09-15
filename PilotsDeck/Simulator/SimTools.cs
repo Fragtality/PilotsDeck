@@ -407,8 +407,10 @@ namespace PilotsDeck
         public static string BuildLvarCode(string template, int ticks)
         {
             string code = "";
-            template = template.Replace("$L:", "L:");
-            template = template.Replace("L:", "");
+            template = template.Replace("$L:", "");
+            if (template.IndexOf("L:") == 0)
+                template = template.Substring(2);
+
             string[] parts = template.Split(':');
 
             if (parts.Length < 2)
@@ -441,7 +443,19 @@ namespace PilotsDeck
 
                     string cmp = increase ? "<=" : ">=";
                     code = $"({lvar}) {step} {op} {parts[2]} {cmp} if{{ {code} }}";
-                }                    
+                }
+                
+                if (parts.Length == 4 && double.TryParse(parts[2], NumberStyles.Number, new RealInvariantFormat(parts[2]), out _) && double.TryParse(parts[3], NumberStyles.Number, new RealInvariantFormat(parts[3]), out _))
+                {
+                    if (parts[2].Contains(','))
+                        parts[2] = parts[2].Replace(',', '.');
+                    if (parts[3].Contains(','))
+                        parts[3] = parts[3].Replace(',', '.');
+
+                    string cmp = increase ? "<" : ">";
+                    string cmp2 = increase ? ">=" : "<=";
+                    code = $"({lvar}) {step} {op} {parts[2]} {cmp} if{{ {code} }} ({lvar}) {step} {op} {parts[2]} {cmp2} if{{ {parts[3]} (>{lvar}) }}";
+                }
             }
 
             return code;
