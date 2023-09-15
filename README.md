@@ -11,7 +11,10 @@ The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, 
 
 Simulator-wise it supports all major Platforms on Windows - **MS Flight Simulator**, **X-Plane** and **Prepar3D**. For MS Platforms it connects through **FSUIPC** to the Simulator, for X-Plane it connects directly via **UDP** Sockets. Either way it will connect automatically as soon as a Simulator is running. All Variables and Commands these Connections allow are usable with the Plugin. You can can directly connect to another Sim without reconfiguring anything.<br/>
 Not all Variables and Commands require a registered Version of FSUIPC, but a registered (bought) Copy of FSUIPC is recommended to use the full Potential. If you only fly in X-Plane, FSUIPC is not needed at all.<br/><br/>
-It is designed for **advanced Sim-Users** which "know how to do Stuff": it does not make any unnecessary complicated Stuff, but doesn't have Features allowing to do anything without knowing anything 😅 If you know how to read Control-States for your Plane and how to trigger these Controls, you can quickly define Actions for that on the StreamDeck. If you don't: be eager to read & learn. 😉 I'll try to give some Background in the Readme, but you have to take it from there!<br/>
+It is designed for **advanced Sim-Users** which "know how to do Stuff": it does not make any unnecessary complicated Stuff, but doesn't have Features allowing to do anything without knowing anything 😅 If you know how to read Control-States for your Plane and how to trigger these Controls, you can quickly define Actions for that on the StreamDeck. If you don't: be eager to read & learn. 😉 I'll try to give some Background in the Readme, but you have to take it from there!<br/><br/>
+
+**Note**: PilotsDeck is 100% free and Open-Source. The Software and the Developer do **not have any Affiliation to Flight Panels**. Buying from Flight Panels **does not support my Work** in any Way.<br/>
+Creating own Profiles is something anyone (knowing how a Plane can be interfaced) can do!<br/><br/>
 
 Predefined StreamDeck Profiles are available under [Integrations](Integrations/), but there are not much. Either your Plane is among these for direct Use or they can at least serve as Example:<br/>
 <img src="img/ExampleLayout01.jpg" width="420"><br/>
@@ -34,7 +37,8 @@ Other Examples can be found under [here](#examples).<br/>
 | X-Plane 11 | yes | yes | None - does not use XUIPC |
 | X-Plane <=10 | yes | no | None - does not use XUIPC |
 
-Supported is understood as "technical and basically supported by the Connection Method". Support in Terms of ensured Compatibility, Fixing Issues and giving Support exists only for the latest Version of the three Major Simulators: MSFS2020, X-Plane 12, P3D v5. I'm happy if it works for older Versions, but I won't make any Effort for them. It is time to go back to the Future! 😅
+Supported is understood as "technical and basically supported by the Connection Method". Support in Terms of ensured Compatibility, Fixing Issues and giving Support exists only for the latest Version of the three Major Simulators: MSFS2020, X-Plane 12, P3D v5. I'm happy if it works for older Versions, but I won't make any Effort for them. It is time to go back to the Future! 😅<br/>
+And yes: the latest Version for Prepar3D is still considered v5, since v6 was just DOA with nearly every Addon-Dev announcing to not support it.
 <br/><br/><br/>
 
 ## 1.2 - Supported Sim-Commands & -Variables
@@ -93,6 +97,8 @@ The Requirements for the Plugin to run:
 - If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases) installed in your Community-Folder
 - Optional: If you want to use **VJOYDRV** Commands you need Version [v2.2.1.1](https://github.com/njz3/vJoy/releases/tag/v2.2.1.1) for Windows 10 and Version [2.1.9.1](https://github.com/jshafer817/vJoy/releases/tag/v2.1.9.1) for Windows 11. It is not checked by the Installer (since it is not a Requirement for the Plugin).
 
+<br/><br/>
+If you want to disable the MSFS Requirements Checks (not recommended), start the Installer with `--ignoremsfs` as Command Line Argument. (Don't ask me what that means)
 
 
 <br/><br/>
@@ -284,10 +290,11 @@ Note that this Command is also only executed when the Plugin is in the Ready Sta
 | --- | --- | --- |
 - *RPN-Code*: The Code in normal RPN Syntax you want to run with the execute_calculator_code Function.
 
-For simple Tasks like increasing/decreasing a L-Var you can use the `$Name:Step(:Limit)` Template (the Plugin will build the right RPN-Code for that):
+For simple Tasks like increasing/decreasing a L-Var you can use the `$Name:Step(:Limit(:Reset))` Template (the Plugin will build the right RPN-Code for that):
 - *Name*: The Name of the L-Var with or without preceding `L:`.
 - *Step*: The positive/negative Number by which the Variable is increased/decreased. A Plus-Sing for a positive Number is optional.
 - *Limit*: The Variable will not be increased/decreased beyond that optional Limit.
+- *Reset*: When the Variable reaches the specified *Limit*, the Variable will be set to the Value of *Reset*
 
 For simple Tasks like triggering a K-Var (Event) you can use the `$K:Name(:Parameter)` Template (the Plugin will build the right RPN-Code for that):
 - *Name*: The Name of the K-Var to trigger, you have to prefix it with `K:`.
@@ -297,6 +304,7 @@ For simple Tasks like triggering a K-Var (Event) you can use the `$K:Name(:Param
 - `(A:LIGHT POTENTIOMETER:13, percent over 100) 0.0 > if{ (A:LIGHT POTENTIOMETER:13, percent over 100) 0.1 - 100 * (>K:LIGHT_POTENTIOMETER_13_SET) }` - Example of RPN Code (Decreasing Cabin Lights in the Fenix Airbus).
 - `$E_FCU_SPEED:+1` - Increase L-Var *E_FCU_SPEED* by *1*.
 - `$A_ASP_VHF_1_VOLUME:-0.05:0` - Decrease L-Var *A_ASP_VHF_1_VOLUME* by *0.05* until it is *0*.
+- `$A_ASP_VHF_1_VOLUME:0.05:1:0.5` - Increase L-Var *A_ASP_VHF_1_VOLUME* by *0.05* as long it is smaller then *1*. When it reaches *1*, the Variable will be reset to *0.5*.
 - `$K:FUELSYSTEM_PUMP_TOGGLE:2` - Trigger the Standard Event *FUELSYSTEM_PUMP_TOGGLE* with Parameter *2*.
 - `$K:A32NX.FCU_SPD_DEC` - Trigger the Custom Event *A32NX.FCU_SPD_DEC*.
 
@@ -370,9 +378,10 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 
 **On Value** / **Off Value**: This Fields are required for all Command & Variable Types. The Plugin will toggle between these two Values: when the current Value matches the Off Value, it will write the On Value. In every other Case the On Value will be written.<br/><br/>
 But the Plugin can also do simple **Value Manipulations** on the Variable to increase/decrease the Value or write a Sequence of Values. These Value Manipulations always start with a `$` Sign and need to be entered in the **On Value** Field (the **Off Value** Field is not used then).<br/>
-The Syntax for increasing/decreasing is `$Step(:Limit)`
+The Syntax for increasing/decreasing is `$Step(:Limit(:Reset))`
 - `$1` - A simple Increment by *1*.
 - `$1:4` - Increment by *1* up to a Value of *4*.
+- `$1:4:2` - Increment by *1* up to a Value of *4*. When *4* is reached, the Variable will be set to *2*.
 
 The Values in a Sequence are defined as `,` separated List. The Plugin will compare the current Value with the List - if the Value is matched, it will write the next Value from the List to the Variable. If there is no match, it will use the last Value in the List. One Value can optionally be defined as Default with a `=` in Front of it. A Sequence must contain at least two Values with an optional Default Value or exactly one Value defined as Default. All Values in the List must be unique with the Exception of the last one.<br/>
 A optional `<` at the End lets the Value "bounce off" - if the current Value is already the last one in the List, the previous Value is written.<br/>
@@ -791,6 +800,7 @@ Sorry I've tricked you, there is no real Tutorial here 🤣 - but I can at least
 The Thing is: there are so many different Aircrafts out there which each handle Things differently, even in the same Simulator, that there can be one or few Tutorials which could explain everything. Don't ask for Tutorial-Videos, they will not exist (at least from me): I don't specifically hate such Videos, I just strongly Belief that Reading is the Key to get a fundamental Understanding of any Topic. On that Fundament, other Mediums like a Video can be great Addition.<br/><br/>
 So *after Reading* this Document - where do you start? 😉<br/>
 Before you can really start with anything in the Plugin, you must have some kind of SDK/API/whatever Reference from anywhere for the Aircraft you want to create StreamDeck Actions for. You need to know how you can read the Control-States and how you manipulate them! Some Aircraft a purely based on L-Vars, others only for read, other not at all. Some use Custom Events, some use Rotor-Brake-Codes. Some things just can't be read. If you are lucky, it is a Default Plane or a Plane which reacts to Standard-Commands and -Variables. For such "defaulty" Planes, you can use the various References for Standard Commands and Variables I have linked in [Defining Commands and Variables](#21---defining-commands--variables).<br/><br/>
+You can use other Sources like MobiFlight's [HubHop](https://hubhop.mobiflight.com/) to lookup if someone else already found out what Variables / Events can be used on a specific Plane. You can also use the ModelBehaviour Debugger of the MSFS DevMode to search for Events & Variables. The great Sebastian (Mr. MobiFlight himself) did a [great Guide on YouTube](https://www.youtube.com/watch?v=PKBjEl9E5A4) how to use that! ❤️<br/><br/>
 Try to follow the KISS Principle. Don't start with Complex Controls or even Displays. Focus on the Cockpit-Controls with the greatest "discomfort" in a normal Simulator Session. Usually the ones where fiddling arround with the Mouse is just annoying. Things like the Aircraft-Lights, because you have to quickly control these when entering/leaving a Runway for Example. Being able to quickly control & check such Controls without loosing Focus on Flying/Taxiing the Aircraft will give you the most Benefit and greatly improves the Simulation Experience.<br/>
 Lights and Signs are a good starting Point (except on the FBW...) because the Variable to read can relatively easily be found. They only have 2 or 3 States and most of the Time you want to toggle them. That calls for a Dynamic Button! Enter the Command, enter the Variable, enter the Values for On/Off (and Special) and select the Light... Images. You have defined your first Light. Just copy and paste that Action for the next similar working Light and change the Command and Variable. Now you have your Light Panel on the StreamDeck!
 <br/><br/>
