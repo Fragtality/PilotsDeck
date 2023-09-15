@@ -96,12 +96,12 @@ namespace Installer
                 control.Message.Text = $"The installed .NET Runtime does not match the Minimum Version {Parameters.netVersion}!\r\nPlease install the following Packages and Reboot:\r\n";
                 Hyperlink link = new Hyperlink(new Run(".NET Runtime\r\n"))
                 {
-                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/3811bb07-e655-45c7-9817-7faaba076977/6bdd137ea2e7f9c42e427a5216539fbc/dotnet-runtime-7.0.10-win-x64.exe\r\n\r\n"),
+                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/e05aedd4-c6e1-4cf8-91d6-4df84e51adb9/cadaaa83f7403cff53d5d8a491ac8049/dotnet-runtime-7.0.11-win-x64.exe\r\n\r\n\r\n"),
                 };
                 control.Message.Inlines.Add(link);
                 link = new Hyperlink(new Run(".NET Desktop Runtime"))
                 {
-                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/747f4a98-2586-4bc6-b828-34f35e384a7d/44225cfd9d365855ec77d00c4812133c/windowsdesktop-runtime-7.0.10-win-x64.exe\r\n\r\n\r\n")
+                    NavigateUri = new Uri("https://download.visualstudio.microsoft.com/download/pr/2ce1cbbe-71d1-44e7-8e80-d9ae336b9b17/a2706bca3474eef8ef95e10a12ecc2a4/windowsdesktop-runtime-7.0.11-win-x64.exe\r\n\r\n\r\n\r\n")
                 };
                 control.Message.Inlines.Add(link);
 
