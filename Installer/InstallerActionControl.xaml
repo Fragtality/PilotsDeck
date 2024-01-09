@@ -16,8 +16,9 @@
                 <ColumnDefinition Width="48"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock Name="Message" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <StackPanel VerticalAlignment="Center" Grid.Column="0" Orientation="Vertical">
+                <Label Name="Title" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="DemiBold"></Label>
+                <TextBlock Margin="10,0,0,0" Name="Message" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap"/>
             </StackPanel>
             <Image Name="Image" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="32" Width="32"/>
         </Grid>

@@ -31,7 +31,7 @@
     <PublisherName>Fragtality</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.7.11.0</ApplicationVersion>
+    <ApplicationVersion>0.7.12.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>false</BootstrapperEnabled>
@@ -132,6 +132,8 @@
       <DependentUpon>InstallerActionControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="InstallerFunctions.cs" />
+    <Compile Include="InstallerTask.cs" />
+    <Compile Include="InstallerWorker.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

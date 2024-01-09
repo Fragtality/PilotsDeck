@@ -13,8 +13,7 @@ Simulator-wise it supports all major Platforms on Windows - **MS Flight Simulato
 Not all Variables and Commands require a registered Version of FSUIPC, but a registered (bought) Copy of FSUIPC is recommended to use the full Potential. If you only fly in X-Plane, FSUIPC is not needed at all.<br/><br/>
 It is designed for **advanced Sim-Users** which "know how to do Stuff": it does not make any unnecessary complicated Stuff, but doesn't have Features allowing to do anything without knowing anything 😅 If you know how to read Control-States for your Plane and how to trigger these Controls, you can quickly define Actions for that on the StreamDeck. If you don't: be eager to read & learn. 😉 I'll try to give some Background in the Readme, but you have to take it from there!<br/><br/>
 
-**Note**: PilotsDeck is 100% free and Open-Source. The Software and the Developer do **not have any Affiliation to Flight Panels**. Buying from Flight Panels **does not support my Work** in any Way.<br/>
-Creating own Profiles is something anyone (knowing how a Plane can be interfaced) can do!<br/><br/>
+**Note**: PilotsDeck is 100% free and Open-Source. The Software and the Developer do **not have any Affiliation to Flight Panels**.<br/><br/>
 
 Predefined StreamDeck Profiles are available under [Integrations](Integrations/), but there are not much. Either your Plane is among these for direct Use or they can at least serve as Example:<br/>
 <img src="img/ExampleLayout01.jpg" width="420"><br/>
@@ -86,15 +85,15 @@ How these Actions can be configured and customized is described under [2.3 - Act
 <br/><br/>
 
 ## 1.4 - Installation & Requirements
-The best Way to Install and Update the Plugin is via the **Installer**: Download, Execute and click Install! It will check the Requirements, informs & links what it missing and installs the Plugin in the correct Location if the Requirements are met (the StreamDeck Software will be automatically stopped).<br/>
+The best Way to Install and Update the Plugin is via the **Installer**: Download, Execute and click Install! It will check and partly also installs the Requirements, informs & links what it missing and installs the Plugin in the correct Location if the Requirements are met (the StreamDeck Software will be automatically stopped).<br/>
 It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues.<br/>
 If it still does not work right or at all, please check [3.3 - Troubleshooting](#33---troubleshooting).<br/><br/>
 The Requirements for the Plugin to run:
 - Windows **10** or **11** (updated)
 - [**StreamDeck Software v6**](https://www.elgato.com/downloads)
-- [**.NET 7**](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) x64 Runtime (.NET Runtime and .NET Desktop Runtime. Do not confuse it with arm64!) installed & updated. Reboot when installing the Runtimes for the first Time.
+- [**.NET 7**](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) x64 Desktop Runtime will be installed/updated by the Installer. Reboot when installing the Runtimes for the first Time.
 - If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 7 for MSFS2020)
-- If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases) installed in your Community-Folder
+- If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases). The Install will take Care of that.
 - Optional: If you want to use **VJOYDRV** Commands you need Version [v2.2.1.1](https://github.com/njz3/vJoy/releases/tag/v2.2.1.1) for Windows 10 and Version [2.1.9.1](https://github.com/jshafer817/vJoy/releases/tag/v2.1.9.1) for Windows 11. It is not checked by the Installer (since it is not a Requirement for the Plugin).
 
 <br/><br/>
@@ -780,9 +779,9 @@ If it still doesn't work, contact me on one of the Platforms or Forums! To help 
 
 ## 3.4 - Plugin Settings
 Some of the Plugin Settings can be tweaked if really necessary in the File `PilotsDeck.dll.config`. Normally you don't need to do anything here. The available Settings and their Default:<br/>
-* **pollInterval**="200"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
+* **pollInterval**="100"		- The Intveral / Tick-Time at which the Offsets and Lvars will be refreshed / read from the Sim.
 * **waitTicks**="150"			- The amount of Ticks to wait between Connection retries. Fractions of that Value are used for other things (Start-Delay between Plugin/StreamDeck, Time-Measuring)
-* **longPressTicks**="3"		- The amount of Ticks a Button had to be pressed/down to be recognized as Long Press when released (3 \* 200 = 600ms).
+* **longPressTicks**="6"		- The amount of Ticks a Button had to be pressed/down to be recognized as Long Press when released (6 \* 100 = 600ms).
 * **controlDelay**="50"			- The amount of milliseconds to delay the next Control send to the Sim. This Delay (times 2) is also used for the Reset Switch. Other Fractions of this Delay are also used when Commands for the Encoder are executed.
 * **stringReplace**="%s"		- If for whatever Reason you don't like the C-Style, you can change the String-to-be-replaced for the Format Field. Don't use the colon (:). The PI and Value Checking are hardcoded to %s, though.
 * **redrawAlways**"="false" 		-  With "true" you can force the Plugin to redraw all Buttons on every Interval, even when the Value has not changed.

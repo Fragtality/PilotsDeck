@@ -1,11 +1,12 @@
 ﻿using Extensions;
 using Microsoft.Win32;
 using System;
-using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -98,6 +99,26 @@ namespace Installer
                 return false;
             }
         }
+
+        public static bool ExtractZipFile(string extractDir, string zipFile)
+        {
+            try
+            {
+                using (Stream stream = new FileStream(zipFile, FileMode.Open))
+                {
+                    ZipArchive archive = new ZipArchive(stream);
+                    archive.ExtractToDirectory(extractDir);
+                    stream.Close();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during ExtractZipFile", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
         #endregion
 
         #region Check Requirements
@@ -136,6 +157,12 @@ namespace Installer
             int vInst;
             int vReq;
             bool prevWasEqual = false;
+
+            for (int i = 0; i < strInst.Length; i++)
+            {
+                if (Regex.IsMatch(strInst[i], @"(\d+)\D"))
+                    strInst[i] = strInst[i].Substring(0, strInst[i].Length - 1);
+            }
 
             //Major
             if (int.TryParse(strInst[0], out vInst) && int.TryParse(strReq[0], out vReq))
@@ -203,16 +230,41 @@ namespace Installer
             return false;
         }
 
-        public static bool CheckFSUIPC()
+        public static bool DownloadFile(string url, string file)
         {
             bool result = false;
+            try
+            {
+                var webClient = new WebClient();
+                webClient.DownloadFile(url, file);
+                result = File.Exists(file);
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during DownloadFile", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return result;
+        }
+
+        public static bool CheckFSUIPC(string version = null)
+        {
+            bool result = false;
+            string ipcVersion = Parameters.ipcVersion;
+            if (!string.IsNullOrEmpty(version))
+                ipcVersion = version;
+
             try
             {
                 string regVersion = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegValue, null);
                 if (!string.IsNullOrWhiteSpace(regVersion))
                 {
                     regVersion = regVersion.Substring(1);
-                    result = CheckVersion(regVersion, Parameters.ipcVersion, true, false);
+                    int index = regVersion.IndexOf("(beta)");
+                    if (index > 0)
+                        regVersion = regVersion.Substring(0, index).TrimEnd();
+                    result = CheckVersion(regVersion, ipcVersion, true, false);
                 }
             }
             catch (Exception e)
@@ -287,12 +339,12 @@ namespace Installer
             return false;
         }
 
-        public static bool CheckStreamDeckSW()
+        public static bool CheckStreamDeckSW(string version)
         {
             try
             {
                 string regVersion = (string)Registry.GetValue(Parameters.sdRegPath, Parameters.sdRegValue, null);
-                if (!string.IsNullOrWhiteSpace(regVersion) && CheckVersion(regVersion, Parameters.sdVersion, true, true))
+                if (!string.IsNullOrWhiteSpace(regVersion) && CheckVersion(regVersion, version, true, true))
                     return true;
                 else
                     return false;
@@ -310,6 +362,7 @@ namespace Installer
             pProcess.StartInfo.FileName = "cmd.exe";
             pProcess.StartInfo.Arguments = "/C" + command;
             pProcess.StartInfo.UseShellExecute = false;
+            pProcess.StartInfo.CreateNoWindow = true;
             pProcess.StartInfo.RedirectStandardOutput = true;
             pProcess.Start();
             string strOutput = pProcess.StandardOutput.ReadToEnd();
@@ -326,34 +379,43 @@ namespace Installer
                 return false;
         }
 
+        public static bool StringEqual(string input, int compare)
+        {
+            if (int.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out int numA) && numA == compare)
+                return true;
+            else
+                return false;
+        }
+
+        public static bool StringGreater(string input, int compare)
+        {
+            if (int.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out int numA) && numA > compare)
+                return true;
+            else
+                return false;
+        }
+
         public static bool CheckDotNet()
         {
             try
             {
-                bool installedCore = false;
                 bool installedDesktop = false;
 
                 string output = RunCommand("dotnet --list-runtimes");
 
-                var matches = Parameters.netCore.Matches(output);
+                var matches = Parameters.netDesktop.Matches(output);
                 foreach (Match match in matches)
                 {
-                    if (!match.Success || match.Groups.Count != 5) continue;
-
-                    if (StringGreaterEqual(match.Groups[2].Value, Parameters.netMajor) && StringGreaterEqual(match.Groups[3].Value, Parameters.netMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.netPatch))
-                        installedCore = true;
-                }
-
-                matches = Parameters.netDesktop.Matches(output);
-                foreach (Match match in matches)
-                {
-                    if (!match.Success || match.Groups.Count != 5) continue;
-
-                    if (StringGreaterEqual(match.Groups[2].Value, Parameters.netMajor) && StringGreaterEqual(match.Groups[3].Value, Parameters.netMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.netPatch))
+                    if (!match.Success || match.Groups.Count != 5)
+                        continue;
+                    if (!StringEqual(match.Groups[2].Value, Parameters.netMajor))
+                        continue;
+                    if ((StringEqual(match.Groups[3].Value, Parameters.netMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.netPatch))
+                        || StringGreater(match.Groups[3].Value, Parameters.netMinor))
                         installedDesktop = true;
                 }
 
-                return installedCore && installedDesktop;
+                return installedDesktop;
             }
             catch (Exception e)
             {

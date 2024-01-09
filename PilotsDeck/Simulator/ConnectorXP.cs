@@ -497,17 +497,16 @@ namespace PilotsDeck
                         }
                         else if (index >= 10)
                         {
-                            if (dataRefs.ContainsKey(index))
+                            if (dataRefs.TryGetValue(index, out IPCValue ipcValue))
                             {
-                                if (dataRefs[index] is IPCValueDataRefString)
+                                if (ipcValue is IPCValueDataRefString)
                                 {
-                                    (dataRefs[index] as IPCValueDataRefString).SetChar(0, Convert.ToChar((int)value));
+                                    (ipcValue as IPCValueDataRefString).SetChar(0, Convert.ToChar((int)value));
                                 }
                                 else
                                 {
-                                    var ipcValue = (IPCValueDataRef)dataRefs[index];
-                                    if (ipcValue != null)
-                                        ipcValue.FloatValue = value;
+                                    if (ipcValue != null && ipcValue is IPCValueDataRef)
+                                        (ipcValue as IPCValueDataRef).FloatValue = value;
                                     else
                                         Logger.Log(LogLevel.Error, "ConnectorXP:ParseResponse", $"IPCValue at Index '{index}' is Null! (Address {AddresstoIndex.Where((k, v) => v == index).FirstOrDefault()})");
                                 }

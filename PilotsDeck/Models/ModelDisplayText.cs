@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace PilotsDeck
 {
-	public class ModelDisplayText : ModelDisplay
+    public class ModelDisplayText : ModelDisplay
     {
 		public virtual string BoxSize { get; set; } = "2";
 		public virtual string BoxColor { get; set; } = "#ffffff";

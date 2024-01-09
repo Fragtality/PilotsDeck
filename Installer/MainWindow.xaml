@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:Installer"
         mc:Ignorable="d"
         Title="PilotsDeck Installer" MinHeight="700" Width="640" ResizeMode="NoResize" SizeToContent="Height">
-    <Grid>
+    <Grid Name="ViewGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="192" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="64" />
         </Grid.RowDefinitions>

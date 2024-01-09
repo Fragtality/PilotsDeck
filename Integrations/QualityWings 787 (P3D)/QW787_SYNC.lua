@@ -4,26 +4,30 @@ ipc.sleep(30000) --Give the QW787 init process some time (seems to trigger Ind L
 
 local syncPilotsDeck = true			--Generates/Writes the Offset Values used in the StreamDeck Profiles to display Baro, MCP Displays and Lights
 
-local syncCabin = false				--Turn the Cabin Lights on or off if the Cabin/Utility Buttton in the Overhead is toggled
-local syncBrake = false				--Sync the Parking Brake to the State of the Joystick Button (TCA and equivalents). Change Joystick Number and Button Number for the two Variables accordingly!
-local brakeJoystick = 1				--The Joystick Number as known to FSUIPC
+local syncCabin = true				--Turn the Cabin Lights on or off if the Cabin/Utility Buttton in the Overhead is toggled
+local syncBrake = true				--Sync the Parking Brake to the State of the Joystick Button (TCA and equivalents). Change Joystick Number and Button Number for the two Variables accordingly!
+local brakeJoystick = 2				--The Joystick Number as known to FSUIPC
 local brakeButton = 19				--The Button Number as known to FSUIPC
-local syncFD = false				--Sync the FO's FD to the Captains
+local syncFD = true					--Sync the FO's FD to the Captains
 
-local syncGSX = false				--Sync to Ground-Service Animations/Handling - open/close doors according to the Services currently performed by GSX. The GSX_AUTO Script QualityWings2GSX need to be running for that!
-local syncChocksAndPower = false	--Automatically set/remove Chocks and External Power according to the Jetway Operating State from GSX (When Jetway connected -> Chocks set / Ext Power available). Only Works when syncGSX is also true.
-local operateJetways = false		--Operate the Jetway(s) automatically when arriving/departing (syncGSX has to be enabled)
+local syncGSX = true				--Sync to Ground-Service Animations/Handling - open/close doors according to the Services currently performed by GSX. The GSX_AUTO Script QualityWings2GSX need to be running for that!
+local syncChocksAndPower = true		--Automatically set/remove Chocks and External Power according to the Jetway Operating State from GSX (When Jetway connected -> Chocks set / Ext Power available). Only Works when syncGSX is also true.
+local operateJetways = true			--Operate the Jetway(s) automatically when arriving/departing (syncGSX has to be enabled)
 
 -- 04E0-0537	88		Project Magenta
 -- 66C0-66FF	64		General Use
 -- 5400-57FF	1024	PMDG CDU0 / Project Magenta
 
+ipc.writeLvar("GSX_AUTO_NUM_DOORS", 2)
+local ticks = 0
 function QW787_SYNC()
 		QWsyncButtons()
 		if syncPilotsDeck then
 			QWreadBARO()		--0x5408 STR,4
 			QWreadFCU()			--SPD: 0x540C STR,9 | HDG: 0x5415 STR,8 | ALT: 0x541D STR,7 | VS: 0x5424 STR,9 | Mode+ALT+VS: 0x542D STR,17
 			QWUpdateButtonLt()	--0x543E UB,1 .. 0x5445
+			QWupdateClock()		--0x544A STR,9
+			ticks = ticks + 1
 		end
 		QWsyncGSX()
 end
@@ -227,6 +231,9 @@ function QWsyncGSX()
 		QW_GSX_JETWAYS_REQUESTED = true
 		ipc.log("QW787_SYNC: Departing - requesting Disconnect")
 		ipc.writeLvar("GSX_AUTO_CONNECT_REQUESTED", 1)
+		-- ipc.writeLvar("EXT_POWER_AVAIL", 0)
+		-- ipc.writeLvar("QW_WheelChocks",0)
+		-- ipc.log("QW787_SYNC: ExtPwr/Chocks are removed.")
 	elseif cycle_state ~=3 and cycle_state ~=7 and QW_GSX_JETWAYS_REQUESTED then
 		QW_GSX_JETWAYS_REQUESTED = false
 	end
@@ -392,5 +399,12 @@ function QWUpdateButtonLt()
 		ipc.writeUB(0x5445,1)
 	else
 		ipc.writeUB(0x5445,0)
+	end
+end
+
+function QWupdateClock()
+	if ticks % 2 == 0 then
+		local result = string.format("%02d:%02d:%02d", ipc.readUB(0x023B), ipc.readUB(0x023C), ipc.readUB(0x023A))
+		ipc.writeSTR(0x544A, result, 9)
 	end
 end
