@@ -128,7 +128,8 @@ namespace Installer
             //Check MSFS Requirements
             var task = new InstallerTask("MSFS Requirements", "Checking FSUIPC & MobiFlight ...");
             taskQueue.Enqueue(task);
-            if (!App.argIgnoreMSFS && InstallerFunctions.CheckInstalledMSFS(out string packagePath) && !string.IsNullOrWhiteSpace(packagePath))
+            bool msfsInstalled = InstallerFunctions.CheckInstalledMSFS(out string packagePath);
+            if (!App.argIgnoreMSFS && msfsInstalled && !string.IsNullOrWhiteSpace(packagePath))
             {                
                 if (InstallerFunctions.CheckFSUIPC())
                 {
@@ -174,7 +175,7 @@ namespace Installer
                     return false;
                 }
             }
-            else if (App.argIgnoreMSFS && InstallerFunctions.CheckInstalledMSFS(out _))
+            else if (App.argIgnoreMSFS && msfsInstalled)
             {
                 task.ResultIcon = ActionIcon.Notice;
                 task.Message = "MSFS Validation was skipped as per User Request. Don't be suprised when the Plugin does not work for MSFS ;)";
@@ -183,10 +184,10 @@ namespace Installer
             }
             else
             {
-                task.ResultIcon = ActionIcon.Error;
-                task.Message = "MSFS not found.";
+                task.ResultIcon = ActionIcon.Notice;
+                task.Message = "MSFS not found / not installed.\r\n(This is only a Problem if you have MSFS installed and want to use PilotsDeck for it.)";
 
-                return false;
+                return true;
             }
         }
 

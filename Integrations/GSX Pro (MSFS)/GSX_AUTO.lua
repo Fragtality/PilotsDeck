@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global
 -------------------------------------------------------------------------
 -- CONFIGURATION
-local GSXAUTO_CFG_PATH = "F:/Prepar3D/Addon Manager" --Path where you have installed GSX/Addon Manager Folder to. MUST use Forward-Slahes ( / ), MUST be as String (enclosed in " ) and MUST NOT end with a Slash
+local GSXAUTO_CFG_PATH = "C:/Program Files (x86)/Addon Manager" --Path where you have installed GSX/Addon Manager Folder to. MUST use Forward-Slahes ( / ), MUST be as String (enclosed in " ) and MUST NOT end with a Slash
 
 --To set these Automations per Plane, check the GSX_AUTO_LOAD_AC Function
 local GSXAUTO_CFG_NOCREW = true 	                        --Disable Boarding and Deboarding of Crew
