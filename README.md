@@ -97,7 +97,8 @@ The Requirements for the Plugin to run:
 - Optional: If you want to use **VJOYDRV** Commands you need Version [v2.2.1.1](https://github.com/njz3/vJoy/releases/tag/v2.2.1.1) for Windows 10 and Version [2.1.9.1](https://github.com/jshafer817/vJoy/releases/tag/v2.1.9.1) for Windows 11. It is not checked by the Installer (since it is not a Requirement for the Plugin).
 
 <br/><br/>
-If you want to disable the MSFS Requirements Checks (not recommended), start the Installer with `--ignoremsfs` as Command Line Argument. (Don't ask me what that means)
+If you want to disable the MSFS Requirements Checks (not recommended), start the Installer with `--ignoremsfs` as Command Line Argument (Don't ask me what that means).<br/>
+This is *only* needed when you have MSFS installed but yet don't want to use PilotsDeck with it! Just run the Installer normally when you don't have MSFS installed.
 
 
 <br/><br/>
