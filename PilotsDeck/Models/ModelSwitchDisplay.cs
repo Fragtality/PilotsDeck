@@ -18,7 +18,7 @@
         public virtual bool UseImageMapping { get; set; } = false;
         public virtual string ImageMap { get; set; } = "";
 
-        public virtual void ManageImageMap(string map, ImageManager imgManager, StreamDeckType deckType, bool add = true)
+        public static void ManageImageMap(string map, ImageManager imgManager, StreamDeckType deckType, bool add = true)
         {
             if (string.IsNullOrEmpty(map))
                 return;
@@ -47,7 +47,12 @@
 
         public string GetValueMapped(string strValue)
         {
-            string result = ModelDisplayText.GetValueMapped(strValue, ImageMap);
+            return GetValueMapped(strValue, ImageMap);
+        }
+
+        public static string GetValueMapped(string strValue, string imageMap)
+        {
+            string result = ModelDisplayText.GetValueMapped(strValue, imageMap);
             if (result != strValue)
                 return $"Images/{result}.png";
             else

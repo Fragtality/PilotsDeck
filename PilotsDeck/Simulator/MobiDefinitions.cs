@@ -20,7 +20,9 @@ namespace PilotsDeck
 
     public enum SIMCONNECT_REQUEST_ID
     {
-        Dummy = 0
+        Dummy = 0,
+        EnumEvents = 101,
+        GetEvent = 102
     }
 
     public enum SIMCONNECT_DEFINE_ID

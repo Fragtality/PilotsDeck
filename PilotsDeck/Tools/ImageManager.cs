@@ -7,7 +7,7 @@ namespace PilotsDeck
 {
     public class ImageManager : IDisposable
     {
-        protected Dictionary<string, ManagedImage> imageCache = new(); //RealFileName to Image
+        protected Dictionary<string, ManagedImage> imageCache = []; //RealFileName to Image
         public int Length => imageCache.Count;
 
         protected static string InsertSuffix(string file, string suffix)
@@ -93,7 +93,7 @@ namespace PilotsDeck
             string fileReal = GetRealFileName(file, type);
             if (!imageCache.TryGetValue(fileReal, out ManagedImage image))
             {
-                image = new ManagedImage(AppSettings.waitImage);
+                image = new ManagedImage(fileReal);
                 Logger.Log(LogLevel.Error, "ImageManager:GetImage", $"Image is not found in Cache! (Ref: {file}) (Real: {fileReal}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
             }
 
@@ -144,7 +144,7 @@ namespace PilotsDeck
         {
             var unusedImages = imageCache.Values.Where(i => i.Registrations == 0).ToList();
             
-            if (unusedImages.Any() )
+            if (unusedImages.Count != 0)
                 Logger.Log(LogLevel.Information, "ImageManager:RemoveUnused", $"Removing {unusedImages.Count} unused Images ...");
             
             foreach (var image in unusedImages)

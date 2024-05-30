@@ -1,19 +1,14 @@
 ﻿namespace PilotsDeck
 {
-    public class HandlerSwitchDisplay : HandlerSwitch
+    public class HandlerSwitchDisplay(string context, ModelSwitchDisplay settings, StreamDeckType deckType) : HandlerSwitch(context, settings, deckType)
     {
         public override ModelSwitch BaseSettings { get { return Settings; } }
         public virtual ModelSwitchDisplay DisplaySettings { get { return Settings; } }
-        public new ModelSwitchDisplay Settings { get; protected set; }
-        
+        public new ModelSwitchDisplay Settings { get; protected set; } = settings;
+
 
         public override string ActionID { get { return $"(HandlerSwitchDisplay) ({Title.Trim()}) {(BaseSettings.IsEncoder ? "(Encoder) " : "")}(Read: {DisplaySettings.Address}) (Action: {(ActionSwitchType)BaseSettings.ActionType} / {Address}) (Long: {BaseSettings.HasLongPress} / {(ActionSwitchType)BaseSettings.ActionTypeLong} / {BaseSettings.AddressActionLong})"; } }
         public override string Address { get { return DisplaySettings.Address; } }
-
-        public HandlerSwitchDisplay(string context, ModelSwitchDisplay settings, StreamDeckType deckType) : base(context, settings, deckType)
-        {
-            Settings = settings;
-        }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
@@ -68,6 +63,7 @@
         {
             base.Update(skipActionUpdate);
             RenderDefaultImages();
+
             ValueManager.UpdateValue(ID.Control, Address);
         }
 
@@ -83,7 +79,7 @@
 
                 if (DisplaySettings.ImageMap != imgRefs[ID.Map])
                 {
-                    DisplaySettings.ManageImageMap(imgRefs[ID.Map], ImgManager, DeckType, false);
+                    ModelSwitchDisplay.ManageImageMap(imgRefs[ID.Map], ImgManager, DeckType, false);
                     DisplaySettings.ManageImageMap(ImgManager, DeckType, true);
                     imgRefs[ID.Map] = DisplaySettings.ImageMap;
                 }
@@ -106,58 +102,91 @@
 
         protected override void RenderDefaultImages()
         {
+            ManagedImage newImage;
             if (!Settings.UseImageMapping)
-                DefaultImage64 = ImgManager.GetImage(DisplaySettings.OffImage, DeckType).GetImageBase64();
+                newImage = ImgManager.GetImage(DisplaySettings.OffImage, DeckType);
             else
             {
                 string mappedImage = Settings.GetValueMapped("0");
                 if (!string.IsNullOrEmpty(mappedImage))
-                    DefaultImage64 = ImgManager.GetImage(mappedImage, DeckType).GetImageBase64();
+                    newImage = ImgManager.GetImage(mappedImage, DeckType);
                 else
-                    DefaultImage64 = ImgManager.GetImage(DisplaySettings.DefaultImage, DeckType).GetImageBase64();
+                    newImage = ImgManager.GetImage(DisplaySettings.DefaultImage, DeckType);
             }
+
+            DefaultImage64 = RefreshGuard(newImage, "0");
         }
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh)
+            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh && (!SwitchSettings.IsGuarded || !ValueManager.IsChanged(ID.Guard)))
                 return;
 
-            string newImage;
+            ManagedImage newImage;
             string currentValue = ValueManager[ID.Control];
 
             if (!Settings.UseImageMapping)
             {
                 if (!string.IsNullOrWhiteSpace(currentValue) && ModelBase.Compare(Settings.OnState, currentValue))
                 {
-                    newImage = ImgManager.GetImage(Settings.OnImage, DeckType).GetImageBase64();
+                    newImage = ImgManager.GetImage(Settings.OnImage, DeckType);
                 }
                 else if (ModelBase.Compare(Settings.OffState, currentValue))
                 {
-                    newImage = ImgManager.GetImage(Settings.OffImage, DeckType).GetImageBase64();
+                    newImage = ImgManager.GetImage(Settings.OffImage, DeckType);
                 }
                 else if (Settings.HasIndication)
                 {
                     if (Settings.IndicationValueAny || ModelBase.Compare(Settings.IndicationValue, currentValue))
-                        newImage = ImgManager.GetImage(Settings.IndicationImage, DeckType).GetImageBase64();
+                        newImage = ImgManager.GetImage(Settings.IndicationImage, DeckType);
                     else
-                        newImage = ErrorImage64;
+                        newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType);
                 }
                 else
-                    newImage = ErrorImage64;
+                    newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType); ;
             }
             else
             {
                 string mappedImage = Settings.GetValueMapped(currentValue);
                 if (!string.IsNullOrEmpty(mappedImage))
-                    newImage = ImgManager.GetImage(mappedImage, DeckType).GetImageBase64();
+                    newImage = ImgManager.GetImage(mappedImage, DeckType);
                 else
-                    newImage = ErrorImage64;
+                    newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType);
             }
 
-            RenderImage64 = newImage;
+            RenderImage64 = RefreshGuard(newImage, currentValue);
             NeedRedraw = true;
         }
 
+        protected string RefreshGuard(ManagedImage image, string currentValue)
+        {
+            string result = image.GetImageBase64();
+
+            if (SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
+            {
+                if (SwitchSettings.UseImageGuardMapping)
+                {
+                    string guardImage = ModelSwitchDisplay.GetValueMapped(currentValue, SwitchSettings.ImageGuardMap);
+                    if (!string.IsNullOrEmpty(guardImage))
+                    {
+                        ImageRenderer render = new(image, DeckType);
+                        render.DrawImage(ImgManager.GetImage(guardImage, DeckType).GetImageObject());
+                        result = render.RenderImage64();
+                        render.Dispose();
+                    }
+                    else
+                        result = image.GetImageBase64();
+                }
+                else
+                {
+                    ImageRenderer render = new(image, DeckType);
+                    render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+                    result = render.RenderImage64();
+                    render.Dispose();
+                }
+            }
+
+            return result;
+        }
     }
 }

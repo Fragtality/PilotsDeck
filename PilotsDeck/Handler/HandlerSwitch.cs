@@ -3,22 +3,16 @@ using System.Threading;
 
 namespace PilotsDeck
 {
-    public class HandlerSwitch : HandlerBase
+    public class HandlerSwitch(string context, ModelSwitch settings, StreamDeckType deckType) : HandlerBase(context, settings, deckType)
     {
         public virtual ModelSwitch BaseSettings { get { return Settings; } }
         public override IModelSwitch SwitchSettings { get { return Settings; } }
-        public virtual ModelSwitch Settings { get; protected set; }
+        public virtual ModelSwitch Settings { get; protected set; } = settings;
 
         public override string ActionID { get { return $"(HandlerSwitch) ({Title.Trim()}) {(BaseSettings.IsEncoder ? "(Encoder) " : "")}(Action: {(ActionSwitchType)BaseSettings.ActionType} / {Address}) (Long: {BaseSettings.HasLongPress} / {(ActionSwitchType)BaseSettings.ActionTypeLong} / {BaseSettings.AddressActionLong})"; } }
         public override string Address { get { return BaseSettings.AddressAction; } }
 
         public override bool HasAction { get; protected set; } = true;
-
-
-        public HandlerSwitch(string context, ModelSwitch settings, StreamDeckType deckType) : base(context, settings, deckType)
-        {
-            Settings = settings;
-        }
 
         public override bool OnButtonDown(long tick)
         {
@@ -28,7 +22,10 @@ namespace PilotsDeck
 
         public static bool RunButtonDown(IPCManager ipcManager, IModelSwitch switchSettings)
         {
-            return ipcManager.RunActionDown(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, switchSettings.SwitchOnState, switchSettings);
+            if (switchSettings.IsGuarded && ModelBase.Compare(switchSettings.GuardActiveValue, ipcManager[switchSettings.AddressGuardActive].Value))
+                return ipcManager.RunActionDown(switchSettings.AddressActionGuard, (ActionSwitchType)switchSettings.ActionTypeGuard, switchSettings.SwitchOnStateGuard, switchSettings);
+            else
+                return ipcManager.RunActionDown(switchSettings.AddressAction, (ActionSwitchType)switchSettings.ActionType, switchSettings.SwitchOnState, switchSettings);
         }
 
         public override bool OnButtonUp(long tick)
@@ -44,7 +41,11 @@ namespace PilotsDeck
             bool result = false;
             bool longPress = ticks >= AppSettings.longPressTicks;
 
-            if (!longPress
+            if (switchSettings.IsGuarded && ModelBase.Compare(switchSettings.GuardActiveValue, ipcManager[switchSettings.AddressGuardActive].Value))
+            {
+                result = ipcManager.RunActionUp(switchSettings.AddressActionGuard, switchSettings.AddressActionGuardOff, (ActionSwitchType)switchSettings.ActionTypeGuard, ipcManager[switchSettings.AddressGuardActive].Value, switchSettings.SwitchOnStateGuard, switchSettings.SwitchOffStateGuard, switchSettings, ignoreBaseOptions, 1, ticks);
+            }
+            else if (!longPress
                 || (IPCTools.IsVjoyAddress(switchSettings.AddressAction, switchSettings.ActionType) && !IPCTools.IsVjoyToggle(switchSettings.AddressAction, switchSettings.ActionType))
                 || (!ignoreBaseOptions && switchSettings.HoldSwitch && (IPCTools.IsHoldableValue(switchSettings.ActionType) || IPCTools.IsHoldableCommand(switchSettings.ActionType))) )
             {
@@ -154,6 +155,60 @@ namespace PilotsDeck
                 return false;
             else
                 return true;
+        }
+
+        public override void Refresh()
+        {
+            if (SwitchSettings.IsGuarded && !string.IsNullOrWhiteSpace(SwitchSettings.ImageGuard))
+            {
+                if (ValueManager.IsChanged(ID.Guard) || NeedRefresh)
+                {
+                    ImageRenderer render = new(ImgManager.GetImage(BaseSettings.DefaultImage, DeckType), DeckType);
+
+                    if (ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
+                        render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+
+                    DefaultImage64 = render.RenderImage64();
+                    render.Dispose();
+                    RenderImage64 = DefaultImage64;
+                    NeedRedraw = true;
+                }
+            }
+            else if (NeedRefresh)
+            {
+                DefaultImage64 = ImgManager.GetImage(BaseSettings.DefaultImage, DeckType).GetImageBase64();
+                RenderImage64 = DefaultImage64;
+                NeedRedraw = true;
+            }
+        }
+
+        public override void Update(bool skipActionUpdate = false)
+        {
+            base.Update(skipActionUpdate);
+            RenderDefaultImages();
+        }
+
+        protected override void RenderDefaultImages()
+        {
+            if (HasAction && SwitchSettings.IsGuarded)
+            {
+                ImageRenderer render = new(ImgManager.GetImage(BaseSettings.DefaultImage, DeckType), DeckType);
+
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+
+                DefaultImage64 = render.RenderImage64();
+                render.Dispose();
+                RenderImage64 = DefaultImage64;
+                NeedRedraw = true;
+                NeedRefresh = true;
+            }
+            else if (HasAction)
+            {
+                DefaultImage64 = ImgManager.GetImage(BaseSettings.DefaultImage, DeckType).GetImageBase64();
+                RenderImage64 = DefaultImage64;
+                NeedRedraw = true;
+                NeedRefresh = true;
+            }
         }
     }
 }

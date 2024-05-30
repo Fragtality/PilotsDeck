@@ -20,8 +20,8 @@ namespace ImportProfiles
         protected readonly static string dir = Directory.GetCurrentDirectory();
         protected readonly static string manifest = dir + @"\manifest.json";
         protected readonly static string savedProfileFile = dir + @"\Profiles\savedProfiles.txt";
-        private static List<Profile> profilesManifest = new();
-        private readonly static Dictionary<string, int> savedProfiles = new();
+        private static List<Profile> profilesManifest = [];
+        private readonly static Dictionary<string, int> savedProfiles = [];
 
         public static void Main()
         {
@@ -48,10 +48,10 @@ namespace ImportProfiles
                 string strJson = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
                 File.WriteAllText(manifest, strJson);
                 
-                List<string> save = new();
+                List<string> save = [];
                 foreach (var prof in savedProfiles)
                     save.Add($"{prof.Key}:{prof.Value}");
-                File.WriteAllLines(savedProfileFile, save.ToArray());
+                File.WriteAllLines(savedProfileFile, [.. save]);
             }
 
 

@@ -46,19 +46,19 @@ namespace PilotsDeck
         private bool redrawAlways = AppSettings.redrawAlways;
 
         public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
-        private List<string> profileSwitcherActions = new();
-        private List<string> switchedDecks = new();
+        private List<string> profileSwitcherActions = [];
+        private List<string> switchedDecks = [];
         private List<StreamDeckProfile> manifestProfiles;
         private string lastAircraft = "";
 
 
         public ActionController()
         {
-            currentActions = new Dictionary<string, IHandler>();
+            currentActions = [];
             ipcManager = new IPCManager();
             SimConnector = SimulatorConnector.CreateConnector("", tickCounter, ipcManager);
             imgManager = new ImageManager();
-            manifestProfiles = new List<StreamDeckProfile>();
+            manifestProfiles = [];
         }
 
         public void Init()
@@ -195,13 +195,12 @@ namespace PilotsDeck
 
         public void DeregisterProfileSwitcher(string context)
         {
-            if (profileSwitcherActions.Contains(context))
+            if (profileSwitcherActions.Remove(context))
             {
-                profileSwitcherActions.Remove(context);
                 Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher deregistered. (Context: {context})");
             }
             else
-                Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher not registered! (Context: {context})");
+                Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher not registered or failed! (Context: {context})");
         }
 
         protected void SwitchProfiles()
@@ -256,7 +255,7 @@ namespace PilotsDeck
             if (!GlobalProfileSettings.ProfilesInstalled)
             {
                 var deckTypes = new int[] { (int)StreamDeckTypeEnum.StreamDeck, (int)StreamDeckTypeEnum.StreamDeckXL, (int)StreamDeckTypeEnum.StreamDeckMini, (int)StreamDeckTypeEnum.StreamDeckPlus, (int)StreamDeckTypeEnum.StreamDeckMobile };
-                List<string> decksToInstall = new();
+                List<string> decksToInstall = [];
                 foreach (int deckType in deckTypes)
                 {
                     if (manifestProfiles.Where(p => p.Type == deckType).Any())
@@ -462,6 +461,18 @@ namespace PilotsDeck
             {
                 Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftString}', searching for matching Profiles ...");
                 SwitchProfiles();
+                if (SimConnector is ConnectorMSFS)
+                {
+                    (SimConnector as ConnectorMSFS).EnumerateInputEvents();
+                }
+            }
+            else if (lastAircraft != SimConnector.AicraftString && SimConnector.IsReady && waitCounter == 0)
+            {
+                if (SimConnector is ConnectorMSFS)
+                {
+                    (SimConnector as ConnectorMSFS).EnumerateInputEvents();
+                    lastAircraft = SimConnector.AicraftString;
+                }
             }
         }
 
@@ -508,6 +519,9 @@ namespace PilotsDeck
                         }
                         else
                             _ = DeckManager.SetImageRawAsync(action.Key, ActionSendImage(action.Value));
+
+                        if (lastState != currentState && currentState == ControllerState.Ready)
+                            CallOnAll(handler => handler.NeedRefresh = true);
                     }
                 }
             }
@@ -682,9 +696,8 @@ namespace PilotsDeck
         {
             try
             {
-                if (!currentActions.ContainsKey(context))
+                if (currentActions.TryAdd(context, handler))
                 {
-                    currentActions.Add(context, handler);
                     handler.Register(imgManager, ipcManager);
                 }
                 else

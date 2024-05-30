@@ -17,7 +17,7 @@ namespace PilotsDeck
         protected virtual ValueManager ValueManager { get; set; }
         protected virtual IPCManager IPCManager { get; set; }
         protected virtual ImageManager ImgManager { get; set; }
-        protected virtual Dictionary<int, string> imgRefs { get; set; } = new Dictionary<int, string>();
+        protected virtual Dictionary<int, string> imgRefs { get; set; } = [];
 
         public virtual string RenderImage64 { get; protected set; } = "";
         public virtual string DefaultImage64 { get; protected set; } = "";
@@ -97,7 +97,26 @@ namespace PilotsDeck
             imgRefs.Add(ID.Wait, CommonSettings.WaitImage);
 
             if (HasAction)
+            {
+                if (SwitchSettings.IsGuarded)
+                {
+                    if (!SwitchSettings.UseImageGuardMapping)
+                    {
+                        imgManager.AddImage(SwitchSettings.ImageGuard, DeckType);
+                        imgRefs.Add(ID.ImgGuard, SwitchSettings.ImageGuard);
+                    }
+                    else
+                    {
+                        ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, imgManager, DeckType, true);
+                        imgRefs.Add(ID.MapGuard, SwitchSettings.ImageGuardMap);
+                    }
+
+                    ValueManager.AddValue(ID.Guard, SwitchSettings.AddressGuardActive);
+
+                    RenderDefaultImages();
+                }
                 RegisterActions();
+            }
 
             NeedRefresh = true;
             NeedRedraw = true;
@@ -118,6 +137,9 @@ namespace PilotsDeck
                 ValueManager.AddValue(ID.SwitchRight, SwitchSettings.AddressActionRight, SwitchSettings.ActionTypeRight);
                 ValueManager.AddValue(ID.SwitchTouch, SwitchSettings.AddressActionTouch, SwitchSettings.ActionTypeTouch);
             }
+
+            if (SwitchSettings.IsGuarded)
+                ValueManager.AddValue(ID.GuardCmd, SwitchSettings.AddressActionGuard, SwitchSettings.ActionTypeGuard);
         }
 
         public virtual void Deregister()
@@ -130,7 +152,19 @@ namespace PilotsDeck
             imgRefs.Remove(ID.Wait);
 
             if (HasAction)
+            {
+                if (SwitchSettings.IsGuarded)
+                {
+                    ImgManager.RemoveImage(SwitchSettings.ImageGuard, DeckType);
+                    imgRefs.Remove(ID.ImgGuard);
+
+                    ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, ImgManager, DeckType, false);
+                    imgRefs.Remove(ID.MapGuard);
+
+                    ValueManager.RemoveValue(ID.Guard);
+                }
                 DeregisterActions();
+            }
         }
 
         public virtual void DeregisterActions()
@@ -148,6 +182,9 @@ namespace PilotsDeck
                 ValueManager.RemoveValue(ID.SwitchRight);
                 ValueManager.RemoveValue(ID.SwitchTouch);
             }
+
+            if (SwitchSettings.IsGuarded)
+                ValueManager.RemoveValue(ID.GuardCmd);
         }
         #endregion
 
@@ -160,6 +197,12 @@ namespace PilotsDeck
 
             if (HasAction && !skipActionUpdate)
             {
+                if (SwitchSettings.IsGuarded && !ValueManager.Contains(ID.Guard))
+                    ValueManager.AddValue(ID.Guard, SwitchSettings.AddressGuardActive);
+                else if (!SwitchSettings.IsGuarded && ValueManager.Contains(ID.Guard))
+                    ValueManager.RemoveValue(ID.Guard);
+                else if (SwitchSettings.IsGuarded)
+                    ValueManager.UpdateValue(ID.Guard, SwitchSettings.AddressGuardActive);
                 UpdateActionSettings();
                 UpdateActions();
             }
@@ -170,15 +213,16 @@ namespace PilotsDeck
 
         protected void UpdateImage(string imgNew, int id, out ManagedImage image)
         {
-            if (imgNew != imgRefs[id])
+            if (imgRefs.TryGetValue(id, out string strRef) && imgNew != strRef)
             {
-                ImgManager.RemoveImage(imgRefs[id], DeckType);
+                ImgManager.RemoveImage(strRef, DeckType);
                 image = ImgManager.AddImage(imgNew, DeckType);
             }
             else
                 image = null;
 
-            imgRefs[id] = imgNew;
+            if (imgRefs.ContainsKey(id))
+                imgRefs[id] = imgNew;
         }
 
         protected virtual void UpdateImages()
@@ -194,6 +238,28 @@ namespace PilotsDeck
             UpdateImage(CommonSettings.WaitImage, ID.Wait, out image);
             if (image != null)
                 WaitImage64 = image.GetImageBase64();
+
+            if (HasAction && SwitchSettings.IsGuarded)
+            {
+                UpdateImage(SwitchSettings.ImageGuard, ID.ImgGuard, out image);
+                if (image != null)
+                    NeedRefresh = true;
+
+                if (imgRefs.TryGetValue(ID.ImgGuard, out string oldMap))
+                {
+                    ModelSwitchDisplay.ManageImageMap(oldMap, ImgManager, DeckType, false);
+                    if (!string.IsNullOrWhiteSpace(SwitchSettings.ImageGuardMap) && SwitchSettings.ImageGuardMap != oldMap && SwitchSettings.UseImageGuardMapping)
+                    {
+                        imgRefs[ID.MapGuard] = SwitchSettings.ImageGuardMap;
+                        ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, ImgManager, DeckType, true);
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(SwitchSettings.ImageGuardMap) && SwitchSettings.UseImageGuardMapping)
+                {
+                    imgRefs[ID.MapGuard] = SwitchSettings.ImageGuardMap;
+                    ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, ImgManager, DeckType, true);
+                }
+            }
         }
 
         public virtual void UpdateActionSettings()
@@ -231,6 +297,9 @@ namespace PilotsDeck
                     ValueManager.UpdateValue(ID.SwitchRight, SwitchSettings.AddressActionRight, SwitchSettings.ActionTypeRight);
                     ValueManager.UpdateValue(ID.SwitchTouch, SwitchSettings.AddressActionTouch, SwitchSettings.ActionTypeTouch);
                 }
+
+                if (SwitchSettings.IsGuarded)
+                    ValueManager.UpdateValue(ID.GuardCmd, SwitchSettings.AddressActionGuard, SwitchSettings.ActionTypeGuard);
             }
         }
         #endregion

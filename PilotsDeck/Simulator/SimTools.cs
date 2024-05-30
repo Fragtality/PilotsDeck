@@ -408,8 +408,8 @@ namespace PilotsDeck
         {
             string code = "";
             template = template.Replace("$L:", "");
-            if (template.IndexOf("L:") == 0)
-                template = template.Substring(2);
+            if (template.StartsWith("L:"))
+                template = template[2..];
 
             string[] parts = template.Split(':');
 

@@ -33,7 +33,7 @@ namespace PilotsDeck
         public int Type { get; set; }
         public bool UseDefault { get; set; } = true;
         public string DefaultProfile { get; set; } = "";
-        public List<StreamDeckProfile> Profiles { get; set; } = new List<StreamDeckProfile>();
+        public List<StreamDeckProfile> Profiles { get; set; } = [];
 
         public DeviceMapping()
         {
@@ -59,7 +59,7 @@ namespace PilotsDeck
         public bool ProfilesInstalled { get; set; } = false;
         public string MappingsJson { get; set; } = "";
         [JsonIgnore]
-        public List<DeviceMapping> DeviceMappings { get; set; } = new List<DeviceMapping>();
+        public List<DeviceMapping> DeviceMappings { get; set; } = [];
 
 
         public ModelProfileSwitcher()

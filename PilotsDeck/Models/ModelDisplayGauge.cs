@@ -52,6 +52,19 @@ namespace PilotsDeck
         public virtual string SwitchOnStateTouch { get; set; } = "";
         public virtual string SwitchOffStateTouch { get; set; } = "";
 
+        //Guarded Switch
+        public virtual bool IsGuarded { get; set; } = false;
+        public virtual string AddressGuardActive { get; set; } = "";
+        public virtual string GuardActiveValue { get; set; } = "";
+        public virtual string AddressActionGuard { get; set; } = "";
+        public virtual string AddressActionGuardOff { get; set; } = "";
+        public virtual int ActionTypeGuard { get; set; } = (int)ActionSwitchType.MACRO;
+        public virtual string SwitchOnStateGuard { get; set; } = "";
+        public virtual string SwitchOffStateGuard { get; set; } = "";
+        public virtual string ImageGuard { get; set; }
+        public virtual bool UseImageGuardMapping { get; set; } = false;
+        public virtual string ImageGuardMap { get; set; } = "";
+
         //Gauge
         public virtual string MinimumValue { get; set; } = "0";
         public string MaximumValue { get; set; } = "100";
@@ -196,12 +209,12 @@ namespace PilotsDeck
 
         public Color[] GetColorRange()
         {
-            return new Color[] { ColorTranslator.FromHtml(CriticalColor), ColorTranslator.FromHtml(WarnColor) };
+            return [ColorTranslator.FromHtml(CriticalColor), ColorTranslator.FromHtml(WarnColor)];
         }
 
         public float[][] GetWarnRange()
         {
-            return new float[][] { GetNumValues(CriticalRange, 0, 10), GetNumValues(WarnRange, 11, 25)};
+            return [GetNumValues(CriticalRange, 0, 10), GetNumValues(WarnRange, 11, 25)];
         }
 
         public static float[] GetNumValues(string valString, float defA, float defB)
@@ -214,7 +227,7 @@ namespace PilotsDeck
                 b = defB;
             }
 
-            return new float[] { a, b };
+            return [a, b];
         }
     }
 }

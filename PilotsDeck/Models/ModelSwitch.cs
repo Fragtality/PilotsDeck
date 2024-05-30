@@ -38,6 +38,19 @@
         int ActionTypeTouch { get; set; }
         string SwitchOnStateTouch { get; set; }
         string SwitchOffStateTouch { get; set; }
+
+        //Guarded
+        bool IsGuarded { get; set; }
+        string AddressGuardActive { get; set; }
+        string GuardActiveValue { get; set; }
+        string AddressActionGuard { get; set; }
+        string AddressActionGuardOff { get; set; }
+        int ActionTypeGuard { get; set; }
+        string SwitchOnStateGuard { get; set; }
+        string SwitchOffStateGuard { get; set; }
+        string ImageGuard { get; set; }
+        bool UseImageGuardMapping { get; set; }
+        string ImageGuardMap { get; set; }
     }
 
     public class ModelSwitch : ModelBase, IModelSwitch
@@ -77,6 +90,19 @@
         public virtual int ActionTypeTouch { get; set; } = (int)ActionSwitchType.MACRO;
         public virtual string SwitchOnStateTouch { get; set; } = "";
         public virtual string SwitchOffStateTouch { get; set; } = "";
+
+        //Guarded Switch
+        public virtual bool IsGuarded { get; set; } = false;
+        public virtual string AddressGuardActive { get; set; } = "";
+        public virtual string GuardActiveValue { get; set; } = "";
+        public virtual string AddressActionGuard { get; set; } = "";
+        public virtual string AddressActionGuardOff { get; set; } = "";
+        public virtual int ActionTypeGuard { get; set; } = (int)ActionSwitchType.MACRO;
+        public virtual string SwitchOnStateGuard { get; set; } = "";
+        public virtual string SwitchOffStateGuard { get; set; } = "";
+        public virtual string ImageGuard { get; set; }
+        public virtual bool UseImageGuardMapping { get; set; } = false;
+        public virtual string ImageGuardMap { get; set; } = "";
 
         public ModelSwitch()
         {

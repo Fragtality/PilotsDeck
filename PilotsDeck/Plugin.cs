@@ -2,10 +2,9 @@
 using StreamDeckLib;
 using System;
 using System.Threading.Tasks;
-
 #if DEBUG
-using System.Diagnostics;
 using System.Threading;
+using System.Diagnostics;
 #endif
 
 namespace PilotsDeck

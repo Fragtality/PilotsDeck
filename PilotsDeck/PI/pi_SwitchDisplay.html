@@ -65,6 +65,8 @@
             </div>
         </div>
 
+        <div id="GuardMappedActions" class="inline"></div>
+
         <div class="sdpi-heading">Background</div>
         <div class="sdpi-item" id="Config_DefaultImage">
             <div class="sdpi-item-label">Default Image</div>
@@ -73,9 +75,10 @@
         <div class="sdpi-item" id="Config_ErrorImage">
             <div class="sdpi-item-label">Error Image</div>
             <img id="Prev_ErrorImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ErrorImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
-        </div>        
+        </div>
     </div>
     <script src="inc_DefaultActions.html"></script>
+    <script src="inc_GuardMappedActions.html"></script>
     <script src="js/pi_Common.js"></script>
     <script src="js/pi_SwitchDisplay.js"></script>
 </body>

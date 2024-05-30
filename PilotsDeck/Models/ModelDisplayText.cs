@@ -33,8 +33,8 @@ namespace PilotsDeck
 			ErrorImage = @"Images/Error.png";
 		}
 
-		public static string GetValueMapped(string strValue, string strMap)
-		{
+        public static string GetValueMapped(string strValue, string strMap)
+        {
             if (!string.IsNullOrEmpty(strMap) && strMap.Contains('='))
             {
                 var dict = GetValueMap(strMap);
@@ -68,11 +68,11 @@ namespace PilotsDeck
                     {
                         strValue = mapping.Value;
                         break;
-					}
+                    }
                 }
             }
 
-			return strValue;
+            return strValue;
         }
 
         public string GetValueMapped(string strValue)

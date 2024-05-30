@@ -3,15 +3,10 @@ using System.Linq;
 
 namespace PilotsDeck
 {
-    public class ValueManager
+    public class ValueManager(IPCManager m)
     {
-        protected Dictionary<int, ManagedValue> ManagedValues = new();
-        protected IPCManager ipcManager;
-
-        public ValueManager(IPCManager m)
-        {
-            ipcManager = m;
-        }
+        protected Dictionary<int, ManagedValue> ManagedValues = [];
+        protected IPCManager ipcManager = m;
 
         #region Add/Remove/Update
         public void AddValue(int id, string address, int type = 5)

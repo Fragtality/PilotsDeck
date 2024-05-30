@@ -103,6 +103,11 @@ namespace PilotsDeck
                 return new RectangleF(0, 0, canvasSize.X, canvasSize.Y);
         }
 
+        public void DrawImage(Image image)
+        {
+            render.DrawImage(image, new PointF(0,0));
+        }
+
         public void DrawImage(Image image, RectangleF drawRectangle)
         {
             render.DrawImage(image, ScaleRectangle(drawRectangle));
@@ -162,9 +167,9 @@ namespace PilotsDeck
             float orgIndY = drawRect.Y + drawRect.Width / 2.0f;
             float top = bottom ? -size : size;
             
-            PointF[] triangle = {   new PointF(orgIndX - top, orgIndY),
+            PointF[] triangle = [   new PointF(orgIndX - top, orgIndY),
                                     new PointF(orgIndX + top, orgIndY + size),
-                                    new PointF(orgIndX + top, orgIndY - size) };
+                                    new PointF(orgIndX + top, orgIndY - size) ];
 
             SolidBrush brush = new(drawColor);
             Rotate(angle, drawArc.Offset);
@@ -243,7 +248,7 @@ namespace PilotsDeck
             float indX = (drawParams.X + (NormalizedRatio(value, minimum, maximum) * drawParams.Width));
             float indY = (bottom ? drawParams.Y + drawParams.Height : drawParams.Y);
             float top = (bottom ? size * -1.0f : size);
-            PointF[] triangle = { new PointF(indX - size, indY - top), new PointF(indX + size, indY - top), new PointF(indX, indY + top) };
+            PointF[] triangle = [new(indX - size, indY - top), new(indX + size, indY - top), new(indX, indY + top)];
 
             SolidBrush brush = new(drawColor);
             render.FillPolygon(brush, triangle);

@@ -29,10 +29,21 @@ var settingsModel = {
 	TopImage: "Images/korry/A-FAULT.png",
 	BotImage: "Images/korry/A-ON-Blue.png",
 	TopRect: "9; 21; 54; 20",
-	BotRect: "9; 45; 54; 20"
+	BotRect: "9; 45; 54; 20",
+	IsGuarded: false,
+	AddressGuardActive: "",
+	GuardActiveValue: "",
+	AddressActionGuard: "",
+	AddressActionGuardOff: "",
+	ActionTypeGuard: 0,
+	SwitchOnStateGuard: "",
+	SwitchOffStateGuard: "",
+	ImageGuard: "Images/GuardCross.png",
+	UseImageGuardMapping: false,
+	ImageGuardMap: ""
 };
 
-var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "ImageGuard"];
 var korrySelectBoxes = ["TopImage", "BotImage"];
 
 function updateForm() {

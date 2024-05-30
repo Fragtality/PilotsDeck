@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace PilotsDeck
 {
-    public class MobiSimConnect : IDisposable
+    public class MobiSimConnect(IPCManager manager) : IDisposable
     {
         public const string MOBIFLIGHT_CLIENT_DATA_NAME_COMMAND = "MobiFlight.Command";
         public const string MOBIFLIGHT_CLIENT_DATA_NAME_RESPONSE = "MobiFlight.Response";
@@ -27,22 +27,22 @@ namespace PilotsDeck
         protected bool isSimConnected = false;
         protected bool isMobiConnected = false;
         protected bool isReceiveRunning = false;
+        protected bool eventsEnumerated = false;
         public bool IsConnected { get { return isSimConnected && isMobiConnected; } }
         public bool IsReady { get { return IsConnected && isReceiveRunning; } }
         public bool HasReceiveError { get { return !isReceiveRunning; } }
 
         protected uint nextID = 1;
         protected const int reorderTreshold = 150;
-        protected Dictionary<string, uint> addressToIndex = new();
-        protected Dictionary<uint, bool> simVarUsed = new();
-        protected Dictionary<uint, IPCValue> simVars = new();
-        protected List<uint> subscribeQueue = new();
-        protected IPCManager ipcManager;
-
-        public MobiSimConnect(IPCManager manager)
-        {
-            ipcManager = manager;
-        }
+        protected Dictionary<string, uint> addressToIndex = [];
+        protected Dictionary<uint, bool> simVarUsed = [];
+        protected Dictionary<uint, IPCValue> simVars = [];
+        protected List<uint> subscribeQueue = [];
+        protected IPCManager ipcManager = manager;
+        protected Dictionary<string, ulong> eventHashes = [];
+        protected uint nextEventID = 1;
+        protected Dictionary<uint, ulong> eventIndex = [];
+        protected Dictionary<ulong, IPCValueInputEvent> eventSubscribedValues = [];
 
         public bool Connect()
         {
@@ -55,7 +55,7 @@ namespace PilotsDeck
                 simConnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(SimConnect_OnOpen);
                 simConnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(SimConnect_OnQuit);
                 simConnect.OnRecvException += new SimConnect.RecvExceptionEventHandler(SimConnect_OnException);
-                
+
                 cancelThread = false;
                 simConnectThread = new(new ThreadStart(SimConnect_ReceiveThread))
                 {
@@ -86,6 +86,8 @@ namespace PilotsDeck
             {
                 isSimConnected = true;
                 simConnect.OnRecvClientData += new SimConnect.RecvClientDataEventHandler(SimConnect_OnClientData);
+                simConnect.OnRecvEnumerateInputEvents += new SimConnect.RecvEnumerateInputEventsEventHandler(SimConnect_OnRecvEnumerateInputEvents);
+                simConnect.OnRecvGetInputEvent += new SimConnect.RecvGetInputEventEventHandler(SimConnect_OnRecvGetInputEvents);
                 CreateDataAreaDefaultChannel();
                 Logger.Log(LogLevel.Information, "MobiSimConnect:SimConnect_OnOpen", $"SimConnect OnOpen received.");
             }
@@ -135,10 +137,8 @@ namespace PilotsDeck
         protected void CreateDataAreaDefaultChannel()
         {
             simConnect.MapClientDataNameToID(MOBIFLIGHT_CLIENT_DATA_NAME_COMMAND, MOBIFLIGHT_CLIENT_DATA_ID.MOBIFLIGHT_CMD);
-            //simConnect.CreateClientData(MOBIFLIGHT_CLIENT_DATA_ID.MOBIFLIGHT_CMD, MOBIFLIGHT_MESSAGE_SIZE, SIMCONNECT_CREATE_CLIENT_DATA_FLAG.DEFAULT);
 
             simConnect.MapClientDataNameToID(MOBIFLIGHT_CLIENT_DATA_NAME_RESPONSE, MOBIFLIGHT_CLIENT_DATA_ID.MOBIFLIGHT_RESPONSE);
-            //simConnect.CreateClientData(MOBIFLIGHT_CLIENT_DATA_ID.MOBIFLIGHT_RESPONSE, MOBIFLIGHT_MESSAGE_SIZE, SIMCONNECT_CREATE_CLIENT_DATA_FLAG.DEFAULT);
 
             simConnect.AddToClientDataDefinition((SIMCONNECT_DEFINE_ID)0, 0, MOBIFLIGHT_MESSAGE_SIZE, 0, 0);
             simConnect.RegisterStruct<SIMCONNECT_RECV_CLIENT_DATA, ResponseString>((SIMCONNECT_DEFINE_ID)0);
@@ -155,13 +155,10 @@ namespace PilotsDeck
         protected void CreateDataAreaClientChannel()
         {
             simConnect.MapClientDataNameToID(PILOTSDECK_CLIENT_DATA_NAME_COMMAND, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_CMD);
-            //simConnect.CreateClientData(PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_CMD, MOBIFLIGHT_MESSAGE_SIZE, SIMCONNECT_CREATE_CLIENT_DATA_FLAG.DEFAULT);
 
             simConnect.MapClientDataNameToID(PILOTSDECK_CLIENT_DATA_NAME_RESPONSE, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_RESPONSE);
-            //simConnect.CreateClientData(PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_RESPONSE, MOBIFLIGHT_MESSAGE_SIZE, SIMCONNECT_CREATE_CLIENT_DATA_FLAG.DEFAULT);
 
             simConnect.MapClientDataNameToID(PILOTSDECK_CLIENT_DATA_NAME_SIMVAR, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_LVARS);
-            //simConnect.CreateClientData(PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_LVARS, MOBIFLIGHT_MESSAGE_SIZE, SIMCONNECT_CREATE_CLIENT_DATA_FLAG.DEFAULT);
 
             simConnect.AddToClientDataDefinition((SIMCONNECT_DEFINE_ID)0, 0, MOBIFLIGHT_MESSAGE_SIZE, 0, 0);
             simConnect.RegisterStruct<SIMCONNECT_RECV_CLIENT_DATA, ResponseString>((SIMCONNECT_DEFINE_ID)0);
@@ -222,6 +219,99 @@ namespace PilotsDeck
             }
         }
 
+        public void EnumerateInputEvents()
+        {
+            Logger.Log(LogLevel.Debug, "MobiSimConnect:EnumerateInputEvents", $"Sending EnumerateInput Request");
+            eventsEnumerated = false;
+            eventHashes.Clear();
+            eventIndex.Clear();
+            nextEventID = 1;
+            eventSubscribedValues.Clear();
+            simConnect.EnumerateInputEvents(SIMCONNECT_REQUEST_ID.EnumEvents);
+        }
+
+        public void RequestInputEventValues()
+        {
+            foreach (var evt in eventSubscribedValues)
+            {
+                Logger.Log(LogLevel.Verbose, "MobiSimConnect:RequestInputEventValues", $"Requesting InputEvent '{evt.Value.Address}' (#{evt.Value.Hash}) on ID '{evt.Key}'");
+                simConnect.GetInputEvent((SIMCONNECT_DEFINE_ID)evt.Key, evt.Value.Hash);
+            }
+        }
+
+        public void SubscribeInputEvent(string name)
+        {
+            if (eventHashes.TryGetValue(name, out ulong hash) && ipcManager.TryGetValue(name, out IPCValue value))
+            {
+                if (!eventSubscribedValues.TryAdd(eventIndex.First(kv => kv.Value == hash).Key, value as IPCValueInputEvent))
+                    Logger.Log(LogLevel.Warning, "MobiSimConnect:SubscribeInputEvent", $"Failed to add InputEvent '{name}' to subscribed Values!");
+                else
+                    (value as IPCValueInputEvent).Hash = hash;
+            }
+            else
+            {
+                Logger.Log(LogLevel.Warning, "MobiSimConnect:SubscribeInputEvent", $"No Hash available for InputEvent '{name}'");
+            }
+        }
+
+        public void UnsubscribeInputEvent(string name)
+        {
+            if (eventSubscribedValues.Any(kv => kv.Value.Address == name))
+            {
+                ulong hash = eventSubscribedValues.First(kv => kv.Value.Address == name).Key;
+                if (eventSubscribedValues.Remove(hash))
+                    Logger.Log(LogLevel.Debug, "MobiSimConnect:UnsubscribeInputEvent", $"InputEvent '{name}' removed from subscribed Values");
+                else
+                    Logger.Log(LogLevel.Warning, "MobiSimConnect:UnsubscribeInputEvent", $"Could not remove InputEvent '{name}' from subscribed Values!");
+            }
+            else
+            {
+                Logger.Log(LogLevel.Warning, "MobiSimConnect:UnsubscribeInputEvent", $"InputEvent '{name}' not in subscribed Values!");
+            }
+        }
+
+        public bool SendInputEvent(string name, double value)
+        {
+            if (eventsEnumerated && eventHashes.TryGetValue(name, out ulong hash))
+            {
+                simConnect.SetInputEvent(hash, value);
+                return true;
+            }
+            else
+            {
+                Logger.Log(LogLevel.Warning, "MobiSimConnect:SendInputEvent", $"No Hash available for InputEvent '{name}'");
+            }
+
+            return false;
+        }
+
+        protected void SimConnect_OnRecvEnumerateInputEvents(SimConnect sender, SIMCONNECT_RECV_ENUMERATE_INPUT_EVENTS data)
+        {
+            if (data.dwRequestID == (uint)SIMCONNECT_REQUEST_ID.EnumEvents)
+            {
+                foreach (SIMCONNECT_INPUT_EVENT_DESCRIPTOR evt in data.rgData.Cast<SIMCONNECT_INPUT_EVENT_DESCRIPTOR>())
+                {
+                    if (evt.eType == SIMCONNECT_INPUT_EVENT_TYPE.DOUBLE)
+                    {
+                        eventHashes.Add("B:" + evt.Name, evt.Hash);
+                        eventIndex.Add(nextEventID, evt.Hash);
+                        Logger.Log(LogLevel.Debug, "MobiSimConnect:SimConnect_OnRecvEnumerateInputEvents", $"Event '{evt.Name}' has Hash: {evt.Hash} (Type: {evt.eType}) on ID {nextEventID}");
+                        nextEventID++;
+                    }
+                }
+                eventsEnumerated = true;
+                SubscribeAllAddresses(true);
+            }
+        }
+
+        protected void SimConnect_OnRecvGetInputEvents(SimConnect sender, SIMCONNECT_RECV_GET_INPUT_EVENT data)
+        {
+            if (eventSubscribedValues.TryGetValue(data.dwRequestID, out IPCValueInputEvent value))
+            {
+                value.SetValue((double)data.Value[0]);
+            }
+        }
+
         protected void SimConnect_OnQuit(SimConnect sender, SIMCONNECT_RECV data)
         {
             Disconnect();
@@ -257,6 +347,11 @@ namespace PilotsDeck
                 simVarUsed.Clear();
                 subscribeQueue.Clear();
                 addressToIndex.Clear();
+                eventHashes.Clear();
+                eventIndex.Clear();
+                eventSubscribedValues.Clear();
+                nextEventID = 1;
+                eventsEnumerated = false;
                 Logger.Log(LogLevel.Information, "MobiSimConnect:Disconnect", $"SimConnect Connection closed.");
             }
             catch (Exception ex)
@@ -312,11 +407,10 @@ namespace PilotsDeck
                     return;
                 }
 
-                if (!addressToIndex.ContainsKey(address))
+                if (addressToIndex.TryAdd(address, nextID))
                 {
                     simVars.Add(nextID, ipcManager[address]);
                     simVarUsed.Add(nextID, true);
-                    addressToIndex.Add(address, nextID);
 
                     subscribeQueue.Add(nextID);
                     nextID++;
@@ -335,16 +429,23 @@ namespace PilotsDeck
             }
         }
 
-        public void Process()
+        public void Process(bool isReady)
         {
+            if (isReady)
+            {
+                RequestInputEventValues();
+            }
+
             SubscribeQueue();
         }
 
-        public void SubscribeAllAddresses()
+        public void SubscribeAllAddresses(bool bVarOnly = false)
         {
             foreach (var address in ipcManager.AddressList)
             {
-                if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
+                if (IPCTools.rxBvar.IsMatch(address))
+                    SubscribeInputEvent(address);
+                if (!bVarOnly && ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
                 {
                     SubscribeAddress(address);
                 }

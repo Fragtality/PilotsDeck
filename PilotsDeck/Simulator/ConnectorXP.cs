@@ -20,9 +20,9 @@ namespace PilotsDeck
 
         protected CancellationTokenSource tokenSource = null;
 
-        protected Dictionary<string, int> AddresstoIndex = new();
-        protected Dictionary<int, IPCValue> dataRefs = new();
-        protected List<int> subscribeQueue = new();
+        protected Dictionary<string, int> AddresstoIndex = [];
+        protected Dictionary<int, IPCValue> dataRefs = [];
+        protected List<int> subscribeQueue = [];
         protected int nextIndex = 10;
         protected bool receiverNotReady = true;
         protected int simPausedReceived = 0;
@@ -74,7 +74,7 @@ namespace PilotsDeck
                     try
                     {
                         if (!receiverTask.IsCompleted)
-                            Task.WaitAll(new[] { receiverTask }, 50);
+                            Task.WaitAll([receiverTask], 50);
                     }
                     catch (Exception ex)
                     {
@@ -256,7 +256,7 @@ namespace PilotsDeck
 
         protected virtual void SubscribeQueue()
         {
-            List<int> success = new();
+            List<int> success = [];
             foreach (int index in subscribeQueue)
             {
                 if (dataRefs[index] is IPCValueDataRefString value)
@@ -426,7 +426,7 @@ namespace PilotsDeck
                 try
                 {
                     if (!receiverTask.IsCompleted)
-                        Task.WaitAll(new[] { receiverTask }, 50);
+                        Task.WaitAll([receiverTask], 50);
                 }
                 catch (Exception ex)
                 {

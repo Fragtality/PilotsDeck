@@ -24,6 +24,9 @@ namespace PilotsDeck
         public static readonly int GaugeFirst = 0;
         public static readonly int GaugeSecond = 7;
 
+        public static readonly int Guard = 18;
+        public static readonly int GuardCmd = 19;
+
         //Images
         public static readonly int Wait = 9;
         public static readonly int Default = 10;
@@ -35,9 +38,12 @@ namespace PilotsDeck
         public static readonly int ImgBot = 16;
         public static readonly int Map = 17;
 
+        public static readonly int ImgGuard = 20;
+        public static readonly int MapGuard = 21;
 
 
-        public static readonly string[] names = { "Control", "Monitor", "Switch", "SwitchLong", "SwitchLeft", "SwitchRight", "SwitchTouch", "SecondControl", "GaugeColor" };
+
+        public static readonly string[] names = ["Control", "Monitor", "Switch", "SwitchLong", "SwitchLeft", "SwitchRight", "SwitchTouch", "SecondControl", "GaugeColor"];
         public static string str(int id)
         {
             if (id >= 0 && id < names.Length)
@@ -62,21 +68,14 @@ namespace PilotsDeck
         XPCMD = 10,
         XPWREF = 11,
         AVAR = 12,
+        BVAR = 13
     }
 
-    public class ManagedValue
+    public class ManagedValue(int id, string address, ActionSwitchType type = ActionSwitchType.READVALUE, IPCValue value = null)
     {
-        public int ID { get; set; }
-        public string Address { get; set; }
-        public ActionSwitchType Type { get; set; }
-        public IPCValue Value { get; set; }
-
-        public ManagedValue(int id, string address, ActionSwitchType type = ActionSwitchType.READVALUE, IPCValue value = null)
-        {
-            ID = id;
-            Address = address;
-            Type = type;
-            Value = value;
-        }
+        public int ID { get; set; } = id;
+        public string Address { get; set; } = address;
+        public ActionSwitchType Type { get; set; } = type;
+        public IPCValue Value { get; set; } = value;
     }
 }

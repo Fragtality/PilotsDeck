@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
-    <Version>0.7.12</Version>
+    <Version>0.8.0</Version>
     <Authors>Fragtality</Authors>
     <Description>Directly control your FlightSim from your StreamDeck via FSUIPC!</Description>
     <Copyright>Copyright © 2023</Copyright>
@@ -52,9 +52,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSUIPCClientDLL" Version="3.3.8" />
+    <PackageReference Include="FSUIPCClientDLL" Version="3.3.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="StreamDeckLib" Version="2401.9.1749" />
+    <PackageReference Include="StreamDeckLib" Version="2405.30.2121" />
   </ItemGroup>
 
   <ItemGroup>
@@ -278,6 +278,24 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\GearTransit.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\GuardCross%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\GuardCross.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\GuardCrossBlack%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\GuardCrossBlack.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\GuardCrossRed%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\GuardCrossRed.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\INOP%402x.png">
@@ -748,6 +766,12 @@
     <None Update="Images\SwitchINOP.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\SwitchRed%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\SwitchRed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Images\SwitchRound%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -813,6 +837,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PI\css\sdpi.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PI\inc_GuardMappedActions.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PI\inc_GuardActions.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PI\inc_DefaultActions.html">
@@ -913,7 +943,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="powershell -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)BuildPlugin.ps1&quot; $(ConfigurationName)" />
+    <Exec Command="powershell -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)BuildPlugin.ps1&quot; $(Configuration)" />
   </Target>
 
 </Project>

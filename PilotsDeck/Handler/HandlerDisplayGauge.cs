@@ -2,23 +2,17 @@
 
 namespace PilotsDeck
 {
-    public class HandlerDisplayGauge : HandlerDisplayText
+    public class HandlerDisplayGauge(string context, ModelDisplayGauge settings, StreamDeckType deckType) : HandlerDisplayText(context, settings, deckType)
     {
         public virtual ModelDisplayGauge GaugeSettings { get { return Settings; } }
         public override IModelSwitch SwitchSettings { get { return Settings; } }
-        public new ModelDisplayGauge Settings { get; protected set; }
+        public new ModelDisplayGauge Settings { get; protected set; } = settings;
 
         public override string Address { get { return GaugeSettings.Address; } }
         public override string ActionID { get { return $"(HandlerDisplayGauge) ({Title.Trim()}) {(GaugeSettings.IsEncoder ? "(Encoder) " : "")}(Read: {GaugeSettings.Address}) (HasAction: {HasAction}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
         public override bool UseFont { get { return true; } }
 
-        protected bool IsArc = false;
-
-        public HandlerDisplayGauge(string context, ModelDisplayGauge settings, StreamDeckType deckType) : base(context, settings, deckType)
-        {
-            Settings = settings;
-            IsArc = settings.DrawArc;
-        }
+        protected bool IsArc = settings.DrawArc;
 
         public override bool OnButtonDown(long tick)
         {

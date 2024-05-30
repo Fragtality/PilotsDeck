@@ -138,7 +138,7 @@ namespace PilotsDeck
                 {
                     string num = Convert.ToString(result, CultureInfo.InvariantCulture.NumberFormat);
 
-                    int idxE = num.IndexOf("E");
+                    int idxE = num.IndexOf('E');
                     if (idxE < 0)
                         return num;
                     else

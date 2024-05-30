@@ -17,7 +17,7 @@ namespace Installer
 
     public partial class InstallerActionControl : UserControl
     {
-        private InstallerTask installerTask;
+        private readonly InstallerTask installerTask;
 
         public InstallerActionControl(InstallerTask task)
         {

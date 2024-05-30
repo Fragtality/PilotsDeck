@@ -7,8 +7,8 @@ namespace PilotsDeck
 {
     public sealed class IPCManager : IDisposable
     {
-        private Dictionary<string, IPCValue> currentValues = new();
-        private Dictionary<string, int> currentRegistrations = new();
+        private Dictionary<string, IPCValue> currentValues = [];
+        private Dictionary<string, int> currentRegistrations = [];
         public SimulatorConnector SimConnector { get; set; }
  
         public int Length => currentValues.Count;
@@ -35,7 +35,7 @@ namespace PilotsDeck
             return currentValues.ContainsKey(FormatAddress(address));
         }
 
-        public List<string> AddressList { get { return currentValues.Keys.ToList(); } }
+        public List<string> AddressList { get { return [.. currentValues.Keys]; } }
 
         public IPCManager()
         {
@@ -296,7 +296,10 @@ namespace PilotsDeck
                         {
                             Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"ToggleSwitch OffState matched - using Alternate Action. (offState: {offState}) (State: {currentState})");
                             runAddress = addressOff;
-                            newValue = offState;
+                            if (actionType != ActionSwitchType.BVAR)
+                                newValue = offState;
+                            else
+                                newValue = "1";
                         }
                         else
                             Logger.Log(LogLevel.Debug, "IPCManager:RunActionUp", $"ToggleSwitch OffState not matched - using Normal Action. (offState: {offState}) (State: {currentState})");
@@ -313,9 +316,16 @@ namespace PilotsDeck
                     //CALCULATE VALUE
                     else if (IPCTools.IsActionReadable(actionType))
                     {
-                        newValue = ValueManipulator.CalculateSwitchValue(currentState, offState, onState, encTicks);
-                        if (!string.IsNullOrEmpty(newValue) && (newValue.StartsWith('>') || newValue.StartsWith('<')))
-                            newValue = newValue.Replace("=", "").Replace("<", "").Replace(">", "");
+                        if (actionType == ActionSwitchType.BVAR && string.IsNullOrWhiteSpace(offState))
+                        {
+                            newValue = onState;
+                        }
+                        else
+                        {
+                            newValue = ValueManipulator.CalculateSwitchValue(currentState, offState, onState, encTicks);
+                            if (!string.IsNullOrEmpty(newValue) && (newValue.StartsWith('>') || newValue.StartsWith('<')))
+                                newValue = newValue.Replace("=", "").Replace("<", "").Replace(">", "");
+                        }
                     }
 
 

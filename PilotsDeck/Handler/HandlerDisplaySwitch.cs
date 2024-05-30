@@ -1,19 +1,13 @@
 ﻿namespace PilotsDeck
 {
-    public class HandlerDisplaySwitch : HandlerDisplayText
+    public class HandlerDisplaySwitch(string context, ModelDisplaySwitch settings, StreamDeckType deckType) : HandlerDisplayText(context, settings, deckType)
     {
         public override ModelDisplayText TextSettings { get { return Settings; } }
         public override IModelSwitch SwitchSettings { get { return Settings; } }
-        public new ModelDisplaySwitch Settings { get; protected set; }
+        public new ModelDisplaySwitch Settings { get; protected set; } = settings;
 
         public override string ActionID { get { return $"(HandlerSwitchDisplay) ({Title.Trim()}) {(TextSettings.IsEncoder ? "(Encoder) " : "")}(Read: {TextSettings.Address}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
         public override bool HasAction { get; protected set; } = true;
-
-
-        public HandlerDisplaySwitch(string context, ModelDisplaySwitch settings, StreamDeckType deckType) : base(context, settings, deckType)
-        {
-            Settings = settings;
-        }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {

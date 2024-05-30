@@ -68,16 +68,50 @@ namespace PilotsDeck
 
         public static string FormatValue(string value, string format)
         {
-            if (string.IsNullOrEmpty(value))
+            try
+            {
+                if (string.IsNullOrEmpty(value))
+                    return value;
+
+                string[] parts = format.Split(':');
+                string replaceFrom = AppSettings.stringReplace;
+
+                if (parts.Length >= 2)
+                {
+                    if (parts[1].Contains(replaceFrom))
+                        return string.Format(AppSettings.numberFormat, parts[1].Replace(replaceFrom, "{0}"), value);
+                    else if (parts[1].Contains(".."))
+                        return GetSubString(value, parts[1]);
+                    else
+                        return value;
+                }
+                else if (parts.Length == 1)
+                {
+                    if (parts[0].Contains(replaceFrom))
+                        return string.Format(AppSettings.numberFormat, parts[0].Replace(replaceFrom, "{0}"), value);
+                    else if (parts[0].Contains(".."))
+                        return GetSubString(value, parts[0]);
+                    else
+                        return value;
+                }
+                else
+                    return value;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, "ModelDisplay:FormatValue", $"Exception '{ex.GetType()}' while formatting Value '{value}' with format '{format}' - ({ex.Message})");
+                return value;
+            }
+        }
+
+        public static string GetSubString(string value, string format)
+        {
+            string[] nums = format.Trim().Split("..");
+            if (nums.Length != 2 || !int.TryParse(nums[0], out int start) || !int.TryParse(nums[1], out int len))
                 return value;
 
-            string[] parts = format.Split(':');
-            string replaceFrom = AppSettings.stringReplace;
-
-            if (parts.Length >= 2 && parts[1].Contains(replaceFrom))
-                return string.Format(AppSettings.numberFormat, parts[1].Replace(replaceFrom, "{0}"), value);
-            else if (parts.Length == 1 && parts[0].Contains(replaceFrom))
-                return string.Format(AppSettings.numberFormat, parts[0].Replace(replaceFrom, "{0}"), value);
+            if (start >= 0 && len >= 1 && start < value.Length && start + len < value.Length)
+                return value.Substring(start, len);
             else
                 return value;
         }

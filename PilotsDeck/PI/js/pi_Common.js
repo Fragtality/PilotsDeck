@@ -9,6 +9,10 @@ if (document.getElementById("EncoderActions") && encoderHtml)
 	document.getElementById("EncoderActions").innerHTML = encoderHtml;
 if (document.getElementById("FontOptions") && fontHtml)
 	document.getElementById("FontOptions").innerHTML = fontHtml;
+if (document.getElementById("GuardActions") && guardHtml)
+	document.getElementById("GuardActions").innerHTML = guardHtml;
+if (document.getElementById("GuardMappedActions") && guardMappedHtml)
+	document.getElementById("GuardMappedActions").innerHTML = guardMappedHtml;
 
 var websocket = null,
 	uuid = null,
@@ -85,6 +89,7 @@ function fillActionSelectBoxes() {
 	if (ActionTypes && ActionTypes != "") {
 		fillTypeSelectBox(ActionTypes, 'ActionType', settingsModel.ActionType);
 		fillTypeSelectBox(ActionTypes, 'ActionTypeLong', settingsModel.ActionTypeLong);
+		fillTypeSelectBox(ActionTypes, 'ActionTypeGuard', settingsModel.ActionTypeGuard);
 		if (settingsModel.IsEncoder) {
 			fillTypeSelectBox(ActionTypes, 'ActionTypeLeft', settingsModel.ActionTypeLeft);
 			fillTypeSelectBox(ActionTypes, 'ActionTypeRight', settingsModel.ActionTypeRight);
@@ -152,16 +157,19 @@ function setPattern(field, type) {
 		return;
 
 	var regName = "[^:\\s][a-zA-Z0-9\x2D\x5F]+";
+	var regNameXP = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2B]+";
 	var regNameMultiple = "[a-zA-Z0-9\x2D\x5F]+";
+	var regNameMultipleXP = "[a-zA-Z0-9\x2D\x5F\x2B]+";
 	var regLVarName = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2E\x3A]+";
 	var regLvar = `^((L:){0,1}${regLVarName}){1}$`;
 	var strHvar = `((H:){0,1}${regName}){1}`;
 	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
-	var regDref = `^(${regName}[\x2F]){1}(${regNameMultiple}[\x2F])*(${regNameMultiple}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
-	var strPathXP = `(${regName}[\x2F]){1}(${regNameMultiple}[\x2F])*(${regNameMultiple}){1}`;
+	var regDref = `^(${regNameXP}[\x2F]){1}(${regNameMultipleXP}[\x2F])*(${regNameMultipleXP}(([\x5B][0-9]+[^\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
+	var strPathXP = `(${regNameXP}[\x2F]){1}(${regNameMultipleXP}[\x2F])*(${regNameMultipleXP}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	var regAvar = `^\\((A:){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w ]+\\)$`;
+	var regBvar = `^(B:${regLVarName}){1}$`;
 	
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
@@ -187,6 +195,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regDref;
 	else if (type == 12) //Avar
 		document.getElementById(field).pattern = regAvar;
+	else if (type == 13) //Bvar
+		document.getElementById(field).pattern = regBvar;
 	else
 		document.getElementById(field).pattern = ".*";
 }
@@ -262,7 +272,7 @@ function toggleSwitchHold(settingsModel) {
 }
 
 function isActionToggleable(actionType) {
-	return (actionType >= 0 && actionType <= 2) || (actionType >= 8 && actionType <= 10);
+	return (actionType >= 0 && actionType <= 2) || (actionType >= 8 && actionType <= 10) || actionType == 13;
 }
 
 function isActionHoldable(actionType) {
@@ -274,7 +284,7 @@ function isActionHoldableValue(actionType) {
 }
 
 function isActionResetable(actionType) {
-	return (actionType >= 3 && actionType <= 5) || (actionType >= 11 && actionType <= 12);
+	return (actionType >= 3 && actionType <= 5) || (actionType >= 11 && actionType <= 13);
 }
 
 function setSwitchOptions(settingsModel) {
@@ -349,6 +359,10 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSw
 		toggleConfigItem(true, offField);
 	}
 	else if (actionType == 12 && !switchCurrent) { //avar
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
+	else if (actionType == 13 && !switchCurrent) { //bvar
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
@@ -457,6 +471,35 @@ function commonFormUpdate() {
 	else if (document.getElementById("DefaultActions")) {
 		document.getElementById("DefaultActions").style.display = "none";
 		setPattern('Address', 5);
+	}
+
+	//GUARDED
+	toggleConfigItem(settingsModel.IsGuarded, 'AddressGuardActive');
+	toggleConfigItem(settingsModel.IsGuarded, 'GuardActiveValue');
+	toggleConfigItem(settingsModel.IsGuarded, 'ActionTypeGuard');
+	toggleConfigItem(settingsModel.IsGuarded, 'AddressActionGuard');
+	toggleConfigItem(settingsModel.IsGuarded, 'AddressActionGuardOff');
+	toggleConfigItem(settingsModel.IsGuarded, 'SwitchOnStateGuard');
+	toggleConfigItem(settingsModel.IsGuarded, 'SwitchOffStateGuard');
+	toggleConfigItem(settingsModel.IsGuarded, 'ImageGuard');
+
+	if (settingsModel.IsGuarded) {
+		setPattern('AddressGuardActive', 5);
+		setPattern('AddressActionGuard', settingsModel.ActionTypeGuard);
+		toggleOnOffState(settingsModel.ActionTypeGuard, 'SwitchOnStateGuard', 'SwitchOffStateGuard', settingsModel.ToggleSwitch);
+	
+		if (isActionHoldable(settingsModel.ActionTypeGuard) && settingsModel.HoldSwitch) {
+			toggleConfigItem(!isActionHoldableValue(settingsModel.ActionTypeGuard), 'AddressActionGuardOff')
+			toggleConfigItem(isActionHoldableValue(settingsModel.ActionTypeGuard), 'SwitchOnStateGuard');
+			toggleConfigItem(isActionHoldableValue(settingsModel.ActionTypeGuard), 'SwitchOffStateGuard');
+		}
+		else if (settingsModel.ToggleSwitch && isActionToggleable(settingsModel.ActionTypeGuard)) {
+			toggleConfigItem(true, 'AddressActionGuardOff');
+			toggleOnOffState(settingsModel.ActionTypeGuard, 'SwitchOnStateGuard', 'SwitchOffStateGuard', false)
+		}
+		else {
+			toggleConfigItem(false, 'AddressActionGuardOff')
+		}
 	}
 
 	//PREVIEWS

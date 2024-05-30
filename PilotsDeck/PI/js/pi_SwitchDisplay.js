@@ -29,10 +29,21 @@ var settingsModel = {
 	OffState: "",
 	IndicationValueAny: false,
 	UseImageMapping: false,
-	ImageMap: ""
+	ImageMap: "",
+	IsGuarded: false,
+	AddressGuardActive: "",
+	GuardActiveValue: "",
+	AddressActionGuard: "",
+	AddressActionGuardOff: "",
+	ActionTypeGuard: 0,
+	SwitchOnStateGuard: "",
+	SwitchOffStateGuard: "",
+	ImageGuard: "Images/GuardCross.png",
+	UseImageGuardMapping: false,
+	ImageGuardMap: ""
 };
 
-var imageSelectBoxes = ["OnImage", "OffImage", "DefaultImage", "ErrorImage", "IndicationImage"];
+var imageSelectBoxes = ["OnImage", "OffImage", "DefaultImage", "ErrorImage", "IndicationImage", "ImageGuard"];
 
 function updateForm() {
 	//SwitchOnCurrent
@@ -54,4 +65,8 @@ function updateForm() {
 	//Image Mapping
 	toggleConfigItem(settingsModel.UseImageMapping, 'ImageMap');
 	setFormItem(!settingsModel.UseImageMapping, 'DefaultMapping');
+
+	toggleConfigItem(settingsModel.IsGuarded, 'UseImageGuardMapping');
+	toggleConfigItem(settingsModel.UseImageGuardMapping && settingsModel.IsGuarded, 'ImageGuardMap');
+	setFormItem(!settingsModel.UseImageGuardMapping && settingsModel.IsGuarded, 'DefaultGuardMapping');
 }

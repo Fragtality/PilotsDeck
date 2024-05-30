@@ -4,16 +4,11 @@ using System.Globalization;
 
 namespace PilotsDeck
 {
-    public class IPCValueSimVar : IPCValue
+    public class IPCValueSimVar(string _address) : IPCValue(_address)
     {
         private bool isChanged = false;
         private double DoubleValue = 0.0;
         private double lastValue = 0.0;
-
-        public IPCValueSimVar(string _address) : base(_address)
-        {
-
-        }
 
         public override bool IsChanged { get { return isChanged; } }
 
@@ -38,7 +33,7 @@ namespace PilotsDeck
         {
             string num = Convert.ToString((float)DoubleValue, CultureInfo.InvariantCulture.NumberFormat);
 
-            int idxE = num.IndexOf("E");
+            int idxE = num.IndexOf('E');
             if (idxE < 0)
                 return num;
             else

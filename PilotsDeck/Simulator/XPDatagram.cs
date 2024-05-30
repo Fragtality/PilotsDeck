@@ -10,12 +10,12 @@ namespace PilotsDeck
 
         public XPDatagram()
         {
-            Bytes = new List<byte>();
+            Bytes = [];
         }
 
         public byte[] Get()
         {
-            return Bytes.ToArray();
+            return [.. Bytes];
         }
 
         protected void Add(byte value)

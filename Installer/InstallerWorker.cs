@@ -10,7 +10,7 @@ namespace Installer
         public bool Running { get; set; } = false;
         public bool Completed { get; set; } = false;
         public bool Success { get; set; } = false;
-        private Queue<InstallerTask> taskQueue;
+        private readonly Queue<InstallerTask> taskQueue;
 
         public InstallerWorker(Queue<InstallerTask> queue)
         {

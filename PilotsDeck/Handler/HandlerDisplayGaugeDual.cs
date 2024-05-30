@@ -2,17 +2,12 @@
 
 namespace PilotsDeck
 {
-    public class HandlerDisplayGaugeDual : HandlerDisplayGauge
+    public class HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings, StreamDeckType deckType) : HandlerDisplayGauge(context, settings, deckType)
     {
         public override ModelDisplayGauge GaugeSettings { get { return Settings; } }
-        public new ModelDisplayGaugeDual Settings { get; protected set; }
+        public new ModelDisplayGaugeDual Settings { get; protected set; } = settings;
 
         public override string ActionID { get { return $"(HandlerDisplayGaugeDual) ({Title.Trim()}) {(GaugeSettings.IsEncoder ? "(Encoder) " : "")}(Read1: {GaugeSettings.Address} / Read2: {Settings.Address2}) (HasAction: {HasAction}) (Action: {(ActionSwitchType)SwitchSettings.ActionType} / {Address}) (Long: {SwitchSettings.HasLongPress} / {(ActionSwitchType)SwitchSettings.ActionTypeLong} / {SwitchSettings.AddressActionLong})"; } }
-
-        public HandlerDisplayGaugeDual(string context, ModelDisplayGaugeDual settings, StreamDeckType deckType) : base(context, settings, deckType)
-        {
-            Settings = settings;
-        }
 
         protected override bool InitializationTest()
         {

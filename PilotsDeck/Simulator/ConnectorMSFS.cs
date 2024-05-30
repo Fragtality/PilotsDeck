@@ -6,11 +6,9 @@ namespace PilotsDeck
     public class ConnectorMSFS : SimulatorConnector
     {
         private static readonly string inMenuAddr = "3365:1";
-        private static readonly string isPausedAddr = "0262:2";
         private static readonly string pauseIndAddr = "0264:2";
         private static readonly string camReadyAddr = "026D:1";
         private IPCValueOffset inMenuValue;
-        private IPCValueOffset isPausedValue;
         private IPCValueOffset pauseIndValue;
         private IPCValueOffset camReadyValue;
 
@@ -26,7 +24,7 @@ namespace PilotsDeck
 
             return result;
         }
-        public override bool IsReady { get { return inMenuValue?.Value == "0" && isPausedValue?.Value == "0" && IsConnected && IsCamReady() && mobiConnect.IsReady; } }
+        public override bool IsReady { get { return inMenuValue?.Value == "0" && pauseIndValue?.Value == "0" && IsConnected && IsCamReady() && mobiConnect.IsReady; } }
         public override bool IsRunning { get { return GetProcessRunning("FlightSimulator"); } }
         public override bool IsPaused { get { return pauseIndValue?.Value != "0"; } protected set { } }
 
@@ -88,7 +86,6 @@ namespace PilotsDeck
             mobiConnect = new(manager);
             forceSubscribeAll = false;
 
-            isPausedValue = new IPCValueOffset(isPausedAddr, AppSettings.groupStringRead, OffsetAction.Read);
             pauseIndValue = new IPCValueOffset(pauseIndAddr, AppSettings.groupStringRead, OffsetAction.Read);
             inMenuValue = new IPCValueOffset(inMenuAddr, AppSettings.groupStringRead, OffsetAction.Read);
             camReadyValue = new IPCValueOffset(camReadyAddr, AppSettings.groupStringRead, OffsetAction.Read);
@@ -104,7 +101,6 @@ namespace PilotsDeck
             {
                 if (!firstProcessSuccess || !lastStateProcess)
                 {
-                    isPausedValue.Connect();
                     pauseIndValue.Connect();
                     inMenuValue.Connect();
                     camReadyValue.Connect();
@@ -120,8 +116,8 @@ namespace PilotsDeck
                     resultProcess = false;
                 }
 
-                if (mobiConnect.IsReady)
-                    mobiConnect.Process();
+                if (IsReady)
+                    mobiConnect.Process(IsReady);
                 else
                     Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnect not ready!");
 
@@ -153,14 +149,22 @@ namespace PilotsDeck
 
         public override void SubscribeAddress(string address)
         {
+            if (IPCTools.rxBvar.IsMatch(address))
+            {
+                mobiConnect.SubscribeInputEvent(address);
+            }
             if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
             {
                 mobiConnect.SubscribeAddress(address);
-            }
+            }      
         }
 
         public override void UnsubscribeAddress(string address)
         {
+            if (IPCTools.rxBvar.IsMatch(address))
+            {
+                mobiConnect.UnsubscribeInputEvent(address);
+            }
             if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
             {
                 mobiConnect.UnsubscribeAddress(address);
@@ -203,6 +207,24 @@ namespace PilotsDeck
             return result;
         }
 
+        protected bool SendInputEvent(string Address, string newValue)
+        {
+            if (string.IsNullOrEmpty(newValue))
+            {
+                newValue = "1";
+                Logger.Log(LogLevel.Debug, "ConnectorMSFS:SendInputEvent", $"Empty Value - using '1' as Default Value");
+            }
+            if (IPCTools.rxBvar.IsMatch(Address) && double.TryParse(newValue, new RealInvariantFormat(newValue), out double result))
+            {
+                return mobiConnect.SendInputEvent(Address, result);
+            }
+            else
+            {
+                Logger.Log(LogLevel.Warning, "ConnectorMSFS:SendInputEvent", $"Malformed Address or Value for Input-Event! ({Address} = {newValue})");
+                return false;
+            }
+        }
+
         public override bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, int ticks = 1)
         {
             switch (actionType)
@@ -215,6 +237,8 @@ namespace PilotsDeck
                     return UpdateLvar(Address, newValue);
                 case ActionSwitchType.AVAR:
                     return UpdateLvar(Address, newValue);
+                case ActionSwitchType.BVAR:
+                    return SendInputEvent(Address, newValue);
                 case ActionSwitchType.HVAR:
                     return SimTools.WriteHvar(mobiConnect, Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.CONTROL:
@@ -227,6 +251,11 @@ namespace PilotsDeck
                     Logger.Log(LogLevel.Error, "ConnectorMSFS:RunAction", $"Action-Type '{actionType}' not valid for Address '{Address}'!");
                     return false;
             }
+        }
+
+        public void EnumerateInputEvents()
+        {
+            mobiConnect.EnumerateInputEvents();
         }
     }
 }

@@ -2,24 +2,18 @@
 
 namespace PilotsDeck
 {
-    public class HandlerDisplayText : HandlerBase
+    public class HandlerDisplayText(string context, ModelDisplayText settings, StreamDeckType deckType) : HandlerBase(context, settings, deckType)
     {
         public virtual ModelDisplayText TextSettings { get { return Settings; } }
         public override IModelSwitch SwitchSettings => throw new System.NotImplementedException();
-        public virtual ModelDisplayText Settings { get; protected set; }
+        public virtual ModelDisplayText Settings { get; protected set; } = settings;
 
         public override string ActionID { get { return $"(HandlerDisplayText) ({Title.Trim()}) {(TextSettings.IsEncoder ? "(Encoder) " : "")}(Read: {TextSettings.Address})"; } }
         public override string Address { get { return TextSettings.Address; } }
 
         public override bool UseFont { get { return true; } }
 
-        protected bool DrawBoxLast = true;
-
-        public HandlerDisplayText(string context, ModelDisplayText settings, StreamDeckType deckType) : base(context, settings, deckType)
-        {
-            Settings = settings;
-            DrawBoxLast = settings.DrawBox;
-        }
+        protected bool DrawBoxLast = settings.DrawBox;
 
         public override bool OnButtonDown(long tick)
         {

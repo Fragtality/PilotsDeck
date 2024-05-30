@@ -123,6 +123,8 @@ namespace PilotsDeck
                 value = new IPCValueDataRefString(address);
             else if (IPCTools.rxDref.IsMatch(address))
                 value = new IPCValueDataRef(address);
+            else if (IPCTools.rxBvar.IsMatch(address))
+                value = new IPCValueInputEvent(address);
             else if (IPCTools.rxLvar.IsMatch(address) || IPCTools.rxAvar.IsMatch(address))
                 value = new IPCValueSimVar(address);
 

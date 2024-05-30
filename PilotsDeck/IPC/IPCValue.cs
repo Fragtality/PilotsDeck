@@ -2,13 +2,8 @@
 
 namespace PilotsDeck
 {
-    public abstract class IPCValue : IDisposable
+    public abstract class IPCValue(string address) : IDisposable
     {
-        public IPCValue(string address)
-        {
-            Address = address;
-        }
-
         public virtual void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -24,7 +19,7 @@ namespace PilotsDeck
 
         }
 
-        public string Address { get; protected set; }
+        public string Address { get; protected set; } = address;
         public string Value
         {
             get { return Read(); }

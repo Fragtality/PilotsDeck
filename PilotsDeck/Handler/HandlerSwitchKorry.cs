@@ -80,13 +80,16 @@ namespace PilotsDeck
             if (!string.IsNullOrEmpty(KorrySettings.BotImage) && !KorrySettings.UseOnlyTopAddr)
                 render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
 
+            if (SwitchSettings.IsGuarded)
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+
             DefaultImage64 = render.RenderImage64();
             render.Dispose();
         }
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bottom)  && !NeedRefresh)
+            if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bottom) && !NeedRefresh && !ValueManager.IsChanged(ID.Guard))
                 return;
 
             ImageRenderer render = new(ImgManager.GetImage(KorrySettings.DefaultImage, DeckType), DeckType);
@@ -103,6 +106,9 @@ namespace PilotsDeck
 
             if (((ModelBase.Compare(KorrySettings.BotState, testValue) && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(testValue))) && !string.IsNullOrEmpty(KorrySettings.BotImage))
                 render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
+
+            if (SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
 
             RenderImage64 = render.RenderImage64();
             NeedRedraw = true;

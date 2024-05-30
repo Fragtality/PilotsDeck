@@ -12,10 +12,10 @@ namespace Installer
 {
     public partial class MainWindow : Window
     {
-        private InstallerWorker worker;
-        private Queue<InstallerTask> taskQueue;
-        private List<InstallerActionControl> actionControls;
-        private DispatcherTimer timer;
+        private readonly InstallerWorker worker;
+        private readonly Queue<InstallerTask> taskQueue;
+        private readonly List<InstallerActionControl> actionControls;
+        private readonly DispatcherTimer timer;
 
         public MainWindow()
         {

@@ -17,16 +17,10 @@ namespace PilotsDeck
         StreamDeckPlus = 7
     }
 
-    public class StreamDeckType
+    public class StreamDeckType(StreamDeckTypeEnum type = StreamDeckTypeEnum.StreamDeck, bool isEncoder = false)
     {
-        public StreamDeckType(StreamDeckTypeEnum type = StreamDeckTypeEnum.StreamDeck, bool isEncoder = false)
-        {
-            Type = type;
-            IsEncoder = isEncoder;
-        }
-
-        public StreamDeckTypeEnum Type { get; set; } = StreamDeckTypeEnum.StreamDeck;
-        public bool IsEncoder { get; set; } = false;
+        public StreamDeckTypeEnum Type { get; set; } = type;
+        public bool IsEncoder { get; set; } = isEncoder;
 
         public PointF GetCanvasSize()
         {
@@ -137,7 +131,7 @@ namespace PilotsDeck
                 Logger.Log(LogLevel.Critical, "ModelPropertyInspectorFonts:ReadImageDirectory", $"Exception while loading ImageFiles! (Exception: {ex.GetType()})");
             }
 
-            return Array.Empty<string>();
+            return [];
         }
 
         public class StreamDeckTitleParameters

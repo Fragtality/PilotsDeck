@@ -3,16 +3,11 @@ using System.Globalization;
 
 namespace PilotsDeck
 {
-    public class IPCValueDataRef : IPCValue
+    public class IPCValueDataRef(string address) : IPCValue(address)
     {
         public float FloatValue { get; set; } = 0.0f;
         private float _lastValue = 0.0f;
         private bool _valueChanged = false;
-
-        public IPCValueDataRef(string address) : base(address)
-        {
-
-        }
 
         public override bool IsChanged
         {
@@ -37,7 +32,7 @@ namespace PilotsDeck
         {
             string num = Convert.ToString(FloatValue, CultureInfo.InvariantCulture.NumberFormat);
 
-            int idxE = num.IndexOf("E");
+            int idxE = num.IndexOf('E');
             if (idxE < 0)
                 return num;
             else

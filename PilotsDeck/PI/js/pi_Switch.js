@@ -18,10 +18,21 @@ var settingsModel = {
     AddressActionLong: "",
     ActionTypeLong: 0,
     SwitchOnStateLong: "",
-    SwitchOffStateLong: ""
+	SwitchOffStateLong: "",
+	IsGuarded: false,
+	AddressGuardActive: "",
+	GuardActiveValue: "",
+	AddressActionGuard: "",
+	AddressActionGuardOff: "",
+	ActionTypeGuard: 0,
+	SwitchOnStateGuard: "",
+	SwitchOffStateGuard: "",
+	ImageGuard: "Images/GuardCross.png",
+	UseImageGuardMapping: false,
+	ImageGuardMap: ""
   };
 
-var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "ImageGuard"];
 
 function updateForm() {
 	//SwitchOnCurrent
