@@ -48,10 +48,21 @@ var settingsModel = {
 	FontColor: '#ffffff',
 	FontColorStby: '#e0e0e0',
 	RectCoord: "3; 1; 64; 32",
-	RectCoordStby: "3; 42; 64; 31"
+	RectCoordStby: "3; 42; 64; 31",
+	IsGuarded: false,
+	AddressGuardActive: "",
+	GuardActiveValue: "",
+	AddressActionGuard: "",
+	AddressActionGuardOff: "",
+	ActionTypeGuard: 0,
+	SwitchOnStateGuard: "",
+	SwitchOffStateGuard: "",
+	ImageGuard: "Images/GuardCross.png",
+	UseImageGuardMapping: false,
+	ImageGuardMap: ""
 };
 
-var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage"];
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage", "ImageGuard"];
 
 // Show/Hide elements on Form (required function)
 function updateForm() {

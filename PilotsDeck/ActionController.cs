@@ -451,10 +451,10 @@ namespace PilotsDeck
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
             if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
-                ipcManager.ScriptManager.CheckFiles();
-                ipcManager.UnsubscribeUnusedAddresses();
-                imgManager.RemoveUnused();
-                if (SimConnector.IsRunning || imageUpdates > 0)
+                int changedScripts = ipcManager.ScriptManager.CheckFiles();
+                int removedAddresses = ipcManager.UnsubscribeUnusedAddresses();
+                int removedImages = imgManager.RemoveUnused();
+                if (SimConnector.IsRunning || imageUpdates > 0 || changedScripts > 0 || removedAddresses > 0 || removedImages > 0)
                     Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count}) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
                 imageUpdates = 0;

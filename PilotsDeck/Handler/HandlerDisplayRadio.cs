@@ -51,7 +51,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !NeedRefresh && ticksIndication == 0)
+            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !NeedRefresh && ticksIndication == 0 && !ValueManager.IsChanged(ID.Guard))
                 return;
 
             string valueAct = ValueManager[ID.Active];
@@ -109,6 +109,9 @@ namespace PilotsDeck
             render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
             render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
+            if (HasAction && SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+
             if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));
 
@@ -139,6 +142,9 @@ namespace PilotsDeck
 
             render.DrawText("0", fontAct, colorAct, Settings.GetRectangleText());
             render.DrawText("0", fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
+
+            if (HasAction && SwitchSettings.IsGuarded)
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
 
             if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));

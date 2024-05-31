@@ -92,6 +92,9 @@ namespace PilotsDeck
             string text = TextSettings.GetValueMapped("0");
             render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
 
+            if (HasAction && SwitchSettings.IsGuarded)
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+
             if (IsEncoder)
                 DrawTitle(render);
 
@@ -102,6 +105,9 @@ namespace PilotsDeck
             render = new(ImgManager.GetImage(TextSettings.ErrorImage, DeckType), DeckType);
             if (TextSettings.DrawBox)
                 render.DrawBox(ColorTranslator.FromHtml("#d70000"), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
+
+            if (HasAction && SwitchSettings.IsGuarded)
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
 
             if (IsEncoder)
                 DrawTitle(render);
@@ -119,6 +125,9 @@ namespace PilotsDeck
 
             WaitImage64 = render.RenderImage64();
             render.Dispose();
+
+            NeedRedraw = true;
+            NeedRefresh = true;
         }
 
         public override void RefreshTitle()
@@ -133,7 +142,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh)
+            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh && !ValueManager.IsChanged(ID.Guard))
                 return;
 
             string value = ValueManager[ID.Control];
@@ -175,6 +184,9 @@ namespace PilotsDeck
 
             if (text != "")
                 render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
+
+            if (HasAction && SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
 
             if (IsEncoder)
                 DrawTitle(render);

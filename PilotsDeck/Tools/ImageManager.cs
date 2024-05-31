@@ -140,8 +140,9 @@ namespace PilotsDeck
             }
         }
 
-        public void RemoveUnused()
+        public int RemoveUnused()
         {
+            int result = 0;
             var unusedImages = imageCache.Values.Where(i => i.Registrations == 0).ToList();
             
             if (unusedImages.Count != 0)
@@ -151,9 +152,11 @@ namespace PilotsDeck
             {
                 imageCache[image.FileName] = null;
                 imageCache.Remove(image.FileName);
-
+                result++;
                 Logger.Log(LogLevel.Debug, "ImageManager:RemoveUnused", $"Removed Image {image.FileName} from Cache.");
             }
+
+            return result;
         }
 
         public void RemoveAll()

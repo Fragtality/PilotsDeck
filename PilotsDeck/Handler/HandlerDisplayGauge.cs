@@ -122,6 +122,9 @@ namespace PilotsDeck
                 DrawText("0", render, true);
             }
 
+            if (HasAction && SwitchSettings.IsGuarded)
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+
             if (IsEncoder)
                 DrawTitle(render);
 
@@ -145,7 +148,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Gauge) && !ValueManager.IsChanged(ID.GaugeColor) && !NeedRefresh)
+            if (!ValueManager.IsChanged(ID.Gauge) && !ValueManager.IsChanged(ID.GaugeColor) && !NeedRefresh && !ValueManager.IsChanged(ID.Guard))
                 return;
 
             //Stopwatch sw = new Stopwatch();
@@ -168,6 +171,9 @@ namespace PilotsDeck
                 DrawBar(value, render);
                 DrawText(value, render);
             }
+
+            if (HasAction && SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
 
             if (IsEncoder)
                 DrawTitle(render);

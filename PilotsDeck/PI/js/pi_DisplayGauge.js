@@ -69,10 +69,21 @@ var settingsModel = {
 	FontSize: "10",
 	FontStyle: 0,
 	FontColor: "#ffffff",
-	RectCoord: "7; 45; 60; 21"
+	RectCoord: "7; 45; 60; 21",
+	IsGuarded: false,
+	AddressGuardActive: "",
+	GuardActiveValue: "",
+	AddressActionGuard: "",
+	AddressActionGuardOff: "",
+	ActionTypeGuard: 0,
+	SwitchOnStateGuard: "",
+	SwitchOffStateGuard: "",
+	ImageGuard: "Images/GuardCross.png",
+	UseImageGuardMapping: false,
+	ImageGuardMap: ""
 };
 
-var imageSelectBoxes = ["DefaultImage", "ErrorImage"];
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "ImageGuard"];
 var firstLoad = true;
 var lastDrawArc = false;
 

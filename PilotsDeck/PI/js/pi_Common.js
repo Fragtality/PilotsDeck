@@ -428,8 +428,14 @@ function commonFormUpdate() {
 	}
 
 	//DEFAULT ACTIONS
-	if (document.getElementById("DefaultActions") && ((settingsModel.GaugeSize != null && settingsModel.HasAction) || settingsModel.HasAction == null)) {
+	var hasAction = (settingsModel.GaugeSize != null && settingsModel.HasAction) || settingsModel.HasAction == null
+	if (document.getElementById("DefaultActions") && hasAction) {
 		document.getElementById("DefaultActions").style.display = "inline";
+		if (document.getElementById("GuardActions"))
+			document.getElementById("GuardActions").style.display = "inline";
+		if (document.getElementById("GuardMappedActions"))
+			document.getElementById("GuardMappedActions").style.display = "inline";
+		toggleConfigItem(true, 'IsGuarded');
 
 		//PATTERNS
 		setPattern('Address', 5);
@@ -471,22 +477,29 @@ function commonFormUpdate() {
 		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'ActionTypeLong');
 		toggleConfigItem(settingsModel.HasLongPress && longAllowed, 'AddressActionLong');
 	}
-	else if (document.getElementById("DefaultActions")) {
-		document.getElementById("DefaultActions").style.display = "none";
+	else {
+		if (document.getElementById("DefaultActions"))
+			document.getElementById("DefaultActions").style.display = "none";
+		if (document.getElementById("GuardActions"))
+			document.getElementById("GuardActions").style.display = "none";
+		if (document.getElementById("GuardMappedActions"))
+			document.getElementById("GuardMappedActions").style.display = "none";
+		toggleConfigItem(false, 'IsGuarded');
 		setPattern('Address', 5);
 	}
 
 	//GUARDED
-	toggleConfigItem(settingsModel.IsGuarded, 'AddressGuardActive');
-	toggleConfigItem(settingsModel.IsGuarded, 'GuardActiveValue');
-	toggleConfigItem(settingsModel.IsGuarded, 'ActionTypeGuard');
-	toggleConfigItem(settingsModel.IsGuarded, 'AddressActionGuard');
-	toggleConfigItem(settingsModel.IsGuarded, 'AddressActionGuardOff');
-	toggleConfigItem(settingsModel.IsGuarded, 'SwitchOnStateGuard');
-	toggleConfigItem(settingsModel.IsGuarded, 'SwitchOffStateGuard');
-	toggleConfigItem(settingsModel.IsGuarded, 'ImageGuard');
+	var isGuarded = settingsModel.IsGuarded
+	toggleConfigItem(isGuarded, 'AddressGuardActive');
+	toggleConfigItem(isGuarded, 'GuardActiveValue');
+	toggleConfigItem(isGuarded, 'ActionTypeGuard');
+	toggleConfigItem(isGuarded, 'AddressActionGuard');
+	toggleConfigItem(isGuarded, 'AddressActionGuardOff');
+	toggleConfigItem(isGuarded, 'SwitchOnStateGuard');
+	toggleConfigItem(isGuarded, 'SwitchOffStateGuard');
+	toggleConfigItem(isGuarded, 'ImageGuard');
 
-	if (settingsModel.IsGuarded) {
+	if (isGuarded) {
 		setPattern('AddressGuardActive', 5);
 		setPattern('AddressActionGuard', settingsModel.ActionTypeGuard);
 		toggleOnOffState(settingsModel.ActionTypeGuard, 'SwitchOnStateGuard', 'SwitchOffStateGuard', settingsModel.ToggleSwitch);

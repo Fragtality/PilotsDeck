@@ -186,13 +186,14 @@ namespace PilotsDeck
             }
         }
 
-        public void UnsubscribeUnusedAddresses()
+        public int UnsubscribeUnusedAddresses()
         {
+            int result = 0;
             ScriptManager.RemoveUnusedScripts();
 
             var unusedAddresses = currentRegistrations.Where(v => v.Value <= 0);
 
-            if (unusedAddresses.Any() )
+            if (unusedAddresses.Any())
                 Logger.Log(LogLevel.Information, "IPCManager:UnsubscribeUnusedAddresses", $"Unsubscribing {unusedAddresses.Count()} unused Addresses ...");
 
             foreach (var address in unusedAddresses)
@@ -202,10 +203,12 @@ namespace PilotsDeck
                 currentValues[address.Key].Dispose();
                 currentValues[address.Key] = null;
                 currentValues.Remove(address.Key);
-
+                result++;
                 Logger.Log(LogLevel.Debug, "IPCManager:UnsubscribeUnusedAddresses", $"Unsubscribed '{address.Key}' from managed Addresses.");
             }
             SimConnector.UnsubscribeUnusedAddresses();
+
+            return result;
         }
 
         public bool Process()

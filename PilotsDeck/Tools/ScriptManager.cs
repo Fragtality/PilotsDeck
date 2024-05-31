@@ -142,8 +142,9 @@ namespace PilotsDeck
             return result;
         }
 
-        public void CheckFiles()
+        public int CheckFiles()
         {
+            int result = 0;
             try
             {
                 foreach (var script in ManagedScripts)
@@ -152,6 +153,7 @@ namespace PilotsDeck
                     {
                         Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Script File '{script.Key}' has changed in Size - Reloading ...");
                         script.Value.Reload();
+                        result++;
                     }
                 }
             }
@@ -159,6 +161,8 @@ namespace PilotsDeck
             {
                 Logger.Log(LogLevel.Critical, "ScriptManager:CheckFiles", $"Exception '{ex.GetType()}' while updating Scripts: {ex.Message}");
             }
+
+            return result;
         }
     }
 }

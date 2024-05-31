@@ -51,10 +51,21 @@ var settingsModel = {
 	FontSize: "10",
 	FontStyle: 0,
 	FontColor: "#ffffff",
-	RectCoord: "-1; 0; 0; 0"
+	RectCoord: "-1; 0; 0; 0",
+	IsGuarded: false,
+	AddressGuardActive: "",
+	GuardActiveValue: "",
+	AddressActionGuard: "",
+	AddressActionGuardOff: "",
+	ActionTypeGuard: 0,
+	SwitchOnStateGuard: "",
+	SwitchOffStateGuard: "",
+	ImageGuard: "Images/GuardCross.png",
+	UseImageGuardMapping: false,
+	ImageGuardMap: ""
 };
 
-var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage"];
+var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage", "ImageGuard"];
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
