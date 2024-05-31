@@ -170,6 +170,7 @@ function setPattern(field, type) {
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	var regAvar = `^\\((A:){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w ]+\\)$`;
 	var regBvar = `^(B:${regLVarName}){1}$`;
+	var regLuaFunc = `^(Lua|lua){1}:{regName}(\.lua){0,1}:{regName}`;
 	
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
@@ -197,6 +198,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regAvar;
 	else if (type == 13) //Bvar
 		document.getElementById(field).pattern = regBvar;
+	else if (type == 14) //LuaFunc
+		document.getElementById(field).pattern = regLuaFunc;
 	else
 		document.getElementById(field).pattern = ".*";
 }
@@ -272,7 +275,7 @@ function toggleSwitchHold(settingsModel) {
 }
 
 function isActionToggleable(actionType) {
-	return (actionType >= 0 && actionType <= 2) || (actionType >= 8 && actionType <= 10) || actionType == 13;
+	return (actionType >= 0 && actionType <= 2) || (actionType >= 8 && actionType <= 10) || actionType == 13 || actionType == 14;
 }
 
 function isActionHoldable(actionType) {

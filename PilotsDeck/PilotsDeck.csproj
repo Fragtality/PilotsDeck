@@ -53,6 +53,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.10" />
+    <PackageReference Include="NeoLua" Version="1.3.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="StreamDeckLib" Version="2405.30.2121" />
   </ItemGroup>

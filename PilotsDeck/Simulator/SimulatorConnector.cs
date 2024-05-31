@@ -125,6 +125,8 @@ namespace PilotsDeck
                 value = new IPCValueDataRef(address);
             else if (IPCTools.rxBvar.IsMatch(address))
                 value = new IPCValueInputEvent(address);
+            else if (IPCTools.rxLuaFunc.IsMatch(address))
+                value = new IPCValueLua(address);
             else if (IPCTools.rxLvar.IsMatch(address) || IPCTools.rxAvar.IsMatch(address))
                 value = new IPCValueSimVar(address);
 

@@ -139,6 +139,8 @@ namespace PilotsDeck
         {
             switch (actionType)
             {
+                case ActionSwitchType.LUAFUNC:
+                    return SimTools.RunLuaFunc(Address);
                 case ActionSwitchType.MACRO:
                     return SimTools.RunMacros(Address);
                 case ActionSwitchType.SCRIPT:

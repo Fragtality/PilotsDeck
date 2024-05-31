@@ -16,7 +16,7 @@ namespace PilotsDeck
         public static readonly string validNameXP = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2B]+";
         public static readonly string validNameMultiple = @"[a-zA-Z0-9\x2D\x5F]+";
         public static readonly string validNameMultipleXP = @"[a-zA-Z0-9\x2D\x5F\x2B]+";
-        public static readonly string validLVarName = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2E\x3A\x20]+";
+        public static readonly string validLVarName = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2E\x20]+([\x3A][0-9]+){0,1}";
         public static readonly Regex rxMacro = new($"^([^0-9]{{1}}{validName}:({validName}){{0,1}}(:{validName}){{0,}}){{1}}$", RegexOptions.Compiled);
         public static readonly Regex rxScript = new($"^(Lua(Set|Clear|Toggle|Value)?:){{1}}{validName}(:[0-9]{{1,4}})*$", RegexOptions.Compiled);
         public static readonly Regex rxControlSeq = new(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
@@ -32,20 +32,11 @@ namespace PilotsDeck
         public static readonly Regex rxCmdXP = new($"^({validPathXP}){{1}}(:{validPathXP})*$", RegexOptions.Compiled);
         public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}[\w][\w ]+\)$", RegexOptions.Compiled);
         public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}}\\)$", RegexOptions.Compiled);
-        public static readonly Regex rxBvar = new($"^(B:{validLVarName}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxBvar = new($"^(B:{validName}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxLuaFunc = new($"^(Lua|lua){{1}}:{validName}(\\.lua){{0,1}}:{validName}", RegexOptions.Compiled);
         #endregion
 
         #region Test-Functions
-        public static bool IsReadAddress(string address)
-        {
-            if (string.IsNullOrEmpty(address))
-                return false;
-            else if (rxOffset.IsMatch(address) || rxLvar.IsMatch(address) || rxDref.IsMatch(address) || rxAvar.IsMatch(address) || rxBvar.IsMatch(address))
-                return true;
-            else
-                return false;
-        }
-
         public static bool IsReadAddressForType(string address, ActionSwitchType type)
         {
             if (type == ActionSwitchType.READVALUE)
@@ -57,7 +48,8 @@ namespace PilotsDeck
                     || (rxLvar.IsMatch(address) && type == ActionSwitchType.LVAR)
                     || (rxDref.IsMatch(address) && type == ActionSwitchType.XPWREF)
                     || (rxAvar.IsMatch(address) && type == ActionSwitchType.AVAR)
-                    || (rxBvar.IsMatch(address) && type == ActionSwitchType.BVAR))
+                    || (rxBvar.IsMatch(address) && type == ActionSwitchType.BVAR)
+                    || (rxLuaFunc.IsMatch(address) && type == ActionSwitchType.LUAFUNC))
                 return true;
             else
                 return false;
@@ -65,16 +57,40 @@ namespace PilotsDeck
 
         public static ActionSwitchType GetReadType(string address, ActionSwitchType type)
         {
+            if (rxLuaFunc.IsMatch(address))
+                return ActionSwitchType.LUAFUNC;
+            if (rxBvar.IsMatch(address))
+                return ActionSwitchType.BVAR;
             if (rxOffset.IsMatch(address))
                 return ActionSwitchType.OFFSET;
-            if (rxLvar.IsMatch(address))
-                return ActionSwitchType.LVAR;
             if (rxDref.IsMatch(address))
                 return ActionSwitchType.XPWREF;
             if (rxAvar.IsMatch(address))
                 return ActionSwitchType.AVAR;
-            if (rxBvar.IsMatch(address))
-                return ActionSwitchType.BVAR;
+            if (rxLvar.IsMatch(address))
+                return ActionSwitchType.LVAR;
+
+            return type;
+        }
+
+        public static ActionSwitchType GetCommandType(string address, ActionSwitchType type)
+        {
+            if (rxLuaFunc.IsMatch(address))
+                return ActionSwitchType.LUAFUNC;
+            if (rxCmdXP.IsMatch(address))
+                return ActionSwitchType.XPCMD;
+            if (rxScript.IsMatch(address))
+                return ActionSwitchType.SCRIPT;
+            if (rxMacro.IsMatch(address))
+                return ActionSwitchType.MACRO;
+            if (rxControl.IsMatch(address) || rxControlSeq.IsMatch(address))
+                return ActionSwitchType.CONTROL;
+            if (rxVjoy.IsMatch(address))
+                return ActionSwitchType.VJOY;
+            if (rxVjoyDrv.IsMatch(address))
+                return ActionSwitchType.VJOYDRV;
+            if (rxHvar.IsMatch(address))
+                return ActionSwitchType.HVAR;
 
             return type;
         }
@@ -82,7 +98,12 @@ namespace PilotsDeck
         public static bool IsActionReadable(ActionSwitchType type)
         {
             return type == ActionSwitchType.LVAR || type == ActionSwitchType.OFFSET || type == ActionSwitchType.XPWREF
-                || type == ActionSwitchType.AVAR || type == ActionSwitchType.READVALUE || type == ActionSwitchType.BVAR;
+                || type == ActionSwitchType.AVAR || type == ActionSwitchType.READVALUE || type == ActionSwitchType.BVAR || type == ActionSwitchType.LUAFUNC;
+        }
+
+        public static bool IsReadableScript(string address, ActionSwitchType type)
+        {
+            return type == ActionSwitchType.READVALUE && rxLuaFunc.IsMatch(address);
         }
 
         public static bool IsActionReadable(int type)
@@ -97,14 +118,14 @@ namespace PilotsDeck
 
             switch (type)
             {
+                case ActionSwitchType.LUAFUNC:
+                    return rxLuaFunc.IsMatch(address);
                 case ActionSwitchType.MACRO:
                     return rxMacro.IsMatch(address);
                 case ActionSwitchType.SCRIPT:
                     return rxScript.IsMatch(address);
                 case ActionSwitchType.CONTROL:
                     return rxControl.IsMatch(address) || rxControlSeq.IsMatch(address);
-                case ActionSwitchType.LVAR:
-                    return rxLvar.IsMatch(address);
                 case ActionSwitchType.HVAR:
                     return rxHvar.IsMatch(address);
                 case ActionSwitchType.OFFSET:
@@ -123,6 +144,8 @@ namespace PilotsDeck
                     return rxAvar.IsMatch(address);
                 case ActionSwitchType.BVAR:
                     return rxBvar.IsMatch(address);
+                case ActionSwitchType.LVAR:
+                    return rxLvar.IsMatch(address);
                 default:
                     return false;
             }
@@ -146,7 +169,7 @@ namespace PilotsDeck
 
         public static bool IsToggleableCommand(ActionSwitchType type)
         {
-            return type == ActionSwitchType.XPCMD || type == ActionSwitchType.CONTROL || type == ActionSwitchType.CALCULATOR
+            return type == ActionSwitchType.XPCMD || type == ActionSwitchType.CONTROL || type == ActionSwitchType.CALCULATOR || type == ActionSwitchType.LUAFUNC
                    || type == ActionSwitchType.SCRIPT || type == ActionSwitchType.HVAR || type == ActionSwitchType.MACRO || type == ActionSwitchType.BVAR;
         }
 
@@ -158,7 +181,7 @@ namespace PilotsDeck
         public static bool IsHoldableCommand(ActionSwitchType type)
         {
             return type == ActionSwitchType.CONTROL || type == ActionSwitchType.XPCMD || type == ActionSwitchType.MACRO || type == ActionSwitchType.CALCULATOR
-                   || type == ActionSwitchType.SCRIPT || type == ActionSwitchType.HVAR;
+                   || type == ActionSwitchType.SCRIPT || type == ActionSwitchType.HVAR || type == ActionSwitchType.LUAFUNC;
         }
 
         public static bool IsHoldableValue(int type)

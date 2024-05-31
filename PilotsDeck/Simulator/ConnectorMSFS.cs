@@ -116,8 +116,8 @@ namespace PilotsDeck
                     resultProcess = false;
                 }
 
-                if (IsReady)
-                    mobiConnect.Process(IsReady);
+                if (mobiConnect.IsReady)
+                    mobiConnect.Process(inMenuValue?.Value == "0" && IsCamReady());
                 else
                     Logger.Log(LogLevel.Debug, "ConnectorMSFS:Process", $"MobiConnect not ready!");
 
@@ -229,6 +229,8 @@ namespace PilotsDeck
         {
             switch (actionType)
             {
+                case ActionSwitchType.LUAFUNC:
+                    return SimTools.RunLuaFunc(Address);
                 case ActionSwitchType.MACRO:
                     return SimTools.RunMacros(Address);
                 case ActionSwitchType.SCRIPT:

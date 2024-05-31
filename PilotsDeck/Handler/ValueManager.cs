@@ -28,13 +28,13 @@ namespace PilotsDeck
 
                 if (IPCTools.IsActionReadable(type) && IPCTools.IsReadAddressForType(address, type))
                 {
-                    ipcValue = ipcManager.RegisterAddress(address);
+                    ipcValue = ipcManager.RegisterAddress(address, type);
                     if (ipcValue != null)
                     {
                         value.Value = ipcValue;
                         Logger.Log(LogLevel.Debug, "ValueManager:AddValue", $"The IPCValue for ID '{ID.str(id)}' was added. {Logger.ActionInfo(address, type)}");
                     }
-                    else
+                    else if (type != ActionSwitchType.LUAFUNC)
                         Logger.Log(LogLevel.Error, "ValueManager:AddValue", $"The IPCValue for ID '{ID.str(id)}' is a NULL-Reference! {Logger.ActionInfo(address, type)}");
                 }
                 ManagedValues.Add(id, value);
@@ -50,8 +50,8 @@ namespace PilotsDeck
         {
             if (ManagedValues.TryGetValue(id, out var value))
             {
-                if (IPCTools.IsActionReadable(value.Type) && ipcManager.Contains(value.Address))
-                    ipcManager.DeregisterAddress(value.Address);
+                if (IPCTools.IsActionReadable(value.Type) && (ipcManager.Contains(value.Address) || value.Type == ActionSwitchType.LUAFUNC))
+                    ipcManager.DeregisterAddress(value.Address, value.Type);
                 
                 ManagedValues.Remove(id);
                 Logger.Log(LogLevel.Debug, "ValueManager:RemoveValue", $"The Value for ID '{ID.str(id)}' was removed. {Logger.ActionInfo(value.Address, value.Type)}");
@@ -90,7 +90,7 @@ namespace PilotsDeck
 
                 if (readOld && validOld)
                 {
-                    if (ipcManager.Contains(value.Address))
+                    if (ipcManager.Contains(value.Address) || value.Type == ActionSwitchType.LUAFUNC)
                         ipcManager.DeregisterAddress(value.Address);
                     value.Value = null;
                     updated = true;
@@ -98,7 +98,7 @@ namespace PilotsDeck
 
                 if ((readNew && validNew) || (!readOld && readNew && validNew))
                 {
-                    value.Value = ipcManager.RegisterAddress(newAddress);
+                    value.Value = ipcManager.RegisterAddress(newAddress, newType);
                     if (value.Value == null)
                         Logger.Log(LogLevel.Error, "ValueManager:UpdateValue", $"The IPCValue for ID '{ID.str(id)}' is a NULL-Reference! {Logger.ActionInfo(newAddress, newType)}");
                     updated = true;

@@ -5,11 +5,13 @@ using System.Threading;
 
 namespace PilotsDeck
 {
-    public sealed class IPCManager : IDisposable
+    public class IPCManager : IDisposable
     {
         private Dictionary<string, IPCValue> currentValues = [];
         private Dictionary<string, int> currentRegistrations = [];
         public SimulatorConnector SimConnector { get; set; }
+
+        public ScriptManager ScriptManager { get; protected set; } = null;
  
         public int Length => currentValues.Count;
 
@@ -39,28 +41,37 @@ namespace PilotsDeck
 
         public IPCManager()
         {
-
+            ScriptManager = new(this);
         }
 
         public void Dispose()
         {
-            try
-            {
-                currentValues.Clear();
-                currentRegistrations.Clear();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Critical, "IPCManager:Dispose", $"Exception while removing Registrations! (Exception: {ex.GetType()})");
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            try
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                SimConnector.Close();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Critical, "IPCManager:Dispose", $"Exception while closing Connections! (Exception: {ex.GetType()})");
+                try
+                {
+                    currentValues.Clear();
+                    currentRegistrations.Clear();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(LogLevel.Critical, "IPCManager:Dispose", $"Exception while removing Registrations! (Exception: {ex.GetType()})");
+                }
+
+                try
+                {
+                    SimConnector.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(LogLevel.Critical, "IPCManager:Dispose", $"Exception while closing Connections! (Exception: {ex.GetType()})");
+                }
             }
         }
 
@@ -79,6 +90,17 @@ namespace PilotsDeck
                 parts[0] = "0x" + sub;
                 address = string.Join(":", parts);
             }
+            if (IPCTools.rxAvar.IsMatch(address))
+            {
+                if (!address.StartsWith("(A:"))
+                    address = address.Insert(1, "A:");
+                address = address.Replace(", ", ",");
+            }
+            if (IPCTools.rxLuaFunc.IsMatch(address))
+            {
+                string[] parts = address.Split(':');
+                address = $"lua:{parts[1].ToLower().Replace(".lua","")}:{parts[2]}";
+            }
             if (IPCTools.rxLvar.IsMatch(address) && !mobi && address.StartsWith("L:"))
             {
                 address = address[2..];
@@ -88,32 +110,32 @@ namespace PilotsDeck
                 if (!address.StartsWith("L:"))
                     address = address.Insert(0, "L:");
                 address = $"({address})";
-                
-            }
-            if (IPCTools.rxAvar.IsMatch(address))
-            {
-                if (!address.StartsWith("(A:"))
-                    address = address.Insert(1, "A:");
-                address = address.Replace(", ", ",");
+
             }
 
             return address;
         }
 
-        public IPCValue RegisterAddress(string address)
+        public IPCValue RegisterAddress(string address, ActionSwitchType type = ActionSwitchType.READVALUE)
         {
             IPCValue value = null;
             try
             {
                 address = FormatAddress(address);
-                if (currentValues.TryGetValue(address, out value))
+
+                if (IPCTools.rxLuaFunc.IsMatch(address))
+                {
+                    ScriptManager.RegisterScript(address);
+                }
+
+                if (type != ActionSwitchType.LUAFUNC && currentValues.TryGetValue(address, out value))
                 {
                     currentRegistrations[address]++;
                     Logger.Log(LogLevel.Debug, "IPCManager:RegisterAddress", $"Added Registration for Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     if (value == null)
                         Logger.Log(LogLevel.Error, "IPCManager:RegisterAddress", $"Registered Address '{address}' has NULL-Reference Value! (Registrations: {currentRegistrations[address]})");
                 }
-                else if (!string.IsNullOrWhiteSpace(address))
+                else if (!string.IsNullOrWhiteSpace(address) && type != ActionSwitchType.LUAFUNC)
                 {
                     value = SimulatorConnector.CreateIPCValue(address);
 
@@ -136,11 +158,17 @@ namespace PilotsDeck
             return value;
         }
 
-        public void DeregisterAddress(string address)
+        public void DeregisterAddress(string address, ActionSwitchType type = ActionSwitchType.READVALUE)
         {
             try
             { 
                 address = FormatAddress(address);
+                
+                if (IPCTools.rxLuaFunc.IsMatch(address))
+                {
+                    ScriptManager.DeregisterScript(address);
+                }
+
                 if (!string.IsNullOrWhiteSpace(address) && currentValues.ContainsKey(address))
                 {
                     if (currentRegistrations[address] >= 1)
@@ -149,7 +177,7 @@ namespace PilotsDeck
                         Logger.Log(LogLevel.Debug, "IPCManager:DeregisterAddress", $"Deregistered Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     }
                 }
-                else
+                else if (type != ActionSwitchType.LUAFUNC)
                     Logger.Log(LogLevel.Error, "IPCManager:DeregisterAddress", $"Could not find Address '{address}'!");
             }
             catch (Exception ex)
@@ -160,6 +188,8 @@ namespace PilotsDeck
 
         public void UnsubscribeUnusedAddresses()
         {
+            ScriptManager.RemoveUnusedScripts();
+
             var unusedAddresses = currentRegistrations.Where(v => v.Value <= 0);
 
             if (unusedAddresses.Any() )
@@ -185,7 +215,10 @@ namespace PilotsDeck
             try
             {
                 if (SimConnector.FirstProcessSuccessfull())
+                {
+                    ScriptManager.RegisterAllVariables();
                     SimConnector.SubscribeAllAddresses();
+                }
 
                 result = SimConnector.Process();
                 foreach (var value in currentValues.Values) //read Lvars

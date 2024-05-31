@@ -1,6 +1,7 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -27,6 +28,7 @@ namespace PilotsDeck
         protected bool isSimConnected = false;
         protected bool isMobiConnected = false;
         protected bool isReceiveRunning = false;
+        protected bool blockUpdates = false;
         protected bool eventsEnumerated = false;
         public bool IsConnected { get { return isSimConnected && isMobiConnected; } }
         public bool IsReady { get { return IsConnected && isReceiveRunning; } }
@@ -37,6 +39,7 @@ namespace PilotsDeck
         protected Dictionary<string, uint> addressToIndex = [];
         protected Dictionary<uint, bool> simVarUsed = [];
         protected Dictionary<uint, IPCValue> simVars = [];
+        protected Dictionary<uint, float> simVarForceUpdate = [];
         protected List<uint> subscribeQueue = [];
         protected IPCManager ipcManager = manager;
         protected Dictionary<string, ulong> eventHashes = [];
@@ -199,18 +202,26 @@ namespace PilotsDeck
                 else
                 {
                     var simData = (ClientDataValue)data.dwData[0];
-                    if (simVars.TryGetValue(data.dwRequestID, out IPCValue ipcValue))
+                    if (!blockUpdates)
                     {
-                        if (ipcValue != null)
+                        if (simVars.TryGetValue(data.dwRequestID, out IPCValue ipcValue))
                         {
-                            //Logger.Log(LogLevel.Debug, "MobiSimConnect:SimConnect_OnClientData", $"ID: {data.dwRequestID} | Value: {simData.data}");
-                            ipcValue.SetValue(simData.data);
+                            if (ipcValue != null)
+                            {
+                                //Logger.Log(LogLevel.Debug, "MobiSimConnect:SimConnect_OnClientData", $"ID: {data.dwRequestID} | Value: {simData.data}");
+                                ipcValue.SetValue(simData.data);
+                            }
+                            else
+                                Logger.Log(LogLevel.Error, "MobiSimConnect:SimConnect_OnClientData", $"The Value for ID '{data.dwRequestID}' is NULL! (Data: {data})");
                         }
                         else
-                            Logger.Log(LogLevel.Error, "MobiSimConnect:SimConnect_OnClientData", $"The Value for ID '{data.dwRequestID}' is NULL! (Data: {data})");
+                            Logger.Log(LogLevel.Error, "MobiSimConnect:SimConnect_OnClientData", $"The received ID '{data.dwRequestID}' is not subscribed! (Data: {data})");
                     }
                     else
-                        Logger.Log(LogLevel.Error, "MobiSimConnect:SimConnect_OnClientData", $"The received ID '{data.dwRequestID}' is not subscribed! (Data: {data})");
+                    {
+                        if (!simVarForceUpdate.TryAdd(data.dwRequestID, simData.data))
+                            simVarForceUpdate[data.dwRequestID] = simData.data;
+                    }
                 }
             }
             catch (Exception ex)
@@ -232,6 +243,9 @@ namespace PilotsDeck
 
         public void RequestInputEventValues()
         {
+            if (!eventsEnumerated)
+                return;
+
             foreach (var evt in eventSubscribedValues)
             {
                 Logger.Log(LogLevel.Verbose, "MobiSimConnect:RequestInputEventValues", $"Requesting InputEvent '{evt.Value.Address}' (#{evt.Value.Hash}) on ID '{evt.Key}'");
@@ -345,6 +359,7 @@ namespace PilotsDeck
                 nextID = 1;
                 simVars.Clear();
                 simVarUsed.Clear();
+                simVarForceUpdate.Clear();
                 subscribeQueue.Clear();
                 addressToIndex.Clear();
                 eventHashes.Clear();
@@ -429,14 +444,40 @@ namespace PilotsDeck
             }
         }
 
-        public void Process(bool isReady)
+        public void Process(bool requestInputEvents)
         {
-            if (isReady)
+            if (requestInputEvents && IsReady)
             {
-                RequestInputEventValues();
+                if (!eventsEnumerated)
+                {
+                    Logger.Log(LogLevel.Error, "MobiSimConnect:Process", $"Sim is Ready and Events not enumerated - running Enumeration");
+                    EnumerateInputEvents();
+                }
+                else
+                    RequestInputEventValues();
+            }
+            else if (!requestInputEvents && IsReady && eventsEnumerated)
+            {
+                Logger.Log(LogLevel.Error, "MobiSimConnect:Process", $"Sim is not Ready and Events are enumerated - reset Enumeration State");
+                eventsEnumerated = false;
             }
 
             SubscribeQueue();
+
+            if (simVarForceUpdate.Count > 0)
+            {
+                foreach (var var in simVarForceUpdate)
+                    if (simVars.TryGetValue(var.Key, out IPCValue value))
+                    {
+                        value.SetValue(var.Value);
+                        value.Process(SimulatorType.MSFS);
+                    }
+
+                simVarForceUpdate.Clear();
+            }
+
+            if (blockUpdates)
+                blockUpdates = false;
         }
 
         public void SubscribeAllAddresses(bool bVarOnly = false)
@@ -455,6 +496,7 @@ namespace PilotsDeck
 
         protected void RegisterVariable(uint ID, string address)
         {
+            Logger.Log(LogLevel.Debug, "MobiSimConnect:RegisterVariable", $"Register ID '{ID}' for Address '{address}'");
             simConnect.AddToClientDataDefinition(
                 (SIMCONNECT_DEFINE_ID)ID,
                 (ID - 1) * sizeof(float),
@@ -530,6 +572,8 @@ namespace PilotsDeck
         {
             try
             {
+                blockUpdates = true;
+
                 var unusedIndices = simVarUsed.Where(flag => !flag.Value).ToList();
                 if (unusedIndices.Count == 0)
                     return;
@@ -546,6 +590,7 @@ namespace PilotsDeck
                 var usedAddresses = addressToIndex.Keys.ToList();
                 simVarUsed.Clear();
                 simVars.Clear();
+                simVarForceUpdate.Clear();
                 addressToIndex.Clear();
                 nextID = 1;
                 SendClientWasmCmd("MF.SimVars.Clear");

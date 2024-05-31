@@ -22,7 +22,7 @@ namespace PilotsDeck
     public class ActionController : IActionController
     {
         private Dictionary<string, IHandler> currentActions = null;
-        private IPCManager ipcManager = null;
+        public IPCManager ipcManager { get; protected set; } = null;
         public ImageManager imgManager { get; protected set; } = null;
 
         public ConnectionManager DeckManager { get; set; }
@@ -381,7 +381,9 @@ namespace PilotsDeck
                         Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Connection failed, waiting for {(waitCounter * 200) / 1000}s.");
                     }
                     else
+                    {
                         Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim is connected.");
+                    }
                 }
                 else if (SimConnector.IsConnected) //CONNECTED
                 {
@@ -449,10 +451,11 @@ namespace PilotsDeck
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
             if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
+                ipcManager.ScriptManager.CheckFiles();
                 ipcManager.UnsubscribeUnusedAddresses();
                 imgManager.RemoveUnused();
                 if (SimConnector.IsRunning || imageUpdates > 0)
-                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count}) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
                 imageUpdates = 0;
             }
@@ -461,18 +464,6 @@ namespace PilotsDeck
             {
                 Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftString}', searching for matching Profiles ...");
                 SwitchProfiles();
-                if (SimConnector is ConnectorMSFS)
-                {
-                    (SimConnector as ConnectorMSFS).EnumerateInputEvents();
-                }
-            }
-            else if (lastAircraft != SimConnector.AicraftString && SimConnector.IsReady && waitCounter == 0)
-            {
-                if (SimConnector is ConnectorMSFS)
-                {
-                    (SimConnector as ConnectorMSFS).EnumerateInputEvents();
-                    lastAircraft = SimConnector.AicraftString;
-                }
             }
         }
 

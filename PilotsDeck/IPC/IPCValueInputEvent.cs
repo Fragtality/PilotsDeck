@@ -12,6 +12,12 @@ namespace PilotsDeck
 
         public override bool IsChanged { get { return isChanged; } }
 
+        public override void Process(SimulatorType simType)
+        {
+            isChanged = lastValue != DoubleValue;
+            lastValue = DoubleValue;
+        }
+
         protected override string Read()
         {
             string num = Convert.ToString((float)DoubleValue, CultureInfo.InvariantCulture.NumberFormat);

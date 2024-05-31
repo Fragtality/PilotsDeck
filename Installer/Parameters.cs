@@ -16,6 +16,7 @@ namespace Installer
         public static readonly string importBinary = "ImportProfiles.exe";
 
         public static readonly string profileDir = pluginDir + @"\Profiles";
+        public static readonly string scriptDir = pluginDir + @"\Scripts";
         public static readonly string defaultProfilesPattern = $"PilotsDeck - *";
 
         //public static readonly Regex netCore = new Regex(@"Microsoft.NETCore.App ((\d+)\.(\d+)\.(\d+)).+", RegexOptions.Compiled);

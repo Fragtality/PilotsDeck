@@ -504,5 +504,11 @@ namespace PilotsDeck
 
             return fails == 0;
         }
+
+        public static bool RunLuaFunc(string address)
+        {
+            Plugin.ActionController.ipcManager.ScriptManager.RunFunction(address, true);
+            return true;
+        }
     }
 }

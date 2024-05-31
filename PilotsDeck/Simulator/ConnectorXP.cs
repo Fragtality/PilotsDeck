@@ -380,6 +380,8 @@ namespace PilotsDeck
                     return RunCommands(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.XPWREF:
                     return XPDatagram.SetDataRef(senderSocket, Address, newValue);
+                case ActionSwitchType.LUAFUNC:
+                    return SimTools.RunLuaFunc(Address);
                 default:
                     Logger.Log(LogLevel.Error, "ConnectorXP:RunAction", $"Action-Type '{actionType}' not valid for Address '{Address}'!");
                     return false;

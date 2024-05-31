@@ -100,6 +100,20 @@ namespace Installer
             }
         }
 
+        public static bool CreateScriptFolder()
+        {
+            try
+            {
+                Directory.CreateDirectory(Parameters.scriptDir);
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during CreateScriptFolder", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
         public static bool ExtractZipFile(string extractDir, string zipFile)
         {
             try

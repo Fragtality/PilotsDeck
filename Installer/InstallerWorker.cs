@@ -256,7 +256,7 @@ namespace Installer
 
             //Extract Plugin
             task.Message = "Old Plugin deleted. Extracting new Version ...";
-            if (InstallerFunctions.ExtractZip())
+            if (InstallerFunctions.ExtractZip() && InstallerFunctions.CreateScriptFolder())
             {
                 task.ResultIcon = ActionIcon.OK;
                 task.Message = $"Plugin installed successfully!\r\nPath: %appdata%{Parameters.sdPluginDir}\\{Parameters.pluginName}";
