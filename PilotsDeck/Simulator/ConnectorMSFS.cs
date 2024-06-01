@@ -28,9 +28,12 @@ namespace PilotsDeck
         public override bool IsRunning { get { return GetProcessRunning("FlightSimulator"); } }
         public override bool IsPaused { get { return pauseIndValue?.Value != "0"; } protected set { } }
 
+        protected static readonly string AircraftPathAddrString = "0x3C00:256:s";
         protected static readonly string AircraftAddrString = "9540:64:s";
+        protected IPCValueOffset AircraftPathValue = null;
         protected IPCValueOffset AircraftValue = null;
         public override string AicraftString { get { return AircraftValue == null ? "" : AircraftValue.Value; } protected set { } }
+        public override string AicraftPathString { get { return AircraftPathValue == null ? "" : AircraftPathValue.Value; } protected set { } }
 
         protected MobiSimConnect mobiConnect = null;
         protected bool mobiConnectRequested = false;
@@ -90,6 +93,7 @@ namespace PilotsDeck
             inMenuValue = new IPCValueOffset(inMenuAddr, AppSettings.groupStringRead, OffsetAction.Read);
             camReadyValue = new IPCValueOffset(camReadyAddr, AppSettings.groupStringRead, OffsetAction.Read);
             AircraftValue = new IPCValueOffset(AircraftAddrString, AppSettings.groupStringRead, OffsetAction.Read);
+            AircraftPathValue = new IPCValueOffset(AircraftPathAddrString, AppSettings.groupStringRead, OffsetAction.Read);
 
             SimType = SimulatorType.MSFS;
         }
@@ -105,6 +109,7 @@ namespace PilotsDeck
                     inMenuValue.Connect();
                     camReadyValue.Connect();
                     AircraftValue.Connect();
+                    AircraftPathValue.Connect();
                 }
                 if (!mobiConnectRequested)
                     mobiConnectRequested = mobiConnect.Connect();

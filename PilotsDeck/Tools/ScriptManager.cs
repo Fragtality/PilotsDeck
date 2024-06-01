@@ -9,9 +9,13 @@ namespace PilotsDeck
     public class ScriptManager(IPCManager manager)
     {
         public readonly static string ScriptFolder = @"Scripts\";
+        public readonly static string GlobalScriptFolder = ScriptFolder + @"global\";
         private IPCManager IPCManager { get; set; } = manager;
         private Dictionary<string, ManagedScript> ManagedScripts { get; set; } = [];
+        private Dictionary<string, ManagedScript> ManagedGlobalScripts { get; set; } = [];
         public int Count {  get { return ManagedScripts.Count; } }
+        public int CountGlobal { get { return ManagedGlobalScripts.Where(kv => kv.Value.IsActiveGlobal).Count(); } }
+        public bool GlobalScriptsStopped { get; private set; } = true;
 
         public static string GetRealFileName(string file)
         {
@@ -20,6 +24,8 @@ namespace PilotsDeck
             string[] parts = file.Split(':');
             if (parts.Length > 1)
                 file = parts[0].ToLower();
+            else
+                file = file.ToLower();
             if (!file.Contains(".lua", StringComparison.InvariantCultureIgnoreCase))
                 file = $"{file}.lua";
 
@@ -37,17 +43,64 @@ namespace PilotsDeck
             return address;
         }
 
-        //public void DeregisterAllVariables()
-        //{
-        //    foreach (var script in ManagedScripts)
-        //        script.Value.DeregisterAllVariables();
-        //}
-
         public void RegisterAllVariables()
         {
             foreach (var script in ManagedScripts)
                 script.Value.RegisterAllVariables();
-        }       
+
+            foreach (var script in ManagedGlobalScripts)
+                script.Value.RegisterAllVariables();
+        }
+
+        private string GetAircraft()
+        {
+            return IPCManager.SimConnector.AicraftPathString;
+        }
+
+        public void StartGlobalScripts()
+        {
+            Logger.Log(LogLevel.Information, "ScriptManager:StartGlobalScripts", $"Starting Global Scripts");
+
+            GlobalScriptsStopped = false;
+            foreach (var script in ManagedGlobalScripts)
+            {
+                if (GetAircraft().Contains(script.Value.Aircraft))
+                {
+                    Logger.Log(LogLevel.Debug, "ScriptManager:CheckFiles", $"Script Aircraft '{script.Value.Aircraft}' matched current AicraftString '{GetAircraft()}'");
+                    script.Value.IsActiveGlobal = true;
+                    script.Value.Start();
+                }
+                else
+                {
+                    Logger.Log(LogLevel.Debug, "ScriptManager:CheckFiles", $"Script Aircraft '{script.Value.Aircraft}' NOT matched current AicraftString '{GetAircraft()}'");
+                    script.Value.Stop();
+                }
+            }
+        }
+
+        public void StopGlobalScripts()
+        {
+            Logger.Log(LogLevel.Information, "ScriptManager:StopGlobalScripts", $"Stopping Global Scripts");
+
+            foreach (var script in ManagedGlobalScripts)
+            {
+                script.Value.Stop();
+            }
+            GlobalScriptsStopped = true;
+        }
+
+        public void RunGlobalScripts()
+        {
+            if (GlobalScriptsStopped)
+                return;
+
+            var now = DateTime.Now;
+            foreach (var script in ManagedGlobalScripts)
+            {
+                if (script.Value.IsActiveGlobal)
+                    script.Value.Run(now);
+            }
+        }
 
         public void RegisterScript(string file)
         {
@@ -154,6 +207,47 @@ namespace PilotsDeck
                         Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Script File '{script.Key}' has changed in Size - Reloading ...");
                         script.Value.Reload();
                         result++;
+                    }
+                }
+
+                var globalDir = new DirectoryInfo(GlobalScriptFolder);
+                foreach (var file in globalDir.GetFiles())
+                {
+                    //ADD/UPDATE GLOBAL SCRIPTS
+                    string fileName = GetRealFileName(file.Name);
+
+                    if (ManagedGlobalScripts.TryGetValue(fileName, out ManagedScript script))
+                    {
+                        bool wasActiveGlobal = script.IsActiveGlobal;
+                        if (script.FileHasChanged())
+                        {
+                            Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Global Script File '{script.FileName}' has changed in Size - Reloading ...");
+                            script.Reload();
+                            result++;
+                            if (wasActiveGlobal && !GlobalScriptsStopped)
+                                script.IsActiveGlobal = true;
+                            else if (!GlobalScriptsStopped && GetAircraft().Contains(script.Aircraft))
+                            {
+                                Logger.Log(LogLevel.Debug, "ScriptManager:CheckFiles", $"Script Aircraft '{script.Aircraft}' matched current AicraftString '{GetAircraft()}'");
+                                script.IsActiveGlobal = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Adding Global Script File '{fileName}'");
+                        script = new ManagedScript(fileName, IPCManager, true);
+                        ManagedGlobalScripts.Add(fileName, script);
+                        if (GetAircraft().Contains(script.Aircraft) && !GlobalScriptsStopped)
+                        {
+                            Logger.Log(LogLevel.Debug, "ScriptManager:CheckFiles", $"Script Aircraft '{script.Aircraft}' matched current AicraftString '{GetAircraft()}'");
+                            script.IsActiveGlobal = true;
+                        }
+                        else
+                        {
+                            Logger.Log(LogLevel.Debug, "ScriptManager:CheckFiles", $"Script Aircraft '{script.Aircraft}' NOT matched current AicraftString '{GetAircraft()}'");
+                            script.Stop();
+                        }
                     }
                 }
             }

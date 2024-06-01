@@ -12,6 +12,7 @@ namespace PilotsDeck
         public SimulatorConnector SimConnector { get; set; }
 
         public ScriptManager ScriptManager { get; protected set; } = null;
+        private string lastAircraft = "";
  
         public int Length => currentValues.Count;
 
@@ -219,15 +220,30 @@ namespace PilotsDeck
             {
                 if (SimConnector.FirstProcessSuccessfull())
                 {
+                    if (ScriptManager.GlobalScriptsStopped)
+                        ScriptManager.StartGlobalScripts();
                     ScriptManager.RegisterAllVariables();
                     SimConnector.SubscribeAllAddresses();
                 }
+                if (SimConnector.IsReady && ScriptManager.GlobalScriptsStopped)
+                    ScriptManager.StartGlobalScripts();
 
                 result = SimConnector.Process();
                 foreach (var value in currentValues.Values) //read Lvars
                 {
                     value.Process(SimConnector.SimType);
                 }
+
+                if (SimConnector.IsReady && !ScriptManager.GlobalScriptsStopped)
+                    ScriptManager.RunGlobalScripts();
+
+                if (!SimConnector.IsReady && !ScriptManager.GlobalScriptsStopped)
+                {
+                    if (!SimConnector.IsPaused || lastAircraft != SimConnector.AicraftString)
+                        ScriptManager.StopGlobalScripts();
+                }
+
+                lastAircraft = SimConnector.AicraftString;
             }
             catch (Exception ex)
             {

@@ -1,8 +1,10 @@
 ﻿using Neo.IronLua;
 using System;
+using System.Timers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 
 namespace PilotsDeck
 {
@@ -16,13 +18,20 @@ namespace PilotsDeck
         public long FileSize { get; set; }
         public List<string> Variables { get; set; } = [];
         public uint Registrations { get; set; } = 1;
+        public bool IsGlobal { get; set; }
+        public bool IsActiveGlobal { get; set; } = false;
+        public int Interval { get; set; } = 1000;
+        public string CallbackFunction { get; set; } = "OnTick";
+        public DateTime NextRun { get; set; } = DateTime.Now;
+        public string Aircraft { get; set; } = "";
         private IPCManager IPCManager { get; set; }
         private SimulatorConnector SimConnector { get { return IPCManager.SimConnector; } }
 
-        public ManagedScript(string file, IPCManager manager)
+        public ManagedScript(string file, IPCManager manager, bool isGlobal = false)
         {
             FileName = file;
             IPCManager = manager;
+            IsGlobal = isGlobal;
 
             Start();
         }
@@ -42,9 +51,17 @@ namespace PilotsDeck
             return LuaEnv.DoChunk(code, FileName);
         }
 
+        private string GetScriptFolder(string file = "")
+        {
+            if (IsGlobal)
+                return ScriptManager.GlobalScriptFolder + file;
+            else
+                return ScriptManager.ScriptFolder + file;
+        }
+
         public void Start()
         {
-            FileSize = new FileInfo(ScriptManager.ScriptFolder + FileName).Length;
+            FileSize = new FileInfo(GetScriptFolder(FileName)).Length;
 
             LuaEngine = new();
             LuaEnv = LuaEngine.CreateEnvironment<LuaGlobal>();
@@ -56,10 +73,25 @@ namespace PilotsDeck
             _env.SimWriteString = new Func<string, string, bool>(SimWriteString);
             _env.SimCommand = new Func<string, double, bool>(SimCommand);
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
+            _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
+            _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
+            _env.RunInterval = new Action<int, string>(RunInterval);
+            _env.RunAircraft = new Action<string>(RunAircraft);
+            _env.Sleep = new Action<int>(ScriptSleep);
 
-            string code = File.ReadAllText(ScriptManager.ScriptFolder + FileName);
+            string code = File.ReadAllText(GetScriptFolder(FileName));
             LuaChunk = LuaEngine.CompileChunk(code, FileName, new LuaCompileOptions());
             DoChunk();
+
+            SetNextRun();
+
+            Logger.Log(LogLevel.Debug, "ManagedScript:Start", $"Script started: {FileName}");
+        }
+
+        private void SetNextRun()
+        {
+            if (IsGlobal)
+                NextRun = DateTime.Now.AddMilliseconds(Interval);
         }
 
         public void Stop()
@@ -67,6 +99,8 @@ namespace PilotsDeck
             DeregisterAllVariables();
 
             LuaChunk = null;
+            
+            IsActiveGlobal = false;
 
             if (LuaEnv != null)
             {
@@ -80,6 +114,21 @@ namespace PilotsDeck
                 LuaEngine.Dispose();
                 LuaEngine = null;
             }
+
+            Logger.Log(LogLevel.Debug, "ManagedScript:Stop", $"Script stopped: {FileName}");
+        }
+
+        public void Run(DateTime now)
+        {
+            if (!IsGlobal || !IsRunning)
+                return;
+
+            if (now >= NextRun)
+            {
+                DoChunk($"{CallbackFunction}()");
+                SetNextRun();
+            }
+
         }
 
         public void Reload()
@@ -90,7 +139,7 @@ namespace PilotsDeck
 
         public bool FileHasChanged()
         {
-            return new FileInfo(ScriptManager.ScriptFolder + FileName).Length != FileSize;
+            return new FileInfo(GetScriptFolder(FileName)).Length != FileSize;
         }
 
         public void DeregisterAllVariables()
@@ -183,6 +232,16 @@ namespace PilotsDeck
                 return string.Format("{0:F1}", value);
         }
 
+        private string SharpFormat(string pattern, params object[] values)
+        {
+            return string.Format(CultureInfo.InvariantCulture.NumberFormat, pattern, values);
+        }
+
+        private string SharpFormatLocale(string pattern, params object[] values)
+        {
+            return string.Format(CultureInfo.CurrentUICulture.NumberFormat, pattern, values);
+        }
+
         private bool SimWrite(string name, double value)
         {
             return SimWriteString(name, ConvertValue(value));
@@ -212,6 +271,26 @@ namespace PilotsDeck
                 return (SimConnector as ConnectorMSFS).RunAction(code, ActionSwitchType.CALCULATOR, "0", new ModelSwitch());
 
             return false;
+        }
+
+        private void RunInterval(int interval, string function = "OnTick")
+        {
+            Interval = interval;
+            if (function == null)
+                function = "OnTick";
+            CallbackFunction = function;
+        }
+
+        private void RunAircraft(string aircraft = "")
+        {
+            if (aircraft == null)
+                aircraft = "";
+            Aircraft = aircraft;
+        }
+
+        private void ScriptSleep(int msec)
+        {
+            Thread.Sleep(msec);
         }
         #endregion
     }

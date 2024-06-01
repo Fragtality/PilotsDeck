@@ -58,6 +58,7 @@ namespace PilotsDeck
         }
 
         public abstract string AicraftString { get; protected set; }
+        public virtual string AicraftPathString { get { return AicraftString; } protected set { } }
         public virtual long TickCounter { get; set; }
 
         public abstract void Init(long tickCounter, IPCManager manager);

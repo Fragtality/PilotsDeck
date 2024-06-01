@@ -105,6 +105,7 @@ namespace Installer
             try
             {
                 Directory.CreateDirectory(Parameters.scriptDir);
+                Directory.CreateDirectory(Parameters.scriptDir + @"\global");
                 return true;
             }
             catch (Exception e)

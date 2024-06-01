@@ -16,16 +16,6 @@ namespace PilotsDeck
 
         public override void SetValue(string strValue)
         {
-            //if (double.TryParse(strValue, NumberStyles.Number, new RealInvariantFormat(strValue), out double value))
-            //{
-            //    string num = Convert.ToString(value, CultureInfo.InvariantCulture.NumberFormat);
-
-            //    int idxE = num.IndexOf('E');
-            //    if (idxE < 0)
-            //        strValue = num;
-            //    else
-            //        strValue = string.Format("{0:F1}", value);
-            //}
             _value = strValue;
             isChanged = lastValue != strValue;
             lastValue = strValue;

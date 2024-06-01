@@ -139,9 +139,17 @@ namespace PilotsDeck
                 case "didReceiveGlobalSettings":
                     OnDidReceiveGlobalSettings(args);
                     break;
+                case "didReceiveDeepLink":
+                    OnDidReceiveDeepLink(args);
+                    break;
                 default:
                     break;
             }
+        }
+
+        protected void OnDidReceiveDeepLink(StreamDeckEventPayload args)
+        {
+            Logger.Log(LogLevel.Debug, "ActionController:OnDidReceiveDeepLink", $"url: {args.payload.url}");
         }
 
         protected void OnDidReceiveGlobalSettings(StreamDeckEventPayload args)
@@ -455,7 +463,7 @@ namespace PilotsDeck
                 int removedAddresses = ipcManager.UnsubscribeUnusedAddresses();
                 int removedImages = imgManager.RemoveUnused();
                 if (SimConnector.IsRunning || imageUpdates > 0 || changedScripts > 0 || removedAddresses > 0 || removedImages > 0)
-                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count}) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} dynamic / {ipcManager.ScriptManager.CountGlobal} global) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
                 imageUpdates = 0;
             }
