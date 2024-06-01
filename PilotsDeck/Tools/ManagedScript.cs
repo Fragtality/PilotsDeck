@@ -1,6 +1,6 @@
 ﻿using Neo.IronLua;
 using System;
-using System.Timers;
+using Serilog;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -17,12 +17,15 @@ namespace PilotsDeck
         public string FileName { get; set; }
         public long FileSize { get; set; }
         public List<string> Variables { get; set; } = [];
+        public bool VariablesRegistered { get; private set; } = false;
         public uint Registrations { get; set; } = 1;
         public bool IsGlobal { get; set; }
         public bool IsActiveGlobal { get; set; } = false;
         public int Interval { get; set; } = 1000;
         public string CallbackFunction { get; set; } = "OnTick";
         public DateTime NextRun { get; set; } = DateTime.Now;
+        public string LogFile { get; set; } = "";
+        private Serilog.Core.Logger Log { get; set; } = null;
         public string Aircraft { get; set; } = "";
         private IPCManager IPCManager { get; set; }
         private SimulatorConnector SimConnector { get { return IPCManager.SimConnector; } }
@@ -32,8 +35,10 @@ namespace PilotsDeck
             FileName = file;
             IPCManager = manager;
             IsGlobal = isGlobal;
+            FileSize = new FileInfo(GetScriptFolder(FileName)).Length;
 
-            Start();
+            if (!IsGlobal)
+                Start();
         }
 
         public void DoChunk()
@@ -61,8 +66,6 @@ namespace PilotsDeck
 
         public void Start()
         {
-            FileSize = new FileInfo(GetScriptFolder(FileName)).Length;
-
             LuaEngine = new();
             LuaEnv = LuaEngine.CreateEnvironment<LuaGlobal>();
             dynamic _env = LuaEnv;
@@ -78,13 +81,17 @@ namespace PilotsDeck
             _env.RunInterval = new Action<int, string>(RunInterval);
             _env.RunAircraft = new Action<string>(RunAircraft);
             _env.Sleep = new Action<int>(ScriptSleep);
+            _env.UseLog = new Action<string>(UseLog);
+            _env.Log = new Action<string>(WriteLog);
 
             string code = File.ReadAllText(GetScriptFolder(FileName));
             LuaChunk = LuaEngine.CompileChunk(code, FileName, new LuaCompileOptions());
             DoChunk();
+            VariablesRegistered = Variables.Count > 0;
 
             SetNextRun();
 
+            Log?.Information("Script started by ScriptManager");
             Logger.Log(LogLevel.Debug, "ManagedScript:Start", $"Script started: {FileName}");
         }
 
@@ -113,6 +120,13 @@ namespace PilotsDeck
                 LuaEngine.Clear();
                 LuaEngine.Dispose();
                 LuaEngine = null;
+
+                Log?.Information("Script stopped by ScriptManager");
+                if (Log != null)
+                {
+                    Log.Dispose();
+                    Log = null;
+                }
             }
 
             Logger.Log(LogLevel.Debug, "ManagedScript:Stop", $"Script stopped: {FileName}");
@@ -151,17 +165,20 @@ namespace PilotsDeck
             {
                 IPCManager.DeregisterAddress(variable);
             }
+            VariablesRegistered = false;
+            Variables.Clear();
         }
 
         public void RegisterAllVariables()
         {
-            if (!IsRunning)
+            if (!IsRunning || VariablesRegistered)
                 return;
 
             foreach (var variable in Variables)
             {
                 IPCManager.RegisterAddress(variable);
             }
+            VariablesRegistered = true;
         }
 
         #region ScriptFunctions
@@ -171,10 +188,13 @@ namespace PilotsDeck
 
             if (IPCTools.IsActionReadable(type) && IPCTools.IsReadAddressForType(name, type))
             {
-                if (IPCManager.RegisterAddress(name) != null)
+                if (Variables.Contains(name))
                 {
-                    if (!Variables.Contains(name))
-                        Variables.Add(name);
+                    Logger.Log(LogLevel.Warning, "ScriptManager:RegisterVariable", $"Variable '{name}' is already registered for Script File '{FileName}'");
+                }
+                else if (IPCManager.RegisterAddress(name) != null)
+                {
+                    Variables.Add(name);
                     Logger.Log(LogLevel.Debug, "ScriptManager:RegisterVariable", $"Registered Variable '{name}' for Script File '{FileName}'");
                     return true;
                 }
@@ -291,6 +311,58 @@ namespace PilotsDeck
         private void ScriptSleep(int msec)
         {
             Thread.Sleep(msec);
+        }
+
+        private void UseLog(string name)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name) || Log != null)
+                    return;
+
+                name = name.Trim().ToLower();
+                if (!name.Contains(".log"))
+                    name = $"{name}.log";
+                LogFile = name;
+
+                name = $"log\\{name}";
+                try
+                {
+                    if (File.Exists(name))
+                        File.Delete(name);
+                }
+                catch (IOException)
+                {
+                    Logger.Log(LogLevel.Critical, "ManagedScript:UseLog", $"IOException while clearing old Log File '{name}' for Script '{FileName}'");
+                }
+
+                LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
+                            .WriteTo.File(name, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Message} {NewLine}")
+                            .MinimumLevel.Information();
+                Log = loggerConfiguration.CreateLogger();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "ManagedScript:UseLog", $"Exception '{ex.GetType()}' while starting Log for Script '{FileName}': {ex.Message}");
+            }
+        }
+
+        private void WriteLog(string message)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(message))
+                    message = "";
+
+                if (Log != null)
+                    Log.Information(message);
+                else
+                    Logger.Log(LogLevel.Information, FileName, message);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "ManagedScript:WriteLog", $"Exception '{ex.GetType()}' while writing Message to Log for Script '{FileName}': {message}");
+            }
         }
         #endregion
     }

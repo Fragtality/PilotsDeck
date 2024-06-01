@@ -235,7 +235,11 @@ namespace PilotsDeck
                 }
 
                 if (SimConnector.IsReady && !ScriptManager.GlobalScriptsStopped)
+                {
+                    if (lastAircraft != SimConnector.AicraftString)
+                        ScriptManager.StartGlobalScripts();
                     ScriptManager.RunGlobalScripts();
+                }
 
                 if (!SimConnector.IsReady && !ScriptManager.GlobalScriptsStopped)
                 {
@@ -243,7 +247,8 @@ namespace PilotsDeck
                         ScriptManager.StopGlobalScripts();
                 }
 
-                lastAircraft = SimConnector.AicraftString;
+                if (SimConnector.IsReady)
+                    lastAircraft = SimConnector.AicraftString;
             }
             catch (Exception ex)
             {

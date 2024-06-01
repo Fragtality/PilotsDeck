@@ -7,6 +7,7 @@ namespace PilotsDeck
     public static class IPCTools
     {
         #region Regex
+        //2B => +
         //2D => -
         //2F => /
         //5F => _
@@ -27,8 +28,8 @@ namespace PilotsDeck
         public static readonly Regex rxOffset = new(@"^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled);
         public static readonly Regex rxVjoy = new(@"^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoyDrv = new(@"^(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static readonly Regex rxDref = new($"^({validName}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){{0,1}}){{1}}$", RegexOptions.Compiled);
-        public static readonly string validPathXP = $"({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultiple}){{1}}";
+        public static readonly Regex rxDref = new($"^({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){{0,1}}){{1}}$", RegexOptions.Compiled);
+        public static readonly string validPathXP = $"({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}){{1}}";
         public static readonly Regex rxCmdXP = new($"^({validPathXP}){{1}}(:{validPathXP})*$", RegexOptions.Compiled);
         public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}[\w][\w ]+\)$", RegexOptions.Compiled);
         public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}}\\)$", RegexOptions.Compiled);

@@ -425,7 +425,7 @@ namespace Installer
                         continue;
                     if (!StringEqual(match.Groups[2].Value, Parameters.netMajor))
                         continue;
-                    if ((StringEqual(match.Groups[3].Value, Parameters.netMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.netPatch))
+                    else if ((StringEqual(match.Groups[3].Value, Parameters.netMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.netPatch))
                         || StringGreater(match.Groups[3].Value, Parameters.netMinor))
                         installedDesktop = true;
                 }
