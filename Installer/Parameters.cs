@@ -26,8 +26,8 @@ namespace Installer
         public static readonly int netMinor = 0;
         public static readonly int netPatch = 6;
         public static readonly string netVersion = $"{netMajor}.{netMinor}.{netPatch}";
-        public static readonly string netUrl = "https://download.visualstudio.microsoft.com/download/pr/fb4a2e70-0c24-42f8-a549-4ea2b6e16831/e7bf08360f9c96ad3a90b0eb2edf96c0/windowsdesktop-runtime-8.0.6-win-x86.exe";
-        public static readonly string netUrlFile = "windowsdesktop-runtime-8.0.6-win-x86.exe";
+        public static readonly string netUrl = "https://download.visualstudio.microsoft.com/download/pr/76e5dbb2-6ae3-4629-9a84-527f8feb709c/09002599b32d5d01dc3aa5dcdffcc984/windowsdesktop-runtime-8.0.6-win-x64.exe";
+        public static readonly string netUrlFile = "windowsdesktop-runtime-8.0.6-win-x64.exe";
 
         public static readonly string sdRegPath = @"HKEY_CURRENT_USER\SOFTWARE\Elgato Systems GmbH\StreamDeck";
         public static readonly string sdRegValue = "last_started_streamdeck_version";

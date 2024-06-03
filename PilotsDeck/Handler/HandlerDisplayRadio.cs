@@ -51,7 +51,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Active) && !ValueManager.IsChanged(ID.Standby) && !NeedRefresh && ticksIndication == 0 && !ValueManager.IsChanged(ID.Guard))
+            if (!ValueManager.HasChangedValues() && !NeedRefresh && ticksIndication == 0)
                 return;
 
             string valueAct = ValueManager[ID.Active];

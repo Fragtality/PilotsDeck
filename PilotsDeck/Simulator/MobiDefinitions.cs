@@ -35,9 +35,15 @@ namespace PilotsDeck
         SIMCONNECT_GROUP_PRIORITY_DEFAULT,
         SIMCONNECT_GROUP_PRIORITY_HIGHEST
     }
-    public enum MOBIFLIGHT_EVENTS
+    public enum SIM_EVENTS
     {
-        DUMMY
+        Dummy = 0
+    };
+
+    public enum NOTFIY_GROUP
+    {
+        INTERNAL = 1,
+        DYNAMIC = 2
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

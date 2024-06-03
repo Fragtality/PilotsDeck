@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PilotsDeck
@@ -72,6 +73,22 @@ namespace PilotsDeck
         public abstract void UnsubscribeAddress(string address);
         public virtual void UnsubscribeUnusedAddresses() { }
         public abstract void SubscribeAllAddresses();
+        public delegate void EventCallback(string evtName, object evtData);
+        public class EventRegistration(string evtName, string receiverID, EventCallback callbackFunction)
+        {
+            public string Name { get; set; } = evtName;
+            public string ReceiverID { get; set; } = receiverID;
+            public EventCallback Callback { get; set; } = callbackFunction;
+        }
+        public Dictionary<string, List<EventRegistration>> RegisteredEvents { get; private set; } = [];
+        public virtual void SubscribeSimEvent(string evtName, string receiverID, EventCallback callbackFunction)
+        {
+
+        }
+        public virtual void UnsubscribeSimEvent(string evtName, string receiverID)
+        {
+
+        }
         public abstract bool RunAction(string Address, ActionSwitchType actionType, string newValue, IModelSwitch switchSettings, int ticks = 1);
 
         public static bool GetProcessRunning(string name)
@@ -128,6 +145,8 @@ namespace PilotsDeck
                 value = new IPCValueInputEvent(address);
             else if (IPCTools.rxLuaFunc.IsMatch(address))
                 value = new IPCValueLua(address);
+            else if (IPCTools.rxInternal.IsMatch(address))
+                value = new IPCValueInternal(address);
             else if (IPCTools.rxLvar.IsMatch(address) || IPCTools.rxAvar.IsMatch(address))
                 value = new IPCValueSimVar(address);
 

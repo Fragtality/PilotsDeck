@@ -6,6 +6,7 @@ namespace PilotsDeck
     public class ValueManager(IPCManager m)
     {
         protected Dictionary<int, ManagedValue> ManagedValues = [];
+        protected Dictionary<string, IPCValue> DynamicValues = [];
         protected IPCManager ipcManager = m;
 
         #region Add/Remove/Update
@@ -46,6 +47,26 @@ namespace PilotsDeck
             }
         }
 
+        public void AddDynamicValue(string id)
+        {
+            if (!DynamicValues.ContainsKey(id))
+            {
+                if (ipcManager.TryGetValue(id, out IPCValue value))
+                {
+                    DynamicValues.Add(id, value);
+                    Logger.Log(LogLevel.Debug, "ValueManager:AddDynamicValue", $"Tge IPC Value for ID '{id}' was registered");
+                }
+                else
+                {
+                    Logger.Log(LogLevel.Error, "ValueManager:AddDynamicValue", $"No IPC Value for ID '{id}'!");
+                }
+            }
+            else
+            {
+                Logger.Log(LogLevel.Error, "ValueManager:AddDynamicValue", $"The IPC Value for ID '{id}' is already registered!");
+            }
+        }
+
         public void RemoveValue(int id)
         {
             if (ManagedValues.TryGetValue(id, out var value))
@@ -59,6 +80,18 @@ namespace PilotsDeck
             else
             {
                 Logger.Log(LogLevel.Error, "ValueManager:RemoveValue", $"The Value for ID '{ID.str(id)}' does not exist!");
+            }
+        }
+
+        public void RemoveDynamicValue(string id)
+        {
+            if (DynamicValues.Remove(id))
+            {
+                Logger.Log(LogLevel.Debug, "ValueManager:RemoveDynamicValue", $"The IPC Value for ID '{id}' was removed");
+            }
+            else
+            {
+                Logger.Log(LogLevel.Error, "ValueManager:RemoveDynamicValue", $"The IPC Value for ID '{id}' is not registered!");
             }
         }
 
@@ -133,12 +166,17 @@ namespace PilotsDeck
         #region IPCValue
         public bool HasChangedValues()
         {
-            return ManagedValues.Where(kv => kv.Value.Value.IsChanged).Any();
+            return ManagedValues.Any(kv => kv.Value.Value != null && kv.Value.Value.IsChanged) || DynamicValues.Any(kv => kv.Value != null && kv.Value.IsChanged);
         }
 
         public bool IsChanged(int id)
         {
             return ManagedValues.TryGetValue(id, out var value) && value.Value != null && value.Value.IsChanged;
+        }
+
+        public bool IsChanged(string id)
+        {
+            return DynamicValues.TryGetValue(id, out var value) && value != null && value.IsChanged;
         }
 
         public string GetValue(int id)

@@ -136,7 +136,7 @@ namespace PilotsDeck
             }
             else
             {
-                Logger.Log(LogLevel.Error, "ImageManager:RemoveImage", $"Image is not found in Cache! (Ref: {file}) (Real: {fileReal}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
+                Logger.Log(LogLevel.Debug, "ImageManager:RemoveImage", $"Image is not found in Cache! (Ref: {file}) (Real: {fileReal}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
             }
         }
 

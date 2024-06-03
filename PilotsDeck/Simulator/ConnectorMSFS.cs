@@ -1,5 +1,6 @@
 ﻿using FSUIPC;
 using System;
+using System.Linq;
 
 namespace PilotsDeck
 {
@@ -86,7 +87,7 @@ namespace PilotsDeck
         {
             TickCounter = tickCounter;
             ipcManager = manager;
-            mobiConnect = new(manager);
+            mobiConnect = new(manager, OnReceiveEvent);
             forceSubscribeAll = false;
 
             pauseIndValue = new IPCValueOffset(pauseIndAddr, AppSettings.groupStringRead, OffsetAction.Read);
@@ -191,6 +192,88 @@ namespace PilotsDeck
             mobiConnect.SubscribeAllAddresses();
         }
 
+        public override void SubscribeSimEvent(string evtName, string receiverID, EventCallback callbackFunction)
+        {
+            try
+            {
+                bool doSub = false;
+                if (RegisteredEvents.TryGetValue(evtName, out var regList))
+                {
+                    if (regList.Any(e => e.Name == evtName && e.ReceiverID == receiverID))
+                        Logger.Log(LogLevel.Warning, "ConnectorMSFS:SubscribeSimEvent", $"The Event '{evtName}' is already subscribed for '{receiverID}'!");
+                    else
+                    {
+                        regList.Add(new EventRegistration(evtName, receiverID, callbackFunction));
+                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:SubscribeSimEvent", $"Subscribed Event '{evtName}' for '{receiverID}'");
+                    }
+                }
+                else
+                {
+                    RegisteredEvents.Add(evtName, []);
+                    RegisteredEvents[evtName].Add(new EventRegistration(evtName, receiverID, callbackFunction));
+                    Logger.Log(LogLevel.Debug, "ConnectorMSFS:SubscribeSimEvent", $"Subscribed Event '{evtName}' for '{receiverID}'");
+                    doSub = true;
+                }
+
+                if (doSub)
+                    mobiConnect.SubscribeSimConnectEvent(evtName);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, "ConnectorMSFS:SubscribeSimEvent", $"Exception '{ex.GetType()}' while subscribing Event '{evtName}' for '{receiverID}': {ex.Message}");
+            }
+        }
+        public override void UnsubscribeSimEvent(string evtName, string receiverID)
+        {
+            try
+            {
+                bool doSub = false;
+                if (RegisteredEvents.TryGetValue(evtName, out var regList))
+                {
+                    EventRegistration reg = regList.FirstOrDefault(e => e.Name == evtName && e.ReceiverID == receiverID, null);
+                    if (reg == null)
+                        Logger.Log(LogLevel.Warning, "ConnectorMSFS:UnsubscribeSimEvent", $"The Event '{evtName}' is not subscribed for '{receiverID}'!");
+                    else
+                    {
+                        regList.Remove(reg);
+                        Logger.Log(LogLevel.Debug, "ConnectorMSFS:UnsubscribeSimEvent", $"Unsubscribed Event '{evtName}' for '{receiverID}'");
+                        if (regList.Count == 0)
+                        {
+                            doSub = true;
+                            RegisteredEvents.Remove(evtName);
+                        }
+                    }
+                }
+                else
+                    Logger.Log(LogLevel.Warning, "ConnectorMSFS:UnsubscribeSimEvent", $"The Event '{evtName}' is not subscribed!");
+
+                if (doSub)
+                    mobiConnect.UnsubscribeSimConnectEvent(evtName);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, "ConnectorMSFS:UnsubscribeSimEvent", $"Exception '{ex.GetType()}' while unsubscribing Event '{evtName}' for '{receiverID}': {ex.Message}");
+            }
+        }
+
+        public void OnReceiveEvent(string evtName, object evtData)
+        {
+            try
+            {
+                if (RegisteredEvents.TryGetValue(evtName, out var events))
+                {
+                    foreach (var evt in events)
+                        evt.Callback(evtName, evtData);
+                }
+                else
+                    Logger.Log(LogLevel.Warning, "ConnectorMSFS:OnReceiveEvent", $"The Event '{evtName}' is not subscribed!");
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, "ConnectorMSFS:OnReceiveEvent", $"Exception '{ex.GetType()}' while receiving Events: {ex.Message}");
+            }
+        }
+
         protected bool UpdateLvar(string Address, string newValue)
         {
             bool result;
@@ -234,6 +317,8 @@ namespace PilotsDeck
         {
             switch (actionType)
             {
+                case ActionSwitchType.INTERNAL:
+                    return SimTools.WriteInternal(Address, newValue);
                 case ActionSwitchType.LUAFUNC:
                     return SimTools.RunLuaFunc(Address);
                 case ActionSwitchType.MACRO:

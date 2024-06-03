@@ -142,7 +142,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh && !ValueManager.IsChanged(ID.Guard))
+            if (!ValueManager.HasChangedValues() && !NeedRefresh)
                 return;
 
             string value = ValueManager[ID.Control];

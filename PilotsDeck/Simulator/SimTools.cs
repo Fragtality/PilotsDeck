@@ -510,5 +510,15 @@ namespace PilotsDeck
             Plugin.ActionController.ipcManager.ScriptManager.RunFunction(address, true);
             return true;
         }
+
+        public static bool WriteInternal(string address, string newValue)
+        {
+            if (Plugin.ActionController.ipcManager.TryGetValue(address, out IPCValue value))
+            {
+                value.SetValue(newValue);
+                return true;
+            }
+            return false;
+        }
     }
 }

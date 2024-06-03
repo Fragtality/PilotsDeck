@@ -212,6 +212,11 @@ namespace PilotsDeck
             return result;
         }
 
+        public void UnloadScripts()
+        {
+            ScriptManager.StopGlobalScripts();
+        }
+
         public bool Process()
         {
             bool result;

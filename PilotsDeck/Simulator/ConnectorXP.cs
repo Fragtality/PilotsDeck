@@ -376,6 +376,8 @@ namespace PilotsDeck
         {
             switch (actionType)
             {
+                case ActionSwitchType.INTERNAL:
+                    return SimTools.WriteInternal(Address, newValue);
                 case ActionSwitchType.XPCMD:
                     return RunCommands(Address, switchSettings.UseControlDelay);
                 case ActionSwitchType.XPWREF:

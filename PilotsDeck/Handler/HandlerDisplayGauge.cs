@@ -148,7 +148,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Gauge) && !ValueManager.IsChanged(ID.GaugeColor) && !NeedRefresh && !ValueManager.IsChanged(ID.Guard))
+            if (!ValueManager.HasChangedValues() && !NeedRefresh)
                 return;
 
             //Stopwatch sw = new Stopwatch();

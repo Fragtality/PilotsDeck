@@ -34,7 +34,9 @@ namespace PilotsDeck
         public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}[\w][\w ]+\)$", RegexOptions.Compiled);
         public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}}\\)$", RegexOptions.Compiled);
         public static readonly Regex rxBvar = new($"^(B:{validName}){{1}}$", RegexOptions.Compiled);
-        public static readonly Regex rxLuaFunc = new($"^(Lua|lua){{1}}:{validName}(\\.lua){{0,1}}:{validName}", RegexOptions.Compiled);
+        public static readonly Regex rxLuaFunc = new($"^(Lua|lua|LUA){{1}}:{validName}(\\.lua){{0,1}}:{validName}([(]{{1}}[^)]+[)]{{1}}){{0,1}}", RegexOptions.Compiled);
+        public static readonly Regex rxLuaFile = new($"^(Lua|lua|LUA){{1}}:{validName}(\\.lua){{0,1}}", RegexOptions.Compiled);
+        public static readonly Regex rxInternal = new($"^X:{validName}$", RegexOptions.Compiled);
         #endregion
 
         #region Test-Functions
@@ -45,12 +47,13 @@ namespace PilotsDeck
 
             if (string.IsNullOrEmpty(address))
                 return false;
-            else if ((rxOffset.IsMatch(address) && type == ActionSwitchType.OFFSET)
-                    || (rxLvar.IsMatch(address) && type == ActionSwitchType.LVAR)
-                    || (rxDref.IsMatch(address) && type == ActionSwitchType.XPWREF)
+            else if (  (rxDref.IsMatch(address) && type == ActionSwitchType.XPWREF)
                     || (rxAvar.IsMatch(address) && type == ActionSwitchType.AVAR)
                     || (rxBvar.IsMatch(address) && type == ActionSwitchType.BVAR)
-                    || (rxLuaFunc.IsMatch(address) && type == ActionSwitchType.LUAFUNC))
+                    || (rxInternal.IsMatch(address) && type == ActionSwitchType.INTERNAL)
+                    || (rxOffset.IsMatch(address) && type == ActionSwitchType.OFFSET)
+                    || (rxLuaFunc.IsMatch(address) && type == ActionSwitchType.LUAFUNC)
+                    || (rxLvar.IsMatch(address) && type == ActionSwitchType.LVAR))
                 return true;
             else
                 return false;
@@ -68,6 +71,8 @@ namespace PilotsDeck
                 return ActionSwitchType.XPWREF;
             if (rxAvar.IsMatch(address))
                 return ActionSwitchType.AVAR;
+            if (rxInternal.IsMatch(address))
+                return ActionSwitchType.INTERNAL;
             if (rxLvar.IsMatch(address))
                 return ActionSwitchType.LVAR;
 
@@ -98,7 +103,7 @@ namespace PilotsDeck
 
         public static bool IsActionReadable(ActionSwitchType type)
         {
-            return type == ActionSwitchType.LVAR || type == ActionSwitchType.OFFSET || type == ActionSwitchType.XPWREF
+            return type == ActionSwitchType.LVAR || type == ActionSwitchType.OFFSET || type == ActionSwitchType.XPWREF || type == ActionSwitchType.INTERNAL
                 || type == ActionSwitchType.AVAR || type == ActionSwitchType.READVALUE || type == ActionSwitchType.BVAR || type == ActionSwitchType.LUAFUNC;
         }
 
@@ -147,6 +152,8 @@ namespace PilotsDeck
                     return rxBvar.IsMatch(address);
                 case ActionSwitchType.LVAR:
                     return rxLvar.IsMatch(address);
+                case ActionSwitchType.INTERNAL:
+                    return rxInternal.IsMatch(address);
                 default:
                     return false;
             }
@@ -202,7 +209,7 @@ namespace PilotsDeck
 
         public static bool IsResetableValue(ActionSwitchType type)
         {
-            return type == ActionSwitchType.AVAR || type == ActionSwitchType.LVAR || type == ActionSwitchType.XPWREF || type == ActionSwitchType.OFFSET || type == ActionSwitchType.BVAR;
+            return type == ActionSwitchType.AVAR || type == ActionSwitchType.LVAR || type == ActionSwitchType.XPWREF || type == ActionSwitchType.OFFSET || type == ActionSwitchType.BVAR || type == ActionSwitchType.INTERNAL;
         }
         public static bool IsVjoyAddress(string address, int type)
         {

@@ -18,6 +18,7 @@ namespace PilotsDeck
         protected virtual IPCManager IPCManager { get; set; }
         protected virtual ImageManager ImgManager { get; set; }
         protected virtual Dictionary<int, string> imgRefs { get; set; } = [];
+        protected virtual Dictionary<int, ImageMapping> mapRefs { get; set; } = [];
 
         public virtual string RenderImage64 { get; protected set; } = "";
         public virtual string DefaultImage64 { get; protected set; } = "";
@@ -106,14 +107,9 @@ namespace PilotsDeck
                         imgRefs.Add(ID.ImgGuard, SwitchSettings.ImageGuard);
                     }
                     else
-                    {
-                        ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, imgManager, DeckType, true);
-                        imgRefs.Add(ID.MapGuard, SwitchSettings.ImageGuardMap);
-                    }
+                        mapRefs.Add(ID.MapGuard, new(SwitchSettings.ImageGuardMap, DeckType, ValueManager));
 
                     ValueManager.AddValue(ID.Guard, SwitchSettings.AddressGuardActive);
-
-                    RenderDefaultImages();
                 }
                 RegisterActions();
             }
@@ -158,7 +154,8 @@ namespace PilotsDeck
                     ImgManager.RemoveImage(SwitchSettings.ImageGuard, DeckType);
                     imgRefs.Remove(ID.ImgGuard);
 
-                    ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, ImgManager, DeckType, false);
+                    if (mapRefs.TryGetValue(ID.MapGuard, out ImageMapping map))
+                        map?.DeregisterMap();
                     imgRefs.Remove(ID.MapGuard);
 
                     ValueManager.RemoveValue(ID.Guard);
@@ -245,20 +242,7 @@ namespace PilotsDeck
                 if (image != null)
                     NeedRefresh = true;
 
-                if (imgRefs.TryGetValue(ID.ImgGuard, out string oldMap))
-                {
-                    ModelSwitchDisplay.ManageImageMap(oldMap, ImgManager, DeckType, false);
-                    if (!string.IsNullOrWhiteSpace(SwitchSettings.ImageGuardMap) && SwitchSettings.ImageGuardMap != oldMap && SwitchSettings.UseImageGuardMapping)
-                    {
-                        imgRefs[ID.MapGuard] = SwitchSettings.ImageGuardMap;
-                        ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, ImgManager, DeckType, true);
-                    }
-                }
-                else if (!string.IsNullOrWhiteSpace(SwitchSettings.ImageGuardMap) && SwitchSettings.UseImageGuardMapping)
-                {
-                    imgRefs[ID.MapGuard] = SwitchSettings.ImageGuardMap;
-                    ModelSwitchDisplay.ManageImageMap(SwitchSettings.ImageGuardMap, ImgManager, DeckType, true);
-                }
+                ImageMapping.RefUpdateHelper(mapRefs, ID.MapGuard, SwitchSettings.UseImageGuardMapping, SwitchSettings.ImageGuardMap, DeckType, ValueManager);
             }
         }
 

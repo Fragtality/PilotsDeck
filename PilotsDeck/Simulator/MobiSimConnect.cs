@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace PilotsDeck
 {
-    public class MobiSimConnect(IPCManager manager) : IDisposable
+    public class MobiSimConnect(IPCManager manager, ConnectorMSFS.EventCallback callbackFunc) : IDisposable
     {
         public const string MOBIFLIGHT_CLIENT_DATA_NAME_COMMAND = "MobiFlight.Command";
         public const string MOBIFLIGHT_CLIENT_DATA_NAME_RESPONSE = "MobiFlight.Response";
@@ -45,6 +45,9 @@ namespace PilotsDeck
         protected uint nextEventID = 1;
         protected Dictionary<uint, ulong> eventIndex = [];
         protected Dictionary<ulong, IPCValueInputEvent> eventSubscribedValues = [];
+        protected Dictionary<uint, string> simEvents = [];
+        protected uint nextSimEventID = 1;
+        protected ConnectorMSFS.EventCallback eventCallback = callbackFunc;
 
         public bool Connect()
         {
@@ -56,6 +59,7 @@ namespace PilotsDeck
                 simConnect = new SimConnect(CLIENT_NAME, simConnectHandle, WM_PILOTSDECK_SIMCONNECT, null, 0);
                 simConnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(SimConnect_OnOpen);
                 simConnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(SimConnect_OnQuit);
+                simConnect.OnRecvEvent += new SimConnect.RecvEventEventHandler(SimConnect_OnReceiveEvent);
                 simConnect.OnRecvException += new SimConnect.RecvExceptionEventHandler(SimConnect_OnException);
 
                 cancelThread = false;
@@ -172,6 +176,85 @@ namespace PilotsDeck
                 0,
                 0,
                 0);
+        }
+
+        public void SubscribeSimConnectEvent(string evtName)
+        {
+            try
+            {
+                if (simEvents.ContainsValue(evtName))
+                {
+                    Logger.Log(LogLevel.Warning, "MobiSimConnect:SubscribeSimConnectEvent", $"The Event '{evtName}' is already subscribed!");
+                    return;
+                }
+
+                simConnect.MapClientEventToSimEvent((SIM_EVENTS)nextSimEventID, evtName);
+                simConnect.AddClientEventToNotificationGroup(NOTFIY_GROUP.DYNAMIC, (SIM_EVENTS)nextSimEventID, false);
+                simEvents.Add(nextSimEventID, evtName);
+
+                Logger.Log(LogLevel.Debug, "MobiSimConnect:SubscribeSimConnectEvent", $"Event '{evtName}' subscribed with ID '{nextSimEventID}'");
+                nextSimEventID++;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "MobiSimConnect:UnsubscribeSimConnectEvent", $"Exception '{ex.GetType}' while subscribing Event '{evtName}': {ex.Message}");
+            }
+        }
+
+        public void UnsubscribeSimConnectEvent(string evtName)
+        {
+            try
+            {
+                if (!simEvents.ContainsValue(evtName))
+                {
+                    Logger.Log(LogLevel.Debug, "MobiSimConnect:UnsubscribeSimConnectEvent", $"The Event '{evtName}' is not subscribed!");
+                    return;
+                }
+                uint id = simEvents.Where(kv => kv.Value == evtName).FirstOrDefault().Key;
+
+                simConnect.RemoveClientEvent(NOTFIY_GROUP.DYNAMIC, (SIM_EVENTS)id);
+                simEvents.Remove(id);
+                Logger.Log(LogLevel.Debug, "MobiSimConnect:UnsubscribeSimConnectEvent", $"Event '{evtName}' with ID '{nextEventID}' is now unsubscribed");
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "MobiSimConnect:UnsubscribeSimConnectEvent", $"Exception '{ex.GetType}' while unsubscribing Event '{evtName}': {ex.Message}");
+            }
+        }
+
+        public void RemoveAllSimConnectEvents()
+        {
+            try
+            {
+                foreach (var evt in simEvents)
+                {
+                    simConnect.RemoveClientEvent(NOTFIY_GROUP.DYNAMIC, (SIM_EVENTS)evt.Key);
+                }
+                simEvents.Clear();
+                nextSimEventID = 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "MobiSimConnect:RemoveAllSimConnectEvents", $"Exception '{ex.GetType}' while unsubscribing Events: {ex.Message}");
+            }
+        }
+
+        protected void SimConnect_OnReceiveEvent(SimConnect sender, SIMCONNECT_RECV_EVENT recEvent)
+        {
+            try
+            {
+                if (recEvent != null && recEvent.uGroupID == (uint)NOTFIY_GROUP.DYNAMIC)
+                {
+                    if (simEvents.TryGetValue(recEvent.uEventID, out string evtName))
+                        eventCallback(evtName, recEvent.dwData);
+                    else
+                        Logger.Log(LogLevel.Warning, "MobiSimConnect:SimConnect_OnReceiveEvent", $"Event ID '{recEvent.uEventID}' is not subscribed!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "MobiSimConnect:SimConnect_OnReceiveEvent", $"Exception '{ex.GetType}' while receiving Events: {ex.Message} (eventID: {recEvent?.uEventID})");
+            }
         }
 
         protected void SimConnect_OnClientData(SimConnect sender, SIMCONNECT_RECV_CLIENT_DATA data)
@@ -337,6 +420,8 @@ namespace PilotsDeck
                 if (isMobiConnected)
                     SendClientWasmCmd("MF.SimVars.Clear");
 
+                RemoveAllSimConnectEvents();
+
                 cancelThread = true;
                 if (simConnectThread != null)
                 {
@@ -366,6 +451,8 @@ namespace PilotsDeck
                 eventSubscribedValues.Clear();
                 nextEventID = 1;
                 eventsEnumerated = false;
+                nextSimEventID = 1;
+                simEvents.Clear();
                 Logger.Log(LogLevel.Information, "MobiSimConnect:Disconnect", $"SimConnect Connection closed.");
             }
             catch (Exception ex)

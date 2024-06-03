@@ -334,6 +334,7 @@ namespace PilotsDeck
             {
                 if (SimConnector.LastStateApp()) //SIM changed to not running
                 {
+                    ipcManager.UnloadScripts();
                     SimConnector.Close();
                     currentState = ControllerState.Error;
                     isClosing = true;
@@ -463,7 +464,7 @@ namespace PilotsDeck
                 int removedAddresses = ipcManager.UnsubscribeUnusedAddresses();
                 int removedImages = imgManager.RemoveUnused();
                 if (SimConnector.IsRunning || imageUpdates > 0 || changedScripts > 0 || removedAddresses > 0 || removedImages > 0)
-                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} dynamic / {ipcManager.ScriptManager.CountGlobal} global) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} d / {ipcManager.ScriptManager.CountGlobal} g / {ipcManager.ScriptManager.CountImages} i) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
                 imageUpdates = 0;
             }

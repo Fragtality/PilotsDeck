@@ -160,7 +160,8 @@ function setPattern(field, type) {
 	var regNameXP = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2B]+";
 	var regNameMultiple = "[a-zA-Z0-9\x2D\x5F]+";
 	var regNameMultipleXP = "[a-zA-Z0-9\x2D\x5F\x2B]+";
-	var regLVarName = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2E\x3A]+";
+	//var regLVarName = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2E\x3A]+";
+	var regLVarName = "[^:\\s][a-zA-Z0-9\x2D\x5F\x2E\x20]+([\x3A][0-9]+){0,1}";
 	var regLvar = `^((L:){0,1}${regLVarName}){1}$`;
 	var strHvar = `((H:){0,1}${regName}){1}`;
 	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
@@ -170,7 +171,8 @@ function setPattern(field, type) {
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
 	var regAvar = `^\\((A:){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w ]+\\)$`;
 	var regBvar = `^(B:${regLVarName}){1}$`;
-	var regLuaFunc = `^(Lua|lua){1}:{regName}(\.lua){0,1}:{regName}`;
+	var regLuaFunc = `^(Lua|lua){1}:${regName}(\.lua){0,1}:${regName}([\(]{1}[^\)]+[\)]{1}){0,1}`;
+	var regInternal = `^X:${regName}$`;
 	
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
@@ -182,8 +184,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regLvar;
 	else if (type == 4)  //offset
 		document.getElementById(field).pattern = regOffset;
-	else if (type == 5) //offset | lvar | dref | avar
-		document.getElementById(field).pattern = `${regOffset}|${regLvar}|${regDref}|${regAvar}`;
+	else if (type == 5) //offset | lvar | dref | avar | bvar | luafunc | internal
+		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvar}|${regInternal}|${regLuaFunc}|${regLvar}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv
@@ -200,6 +202,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regBvar;
 	else if (type == 14) //LuaFunc
 		document.getElementById(field).pattern = regLuaFunc;
+	else if (type == 15) //Internal
+		document.getElementById(field).pattern = regInternal;
 	else
 		document.getElementById(field).pattern = ".*";
 }
@@ -287,7 +291,7 @@ function isActionHoldableValue(actionType) {
 }
 
 function isActionResetable(actionType) {
-	return (actionType >= 3 && actionType <= 5) || (actionType >= 11 && actionType <= 13);
+	return (actionType >= 3 && actionType <= 5) || (actionType >= 11 && actionType <= 13) || actionType == 15;
 }
 
 function setSwitchOptions(settingsModel) {
@@ -366,6 +370,10 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSw
 		toggleConfigItem(true, offField);
 	}
 	else if (actionType == 13 && !switchCurrent) { //bvar
+		toggleConfigItem(true, onField);
+		toggleConfigItem(true, offField);
+	}
+	else if (actionType == 15 && !switchCurrent) { //bvar
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}

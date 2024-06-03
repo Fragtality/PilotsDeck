@@ -113,9 +113,32 @@ namespace PilotsDeck
             render.DrawImage(image, ScaleRectangle(drawRectangle));
         }
 
+        public static bool GetColorFromString(ref string text, out Color color)
+        {
+            color = default;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(text) && text.StartsWith("[[#"))
+                {
+                    string strColor = text[0..9].Replace("[[","");
+                    color = ColorTranslator.FromHtml(strColor);
+                    text = text[9..];
+                    return true;
+                }
+            }
+            catch { }
+
+            return false;
+        }
+
         public void DrawText(string text, Font drawFont, Color drawColor, RectangleF drawRectangle)
         {
-            SolidBrush drawBrush = new (drawColor);
+            SolidBrush drawBrush;
+            if (GetColorFromString(ref text, out Color strColor))
+                drawBrush = new SolidBrush(strColor);
+            else
+                drawBrush = new(drawColor);
+
             render.DrawString(text, ScaleFont(drawFont), drawBrush, ScaleRectangle(drawRectangle), stringFormat);
             drawBrush.Dispose();
         }

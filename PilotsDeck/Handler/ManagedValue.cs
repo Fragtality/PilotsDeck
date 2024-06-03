@@ -69,7 +69,8 @@ namespace PilotsDeck
         XPWREF = 11,
         AVAR = 12,
         BVAR = 13,
-        LUAFUNC = 14
+        LUAFUNC = 14,
+        INTERNAL = 15
     }
 
     public class ManagedValue(int id, string address, ActionSwitchType type = ActionSwitchType.READVALUE, IPCValue value = null)

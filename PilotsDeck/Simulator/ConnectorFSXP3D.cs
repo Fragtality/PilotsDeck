@@ -139,6 +139,8 @@ namespace PilotsDeck
         {
             switch (actionType)
             {
+                case ActionSwitchType.INTERNAL:
+                    return SimTools.WriteInternal(Address, newValue);
                 case ActionSwitchType.LUAFUNC:
                     return SimTools.RunLuaFunc(Address);
                 case ActionSwitchType.MACRO:

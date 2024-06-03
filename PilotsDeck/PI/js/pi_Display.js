@@ -23,7 +23,8 @@ var settingsModel = {
 	FontSize: "10",
 	FontStyle: 0,
 	FontColor: "#ffffff",
-	RectCoord: "-1; 0; 0; 0"
+	RectCoord: "-1; 0; 0; 0",
+	IsGuarded: false,
 };
 
 var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage"];

@@ -89,7 +89,7 @@ namespace PilotsDeck
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Top) && !ValueManager.IsChanged(ID.Bottom) && !NeedRefresh && !ValueManager.IsChanged(ID.Guard))
+            if (!ValueManager.HasChangedValues() && !NeedRefresh)
                 return;
 
             ImageRenderer render = new(ImgManager.GetImage(KorrySettings.DefaultImage, DeckType), DeckType);

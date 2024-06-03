@@ -106,6 +106,7 @@ namespace Installer
             {
                 Directory.CreateDirectory(Parameters.scriptDir);
                 Directory.CreateDirectory(Parameters.scriptDir + @"\global");
+                Directory.CreateDirectory(Parameters.scriptDir + @"\image");
                 return true;
             }
             catch (Exception e)

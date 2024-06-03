@@ -10,6 +10,7 @@
         public override string ActionID { get { return $"(HandlerSwitchDisplay) ({Title.Trim()}) {(BaseSettings.IsEncoder ? "(Encoder) " : "")}(Read: {DisplaySettings.Address}) (Action: {(ActionSwitchType)BaseSettings.ActionType} / {Address}) (Long: {BaseSettings.HasLongPress} / {(ActionSwitchType)BaseSettings.ActionTypeLong} / {BaseSettings.AddressActionLong})"; } }
         public override string Address { get { return DisplaySettings.Address; } }
 
+
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
             base.Register(imgManager, ipcManager);
@@ -24,8 +25,8 @@
                     imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
                 imgRefs.Add(ID.Indication, DisplaySettings.IndicationImage);
 
-                DisplaySettings.ManageImageMap(imgManager, DeckType, true);
-                imgRefs.Add(ID.Map, DisplaySettings.ImageMap);
+                if (DisplaySettings.UseImageMapping)
+                    mapRefs.Add(ID.Map, new(DisplaySettings.ImageMap, DeckType, ValueManager));
             }
 
             ValueManager.AddValue(ID.Control, DisplaySettings.Address);
@@ -52,7 +53,8 @@
                     ImgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
                 imgRefs.Remove(ID.Indication);
 
-                DisplaySettings.ManageImageMap(ImgManager, DeckType, false);
+                if (mapRefs.TryGetValue(ID.Map, out ImageMapping map))
+                    map?.DeregisterMap();
                 imgRefs.Remove(ID.Map);
             }
 
@@ -77,12 +79,7 @@
                 UpdateImage(DisplaySettings.OffImage, ID.Off, out _);
                 UpdateImage(DisplaySettings.IndicationImage, ID.Indication, out _);
 
-                if (DisplaySettings.ImageMap != imgRefs[ID.Map])
-                {
-                    ModelSwitchDisplay.ManageImageMap(imgRefs[ID.Map], ImgManager, DeckType, false);
-                    DisplaySettings.ManageImageMap(ImgManager, DeckType, true);
-                    imgRefs[ID.Map] = DisplaySettings.ImageMap;
-                }
+                ImageMapping.RefUpdateHelper(mapRefs, ID.Map, DisplaySettings.UseImageMapping, DisplaySettings.ImageMap, DeckType, ValueManager);
             }
         }
 
@@ -106,20 +103,14 @@
             if (!Settings.UseImageMapping)
                 newImage = ImgManager.GetImage(DisplaySettings.OffImage, DeckType);
             else
-            {
-                string mappedImage = Settings.GetValueMapped("0");
-                if (!string.IsNullOrEmpty(mappedImage))
-                    newImage = ImgManager.GetImage(mappedImage, DeckType);
-                else
-                    newImage = ImgManager.GetImage(DisplaySettings.DefaultImage, DeckType);
-            }
+                newImage = mapRefs[ID.Map].GetMappedImage("0", DisplaySettings.DefaultImage);
 
             DefaultImage64 = RefreshGuard(newImage, "0");
         }
 
         public override void Refresh()
         {
-            if (!ValueManager.IsChanged(ID.Control) && !NeedRefresh && (!SwitchSettings.IsGuarded || !ValueManager.IsChanged(ID.Guard)))
+            if (!ValueManager.HasChangedValues() && !NeedRefresh)
                 return;
 
             ManagedImage newImage;
@@ -147,11 +138,7 @@
             }
             else
             {
-                string mappedImage = Settings.GetValueMapped(currentValue);
-                if (!string.IsNullOrEmpty(mappedImage))
-                    newImage = ImgManager.GetImage(mappedImage, DeckType);
-                else
-                    newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType);
+                newImage = mapRefs[ID.Map].GetMappedImage(currentValue, DisplaySettings.ErrorImage);
             }
 
             RenderImage64 = RefreshGuard(newImage, currentValue);
@@ -166,7 +153,7 @@
             {
                 if (SwitchSettings.UseImageGuardMapping)
                 {
-                    string guardImage = ModelSwitchDisplay.GetValueMapped(currentValue, SwitchSettings.ImageGuardMap);
+                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentValue);
                     if (!string.IsNullOrEmpty(guardImage))
                     {
                         ImageRenderer render = new(image, DeckType);
