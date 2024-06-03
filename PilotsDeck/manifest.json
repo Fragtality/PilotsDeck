@@ -62,6 +62,13 @@
           "FontSize": "10"
         }
       ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "layout-pilotsdeck.json"
+      },
       "SupportedInMultiActions": false,
       "PropertyInspectorPath": "PI/pi_SwitchDisplay.html",
       "Tooltip": "A Button with Status Indication of its current State in the Sim",

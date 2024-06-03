@@ -840,9 +840,6 @@
     <None Update="PI\css\sdpi.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="PI\inc_GuardMappedActions.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="PI\inc_GuardActions.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

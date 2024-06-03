@@ -1,4 +1,6 @@
-﻿namespace PilotsDeck
+﻿using System.Drawing;
+
+namespace PilotsDeck
 {
     public interface IModelSwitch
     {
@@ -49,8 +51,14 @@
         string SwitchOnStateGuard { get; set; }
         string SwitchOffStateGuard { get; set; }
         string ImageGuard { get; set; }
+        string GuardRect { get; set; }
         bool UseImageGuardMapping { get; set; }
         string ImageGuardMap { get; set; }
+
+        Rectangle GetRectangleGuard()
+        {
+            return ModelDisplayText.GetRectangle(GuardRect);
+        }
     }
 
     public class ModelSwitch : ModelBase, IModelSwitch
@@ -101,6 +109,7 @@
         public virtual string SwitchOnStateGuard { get; set; } = "";
         public virtual string SwitchOffStateGuard { get; set; } = "";
         public virtual string ImageGuard { get; set; }
+        public virtual string GuardRect { get; set; } = "0; 0; 72; 72";
         public virtual bool UseImageGuardMapping { get; set; } = false;
         public virtual string ImageGuardMap { get; set; } = "";
 

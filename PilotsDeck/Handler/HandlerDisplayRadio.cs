@@ -109,8 +109,8 @@ namespace PilotsDeck
             render.DrawText(valueAct, fontAct, colorAct, Settings.GetRectangleText());
             render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
-            if (HasAction && SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+            if (HasAction && SwitchSettings.IsGuarded)
+                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
 
             if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));
@@ -144,7 +144,7 @@ namespace PilotsDeck
             render.DrawText("0", fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
             if (HasAction && SwitchSettings.IsGuarded)
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+                RenderGuard(render, "0", "0");
 
             if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));

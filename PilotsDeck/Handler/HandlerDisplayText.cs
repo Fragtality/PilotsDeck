@@ -93,7 +93,7 @@ namespace PilotsDeck
             render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
 
             if (HasAction && SwitchSettings.IsGuarded)
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+                RenderGuard(render, "0", "0");
 
             if (IsEncoder)
                 DrawTitle(render);
@@ -107,7 +107,7 @@ namespace PilotsDeck
                 render.DrawBox(ColorTranslator.FromHtml("#d70000"), ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
 
             if (HasAction && SwitchSettings.IsGuarded)
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject(), SwitchSettings.GetRectangleGuard());
 
             if (IsEncoder)
                 DrawTitle(render);
@@ -153,31 +153,37 @@ namespace PilotsDeck
             value = TextSettings.RoundValue(value);
 
             //evaluate value and set indication
-            string background = TextSettings.DefaultImage;
             TextSettings.GetFontParameters(TitleParameters, out Font drawFont, out Color drawColor);
             Color boxColor = ColorTranslator.FromHtml(TextSettings.BoxColor);
 
-            string text = "";
-            if (TextSettings.HasIndication && ModelBase.Compare(TextSettings.IndicationValue, value)) 
+            string text = TextSettings.FormatValue(value);
+            string indImage = "";
+            if (TextSettings.HasIndication) 
             {
-                background = TextSettings.IndicationImage;
-                if (!TextSettings.IndicationHideValue)
+                bool valueCompares = ModelBase.Compare(TextSettings.IndicationValue, value);
+
+                if (TextSettings.IndicationHideValue && valueCompares)
+                    text = "";
+
+                if (TextSettings.IndicationUseColor && valueCompares)
                 {
-                    text = TextSettings.FormatValue(value);
-                    if (TextSettings.IndicationUseColor)
-                        drawColor = ColorTranslator.FromHtml(TextSettings.IndicationColor);
+                    drawColor = ColorTranslator.FromHtml(TextSettings.IndicationColor);
+                    boxColor = ColorTranslator.FromHtml(TextSettings.IndicationColor);
                 }
 
-                if (TextSettings.IndicationUseColor)
-                        boxColor = ColorTranslator.FromHtml(TextSettings.IndicationColor);
+                if (!CommonSettings.UseImageMapping && valueCompares)
+                    indImage = TextSettings.IndicationImage;                        
+                else if (CommonSettings.UseImageMapping)
+                    indImage = mapRefs[ID.Map].GetMappedImageString(value, indImage);
             }
-            else
-                text = TextSettings.FormatValue(value);
 
             text = TextSettings.GetValueMapped(text);
 
 
-            ImageRenderer render = new(ImgManager.GetImage(background, DeckType), DeckType);
+            ImageRenderer render = new(ImgManager.GetImage(TextSettings.DefaultImage, DeckType), DeckType);
+
+            if (indImage != "")
+                render.DrawImage(ImgManager.GetImage(indImage, DeckType).GetImageObject());
 
             if (TextSettings.DrawBox)
                 render.DrawBox(boxColor, ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
@@ -185,8 +191,8 @@ namespace PilotsDeck
             if (text != "")
                 render.DrawText(text, drawFont, drawColor, TextSettings.GetRectangleText());
 
-            if (HasAction && SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+            if (HasAction && SwitchSettings.IsGuarded)
+                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
 
             if (IsEncoder)
                 DrawTitle(render);

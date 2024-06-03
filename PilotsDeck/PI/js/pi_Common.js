@@ -11,8 +11,6 @@ if (document.getElementById("FontOptions") && fontHtml)
 	document.getElementById("FontOptions").innerHTML = fontHtml;
 if (document.getElementById("GuardActions") && guardHtml)
 	document.getElementById("GuardActions").innerHTML = guardHtml;
-if (document.getElementById("GuardMappedActions") && guardMappedHtml)
-	document.getElementById("GuardMappedActions").innerHTML = guardMappedHtml;
 
 var websocket = null,
 	uuid = null,
@@ -373,7 +371,7 @@ function toggleOnOffState(actionType, onField, offField, switchCurrent, toggleSw
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
-	else if (actionType == 15 && !switchCurrent) { //bvar
+	else if (actionType == 15 && !switchCurrent) { //internal
 		toggleConfigItem(true, onField);
 		toggleConfigItem(true, offField);
 	}
@@ -424,6 +422,13 @@ function updateImagePreviews() {
 	}
 }
 
+function toggleImageMapping(useMap) {
+	toggleOnControlsMap.forEach((id) => toggleConfigItem(useMap, id));
+	toggleOffControlsMap.forEach((id) => toggleConfigItem(!useMap, id));
+	toggleOnDivMap.forEach((id) => setFormItem(useMap, id));
+	toggleOffDivMap.forEach((id) => setFormItem(!useMap, id));
+}
+
 function commonFormUpdate() {
 	//ENCODER ACTIONS
 	if (!settingsModel.IsEncoder) {
@@ -441,8 +446,7 @@ function commonFormUpdate() {
 		document.getElementById("DefaultActions").style.display = "inline";
 		if (document.getElementById("GuardActions"))
 			document.getElementById("GuardActions").style.display = "inline";
-		if (document.getElementById("GuardMappedActions"))
-			document.getElementById("GuardMappedActions").style.display = "inline";
+
 		toggleConfigItem(true, 'IsGuarded');
 
 		//PATTERNS
@@ -490,8 +494,7 @@ function commonFormUpdate() {
 			document.getElementById("DefaultActions").style.display = "none";
 		if (document.getElementById("GuardActions"))
 			document.getElementById("GuardActions").style.display = "none";
-		if (document.getElementById("GuardMappedActions"))
-			document.getElementById("GuardMappedActions").style.display = "none";
+
 		toggleConfigItem(false, 'IsGuarded');
 		setPattern('Address', 5);
 	}
@@ -505,7 +508,9 @@ function commonFormUpdate() {
 	toggleConfigItem(isGuarded, 'AddressActionGuardOff');
 	toggleConfigItem(isGuarded, 'SwitchOnStateGuard');
 	toggleConfigItem(isGuarded, 'SwitchOffStateGuard');
-	toggleConfigItem(isGuarded, 'ImageGuard');
+	toggleConfigItem(isGuarded, 'ImageGuard'); 
+	toggleConfigItem(isGuarded, 'GuardRect');
+
 
 	if (isGuarded) {
 		setPattern('AddressGuardActive', 5);
@@ -525,6 +530,15 @@ function commonFormUpdate() {
 			toggleConfigItem(false, 'AddressActionGuardOff')
 		}
 	}
+
+	//Image Mapping
+	toggleImageMapping(settingsModel.UseImageMapping);
+	//toggleConfigItem(settingsModel.UseImageMapping, 'ImageMap');
+	//setFormItem(!settingsModel.UseImageMapping, 'DefaultMapping');
+
+	toggleConfigItem(settingsModel.IsGuarded, 'UseImageGuardMapping');
+	toggleConfigItem(settingsModel.UseImageGuardMapping && settingsModel.IsGuarded, 'ImageGuardMap');
+	setFormItem(!settingsModel.UseImageGuardMapping && settingsModel.IsGuarded, 'DefaultGuardMapping');
 
 	//PREVIEWS
 	updateImagePreviews();

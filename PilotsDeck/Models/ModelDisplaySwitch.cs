@@ -48,6 +48,7 @@
         public virtual string SwitchOnStateGuard { get; set; } = "";
         public virtual string SwitchOffStateGuard { get; set; } = "";
         public virtual string ImageGuard { get; set; }
+        public virtual string GuardRect { get; set; } = "0; 0; 72; 72";
         public virtual bool UseImageGuardMapping { get; set; } = false;
         public virtual string ImageGuardMap { get; set; } = "";
 

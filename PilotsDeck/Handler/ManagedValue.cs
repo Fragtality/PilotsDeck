@@ -37,6 +37,8 @@ namespace PilotsDeck
         public static readonly int ImgTop = 15;
         public static readonly int ImgBot = 16;
         public static readonly int Map = 17;
+        public static readonly int MapTop = 17;
+        public static readonly int MapBot = 22;
 
         public static readonly int ImgGuard = 20;
         public static readonly int MapGuard = 21;

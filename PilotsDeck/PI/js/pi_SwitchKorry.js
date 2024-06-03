@@ -22,6 +22,8 @@ var settingsModel = {
 	AddressTop: "",
 	AddressBot: "",
 	UseOnlyTopAddr: false,
+	ShowTopImage: true,
+	ShowBotImage: true,
 	TopState: "",
 	ShowTopNonZero: false,
 	BotState: "",
@@ -39,28 +41,42 @@ var settingsModel = {
 	SwitchOnStateGuard: "",
 	SwitchOffStateGuard: "",
 	ImageGuard: "Images/GuardCross.png",
+	GuardRect: "0; 0; 72; 72",
 	UseImageGuardMapping: false,
-	ImageGuardMap: ""
+	ImageGuardMap: "",
+	UseImageMapping: false,
+	ImageMap: "",
+	ImageMapBot: ""
 };
 
 var imageSelectBoxes = ["DefaultImage", "ErrorImage", "ImageGuard"];
 var korrySelectBoxes = ["TopImage", "BotImage"];
+var toggleOnControlsMap = [];
+var toggleOffControlsMap = [];
+var toggleOnDivMap = [];
+var toggleOffDivMap = []
 
 function updateForm() {
 	//PATTERN
 	setPattern('AddressTop', 5);
 	setPattern('AddressBot', 5);
 
-	//only Top adr
-	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'AddressBot');
-	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'BotState');
-	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'BotImage');
-	setFormItem(!settingsModel.UseOnlyTopAddr, 'Prev_BotImage');
-	toggleConfigItem(!settingsModel.UseOnlyTopAddr, 'ShowBotNonZero');
+	//TOP
+	toggleConfigItem(settingsModel.ShowTopImage, 'AddressTop');
+	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'TopState');
+	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'TopImage');
+	toggleConfigItem(settingsModel.ShowTopImage && settingsModel.UseImageMapping, 'ImageMap');
+	setFormItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'Prev_TopImage');
+	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'ShowTopNonZero');
 
-	//non-zero
-	toggleConfigItem(!settingsModel.ShowTopNonZero, 'TopState')
-	toggleConfigItem(!settingsModel.UseOnlyTopAddr && !settingsModel.ShowBotNonZero, 'BotState')
+
+	//BOT
+	toggleConfigItem(settingsModel.ShowBotImage, 'AddressBot');
+	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'BotState');
+	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'BotImage');
+	toggleConfigItem(settingsModel.ShowBotImage && settingsModel.UseImageMapping, 'ImageMapBot');
+	setFormItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'Prev_BotImage');
+	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'ShowBotNonZero');
 
 	//CURRENT VALUE
 	settingsModel.SwitchOnCurrentValue = false;

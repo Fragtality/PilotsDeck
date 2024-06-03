@@ -81,7 +81,6 @@ namespace PilotsDeck
             _env.SimRead = new Func<string, double>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
             _env.SimWrite = new Func<string, object, bool>(SimWrite);
-            //_env.SimWriteString = new Func<string, string, bool>(SimWriteString);
             _env.SimCommand = new Func<string, double, bool>(SimCommand);
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
@@ -268,19 +267,6 @@ namespace PilotsDeck
         protected static bool IsNumberType(object value, out double number)
         {
             number = 0;
-            //try
-            //{
-            //    number = Convert.ToDouble(value);
-            //    return true;
-            //}
-            //catch (OverflowException)
-            //{
-            //    return false;
-            //}
-            //catch (FormatException)
-            //{
-            //    return false;
-            //}
             try
             {
                 if (value is double || value is float || value is int || value is uint || value is long || value is short || value is ushort || value is ulong)

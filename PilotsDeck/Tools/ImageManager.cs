@@ -143,7 +143,7 @@ namespace PilotsDeck
         public int RemoveUnused()
         {
             int result = 0;
-            var unusedImages = imageCache.Values.Where(i => i.Registrations == 0).ToList();
+            var unusedImages = imageCache.Values.Where(i => i.Registrations <= 0).ToList();
             
             if (unusedImages.Count != 0)
                 Logger.Log(LogLevel.Information, "ImageManager:RemoveUnused", $"Removing {unusedImages.Count} unused Images ...");

@@ -15,9 +15,6 @@
         public virtual string IndicationImage { get; set; } = @"Images/Fault.png";
         public virtual string IndicationValue { get; set; } = "0";
 
-        public virtual bool UseImageMapping { get; set; } = false;
-        public virtual string ImageMap { get; set; } = "";
-
         public static void ManageImageMap(string map, ImageManager imgManager, StreamDeckType deckType, bool add = true)
         {
             if (string.IsNullOrEmpty(map))

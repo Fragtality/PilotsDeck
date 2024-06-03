@@ -79,11 +79,18 @@ var settingsModel = {
 	SwitchOnStateGuard: "",
 	SwitchOffStateGuard: "",
 	ImageGuard: "Images/GuardCross.png",
+	GuardRect: "0; 0; 72; 72",
 	UseImageGuardMapping: false,
-	ImageGuardMap: ""
+	ImageGuardMap: "",
+	UseImageMapping: false,
+	ImageMap: ""
 };
 
 var imageSelectBoxes = ["DefaultImage", "ErrorImage", "ImageGuard"];
+var toggleOnControlsMap = ["ImageMap"];
+var toggleOffControlsMap = ["DefaultImage", "ErrorImage"];
+var toggleOnDivMap = [];
+var toggleOffDivMap = []
 var firstLoad = true;
 var lastDrawArc = false;
 

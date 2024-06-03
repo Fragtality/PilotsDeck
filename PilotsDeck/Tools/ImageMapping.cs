@@ -122,6 +122,15 @@ namespace PilotsDeck
                 return ImgManager.GetImage(defaultImage, DeckType);
         }
 
+        public string GetMappedImageString(string currentValue, string defaultImage)
+        {
+            string mappedImage = GetMappedImageString(currentValue);
+            if (!string.IsNullOrEmpty(mappedImage))
+                return mappedImage;
+            else
+                return defaultImage;
+        }
+
         public string GetMappedImageString(string currentValue)
         {
             string result = "";

@@ -211,7 +211,7 @@ namespace PilotsDeck
 
             Pen pen = new(drawColor, size * (IsSquare ? scalar.Y : nonSquareScale));
             Rotate(angle, drawArc.Offset);
-            render.DrawLine(pen, orgIndX - (drawArc.Width * (IsSquare ? scalar.X : nonSquareScale) * 0.5f), orgIndY, orgIndX + (drawArc.Width * (IsSquare ? scalar.X : nonSquareScale) * 0.5f), orgIndY); ;
+            render.DrawLine(pen, orgIndX - (drawArc.Width * (IsSquare ? scalar.X : nonSquareScale) * 0.5f), orgIndY, orgIndX + (drawArc.Width * (IsSquare ? scalar.X : nonSquareScale) * 0.5f), orgIndY);
             Rotate(-angle, drawArc.Offset);
             pen.Dispose();
         }

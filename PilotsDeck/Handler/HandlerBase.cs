@@ -97,6 +97,9 @@ namespace PilotsDeck
             WaitImage64 = ImgManager.AddImage(CommonSettings.WaitImage, DeckType).GetImageBase64();
             imgRefs.Add(ID.Wait, CommonSettings.WaitImage);
 
+            if (CommonSettings.UseImageMapping)
+                mapRefs.Add(ID.Map, new(CommonSettings.ImageMap, DeckType, ValueManager));
+
             if (HasAction)
             {
                 if (SwitchSettings.IsGuarded)
@@ -108,6 +111,12 @@ namespace PilotsDeck
                     }
                     else
                         mapRefs.Add(ID.MapGuard, new(SwitchSettings.ImageGuardMap, DeckType, ValueManager));
+
+                    if (string.IsNullOrWhiteSpace(SwitchSettings.GuardRect))
+                    {
+                        SwitchSettings.GuardRect = "0; 0; 72; 72";
+                        UpdateSettingsModel = true;
+                    }
 
                     ValueManager.AddValue(ID.Guard, SwitchSettings.AddressGuardActive);
                 }
@@ -147,6 +156,10 @@ namespace PilotsDeck
             ImgManager.RemoveImage(CommonSettings.WaitImage, DeckType);
             imgRefs.Remove(ID.Wait);
 
+            if (mapRefs.TryGetValue(ID.Map, out ImageMapping map))
+                map?.DeregisterMap();
+            imgRefs.Remove(ID.Map);
+
             if (HasAction)
             {
                 if (SwitchSettings.IsGuarded)
@@ -154,8 +167,8 @@ namespace PilotsDeck
                     ImgManager.RemoveImage(SwitchSettings.ImageGuard, DeckType);
                     imgRefs.Remove(ID.ImgGuard);
 
-                    if (mapRefs.TryGetValue(ID.MapGuard, out ImageMapping map))
-                        map?.DeregisterMap();
+                    if (mapRefs.TryGetValue(ID.MapGuard, out ImageMapping mapGuard))
+                        mapGuard?.DeregisterMap();
                     imgRefs.Remove(ID.MapGuard);
 
                     ValueManager.RemoveValue(ID.Guard);
@@ -235,6 +248,8 @@ namespace PilotsDeck
             UpdateImage(CommonSettings.WaitImage, ID.Wait, out image);
             if (image != null)
                 WaitImage64 = image.GetImageBase64();
+
+            ImageMapping.RefUpdateHelper(mapRefs, ID.Map, CommonSettings.UseImageMapping, CommonSettings.ImageMap, DeckType, ValueManager);
 
             if (HasAction && SwitchSettings.IsGuarded)
             {
@@ -319,6 +334,52 @@ namespace PilotsDeck
                 RenderImage64 = DefaultImage64;
                 NeedRedraw = true;
             }
+        }
+
+        protected virtual void RenderGuard(ImageRenderer render, string compareValue, string currentValue)
+        {
+            if (SwitchSettings.IsGuarded && ModelBase.Compare(compareValue, currentValue))
+            {
+                if (SwitchSettings.UseImageGuardMapping)
+                {
+                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentValue);
+                    if (!string.IsNullOrEmpty(guardImage))
+                        render.DrawImage(ImgManager.GetImage(guardImage, DeckType).GetImageObject(), SwitchSettings.GetRectangleGuard());
+                }
+                else
+                    render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject(), SwitchSettings.GetRectangleGuard());
+            }
+        }
+
+        protected string GetGuardedImage64(ManagedImage image, string compareValue, string currentValue)
+        {
+            string result = image.GetImageBase64();
+
+            if (SwitchSettings.IsGuarded && ModelBase.Compare(compareValue, currentValue))
+            {
+                if (SwitchSettings.UseImageGuardMapping)
+                {
+                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentValue);
+                    if (!string.IsNullOrEmpty(guardImage))
+                    {
+                        ImageRenderer render = new(image, DeckType);
+                        render.DrawImage(ImgManager.GetImage(guardImage, DeckType).GetImageObject());
+                        result = render.RenderImage64();
+                        render.Dispose();
+                    }
+                    else
+                        result = image.GetImageBase64();
+                }
+                else
+                {
+                    ImageRenderer render = new(image, DeckType);
+                    render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject(), SwitchSettings.GetRectangleGuard());
+                    result = render.RenderImage64();
+                    render.Dispose();
+                }
+            }
+
+            return result;
         }
 
         public virtual void SetTitleParameters(string title, StreamDeckTools.StreamDeckTitleParameters titleParameters)

@@ -149,7 +149,22 @@ namespace PilotsDeck
 
         protected void OnDidReceiveDeepLink(StreamDeckEventPayload args)
         {
-            Logger.Log(LogLevel.Debug, "ActionController:OnDidReceiveDeepLink", $"url: {args.payload.url}");
+            Logger.Log(LogLevel.Debug, "ActionController:OnDidReceiveDeepLink", $"url: {args?.payload?.url}");
+            if (!string.IsNullOrWhiteSpace(args?.payload?.url))
+            {
+                string url = args?.payload?.url;
+                url = url.Replace("/", "");
+                string[] parts = url.Split('=');
+                if (parts.Length == 2)
+                {
+                    parts[0] = $"X:{parts[0]}";
+                    if (IPCTools.rxInternal.IsMatch(parts[0]) && ipcManager.Contains(parts[0]))
+                    {
+                        Logger.Log(LogLevel.Debug, "ActionController:OnDidReceiveDeepLink", $"Setting internal Variable '{parts[0]}' with Value '{parts[1]}'");
+                        ipcManager[parts[0]].SetValue(parts[1]);
+                    }
+                }
+            }
         }
 
         protected void OnDidReceiveGlobalSettings(StreamDeckEventPayload args)
@@ -458,13 +473,14 @@ namespace PilotsDeck
 
             watchRefresh.Stop();
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
-            if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
+            //if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
+            if (tickCounter % waitTicks == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
             {
                 int changedScripts = ipcManager.ScriptManager.CheckFiles();
                 int removedAddresses = ipcManager.UnsubscribeUnusedAddresses();
                 int removedImages = imgManager.RemoveUnused();
                 if (SimConnector.IsRunning || imageUpdates > 0 || changedScripts > 0 || removedAddresses > 0 || removedImages > 0)
-                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks / 2} Ticks: {averageTime / (waitTicks / 2):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} d / {ipcManager.ScriptManager.CountGlobal} g / {ipcManager.ScriptManager.CountImages} i) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks} Ticks: {averageTime /waitTicks:F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} d / {ipcManager.ScriptManager.CountGlobal} g / {ipcManager.ScriptManager.CountImages} i) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
                 imageUpdates = 0;
             }

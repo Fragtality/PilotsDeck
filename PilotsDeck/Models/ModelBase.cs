@@ -11,6 +11,9 @@ namespace PilotsDeck
 
         public virtual bool SwitchOnCurrentValue { get; set; } = false;
 
+        public virtual bool UseImageMapping { get; set; } = false;
+        public virtual string ImageMap { get; set; } = "";
+
         public static bool Compare(string a, string b)
         {
             if (!string.IsNullOrEmpty(a) && !string.IsNullOrEmpty(b) && (a.Contains('<') || a.Contains('>')))

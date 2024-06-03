@@ -61,11 +61,18 @@ var settingsModel = {
 	SwitchOnStateGuard: "",
 	SwitchOffStateGuard: "",
 	ImageGuard: "Images/GuardCross.png",
+	GuardRect: "0; 0; 72; 72",
 	UseImageGuardMapping: false,
-	ImageGuardMap: ""
+	ImageGuardMap: "",
+	UseImageMapping: false,
+	ImageMap: ""
 };
 
 var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage", "ImageGuard"];
+var toggleOnControlsMap = ["ImageMap"];
+var toggleOffControlsMap = ["IndicationImage"];
+var toggleOnDivMap = [];
+var toggleOffDivMap = []
 
 // Show/Hide elements on Form (required function)
 function updateForm() {
@@ -81,10 +88,12 @@ function updateForm() {
 
 	//INDICATION
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationHideValue');
-	toggleConfigItem(settingsModel.HasIndication, 'IndicationImage');
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationUseColor');
 	toggleConfigItem(settingsModel.HasIndication && settingsModel.IndicationUseColor, 'IndicationColor');
 	toggleConfigItem(settingsModel.HasIndication, 'IndicationValue');
+	toggleConfigItem(settingsModel.HasIndication, 'UseImageMapping');
+	toggleConfigItem(settingsModel.HasIndication && !settingsModel.UseImageMapping, 'IndicationImage');
+	toggleConfigItem(settingsModel.HasIndication && settingsModel.UseImageMapping, 'ImageMap');
 
 	//FONT
 	toggleConfigItem(!settingsModel.FontInherit, 'FontName');

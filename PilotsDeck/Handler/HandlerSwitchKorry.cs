@@ -20,11 +20,20 @@ namespace PilotsDeck
 
         protected override bool InitializationTest()
         {
-            return !string.IsNullOrEmpty(KorrySettings.AddressTop) && !string.IsNullOrEmpty(BaseSettings.AddressAction) && (!string.IsNullOrEmpty(KorrySettings.AddressBot) || KorrySettings.UseOnlyTopAddr);
+            return !string.IsNullOrEmpty(KorrySettings.AddressTop) && KorrySettings.ShowTopImage && !string.IsNullOrEmpty(BaseSettings.AddressAction) && !string.IsNullOrEmpty(KorrySettings.AddressBot) && KorrySettings.ShowBotImage;
         }
 
         public override void Register(ImageManager imgManager, IPCManager ipcManager)
         {
+            if (  (KorrySettings.UseOnlyTopAddr && KorrySettings.ShowTopImage && KorrySettings.ShowBotImage)
+               || (KorrySettings.UseOnlyTopAddr && !KorrySettings.ShowTopImage && !KorrySettings.ShowBotImage))
+            {
+                KorrySettings.UseOnlyTopAddr = false;
+                KorrySettings.ShowBotImage = false;
+                KorrySettings.ShowTopImage = true;
+                UpdateSettingsModel = true;
+            }
+
             BaseSettings.SwitchOnCurrentValue = false;
             base.Register(imgManager, ipcManager);
 
@@ -32,6 +41,9 @@ namespace PilotsDeck
             imgRefs.Add(ID.ImgTop, KorrySettings.TopImage);
             imgManager.AddImage(KorrySettings.BotImage, DeckType);
             imgRefs.Add(ID.ImgBot, KorrySettings.BotImage);
+
+            if (CommonSettings.UseImageMapping)
+                mapRefs.Add(ID.MapBot, new(KorrySettings.ImageMapBot, DeckType, ValueManager));
 
             RenderDefaultImages();
 
@@ -46,6 +58,10 @@ namespace PilotsDeck
             imgRefs.Remove(ID.ImgTop);
             ImgManager.RemoveImage(KorrySettings.BotImage, DeckType);
             imgRefs.Remove(ID.ImgBot);
+
+            if (mapRefs.TryGetValue(ID.MapBot, out ImageMapping map))
+                map?.DeregisterMap();
+            imgRefs.Remove(ID.MapBot);
 
             ValueManager.RemoveValue(ID.Bottom); 
         }
@@ -64,6 +80,8 @@ namespace PilotsDeck
 
             UpdateImage(KorrySettings.TopImage, ID.ImgTop, out _);
             UpdateImage(KorrySettings.BotImage, ID.ImgBot, out _);
+
+            ImageMapping.RefUpdateHelper(mapRefs, ID.MapBot, CommonSettings.UseImageMapping, KorrySettings.ImageMapBot, DeckType, ValueManager);
         }
 
         public override void UpdateActionSettings()
@@ -75,13 +93,24 @@ namespace PilotsDeck
         {
             ImageRenderer render = new (ImgManager.GetImage(KorrySettings.DefaultImage, DeckType), DeckType);
 
-            if (!string.IsNullOrEmpty(KorrySettings.TopImage))
-                render.DrawImage(ImgManager.GetImage(KorrySettings.TopImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());
-            if (!string.IsNullOrEmpty(KorrySettings.BotImage) && !KorrySettings.UseOnlyTopAddr)
-                render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
+            if (KorrySettings.ShowTopImage)
+            {
+                if (!string.IsNullOrEmpty(KorrySettings.TopImage) && !CommonSettings.UseImageMapping)
+                    render.DrawImage(ImgManager.GetImage(KorrySettings.TopImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());
+                else if (CommonSettings.UseImageMapping)
+                    render.DrawImage(mapRefs[ID.Map].GetMappedImage("0", KorrySettings.TopImage).GetImageObject(), KorrySettings.GetRectangleTop());
+            }
+
+            if (KorrySettings.ShowBotImage)
+            {
+                if (!string.IsNullOrEmpty(KorrySettings.BotImage) && !CommonSettings.UseImageMapping)
+                    render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
+                else if (CommonSettings.UseImageMapping)
+                    render.DrawImage(mapRefs[ID.MapBot].GetMappedImage("0", KorrySettings.BotImage).GetImageObject(), KorrySettings.GetRectangleBot());
+            }
 
             if (SwitchSettings.IsGuarded)
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+                RenderGuard(render, "0", "0");
 
             DefaultImage64 = render.RenderImage64();
             render.Dispose();
@@ -97,18 +126,32 @@ namespace PilotsDeck
             string top = ValueManager[ID.Top];
             string bot = ValueManager[ID.Bottom];
 
-            if (((ModelBase.Compare(KorrySettings.TopState, top) && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(top))) && !string.IsNullOrEmpty(KorrySettings.TopImage))
-                render.DrawImage(ImgManager.GetImage(KorrySettings.TopImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());
+            if (KorrySettings.ShowTopImage)
+            {
+                if (!CommonSettings.UseImageMapping && !string.IsNullOrEmpty(KorrySettings.TopImage) && ((ModelBase.Compare(KorrySettings.TopState, top) && !KorrySettings.ShowTopNonZero) || (KorrySettings.ShowTopNonZero && ValueNonZero(top))))
+                    render.DrawImage(ImgManager.GetImage(KorrySettings.TopImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());
+                else if (CommonSettings.UseImageMapping)
+                {
+                    string topImage = mapRefs[ID.MapTop].GetMappedImageString(top);
+                    if (!string.IsNullOrEmpty(topImage))
+                        render.DrawImage(ImgManager.GetImage(topImage, DeckType).GetImageObject(), KorrySettings.GetRectangleTop());
+                }
+            }
 
-            string testValue = bot;
-            if (KorrySettings.UseOnlyTopAddr)
-                testValue = top;
+            if (KorrySettings.ShowBotImage)
+            {
+                if (!CommonSettings.UseImageMapping && !string.IsNullOrEmpty(KorrySettings.BotImage) && ((ModelBase.Compare(KorrySettings.BotState, bot) && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(bot))))
+                    render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
+                else if (CommonSettings.UseImageMapping)
+                {
+                    string BotImage = mapRefs[ID.MapBot].GetMappedImageString(bot);
+                    if (!string.IsNullOrEmpty(BotImage))
+                        render.DrawImage(ImgManager.GetImage(BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
+                }
+            }
 
-            if (((ModelBase.Compare(KorrySettings.BotState, testValue) && !KorrySettings.ShowBotNonZero) || (KorrySettings.ShowBotNonZero && ValueNonZero(testValue))) && !string.IsNullOrEmpty(KorrySettings.BotImage))
-                render.DrawImage(ImgManager.GetImage(KorrySettings.BotImage, DeckType).GetImageObject(), KorrySettings.GetRectangleBot());
-
-            if (SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+            if (SwitchSettings.IsGuarded)
+                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
 
             RenderImage64 = render.RenderImage64();
             NeedRedraw = true;

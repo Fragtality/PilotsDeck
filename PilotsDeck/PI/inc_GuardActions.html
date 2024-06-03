@@ -33,8 +33,23 @@
     <div class="sdpi-item-label" id="lblSwitchOffStateGuard">Off Value</div>
     <input id="SwitchOffStateGuard" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value or Comparison for Off State" />
 </div>
-<div class="sdpi-item" id="Config_ImageGuard">
-    <div class="sdpi-item-label" id="lblImageGuard">Guard Image</div>
-    <img id="Prev_ImageGuard" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ImageGuard" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+<div type="checkbox" class="sdpi-item" id="Config_UseImageGuardMapping">
+    <div class="sdpi-item-label" id="lblUseImageGuardMapping">Guard Image Mapping</div>
+    <input class="sdpi-item-value" id="UseImageGuardMapping" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+    <label for="UseImageGuardMapping"><span></span>Map Guard Images per Value</label>
+</div>
+<div class="sdpi-item" id="Config_ImageGuardMap">
+    <div class="sdpi-item-label" id="lblImageGuardMap">Guard Image Map</div>
+    <input id="ImageGuardMap" class="sdpi-item-value" type="text" pattern="^([0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+)*)|((Lua|lua|LUA){1}:[^:\s][a-zA-Z0-9\x2D\x5F]+(\.lua){0,1}(:[^:\s]+){0,1})$" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to Image Mappings" />
+</div>
+<div id="DefaultGuardMapping" class="inline">
+    <div class="sdpi-item" id="Config_ImageGuard">
+        <div class="sdpi-item-label" id="lblImageGuard">Guard Image</div>
+        <img id="Prev_ImageGuard" src="../Images/Wait.png" alt="Wait" height="32" /><select id="ImageGuard" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+    </div>
+</div>
+<div class="sdpi-item" id="Config_GuardRect">
+    <div class="sdpi-item-label" id="lblGuardRect">Draw Rectangle</div>
+    <input id="GuardRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
 </div>
 `;

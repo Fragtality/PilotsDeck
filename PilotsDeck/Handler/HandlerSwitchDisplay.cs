@@ -24,9 +24,6 @@
                 if (DisplaySettings.HasIndication)
                     imgManager.AddImage(DisplaySettings.IndicationImage, DeckType);
                 imgRefs.Add(ID.Indication, DisplaySettings.IndicationImage);
-
-                if (DisplaySettings.UseImageMapping)
-                    mapRefs.Add(ID.Map, new(DisplaySettings.ImageMap, DeckType, ValueManager));
             }
 
             ValueManager.AddValue(ID.Control, DisplaySettings.Address);
@@ -52,10 +49,6 @@
                 if (DisplaySettings.HasIndication)
                     ImgManager.RemoveImage(DisplaySettings.IndicationImage, DeckType);
                 imgRefs.Remove(ID.Indication);
-
-                if (mapRefs.TryGetValue(ID.Map, out ImageMapping map))
-                    map?.DeregisterMap();
-                imgRefs.Remove(ID.Map);
             }
 
             ValueManager.RemoveValue(ID.Control);
@@ -78,8 +71,6 @@
                 UpdateImage(DisplaySettings.OnImage, ID.On, out _);
                 UpdateImage(DisplaySettings.OffImage, ID.Off, out _);
                 UpdateImage(DisplaySettings.IndicationImage, ID.Indication, out _);
-
-                ImageMapping.RefUpdateHelper(mapRefs, ID.Map, DisplaySettings.UseImageMapping, DisplaySettings.ImageMap, DeckType, ValueManager);
             }
         }
 
@@ -105,7 +96,7 @@
             else
                 newImage = mapRefs[ID.Map].GetMappedImage("0", DisplaySettings.DefaultImage);
 
-            DefaultImage64 = RefreshGuard(newImage, "0");
+            DefaultImage64 = GetGuardedImage64(newImage, "0", "0");
         }
 
         public override void Refresh()
@@ -134,46 +125,15 @@
                         newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType);
                 }
                 else
-                    newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType); ;
+                    newImage = ImgManager.GetImage(Settings.ErrorImage, DeckType);
             }
             else
             {
                 newImage = mapRefs[ID.Map].GetMappedImage(currentValue, DisplaySettings.ErrorImage);
             }
 
-            RenderImage64 = RefreshGuard(newImage, currentValue);
+            RenderImage64 = GetGuardedImage64(newImage, SwitchSettings.GuardActiveValue, currentValue);
             NeedRedraw = true;
-        }
-
-        protected string RefreshGuard(ManagedImage image, string currentValue)
-        {
-            string result = image.GetImageBase64();
-
-            if (SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
-            {
-                if (SwitchSettings.UseImageGuardMapping)
-                {
-                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentValue);
-                    if (!string.IsNullOrEmpty(guardImage))
-                    {
-                        ImageRenderer render = new(image, DeckType);
-                        render.DrawImage(ImgManager.GetImage(guardImage, DeckType).GetImageObject());
-                        result = render.RenderImage64();
-                        render.Dispose();
-                    }
-                    else
-                        result = image.GetImageBase64();
-                }
-                else
-                {
-                    ImageRenderer render = new(image, DeckType);
-                    render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
-                    result = render.RenderImage64();
-                    render.Dispose();
-                }
-            }
-
-            return result;
         }
     }
 }

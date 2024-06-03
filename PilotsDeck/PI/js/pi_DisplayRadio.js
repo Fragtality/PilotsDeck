@@ -58,11 +58,18 @@ var settingsModel = {
 	SwitchOnStateGuard: "",
 	SwitchOffStateGuard: "",
 	ImageGuard: "Images/GuardCross.png",
+	GuardRect: "0; 0; 72; 72",
 	UseImageGuardMapping: false,
-	ImageGuardMap: ""
+	ImageGuardMap: "",
+	UseImageMapping: false,
+	ImageMap: ""
 };
 
 var imageSelectBoxes = ["DefaultImage", "ErrorImage", "IndicationImage", "ImageGuard"];
+var toggleOnControlsMap = [];
+var toggleOffControlsMap = [];
+var toggleOnDivMap = [];
+var toggleOffDivMap = []
 
 // Show/Hide elements on Form (required function)
 function updateForm() {

@@ -64,7 +64,7 @@ namespace PilotsDeck
         public virtual string ImageGuard { get; set; }
         public virtual bool UseImageGuardMapping { get; set; } = false;
         public virtual string ImageGuardMap { get; set; } = "";
-
+        public virtual string GuardRect { get; set; } = "0; 0; 72; 72";
         //Gauge
         public virtual string MinimumValue { get; set; } = "0";
         public string MaximumValue { get; set; } = "100";

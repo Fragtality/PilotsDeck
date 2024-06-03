@@ -109,7 +109,11 @@ namespace PilotsDeck
         protected override void RenderDefaultImages()
         {
             //Default
-            ImageRenderer render = new (ImgManager.GetImage(GaugeSettings.DefaultImage, DeckType), DeckType);
+            ImageRenderer render;
+            if (CommonSettings.UseImageMapping)
+                render = new(mapRefs[ID.Map].GetMappedImage("0", GaugeSettings.DefaultImage), DeckType);
+            else
+                render = new (ImgManager.GetImage(GaugeSettings.DefaultImage, DeckType), DeckType);
 
             if(GaugeSettings.DrawArc)
             {
@@ -123,7 +127,7 @@ namespace PilotsDeck
             }
 
             if (HasAction && SwitchSettings.IsGuarded)
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+                RenderGuard(render, "0", "0");
 
             if (IsEncoder)
                 DrawTitle(render);
@@ -131,12 +135,17 @@ namespace PilotsDeck
             DefaultImage64 = render.RenderImage64();
             render.Dispose();
 
-            //Error
-            render = new(ImgManager.GetImage(GaugeSettings.ErrorImage, DeckType), DeckType);
-            if (IsEncoder)
-                DrawTitle(render);
-            ErrorImage64 = render.RenderImage64();
-            render.Dispose();
+            if (!CommonSettings.UseImageMapping)
+            {
+                //Error
+                render = new(ImgManager.GetImage(GaugeSettings.ErrorImage, DeckType), DeckType);
+                if (IsEncoder)
+                    DrawTitle(render);
+                ErrorImage64 = render.RenderImage64();
+                render.Dispose();
+            }
+            else
+                ErrorImage64 = DefaultImage64;
 
             //Wait
             render = new(ImgManager.GetImage(GaugeSettings.WaitImage, DeckType), DeckType);
@@ -159,7 +168,11 @@ namespace PilotsDeck
                 value = ModelDisplay.ConvertFromBCD(value);
             value = GaugeSettings.ScaleValue(value);
 
-            ImageRenderer render = new (ImgManager.GetImage(GaugeSettings.DefaultImage, DeckType), DeckType);
+            ImageRenderer render;
+            if (CommonSettings.UseImageMapping)
+                render = new(mapRefs[ID.Map].GetMappedImage(value, GaugeSettings.DefaultImage), DeckType);
+            else
+                render = new(ImgManager.GetImage(GaugeSettings.DefaultImage, DeckType), DeckType);
 
             if (GaugeSettings.DrawArc)
             {
@@ -172,8 +185,8 @@ namespace PilotsDeck
                 DrawText(value, render);
             }
 
-            if (HasAction && SwitchSettings.IsGuarded && ModelBase.Compare(SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]))
-                render.DrawImage(ImgManager.GetImage(SwitchSettings.ImageGuard, DeckType).GetImageObject());
+            if (HasAction && SwitchSettings.IsGuarded)
+                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
 
             if (IsEncoder)
                 DrawTitle(render);

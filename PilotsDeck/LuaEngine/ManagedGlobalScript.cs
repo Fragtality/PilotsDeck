@@ -29,7 +29,6 @@ namespace PilotsDeck
             _env.SimRead = new Func<string, double>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
             _env.SimWrite = new Func<string, object, bool>(SimWrite);
-            //_env.SimWriteString = new Func<string, string, bool>(SimWriteString);
             _env.SimCommand = new Func<string, double, bool>(SimCommand);
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
