@@ -37,6 +37,7 @@ namespace PilotsDeck
         public static readonly Regex rxLuaFunc = new($"^(Lua|lua|LUA){{1}}:{validName}(\\.lua){{0,1}}:{validName}([(]{{1}}[^)]+[)]{{1}}){{0,1}}", RegexOptions.Compiled);
         public static readonly Regex rxLuaFile = new($"^(Lua|lua|LUA){{1}}:{validName}(\\.lua){{0,1}}", RegexOptions.Compiled);
         public static readonly Regex rxInternal = new($"^X:{validName}$", RegexOptions.Compiled);
+        public static readonly Regex rxCalcRead = new(@"^C:[^\s].+$", RegexOptions.Compiled);
         #endregion
 
         #region Test-Functions
@@ -53,6 +54,7 @@ namespace PilotsDeck
                     || (rxInternal.IsMatch(address) && type == ActionSwitchType.INTERNAL)
                     || (rxOffset.IsMatch(address) && type == ActionSwitchType.OFFSET)
                     || (rxLuaFunc.IsMatch(address) && type == ActionSwitchType.LUAFUNC)
+                    || (rxCalcRead.IsMatch(address) && type == ActionSwitchType.CALCULATOR)
                     || (rxLvar.IsMatch(address) && type == ActionSwitchType.LVAR))
                 return true;
             else
@@ -73,6 +75,8 @@ namespace PilotsDeck
                 return ActionSwitchType.AVAR;
             if (rxInternal.IsMatch(address))
                 return ActionSwitchType.INTERNAL;
+            if (rxCalcRead.IsMatch(address))
+                return ActionSwitchType.CALCULATOR;
             if (rxLvar.IsMatch(address))
                 return ActionSwitchType.LVAR;
 
@@ -103,7 +107,7 @@ namespace PilotsDeck
 
         public static bool IsActionReadable(ActionSwitchType type)
         {
-            return type == ActionSwitchType.LVAR || type == ActionSwitchType.OFFSET || type == ActionSwitchType.XPWREF || type == ActionSwitchType.INTERNAL
+            return type == ActionSwitchType.LVAR || type == ActionSwitchType.OFFSET || type == ActionSwitchType.XPWREF || type == ActionSwitchType.INTERNAL || type == ActionSwitchType.CALCULATOR
                 || type == ActionSwitchType.AVAR || type == ActionSwitchType.READVALUE || type == ActionSwitchType.BVAR || type == ActionSwitchType.LUAFUNC;
         }
 

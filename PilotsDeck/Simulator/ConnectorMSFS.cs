@@ -159,7 +159,8 @@ namespace PilotsDeck
             {
                 mobiConnect.SubscribeInputEvent(address);
             }
-            if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
+            if ( !IPCTools.rxOffset.IsMatch(address) &&
+                 (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || (IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars)) )
             {
                 mobiConnect.SubscribeAddress(address);
             }      
@@ -171,7 +172,8 @@ namespace PilotsDeck
             {
                 mobiConnect.UnsubscribeInputEvent(address);
             }
-            if (((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
+            if (!IPCTools.rxOffset.IsMatch(address) &&
+                 (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || (IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars)))
             {
                 mobiConnect.UnsubscribeAddress(address);
             }

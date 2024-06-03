@@ -67,7 +67,7 @@ function updateForm() {
 	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'TopImage');
 	toggleConfigItem(settingsModel.ShowTopImage && settingsModel.UseImageMapping, 'ImageMap');
 	setFormItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'Prev_TopImage');
-	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'ShowTopNonZero');
+	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping && !settingsModel.ShowTopNonZero, 'ShowTopNonZero');
 
 
 	//BOT
@@ -76,7 +76,7 @@ function updateForm() {
 	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'BotImage');
 	toggleConfigItem(settingsModel.ShowBotImage && settingsModel.UseImageMapping, 'ImageMapBot');
 	setFormItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'Prev_BotImage');
-	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'ShowBotNonZero');
+	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping && !settingsModel.ShowBotNonZero, 'ShowBotNonZero');
 
 	//CURRENT VALUE
 	settingsModel.SwitchOnCurrentValue = false;

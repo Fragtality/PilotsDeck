@@ -91,28 +91,33 @@ namespace PilotsDeck
                 parts[0] = "0x" + sub;
                 address = string.Join(":", parts);
             }
-            if (IPCTools.rxAvar.IsMatch(address))
+            else if (IPCTools.rxAvar.IsMatch(address))
             {
                 if (!address.StartsWith("(A:"))
                     address = address.Insert(1, "A:");
                 address = address.Replace(", ", ",");
             }
-            if (IPCTools.rxLuaFunc.IsMatch(address))
+            else if (IPCTools.rxLuaFunc.IsMatch(address))
             {
                 string[] parts = address.Split(':');
                 address = $"lua:{parts[1].ToLower().Replace(".lua","")}:{parts[2]}";
             }
-            if (IPCTools.rxLvar.IsMatch(address) && !mobi && address.StartsWith("L:"))
+            else if (IPCTools.rxCalcRead.IsMatch(address))
             {
-                address = address[2..];
+                
             }
-            if (IPCTools.rxLvar.IsMatch(address) && mobi)
+            else if (IPCTools.rxLvar.IsMatch(address) && mobi)
             {
                 if (!address.StartsWith("L:"))
                     address = address.Insert(0, "L:");
                 address = $"({address})";
 
             }
+            else if (IPCTools.rxLvar.IsMatch(address) && !mobi && address.StartsWith("L:"))
+            {
+                address = address[2..];
+            }
+            
 
             return address;
         }

@@ -171,6 +171,7 @@ function setPattern(field, type) {
 	var regBvar = `^(B:${regLVarName}){1}$`;
 	var regLuaFunc = `^(Lua|lua){1}:${regName}(\.lua){0,1}:${regName}([\(]{1}[^\)]+[\)]{1}){0,1}`;
 	var regInternal = `^X:${regName}$`;
+	var regCalcRead = `^C:[^\s].+$`
 	
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
@@ -182,8 +183,8 @@ function setPattern(field, type) {
 		document.getElementById(field).pattern = regLvar;
 	else if (type == 4)  //offset
 		document.getElementById(field).pattern = regOffset;
-	else if (type == 5) //offset | lvar | dref | avar | bvar | luafunc | internal
-		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvar}|${regInternal}|${regLuaFunc}|${regLvar}`;
+	else if (type == 5) //offset | lvar | dref | avar | bvar | luafunc | internal | calcRead
+		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvar}|${regInternal}|${regLuaFunc}|${regCalcRead}|${regLvar}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv

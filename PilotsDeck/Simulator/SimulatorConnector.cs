@@ -147,7 +147,7 @@ namespace PilotsDeck
                 value = new IPCValueLua(address);
             else if (IPCTools.rxInternal.IsMatch(address))
                 value = new IPCValueInternal(address);
-            else if (IPCTools.rxLvar.IsMatch(address) || IPCTools.rxAvar.IsMatch(address))
+            else if (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || IPCTools.rxLvar.IsMatch(address))
                 value = new IPCValueSimVar(address);
 
             return value;

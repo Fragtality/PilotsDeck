@@ -497,7 +497,7 @@ namespace PilotsDeck
         {
             try
             {
-                if (!IPCTools.rxAvar.IsMatch(address) && !IPCTools.rxLvar.IsMatch(address))
+                if (!IPCTools.rxAvar.IsMatch(address) && !IPCTools.rxLvar.IsMatch(address) && !IPCTools.rxCalcRead.IsMatch(address))
                 {
                     Logger.Log(LogLevel.Error, "MobiSimConnect:SubscribeAddress", $"The Address '{address}' is not valid for MobiFlight!");
                     return;
@@ -559,10 +559,9 @@ namespace PilotsDeck
             {
                 if (IPCTools.rxBvar.IsMatch(address))
                     SubscribeInputEvent(address);
-                if (!bVarOnly && ((IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars) || IPCTools.rxAvar.IsMatch(address)) && !IPCTools.rxOffset.IsMatch(address))
-                {
+                if (!bVarOnly && !IPCTools.rxOffset.IsMatch(address) &&
+                 (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || (IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars)))
                     SubscribeAddress(address);
-                }
             }
             Logger.Log(LogLevel.Information, "MobiSimConnect:SubscribeAllAddresses", $"Subscribed all IPCValues.");
         }
@@ -601,7 +600,10 @@ namespace PilotsDeck
             {
                 if (simVars.TryGetValue(index, out IPCValue value))
                 {
-                    RegisterVariable(index, value.Address);
+                    if (value.Address.StartsWith("C:"))
+                        RegisterVariable(index, value.Address[2..]);
+                    else
+                        RegisterVariable(index, value.Address);
                     registered++;
                 }
             }
@@ -617,7 +619,7 @@ namespace PilotsDeck
         {
             try
             {
-                if (!IPCTools.rxAvar.IsMatch(address) && !IPCTools.rxLvar.IsMatch(address))
+                if (!IPCTools.rxAvar.IsMatch(address) && !IPCTools.rxLvar.IsMatch(address) && !IPCTools.rxCalcRead.IsMatch(address))
                 {
                     Logger.Log(LogLevel.Error, "MobiSimConnect:UnsubscribeAddress", $"The Address '{address}' is not valid for MobiFlight!");
                     return;
