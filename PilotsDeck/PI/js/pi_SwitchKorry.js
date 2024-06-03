@@ -63,20 +63,20 @@ function updateForm() {
 
 	//TOP
 	toggleConfigItem(settingsModel.ShowTopImage, 'AddressTop');
-	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'TopState');
+	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping && !settingsModel.ShowTopNonZero, 'TopState');
 	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'TopImage');
 	toggleConfigItem(settingsModel.ShowTopImage && settingsModel.UseImageMapping, 'ImageMap');
 	setFormItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'Prev_TopImage');
-	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping && !settingsModel.ShowTopNonZero, 'ShowTopNonZero');
+	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'ShowTopNonZero');
 
 
 	//BOT
 	toggleConfigItem(settingsModel.ShowBotImage, 'AddressBot');
-	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'BotState');
+	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping && !settingsModel.ShowBotNonZero, 'BotState');
 	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'BotImage');
 	toggleConfigItem(settingsModel.ShowBotImage && settingsModel.UseImageMapping, 'ImageMapBot');
 	setFormItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'Prev_BotImage');
-	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping && !settingsModel.ShowBotNonZero, 'ShowBotNonZero');
+	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'ShowBotNonZero');
 
 	//CURRENT VALUE
 	settingsModel.SwitchOnCurrentValue = false;
