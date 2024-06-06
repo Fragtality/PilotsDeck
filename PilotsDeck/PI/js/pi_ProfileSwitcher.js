@@ -8,10 +8,11 @@ var settingsModel = {
 installationRequested = false;
 firstUpdate = true;
 
-// Fill Select Boxes for Actions here
-function fillSelectBoxes() {
-
-}
+var imageSelectBoxes = [];
+var toggleOnControlsMap = [];
+var toggleOffControlsMap = [];
+var toggleOnDivMap = [];
+var toggleOffDivMap = []
 
 // Show/Hide elements on Form (required function)
 function updateForm() {

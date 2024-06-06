@@ -534,8 +534,6 @@ function commonFormUpdate() {
 
 	//Image Mapping
 	toggleImageMapping(settingsModel.UseImageMapping);
-	//toggleConfigItem(settingsModel.UseImageMapping, 'ImageMap');
-	//setFormItem(!settingsModel.UseImageMapping, 'DefaultMapping');
 
 	toggleConfigItem(settingsModel.IsGuarded, 'UseImageGuardMapping');
 	toggleConfigItem(settingsModel.UseImageGuardMapping && settingsModel.IsGuarded, 'ImageGuardMap');

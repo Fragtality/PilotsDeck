@@ -490,7 +490,14 @@ namespace PilotsDeck
                 Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftString}', searching for matching Profiles ...");
                 SwitchProfiles();
             }
+            //if (!switched)
+            //{
+            //    _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, "1B777F7DDE49829A65D57025BCAC4A66", "Profiles/test/test");
+            //    //MD5 of "@(1)[4057/108/CL05K1A00574]"
+            //    switched = true;
+            //}
         }
+        protected bool switched = false;
 
         protected void RefreshActions(CancellationToken token)
         {

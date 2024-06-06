@@ -80,7 +80,7 @@ namespace PilotsDeck
             _env.SimVar = new Func<string, bool>(RegisterVariable);
             _env.SimRead = new Func<string, dynamic>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
-            _env.SimWrite = new Func<string, object, bool>(SimWrite);
+            _env.SimWrite = new Func<string, dynamic, bool>(SimWrite);
             _env.SimCommand = new Func<string, double, bool>(SimCommand);
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
@@ -102,11 +102,8 @@ namespace PilotsDeck
                 else
                     FileSize = fileSize;
 
-                if (log != null)
-                {
+                if (log != null && (LogUseDefault || Log == null))
                     Log = log;
-                    LogUseDefault = true;
-                }
 
                 LuaEngine = new();
                 CreateEnvironment();
@@ -144,15 +141,9 @@ namespace PilotsDeck
                 LuaEngine.Clear();
                 LuaEngine.Dispose();
                 LuaEngine = null;
-
-                Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script stopped by ScriptManager"));
-                if (Log != null && !LogUseDefault)
-                {
-                    Log.Dispose();
-                    Log = null;
-                }
             }
 
+            Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script stopped by ScriptManager"));
             Logger.Log(LogLevel.Debug, "ManagedScript:Stop", $"Script stopped: {FileName}");
         }
 
@@ -304,7 +295,7 @@ namespace PilotsDeck
             }
         }
 
-        protected virtual bool SimWrite(string name, object value)
+        protected virtual bool SimWrite(string name, dynamic value)
         {
             if (value == null)
                 return SimWrite(name, "");

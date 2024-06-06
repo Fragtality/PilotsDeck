@@ -75,9 +75,13 @@ namespace PilotsDeck
                 else
                     Logger.Log(LogLevel.Warning, "ManagedImageScript:GetImage", $"The current Value is null! ('{FileName}')");
             }
+            catch (LuaRuntimeException ex)
+            {
+                Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"{ex.GetType()}: {ex.Message}"));
+            }
             catch (Exception ex)
             {
-                Log?.Fatal(ScriptManager.FormatLogMessage(FileName, $"Exception '{ex.GetType()}' while getting mapped Image: {ex.Message}"));
+                Logger.Log(LogLevel.Critical, "ManagedImageScript:GetImage", $"Exception '{ex.GetType()}' while getting mapped Image in File '{FileName}': {ex.Message}");
             }
 
             return image;

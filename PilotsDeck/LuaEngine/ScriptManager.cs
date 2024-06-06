@@ -234,7 +234,7 @@ namespace PilotsDeck
             }
             catch (Exception ex)
             {
-                Log.Fatal(FormatLogMessage("RunGlobalScripts", $"Exception '{ex.GetType()}' while running global Scripts: {ex.Message}"));
+                Logger.Log(LogLevel.Critical, "ScriptManager:RunGlobalScripts", $"Exception '{ex.GetType()}' while running global Scripts: {ex.Message}");
             }
         }
 
@@ -401,9 +401,13 @@ namespace PilotsDeck
                     result = $"{luaResult[0]}";
                 }
             }
+            catch (LuaRuntimeException ex)
+            {
+                Log.Fatal(FormatLogMessage(script.FileName, $"{ex.GetType()}: {ex.Message}"));
+            }
             catch (Exception ex)
             {
-                Log.Fatal(FormatLogMessage("RunFunction", $"Exception '{ex.GetType()}' while running Function '{function}' in Script '{script.FileName}': {ex.Message}"));
+                Logger.Log(LogLevel.Critical, "ScriptManager:RunFunction", $"Exception '{ex.GetType()}' while running Function '{function}' in Script '{script.FileName}': {ex.Message}");
             }
 
 

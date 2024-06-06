@@ -10,6 +10,7 @@ namespace PilotsDeck
         public virtual int Interval { get; set; } = 1000;
         public virtual Dictionary<string, string> EventCallbacks { get; private set; } = [];
         public virtual string CallbackFunction { get; set; } = "OnTick";
+        public virtual bool CallbacksIntialized { get; protected set; } = false;
         public virtual DateTime NextRun { get; set; } = DateTime.Now;
         public virtual string Aircraft { get; set; } = "";
 
@@ -51,15 +52,21 @@ namespace PilotsDeck
 
         public virtual void RunGlobal(DateTime now)
         {
-            if (!IsRunning)
+            if (!IsRunning || !CallbacksIntialized)
                 return;
 
-            if (now >= NextRun)
+            try
             {
-                DoChunk($"{CallbackFunction}()");
-                SetNextRun();
+                if (now >= NextRun)
+                {
+                    DoChunk($"{CallbackFunction}()");
+                    SetNextRun();
+                }
             }
-
+            catch (LuaRuntimeException ex)
+            {
+                Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"{ex.GetType()}: {ex.Message}"));
+            }
         }
 
         public virtual void DoEvent(string evtName, object evtData)
@@ -75,6 +82,10 @@ namespace PilotsDeck
                 }
                 else
                     Logger.Log(LogLevel.Debug, "ManagedGlobalScript:DoEvent", $"Script '{FileName}' has no Callback for Event '{evtName}'");
+            }
+            catch (LuaRuntimeException ex)
+            {
+                Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"{ex.GetType()}: {ex.Message}"));
             }
             catch (Exception ex)
             {
@@ -126,6 +137,7 @@ namespace PilotsDeck
             CallbackFunction = function;
             NextRun = DateTime.Now.AddMilliseconds(Interval);
             Logger.Log(LogLevel.Debug, "ManagedGlobalScript:RunInterval", $"Interval set to '{Interval}' for Function '{CallbackFunction}' in Script '{FileName}'");
+            CallbacksIntialized = true;
         }
 
         protected virtual void RunAircraft(string aircraft = "")
@@ -149,6 +161,8 @@ namespace PilotsDeck
             }
             else
                 Logger.Log(LogLevel.Warning, "ManagedGlobalScript:RunEvent", $"Could not add Event '{evtName}' for Script '{FileName}'");
+
+            CallbacksIntialized = true;
         }
 
         protected override void UseLog(string name)
