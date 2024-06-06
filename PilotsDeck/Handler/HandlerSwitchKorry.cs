@@ -37,17 +37,24 @@ namespace PilotsDeck
             BaseSettings.SwitchOnCurrentValue = false;
             base.Register(imgManager, ipcManager);
 
-            imgManager.AddImage(KorrySettings.TopImage, DeckType);
-            imgRefs.Add(ID.ImgTop, KorrySettings.TopImage);
-            imgManager.AddImage(KorrySettings.BotImage, DeckType);
-            imgRefs.Add(ID.ImgBot, KorrySettings.BotImage);
+            if (KorrySettings.ShowTopImage)
+            {
+                imgManager.AddImage(KorrySettings.TopImage, DeckType);
+                imgRefs.Add(ID.ImgTop, KorrySettings.TopImage);
+            }
+            if (KorrySettings.ShowBotImage)
+            {
+                imgManager.AddImage(KorrySettings.BotImage, DeckType);
+                imgRefs.Add(ID.ImgBot, KorrySettings.BotImage);
+            }
 
             if (CommonSettings.UseImageMapping)
                 mapRefs.Add(ID.MapBot, new(KorrySettings.ImageMapBot, DeckType, ValueManager));
 
             RenderDefaultImages();
 
-            ValueManager.AddValue(ID.Bottom, KorrySettings.AddressBot); 
+            if (KorrySettings.ShowBotImage)
+                ValueManager.AddValue(ID.Bottom, KorrySettings.AddressBot); 
         }
 
         public override void Deregister()
@@ -110,7 +117,7 @@ namespace PilotsDeck
             }
 
             if (SwitchSettings.IsGuarded)
-                RenderGuard(render, "0", "0");
+                RenderGuard(render, "0", "0", "0");
 
             DefaultImage64 = render.RenderImage64();
             render.Dispose();
@@ -151,7 +158,7 @@ namespace PilotsDeck
             }
 
             if (SwitchSettings.IsGuarded)
-                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
+                RenderGuard(render, SwitchSettings.GuardActiveValue, top, ValueManager[ID.Guard]);
 
             RenderImage64 = render.RenderImage64();
             NeedRedraw = true;

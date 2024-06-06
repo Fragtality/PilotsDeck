@@ -7,8 +7,8 @@ namespace PilotsDeck
     public class IPCValueSimVar(string _address) : IPCValue(_address)
     {
         private bool isChanged = false;
-        private double DoubleValue = 0.0;
-        private double lastValue = 0.0;
+        private string _value = "0";
+        private string _lastValue = "0";
 
         public override bool IsChanged { get { return isChanged; } }
 
@@ -20,8 +20,8 @@ namespace PilotsDeck
                     && FSUIPCConnection.IsOpen)
                     SetValue(FSUIPCConnection.ReadLVar(Address));
 
-                isChanged = lastValue != DoubleValue;
-                lastValue = DoubleValue;
+                isChanged = _lastValue != _value;
+                _lastValue = _value;
             }
             catch (Exception ex)
             {
@@ -31,31 +31,31 @@ namespace PilotsDeck
 
         protected override string Read()
         {
-            string num = Convert.ToString((float)DoubleValue, CultureInfo.InvariantCulture.NumberFormat);
-
-            int idxE = num.IndexOf('E');
-            if (idxE < 0)
-                return num;
-            else
-                return string.Format("{0:F1}", DoubleValue);
+            return _value;
         }
 
         public override dynamic RawValue()
         {
-            return DoubleValue;
+            if (double.TryParse(_value, new RealInvariantFormat(_value), out double numValue))
+                return numValue;
+            else
+                return _value;
         }
 
         public override void SetValue(string strValue)
         {
-            if (double.TryParse(strValue, NumberStyles.Number, new RealInvariantFormat(strValue), out double value))
-            {
-                SetValue(value);
-            }
+            _value = strValue;
         }
 
         public override void SetValue(double value)
         {
-            DoubleValue = value;
+            string num = Convert.ToString(value, CultureInfo.InvariantCulture.NumberFormat);
+
+            int idxE = num.IndexOf('E');
+            if (idxE < 0)
+                _value = num;
+            else
+                _value = string.Format("{0:F1}", num);
         }
     }
 }

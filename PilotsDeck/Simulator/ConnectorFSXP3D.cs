@@ -41,8 +41,8 @@ namespace PilotsDeck
                 if (FSUIPCConnection.IsOpen)
                 {
                     Logger.Log(LogLevel.Information, "ConnectorFSXP3D:Connect", $"FSUIPC Connected.");
-                    foreach (var addr in ipcManager.AddressList)
-                        ipcManager[addr].Connect();
+                    foreach (var value in ipcManager.ValueList)
+                        value.Connect();
                 }
             }
             catch (Exception ex)
@@ -105,7 +105,7 @@ namespace PilotsDeck
             return resultProcess;
         }
 
-        public override void SubscribeAddress(string address)
+        public override void SubscribeAddress(string address, IPCValue value)
         {
             
         }
@@ -117,9 +117,9 @@ namespace PilotsDeck
 
         public override void SubscribeAllAddresses()
         {
-            foreach (var address in ipcManager.AddressList)
+            foreach (var value in ipcManager.ValueList)
             {
-                ipcManager[address].Connect();
+                value.Connect();
             }
             Logger.Log(LogLevel.Debug, "ConnectorFSXP3D:SubscribeAllAddresses", $"Subscribed all IPCValues. (Count: {ipcManager.AddressList.Count})");
         }

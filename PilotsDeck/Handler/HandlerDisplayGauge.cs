@@ -127,7 +127,7 @@ namespace PilotsDeck
             }
 
             if (HasAction && SwitchSettings.IsGuarded)
-                RenderGuard(render, "0", "0");
+                RenderGuard(render, "0", "0", "0");
 
             if (IsEncoder)
                 DrawTitle(render);
@@ -186,7 +186,7 @@ namespace PilotsDeck
             }
 
             if (HasAction && SwitchSettings.IsGuarded)
-                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
+                RenderGuard(render, SwitchSettings.GuardActiveValue, value, ValueManager[ID.Guard]);
 
             if (IsEncoder)
                 DrawTitle(render);

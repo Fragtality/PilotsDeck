@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace PilotsDeck
 {
-    public class ManagedImageScript(string file) : ManagedScript(file)
+    public class ManagedImageScript(string file, Serilog.Core.Logger log) : ManagedScript(file, log)
     {
         public virtual Dictionary<int, string> ImagedIDs { get; protected set; } = [];
 
@@ -15,7 +15,7 @@ namespace PilotsDeck
             LuaEnv = LuaEngine.CreateEnvironment<LuaGlobal>();
             dynamic _env = LuaEnv;
             _env.SimVar = new Func<string, bool>(RegisterVariable);
-            _env.SimRead = new Func<string, double>(SimRead);
+            _env.SimRead = new Func<string, dynamic>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
             _env.Log = new Action<string>(WriteLog);
             _env.MapImage = new Func<string, int, bool>(MapImage);
@@ -77,7 +77,7 @@ namespace PilotsDeck
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "ManagedImageScript:GetImage", $"Exception '{ex.GetType()}' getting mapped Image in File '{FileName}': {ex.Message}");
+                Log?.Fatal(ScriptManager.FormatLogMessage(FileName, $"Exception '{ex.GetType()}' while getting mapped Image: {ex.Message}"));
             }
 
             return image;

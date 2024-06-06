@@ -1,11 +1,10 @@
 ﻿using Neo.IronLua;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace PilotsDeck
 {
-    public class ManagedGlobalScript(string file) : ManagedScript(file)
+    public class ManagedGlobalScript(string file, Serilog.Core.Logger log) : ManagedScript(file, log)
     {
         public virtual bool IsActiveGlobal { get; set; } = false;
         public virtual int Interval { get; set; } = 1000;
@@ -14,19 +13,12 @@ namespace PilotsDeck
         public virtual DateTime NextRun { get; set; } = DateTime.Now;
         public virtual string Aircraft { get; set; } = "";
 
-        protected override void Init(string file)
-        {
-            FileName = file;
-            IPCManager = Plugin.ActionController.ipcManager;
-            FileSize = new FileInfo(GetScriptFolder(FileName)).Length;
-        }
-
         protected override void CreateEnvironment()
         {
             LuaEnv = LuaEngine.CreateEnvironment<LuaGlobal>();
             dynamic _env = LuaEnv;
             _env.SimVar = new Func<string, bool>(RegisterVariable);
-            _env.SimRead = new Func<string, double>(SimRead);
+            _env.SimRead = new Func<string, dynamic>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
             _env.SimWrite = new Func<string, object, bool>(SimWrite);
             _env.SimCommand = new Func<string, double, bool>(SimCommand);
@@ -41,12 +33,12 @@ namespace PilotsDeck
             _env.Log = new Action<string>(WriteLog);
         }
 
-        public override void Start(long fileSize = -1)
+        public override void Start(long fileSize = -1, Serilog.Core.Logger log = null)
         {
             if (LuaEngine != null)
                 return;
 
-            base.Start(fileSize);
+            base.Start(fileSize, log);
             
             SetNextRun();
         }
@@ -55,12 +47,6 @@ namespace PilotsDeck
         {
             if (IsRunning)
                 NextRun = DateTime.Now.AddMilliseconds(Interval);
-        }
-
-        public override void Stop()
-        {
-            IsActiveGlobal = false;
-            base.Stop();
         }
 
         public virtual void RunGlobal(DateTime now)
@@ -107,12 +93,12 @@ namespace PilotsDeck
             EventCallbacks.Clear();
         }
 
-        public override void RegisterAllVariables()
+        public override void CheckVariables()
         {
-            if (!IsRunning || VariablesRegistered)
-                return;
+            base.CheckVariables();
 
-            base.RegisterAllVariables();
+            if (!IsRunning)
+                return;
 
             foreach (var callback in EventCallbacks)
             {
@@ -121,6 +107,17 @@ namespace PilotsDeck
         }
 
         #region ScriptFunctions
+        protected override bool RegisterVariable(string name)
+        {
+            if (IsActiveGlobal)
+                return base.RegisterVariable(name);
+            else
+            {
+                Logger.Log(LogLevel.Verbose, "ManagedGlobalScript:RegisterVariable", $"SimVar Request from Script File '{FileName}' while not active (Variable: '{name}')");
+                return false;
+            }
+        }
+
         protected virtual void RunInterval(int interval, string function = "OnTick")
         {
             Interval = interval;
@@ -141,6 +138,9 @@ namespace PilotsDeck
 
         protected virtual void RunEvent(string evtName, string callback)
         {
+            if (!IsActiveGlobal)
+                return;
+
             if (!string.IsNullOrWhiteSpace(callback) && !string.IsNullOrWhiteSpace(evtName) && !EventCallbacks.ContainsKey(evtName))
             {
                 EventCallbacks.Add(evtName, callback);
@@ -149,6 +149,14 @@ namespace PilotsDeck
             }
             else
                 Logger.Log(LogLevel.Warning, "ManagedGlobalScript:RunEvent", $"Could not add Event '{evtName}' for Script '{FileName}'");
+        }
+
+        protected override void UseLog(string name)
+        {
+            if (!IsActiveGlobal)
+                return;
+
+            base.UseLog(name);
         }
         #endregion
     }

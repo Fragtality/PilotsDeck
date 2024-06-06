@@ -8,14 +8,16 @@ namespace PilotsDeck
     {
         MOBIFLIGHT_LVARS,
         MOBIFLIGHT_CMD,
-        MOBIFLIGHT_RESPONSE
+        MOBIFLIGHT_RESPONSE,
+        MOBIFLIGHT_STRINGVARS
     }
 
     public enum PILOTSDECK_CLIENT_DATA_ID
     {
         MOBIFLIGHT_LVARS = 1984,
         MOBIFLIGHT_CMD,
-        MOBIFLIGHT_RESPONSE
+        MOBIFLIGHT_RESPONSE,
+        MOBIFLIGHT_STRINGVARS
     }
 
     public enum SIMCONNECT_REQUEST_ID
@@ -27,7 +29,8 @@ namespace PilotsDeck
 
     public enum SIMCONNECT_DEFINE_ID
     {
-        Dummy = 0
+        CLIENT_MOBI = 0,
+        CLIENT_PILOTSDECK = 1
     }
 
     public enum SIMCONNECT_NOTIFICATION_GROUP_ID
@@ -50,6 +53,12 @@ namespace PilotsDeck
     public struct ClientDataValue
     {
         public float data;
+    }
+
+    public struct ClientDataStringValue
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+        public String data;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -19,6 +19,7 @@ namespace PilotsDeck
         protected Task receiverTask;
 
         protected CancellationTokenSource tokenSource = null;
+        protected CancellationToken Token;
 
         protected Dictionary<string, int> AddresstoIndex = [];
         protected Dictionary<int, IPCValue> dataRefs = [];
@@ -34,7 +35,7 @@ namespace PilotsDeck
         public override bool IsConnected { get { return senderSocket != null && senderSocket.Client.Connected && !socketError; } protected set { } }
         public override bool IsReady { get { return IsConnected && !receiverNotReady && !socketError && simPausedReceived >= (AppSettings.waitTicks / waitDivisor); } }
 
-        public override bool IsRunning { get { return GetProcessRunning("X-Plane"); } }
+        public override bool IsRunning { get { return GetProcessRunning("X-Plane") && !Token.IsCancellationRequested; } }
         public override bool IsPaused { get; protected set; }
 
         protected static readonly string AircraftRefString = "sim/aircraft/view/acf_relative_path:s32";
@@ -115,10 +116,11 @@ namespace PilotsDeck
                 receiverSocket = new UdpClient(epLocal);
 
                 tokenSource = new CancellationTokenSource();
+                Token = tokenSource.Token;
 
                 receiverTask = Task.Factory.StartNew(async () =>
                 {
-                    while (tokenSource != null && !tokenSource.Token.IsCancellationRequested && !CloseRequested)
+                    while (tokenSource != null && !Token.IsCancellationRequested && !CloseRequested)
                     {
                         try
                         {
@@ -132,13 +134,14 @@ namespace PilotsDeck
                                 Logger.Log(LogLevel.Critical, "ConnectorXP:Connect", $"Exception while receiving Data from Socket! (Exception: {ex.GetType()}) (Message: {ex.Message})");
 
                             socketError = true;
+                            receiverSocket.Close();
                             break;
                         }
                         socketError = false;
                     }
-                    if (CloseRequested)
+                    if (CloseRequested || Token.IsCancellationRequested)
                         receiverSocket.Close();
-                }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                }, Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
                 result = XPDatagram.SendSubscribe(senderSocket, "sim/time/paused", 0);
             }
@@ -159,7 +162,7 @@ namespace PilotsDeck
                     receiverSocket.Dispose();
                     receiverSocket = null;
                 }
-                if (receiverTask != null && tokenSource != null)
+                if (receiverTask != null || tokenSource != null)
                     tokenSource.Cancel();
             }
 
@@ -281,15 +284,15 @@ namespace PilotsDeck
 
         public override void SubscribeAllAddresses()
         {
-            foreach (var address in ipcManager.AddressList)
+            foreach (var value in ipcManager.ValueList)
             { 
-                if (!AddresstoIndex.ContainsKey(address))
-                    SubscribeAddress(address);
+                if (!AddresstoIndex.ContainsKey(value.Address))
+                    SubscribeAddress(value.Address, value);
             }
             Logger.Log(LogLevel.Information, "ConnectorXP:SubscribeAllAddresses", $"Subscribed all IPCValues.");
         }
 
-        public override void SubscribeAddress(string address)
+        public override void SubscribeAddress(string address, IPCValue value)
         {
             try
             {

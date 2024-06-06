@@ -39,7 +39,7 @@ namespace PilotsDeck
                         Logger.Log(LogLevel.Error, "ValueManager:AddValue", $"The IPCValue for ID '{ID.str(id)}' is a NULL-Reference! {Logger.ActionInfo(address, type)}");
                 }
                 ManagedValues.Add(id, value);
-                Logger.Log(LogLevel.Debug, "ValueManager:AddValue", $"The Value ID '{ID.str(id)}' is now managed. {Logger.ActionInfo(address, type)}");
+                Logger.Log(LogLevel.Verbose, "ValueManager:AddValue", $"The Value ID '{ID.str(id)}' is now managed. {Logger.ActionInfo(address, type)}");
             }
             else
             {

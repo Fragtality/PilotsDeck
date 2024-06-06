@@ -336,13 +336,13 @@ namespace PilotsDeck
             }
         }
 
-        protected virtual void RenderGuard(ImageRenderer render, string compareValue, string currentValue)
+        protected virtual void RenderGuard(ImageRenderer render, string compareValue, string currentControlValue, string currentGuardValue)
         {
-            if (SwitchSettings.IsGuarded && ModelBase.Compare(compareValue, currentValue))
+            if (SwitchSettings.IsGuarded && ModelBase.Compare(compareValue, currentGuardValue))
             {
                 if (SwitchSettings.UseImageGuardMapping)
                 {
-                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentValue);
+                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentControlValue);
                     if (!string.IsNullOrEmpty(guardImage))
                         render.DrawImage(ImgManager.GetImage(guardImage, DeckType).GetImageObject(), SwitchSettings.GetRectangleGuard());
                 }
@@ -351,15 +351,15 @@ namespace PilotsDeck
             }
         }
 
-        protected string GetGuardedImage64(ManagedImage image, string compareValue, string currentValue)
+        protected string GetGuardedImage64(ManagedImage image, string compareValue, string currentControlValue, string currentGuardValue)
         {
             string result = image.GetImageBase64();
 
-            if (SwitchSettings.IsGuarded && ModelBase.Compare(compareValue, currentValue))
+            if (SwitchSettings.IsGuarded && ModelBase.Compare(compareValue, currentGuardValue))
             {
                 if (SwitchSettings.UseImageGuardMapping)
                 {
-                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentValue);
+                    string guardImage = mapRefs[ID.MapGuard].GetMappedImageString(currentControlValue);
                     if (!string.IsNullOrEmpty(guardImage))
                     {
                         ImageRenderer render = new(image, DeckType);

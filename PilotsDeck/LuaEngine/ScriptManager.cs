@@ -15,6 +15,8 @@ namespace PilotsDeck
         private Dictionary<string, ManagedScript> ManagedScripts { get; set; } = [];
         private Dictionary<string, ManagedGlobalScript> ManagedGlobalScripts { get; set; } = [];
         private Dictionary<string, ManagedImageScript> ManagedImageScripts { get; set; } = [];
+        private static string LogFile = "lua.log";
+        protected Serilog.Core.Logger Log { get; set; } = ManagedScript.CreaterLogger(ref LogFile, "ScriptManager");
         public int Count {  get { return ManagedScripts.Count; } }
         public int CountGlobal { get { return ManagedGlobalScripts.Where(kv => kv.Value.IsActiveGlobal).Count(); } }
         public int CountImages { get { return ManagedImageScripts.Count; } }
@@ -51,22 +53,36 @@ namespace PilotsDeck
             return address.Contains('(');
         }
 
-        public void RegisterAllVariables()
+        public static string FormatLogMessage(string context, string message)
+        {
+            return string.Format("[ {0,-20} ] {1}", (context.Length <= 20 ? context : context[0..20]), message.Replace("\n", "").Replace("\r", "").Replace("\t", ""));
+        }
+
+        protected void CheckVariables()
         {
             try
             {
                 foreach (var script in ManagedScripts)
-                    script.Value.RegisterAllVariables();
+                {
+                    Logger.Log(LogLevel.Debug, "ScriptManager:CheckVariables", $"Checking Variables and Events for Script '{script.Value.FileName}' (Count: {script.Value.Variables.Count} | Subscribed: {script.Value.Variables.Where(kv => kv.Value).Count()})");
+                    script.Value.CheckVariables();
+                }
 
                 foreach (var script in ManagedGlobalScripts)
-                    script.Value.RegisterAllVariables();
+                {
+                    Logger.Log(LogLevel.Debug, "ScriptManager:CheckVariables", $"Checking Variables and Events for Script '{script.Value.FileName}' (Count: {script.Value.Variables.Count} | Subscribed: {script.Value.Variables.Where(kv => kv.Value).Count()})");
+                    script.Value.CheckVariables();
+                }
 
                 foreach (var script in ManagedImageScripts)
-                    script.Value.RegisterAllVariables();
+                {
+                    Logger.Log(LogLevel.Debug, "ScriptManager:CheckVariables", $"Checking Variables and Events for Script '{script.Value.FileName}' (Count: {script.Value.Variables.Count} | Subscribed: {script.Value.Variables.Where(kv => kv.Value).Count()})");
+                    script.Value.CheckVariables();
+                }
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "ScriptManager:RegisterAllVariables", $"Exception '{ex.GetType()}' while registering Variables & Events: {ex.Message}");
+                Logger.Log(LogLevel.Critical, "ScriptManager:CheckVariables", $"Exception '{ex.GetType()}' while checking Variables & Events: {ex.Message}");
             }
         }
 
@@ -75,39 +91,52 @@ namespace PilotsDeck
             return IPCManager.SimConnector.AicraftPathString;
         }
 
+        protected bool ToggleGlobalScript(ManagedGlobalScript script, bool reload = false)
+        {
+            bool nameMatched = !string.IsNullOrWhiteSpace(GetAircraft()) && GetAircraft().Contains(script.Aircraft);
+            bool result = false;
+
+            if (nameMatched)
+            {
+                if (!script.IsActiveGlobal || reload)
+                {
+                    Logger.Log(LogLevel.Debug, "ScriptManager:ToggleGlobalScript", $"MATCH for Aircraft '{script.Aircraft}' in Script '{script.FileName}' (reload: {reload}) for current AicraftString '{GetAircraft()}'");
+
+                    if (script.IsRunning)
+                        script.Stop();
+
+                    script.IsActiveGlobal = true;
+                    script.Start();
+                    result = true;
+                }
+                else
+                    Logger.Log(LogLevel.Debug, "ScriptManager:ToggleGlobalScript", $"NO CHANGE for Script '{script.FileName}' for current AicraftString '{GetAircraft()}'");
+            }
+            else if (script.IsActiveGlobal || script.IsRunning)
+            {
+                Logger.Log(LogLevel.Debug, "ScriptManager:ToggleGlobalScript", $"NO MATCH for Aircraft '{script.Aircraft}' in Script '{script.FileName}' for current AicraftString '{GetAircraft()}'");
+
+                if (script.IsRunning)
+                    script.Stop();
+
+                script.IsActiveGlobal = false;
+                result = true;
+            }
+            else
+                Logger.Log(LogLevel.Debug, "ScriptManager:ToggleGlobalScript", $"NO CHANGE for Script '{script.FileName}' for current AicraftString '{GetAircraft()}'");
+
+            return result;
+        }
+
         public void StartGlobalScripts()
         {
             try
             {
-                var globalDir = new DirectoryInfo(GlobalScriptFolder);
-                foreach (var file in globalDir.GetFiles())
-                {
-                    string fileName = GetRealFileName(file.Name);
-
-                    if (!ManagedGlobalScripts.ContainsKey(fileName))
-                    {
-                        Logger.Log(LogLevel.Information, "ScriptManager:StartGlobalScripts", $"Adding Global Script File '{fileName}'");
-                        var script = new ManagedGlobalScript(fileName);
-                        ManagedGlobalScripts.Add(fileName, script);
-                    }
-                }
-
                 Logger.Log(LogLevel.Information, "ScriptManager:StartGlobalScripts", $"Starting Global Scripts");
-                GlobalScriptsStopped = false;
                 foreach (var script in ManagedGlobalScripts)
-                {
-                    if (GetAircraft().Contains(script.Value.Aircraft))
-                    {
-                        Logger.Log(LogLevel.Debug, "ScriptManager:StartGlobalScripts", $"Script Aircraft '{script.Value.Aircraft}' matched current AicraftString '{GetAircraft()}'");
-                        script.Value.IsActiveGlobal = true;
-                        script.Value.Start();
-                    }
-                    else
-                    {
-                        Logger.Log(LogLevel.Debug, "ScriptManager:StartGlobalScripts", $"Script Aircraft '{script.Value.Aircraft}' NOT matched current AicraftString '{GetAircraft()}'");
-                        script.Value.Stop();
-                    }
-                }
+                    ToggleGlobalScript(script.Value);
+
+                GlobalScriptsStopped = false;
             }
             catch (Exception ex)
             {
@@ -124,6 +153,7 @@ namespace PilotsDeck
                 foreach (var script in ManagedGlobalScripts)
                 {
                     script.Value.Stop();
+                    script.Value.IsActiveGlobal = false;
                 }
 
             }
@@ -135,6 +165,57 @@ namespace PilotsDeck
             {
                 GlobalScriptsStopped = true;
             }
+        }
+
+        public int CheckFiles()
+        {
+            int result = 0;
+            try
+            {
+                foreach (var script in ManagedScripts)
+                {
+                    if (script.Value.FileHasChanged())
+                    {
+                        Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Script File '{script.Key}' has changed in Size - Reloading ...");
+                        
+                        script.Value.Reload();
+                        result++;
+                    }
+                }
+
+                var globalDir = new DirectoryInfo(GlobalScriptFolder);
+                foreach (var file in globalDir.GetFiles())
+                {
+                    string fileName = GetRealFileName(file.Name);
+
+                    if (!ManagedGlobalScripts.TryGetValue(fileName, out ManagedGlobalScript script))
+                    {
+                        Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Adding Global Script File '{fileName}'");
+                        
+                        script = new ManagedGlobalScript(fileName, Log);
+                        script.Stop();
+                        ManagedGlobalScripts.Add(fileName, script);
+                        if (ToggleGlobalScript(script))
+                            result++;
+                    }
+                    else if (script.FileHasChanged())
+                    {
+                        Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Script File '{script.FileName}' has changed in Size - Reloading ...");
+                        
+                        if (ToggleGlobalScript(script, true))
+                            result++;
+                    }
+                }
+
+                if (result > 0)
+                    CheckVariables();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "ScriptManager:CheckFiles", $"Exception '{ex.GetType()}' while updating Scripts: {ex.Message}");
+            }
+
+            return result;
         }
 
         public void RunGlobalScripts()
@@ -153,7 +234,7 @@ namespace PilotsDeck
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "ScriptManager:RunGlobalScripts", $"Exception '{ex.GetType()}' while running global Scripts: {ex.Message}");
+                Log.Fatal(FormatLogMessage("RunGlobalScripts", $"Exception '{ex.GetType()}' while running global Scripts: {ex.Message}"));
             }
         }
 
@@ -174,7 +255,7 @@ namespace PilotsDeck
 
                 if (!ManagedScripts.TryGetValue(file, out value))
                 {
-                    value = new(file);
+                    value = new(file, Log);
                     ManagedScripts.Add(file, value);
                     Logger.Log(LogLevel.Information, "ScriptManager:RegisterScript", $"Script File '{file}' added to managed Scripts");
                 }
@@ -203,7 +284,7 @@ namespace PilotsDeck
 
                 if (!ManagedImageScripts.TryGetValue(file, out value))
                 {
-                    value = new(file);
+                    value = new(file, Log);
                     ManagedImageScripts.Add(file, value);
                     Logger.Log(LogLevel.Information, "ScriptManager:RegisterImageScript", $"Script File '{file}' added to managed Scripts");
                 }
@@ -322,62 +403,9 @@ namespace PilotsDeck
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "ScriptManager:RunFunction", $"Exception '{ex.GetType()}' while running Function '{function}' in Script '{script.FileName}': {ex.Message}");
+                Log.Fatal(FormatLogMessage("RunFunction", $"Exception '{ex.GetType()}' while running Function '{function}' in Script '{script.FileName}': {ex.Message}"));
             }
 
-
-            return result;
-        }
-
-        public int CheckFiles()
-        {
-            int result = 0;
-            try
-            {
-                foreach (var script in ManagedScripts)
-                {
-                    if (script.Value.FileHasChanged())
-                    {
-                        Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Script File '{script.Key}' has changed in Size - Reloading ...");
-                        script.Value.Reload();
-                        result++;
-                    }
-                }
-
-                var globalDir = new DirectoryInfo(GlobalScriptFolder);
-                foreach (var file in globalDir.GetFiles())
-                {
-                    string fileName = GetRealFileName(file.Name);
-
-                    if (ManagedGlobalScripts.TryGetValue(fileName, out ManagedGlobalScript script))
-                    {
-                        bool wasActiveGlobal = script.IsActiveGlobal;
-                        if (script.FileHasChanged())
-                        {
-                            Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Global Script File '{script.FileName}' has changed in Size - Reloading ...");
-                            script.Reload();
-                            result++;
-                            if (wasActiveGlobal && !GlobalScriptsStopped)
-                                script.IsActiveGlobal = true;
-                        }
-                    }
-                    else
-                    {
-                        Logger.Log(LogLevel.Information, "ScriptManager:CheckFiles", $"Adding Global Script File '{fileName}'");
-                        script = new ManagedGlobalScript(fileName);
-                        ManagedGlobalScripts.Add(fileName, script);
-                        if (GetAircraft().Contains(script.Aircraft) && !GlobalScriptsStopped)
-                        {
-                            Logger.Log(LogLevel.Debug, "ScriptManager:CheckFiles", $"Script Aircraft '{script.Aircraft}' matched current AicraftString '{GetAircraft()}'");
-                            script.IsActiveGlobal = true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Critical, "ScriptManager:CheckFiles", $"Exception '{ex.GetType()}' while updating Scripts: {ex.Message}");
-            }
 
             return result;
         }

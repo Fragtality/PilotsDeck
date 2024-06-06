@@ -110,7 +110,7 @@ namespace PilotsDeck
             if (nums.Length != 2 || !int.TryParse(nums[0], out int start) || !int.TryParse(nums[1], out int len))
                 return value;
 
-            if (start >= 0 && len >= 1 && start < value.Length && start + len < value.Length)
+            if (start >= 0 && len >= 1 && start < value.Length && start + len <= value.Length)
                 return value.Substring(start, len);
             else
                 return value;

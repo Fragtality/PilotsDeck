@@ -42,7 +42,7 @@
             return false;
         }
 
-        public override void SubscribeAddress(string address)
+        public override void SubscribeAddress(string address, IPCValue value)
         {
 
         }

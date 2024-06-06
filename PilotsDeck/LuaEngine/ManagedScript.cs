@@ -16,16 +16,16 @@ namespace PilotsDeck
         public virtual LuaChunk LuaChunk { get; set; }
         public virtual string FileName { get; set; }
         public virtual long FileSize { get; set; }
-        public virtual List<string> Variables { get; set; } = [];
-        public virtual bool VariablesRegistered { get; private set; } = false;
+        public virtual Dictionary<string, bool> Variables { get; set; } = [];
         public virtual uint Registrations { get; set; } = 1;
-        public virtual string LogFile { get; set; } = "";
-        protected virtual Serilog.Core.Logger Log { get; set; } = null;
+        public virtual bool LogUseDefault { get; set; } = true;
+        protected virtual Serilog.Core.Logger Log { get; set; }
         protected virtual IPCManager IPCManager { get; set; }
         protected virtual SimulatorConnector SimConnector { get { return IPCManager.SimConnector; } }
 
-        public ManagedScript(string file)
+        public ManagedScript(string file, Serilog.Core.Logger log)
         {
+            Log = log;
             Init(file);
         }
 
@@ -78,7 +78,7 @@ namespace PilotsDeck
             LuaEnv = LuaEngine.CreateEnvironment<LuaGlobal>();
             dynamic _env = LuaEnv;
             _env.SimVar = new Func<string, bool>(RegisterVariable);
-            _env.SimRead = new Func<string, double>(SimRead);
+            _env.SimRead = new Func<string, dynamic>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
             _env.SimWrite = new Func<string, object, bool>(SimWrite);
             _env.SimCommand = new Func<string, double, bool>(SimCommand);
@@ -90,7 +90,7 @@ namespace PilotsDeck
             _env.Log = new Action<string>(WriteLog);
         }
 
-        public virtual void Start(long fileSize = -1)
+        public virtual void Start(long fileSize = -1, Serilog.Core.Logger log = null)
         {
             try
             {
@@ -102,16 +102,23 @@ namespace PilotsDeck
                 else
                     FileSize = fileSize;
 
+                if (log != null)
+                {
+                    Log = log;
+                    LogUseDefault = true;
+                }
+
                 LuaEngine = new();
                 CreateEnvironment();
 
                 string code = File.ReadAllText(GetScriptFolder(FileName));
-                LuaChunk = LuaEngine.CompileChunk(code, FileName, new LuaCompileOptions());
+                LuaChunk = LuaEngine.CompileChunk(code, FileName, new LuaCompileOptions() { ClrEnabled = false });
                 DoChunk();
-                VariablesRegistered = true;
 
-                Log?.Information("Script started by ScriptManager");
+                Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script started by ScriptManager"));
                 Logger.Log(LogLevel.Debug, "ManagedScript:Start", $"Script started: {FileName}");
+
+                CheckVariables();
             }
             catch (Exception ex)
             {
@@ -123,11 +130,12 @@ namespace PilotsDeck
         {
             DeregisterAllVariables();
 
+            LuaChunk?.Lua?.Clear();
             LuaChunk = null;
 
             if (LuaEnv != null)
             {
-                LuaEnv.Clear();
+                LuaEnv?.Clear();
                 LuaEnv = null;
             }
 
@@ -137,8 +145,8 @@ namespace PilotsDeck
                 LuaEngine.Dispose();
                 LuaEngine = null;
 
-                Log?.Information("Script stopped by ScriptManager");
-                if (Log != null)
+                Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script stopped by ScriptManager"));
+                if (Log != null && !LogUseDefault)
                 {
                     Log.Dispose();
                     Log = null;
@@ -161,65 +169,74 @@ namespace PilotsDeck
 
         public virtual void DeregisterAllVariables()
         {
-            Logger.Log(LogLevel.Debug, "ManagedScript:DeregisterAllVariables", $"Deregistering Variables and Events for Script '{FileName}'");
+            Logger.Log(LogLevel.Verbose, "ManagedScript:DeregisterAllVariables", $"Deregistering Variables and Events for Script '{FileName}'");
             foreach (var variable in Variables)
             {
-                IPCManager.DeregisterAddress(variable);
+                IPCManager.DeregisterAddress(variable.Key);
+                Variables[variable.Key] = false;
             }
-            VariablesRegistered = false;
-            Variables.Clear();
         }
 
-        public virtual void RegisterAllVariables()
+        public virtual void CheckVariables()
         {
-            if (!IsRunning || VariablesRegistered)
+            if (!IsRunning)
                 return;
 
-            Logger.Log(LogLevel.Debug, "ManagedScript:RegisterAllVariables", $"Registering Variables and Events for Script '{FileName}'");
             foreach (var variable in Variables)
             {
-                IPCManager.RegisterAddress(variable);
+                if (!variable.Value)
+                    Variables[variable.Key] = IPCManager.RegisterAddress(variable.Key) != null;
             }
-            VariablesRegistered = true;
         }
 
         #region ScriptFunctions
         protected virtual bool RegisterVariable(string name)
         {
+            Logger.Log(LogLevel.Verbose, "ManagedScript:RegisterVariable", $"SimVar Request from Script File '{FileName}' for Variable '{name}'");
             ActionSwitchType type = IPCTools.GetReadType(name, ActionSwitchType.MACRO);
 
             if (IPCTools.IsActionReadable(type) && IPCTools.IsReadAddressForType(name, type))
             {
-                if (Variables.Contains(name))
+                if (Variables.ContainsKey(name))
                 {
-                    Logger.Log(LogLevel.Warning, "ManagedScript:RegisterVariable", $"Variable '{name}' is already registered for Script File '{FileName}'");
+                    if (Variables[name])
+                        Logger.Log(LogLevel.Warning, "ManagedScript:RegisterVariable", $"Variable '{name}' is already registered for Script File '{FileName}'");
+                    else
+                        Variables[name] = IPCManager.RegisterAddress(name) != null;
                 }
                 else if (IPCManager.RegisterAddress(name) != null)
                 {
-                    Variables.Add(name);
+                    Variables.Add(name, true);
                     Logger.Log(LogLevel.Debug, "ManagedScript:RegisterVariable", $"Registered Variable '{name}' for Script File '{FileName}'");
                     return true;
                 }
                 else
+                {
+                    Variables.Add(name, false);
                     Logger.Log(LogLevel.Error, "ManagedScript:RegisterVariable", $"Could not register Variable '{name}' for Script File '{FileName}' (Type {type})");
+                }
             }
 
             return false;
         }
 
-        protected virtual double SimRead(string name)
+        protected virtual dynamic SimRead(string name)
         {
             IPCValue value = IPCManager[name];
             if (value == null)
+            {
+                Log?.Warning(ScriptManager.FormatLogMessage(FileName, $"The requested Variable '{name}' is not registered!"));
                 return 0;
+            }
             else
             {
                 try
                 {
                     return value.RawValue();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"Exception '{ex.GetType()}' on SimRead for '{name}': {ex.Message}"));
                     return 0;
                 }
             }
@@ -229,15 +246,19 @@ namespace PilotsDeck
         {
             IPCValue value = IPCManager[name];
             if (value == null)
+            {
+                Log?.Warning(ScriptManager.FormatLogMessage(FileName, $"The requested Variable '{name}' is not registered!"));
                 return "";
+            }
             else
             {
                 try
                 {
                     return value.Value;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"Exception '{ex.GetType()}' on SimReadString for '{name}': {ex.Message}"));
                     return "";
                 }
             }
@@ -336,17 +357,16 @@ namespace PilotsDeck
             Thread.Sleep(msec);
         }
 
-        protected virtual void UseLog(string name)
+        public static Serilog.Core.Logger CreaterLogger(ref string name, string id)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(name) || Log != null)
-                    return;
+                if (string.IsNullOrWhiteSpace(name))
+                    return null;
 
                 name = name.Trim().ToLower();
                 if (!name.Contains(".log"))
                     name = $"{name}.log";
-                LogFile = name;
 
                 name = $"log\\{name}";
                 try
@@ -356,18 +376,28 @@ namespace PilotsDeck
                 }
                 catch (IOException)
                 {
-                    Logger.Log(LogLevel.Critical, "ManagedScript:UseLog", $"IOException while clearing old Log File '{name}' for Script '{FileName}'");
+                    Logger.Log(LogLevel.Critical, "ManagedScript:CreaterLogger", $"IOException while clearing old Log File '{name}' for Script '{id}'");
                 }
 
                 LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
                             .WriteTo.File(name, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} - {Message} {NewLine}")
                             .MinimumLevel.Information();
-                Log = loggerConfiguration.CreateLogger();
+                return loggerConfiguration.CreateLogger();
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Critical, "ManagedScript:UseLog", $"Exception '{ex.GetType()}' while starting Log for Script '{FileName}': {ex.Message}");
+                Logger.Log(LogLevel.Critical, "ManagedScript:CreaterLogger", $"Exception '{ex.GetType()}' while starting Log for Script '{id}': {ex.Message}");
+                return null;
             }
+        }
+
+        protected virtual void UseLog(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name) || !LogUseDefault)
+                return;
+
+            Log = CreaterLogger(ref name, FileName);
+            LogUseDefault = false;
         }
 
         protected virtual void WriteLog(string message)
@@ -378,7 +408,7 @@ namespace PilotsDeck
                     message = "";
 
                 if (Log != null)
-                    Log.Information(message);
+                    Log.Information(ScriptManager.FormatLogMessage(FileName, message));
                 else
                     Logger.Log(LogLevel.Information, FileName, message);
             }

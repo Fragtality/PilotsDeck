@@ -26,7 +26,9 @@
                 imgRefs.Add(ID.Indication, DisplaySettings.IndicationImage);
             }
 
-            ValueManager.AddValue(ID.Control, DisplaySettings.Address);
+            if (this.GetType() != typeof(HandlerSwitchKorry) || (this as HandlerSwitchKorry).KorrySettings.ShowTopImage)
+                ValueManager.AddValue(ID.Control, DisplaySettings.Address);
+
             if (BaseSettings.SwitchOnCurrentValue)
             {
                 BaseSettings.SwitchOffState = DisplaySettings.OffState;
@@ -96,7 +98,7 @@
             else
                 newImage = mapRefs[ID.Map].GetMappedImage("0", DisplaySettings.DefaultImage);
 
-            DefaultImage64 = GetGuardedImage64(newImage, "0", "0");
+            DefaultImage64 = GetGuardedImage64(newImage, "0", "0", "0");
         }
 
         public override void Refresh()
@@ -132,7 +134,7 @@
                 newImage = mapRefs[ID.Map].GetMappedImage(currentValue, DisplaySettings.ErrorImage);
             }
 
-            RenderImage64 = GetGuardedImage64(newImage, SwitchSettings.GuardActiveValue, currentValue);
+            RenderImage64 = GetGuardedImage64(newImage, SwitchSettings.GuardActiveValue, currentValue, ValueManager[ID.Guard]);
             NeedRedraw = true;
         }
     }

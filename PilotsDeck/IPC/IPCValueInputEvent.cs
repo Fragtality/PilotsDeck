@@ -45,8 +45,6 @@ namespace PilotsDeck
         public override void SetValue(double value)
         {
             DoubleValue = value;
-            isChanged = lastValue != DoubleValue;
-            lastValue = DoubleValue;
         }
     }
 }

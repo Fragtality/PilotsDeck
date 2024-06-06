@@ -12,13 +12,13 @@ namespace PilotsDeck
         public override void Process(SimulatorType simType)
         {
             SetValue(Plugin.ActionController.ipcManager.ScriptManager.RunFunction(Address, false));
+            isChanged = _value != lastValue;
+            lastValue = _value;
         }
 
         public override void SetValue(string strValue)
         {
             _value = strValue;
-            isChanged = lastValue != strValue;
-            lastValue = strValue;
         }
 
         protected override string Read()

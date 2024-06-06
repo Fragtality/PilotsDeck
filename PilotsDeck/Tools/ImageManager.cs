@@ -106,7 +106,7 @@ namespace PilotsDeck
             if (imageCache.TryGetValue(fileReal, out ManagedImage image))
             {
                 image.Registrations++;
-                Logger.Log(LogLevel.Debug, "ImageManager:AddImage", $"Registration added to cached Image. (Ref: {file}) (Real: {fileReal}) (Registrations: {image.Registrations}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
+                Logger.Log(LogLevel.Verbose, "ImageManager:AddImage", $"Registration added to cached Image. (Ref: {file}) (Real: {fileReal}) (Registrations: {image.Registrations}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
             }
             else
             {
@@ -132,7 +132,10 @@ namespace PilotsDeck
             if (imageCache.TryGetValue(fileReal, out ManagedImage image))
             {
                 image.Registrations--;
-                Logger.Log(LogLevel.Debug, "ImageManager:RemoveImage", $"Registration removed from cached Image. (Ref: {file}) (Real: {fileReal}) (Registrations: {image.Registrations}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
+                if (image.Registrations >= 1)
+                    Logger.Log(LogLevel.Verbose, "ImageManager:RemoveImage", $"Registration removed from cached Image. (Ref: {file}) (Real: {fileReal}) (Registrations: {image.Registrations}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
+                else
+                    Logger.Log(LogLevel.Debug, "ImageManager:RemoveImage", $"Registration removed from cached Image. (Ref: {file}) (Real: {fileReal}) (Registrations: {image.Registrations}) (Deck: {type.Type}){(type.IsEncoder ? " (Encoder) " : "")}");
             }
             else
             {

@@ -354,8 +354,8 @@ namespace PilotsDeck
                     currentState = ControllerState.Error;
                     isClosing = true;
 
-                    waitCounter = waitTicks / 4;
-                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to NOT running, waiting for {(waitCounter * 200) / 1000}s.");
+                    waitCounter = (5000 / AppSettings.pollInterval);
+                    Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to NOT running, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                 }
                 else if (isClosing && waitCounter == 0)
                 {
@@ -379,8 +379,8 @@ namespace PilotsDeck
 
                     if (tickCounter > firstTick)
                     {
-                        waitCounter = waitTicks;
-                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to running, waiting for {(waitCounter * 200) / 1000}s.");
+                        waitCounter = (30000 / AppSettings.pollInterval);
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to running, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                     }
                     else
                     {
@@ -395,14 +395,14 @@ namespace PilotsDeck
                     {
                         currentState = ControllerState.Error;
                         waitCounter = waitTicks / 2;
-                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to disconnected, waiting for {(waitCounter * 200) / 1000}s.");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to disconnected, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                     }
 
                     if (!SimConnector.Connect())
                     {
                         waitCounter = waitTicks;
                         currentState = ControllerState.Wait;
-                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Connection failed, waiting for {(waitCounter * 200) / 1000}s.");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim Connection failed, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                     }
                     else
                     {
@@ -418,7 +418,7 @@ namespace PilotsDeck
                         if (tickCounter > firstTick && !SimConnector.IsReady)
                         {
                             waitCounter = waitTicks / 2;
-                            Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to connected, waiting for {(waitCounter * 200) / 1000}s.");
+                            Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim changed to connected, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                         }
                     }
 
@@ -453,7 +453,7 @@ namespace PilotsDeck
                         {
                             currentState = ControllerState.Error;
                             waitCounter = waitTicks / 2;
-                            Logger.Log(LogLevel.Warning, "ActionController:Run", $"Sim Process failed, waiting for {(waitCounter * 200) / 1000}s.");
+                            Logger.Log(LogLevel.Warning, "ActionController:Run", $"Sim Process failed, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                         }
                     }
                     else if (!SimConnector.IsReady && waitCounter == 0)
@@ -462,7 +462,7 @@ namespace PilotsDeck
                         SimConnector.Process();
                         currentState = ControllerState.Wait;
                         wasPaused = true;
-                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim not ready, waiting for {(waitCounter * 200) / 1000}s.");
+                        Logger.Log(LogLevel.Information, "ActionController:Run", $"Sim not ready, waiting for {(waitCounter * AppSettings.pollInterval) / 1000}s.");
                     }
                 }
             }
@@ -473,14 +473,14 @@ namespace PilotsDeck
 
             watchRefresh.Stop();
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
-            //if (tickCounter % (waitTicks / 2) == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
-            if (tickCounter % waitTicks == 0) //every <150> / 2 = 75 Ticks => 75 * <200> = 15s
+            int time = AppSettings.refreshInterval;
+            if (tickCounter % (time / AppSettings.pollInterval) == 0)
             {
                 int changedScripts = ipcManager.ScriptManager.CheckFiles();
                 int removedAddresses = ipcManager.UnsubscribeUnusedAddresses();
                 int removedImages = imgManager.RemoveUnused();
                 if (SimConnector.IsRunning || imageUpdates > 0 || changedScripts > 0 || removedAddresses > 0 || removedImages > 0)
-                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {waitTicks} Ticks: {averageTime /waitTicks:F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} d / {ipcManager.ScriptManager.CountGlobal} g / {ipcManager.ScriptManager.CountImages} i) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
+                    Logger.Log(LogLevel.Debug, "ActionController:Run", $"Refresh Tick #{tickCounter}: average Refresh-Time over the last {time/1000}s: {averageTime / (time / AppSettings.pollInterval):F3}ms. (Actions: {currentActions.Count}) (IPCValues: {ipcManager.Length}) (Scripts: {ipcManager.ScriptManager.Count} d / {ipcManager.ScriptManager.CountGlobal} g / {ipcManager.ScriptManager.CountImages} i) (Images: {imgManager.Length}) (Updates: {imageUpdates})");
                 averageTime = 0;
                 imageUpdates = 0;
             }

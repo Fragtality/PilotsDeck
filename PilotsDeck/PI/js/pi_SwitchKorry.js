@@ -62,6 +62,10 @@ function updateForm() {
 	setPattern('AddressBot', 5);
 
 	//TOP
+	if (settingsModel.ShowTopImage)
+		document.getElementById('ShowTopImage').checked = true;
+	else
+		document.getElementById('ShowTopImage').checked = false;
 	toggleConfigItem(settingsModel.ShowTopImage, 'AddressTop');
 	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping && !settingsModel.ShowTopNonZero, 'TopState');
 	toggleConfigItem(settingsModel.ShowTopImage && !settingsModel.UseImageMapping, 'TopImage');
@@ -71,6 +75,10 @@ function updateForm() {
 
 
 	//BOT
+	if (settingsModel.ShowBotImage)
+		document.getElementById('ShowBotImage').checked = true;
+	else
+		document.getElementById('ShowBotImage').checked = false;
 	toggleConfigItem(settingsModel.ShowBotImage, 'AddressBot');
 	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping && !settingsModel.ShowBotNonZero, 'BotState');
 	toggleConfigItem(settingsModel.ShowBotImage && !settingsModel.UseImageMapping, 'BotImage');

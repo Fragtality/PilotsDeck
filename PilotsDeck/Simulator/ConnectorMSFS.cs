@@ -64,8 +64,8 @@ namespace PilotsDeck
                 if (FSUIPCConnection.IsOpen)
                 {
                     Logger.Log(LogLevel.Information, "ConnectorMSFS:Connect", $"FSUIPC Connected.");
-                    foreach (var addr in ipcManager.AddressList)
-                        ipcManager[addr].Connect();
+                    foreach (var value in ipcManager.ValueList)
+                        value.Connect();
                 }
 
                 mobiConnectRequested = mobiConnect.Connect();
@@ -153,16 +153,22 @@ namespace PilotsDeck
             return resultProcess;
         }
 
-        public override void SubscribeAddress(string address)
+        public static bool IsValidConnectorAddress(string address)
+        {
+            return !IPCTools.rxOffset.IsMatch(address) &&
+                 (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) ||
+                 (!AppSettings.Fsuipc7LegacyLvars && IPCTools.rxLvarMobi.IsMatch(address)) || (!AppSettings.Fsuipc7LegacyLvars && IPCTools.rxLvar.IsMatch(address)));
+        }
+
+        public override void SubscribeAddress(string address, IPCValue value)
         {
             if (IPCTools.rxBvar.IsMatch(address))
             {
                 mobiConnect.SubscribeInputEvent(address);
             }
-            if ( !IPCTools.rxOffset.IsMatch(address) &&
-                 (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || (IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars)) )
+            if (IsValidConnectorAddress(address))
             {
-                mobiConnect.SubscribeAddress(address);
+                mobiConnect.SubscribeAddress(address, value);
             }      
         }
 
@@ -172,8 +178,7 @@ namespace PilotsDeck
             {
                 mobiConnect.UnsubscribeInputEvent(address);
             }
-            if (!IPCTools.rxOffset.IsMatch(address) &&
-                 (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || (IPCTools.rxLvar.IsMatch(address) && !AppSettings.Fsuipc7LegacyLvars)))
+            if (IsValidConnectorAddress(address))
             {
                 mobiConnect.UnsubscribeAddress(address);
             }
@@ -186,9 +191,9 @@ namespace PilotsDeck
 
         public override void SubscribeAllAddresses()
         {
-            foreach (var address in ipcManager.AddressList)
+            foreach (var value in ipcManager.ValueList)
             {
-                ipcManager[address].Connect();
+                value.Connect();
             }
             Logger.Log(LogLevel.Debug, "ConnectorMSFS:SubscribeAllAddresses", $"Subscribed all IPCValues. (Count: {ipcManager.AddressList.Count})");
             mobiConnect.SubscribeAllAddresses();

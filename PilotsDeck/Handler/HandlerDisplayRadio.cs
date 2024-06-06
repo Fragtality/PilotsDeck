@@ -110,7 +110,7 @@ namespace PilotsDeck
             render.DrawText(valueStb, fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
             if (HasAction && SwitchSettings.IsGuarded)
-                RenderGuard(render, SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
+                RenderGuard(render, SwitchSettings.GuardActiveValue, valueAct, ValueManager[ID.Guard]);
 
             if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));
@@ -144,7 +144,7 @@ namespace PilotsDeck
             render.DrawText("0", fontStb, colorStb, ModelDisplayText.GetRectangleF(Settings.RectCoordStby));
 
             if (HasAction && SwitchSettings.IsGuarded)
-                RenderGuard(render, "0", "0");
+                RenderGuard(render, "0", "0", "0");
 
             if (IsEncoder)
                 DrawTitle(render, new PointF(100, 51.0f));

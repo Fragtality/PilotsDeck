@@ -50,8 +50,11 @@ namespace PilotsDeck
                         MapScript = ScriptManager.RegisterImageScript(scriptFile);
                         foreach (var image in MapScript.ImagedIDs)
                             ImgManager.AddImage(image.Value, DeckType);
+
                         foreach (var value in MapScript.Variables)
-                            ValueManager.AddDynamicValue(value);
+                            if (!value.Value)
+                                ValueManager.AddDynamicValue(value.Key);
+
                         ScriptParam = GetFunctionParam(MapString);
                     }
                     else
@@ -74,8 +77,11 @@ namespace PilotsDeck
                 {
                     foreach (var image in MapScript.ImagedIDs)
                         ImgManager.RemoveImage(image.Value, DeckType);
+
                     foreach (var value in MapScript.Variables)
-                        ValueManager.RemoveDynamicValue(value);
+                        if (!value.Value)
+                            ValueManager.RemoveDynamicValue(value.Key);
+
                     ScriptManager.DeregisterImageScript(MapScript.FileName);
                     ScriptParam = "";
                 }

@@ -20,9 +20,11 @@ namespace PilotsDeck
         public static readonly string targetTitle = "pdTitle";
 
         public static readonly int pollInterval = Convert.ToInt32(ConfigurationManager.AppSettings["pollInterval"]);
+        public static readonly int refreshInterval = Convert.ToInt32(ConfigurationManager.AppSettings["refreshInterval"]); 
         public static readonly int waitTicks = Convert.ToInt32(ConfigurationManager.AppSettings["waitTicks"]);
         public static readonly int longPressTicks = Convert.ToInt32(ConfigurationManager.AppSettings["longPressTicks"]);
         public static readonly int controlDelay = Convert.ToInt32(ConfigurationManager.AppSettings["controlDelay"]);
+        public static readonly int reorderThreshold = Convert.ToInt32(ConfigurationManager.AppSettings["reorderThreshold"]);
 
         public static readonly string stringReplace = Convert.ToString(ConfigurationManager.AppSettings["stringReplace"]);
         public static readonly bool forceDecimalPoint = Convert.ToBoolean(ConfigurationManager.AppSettings["forceDecimalPoint"]);

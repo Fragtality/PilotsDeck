@@ -13,7 +13,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.RegisterAction(args.context, new HandlerDisplayGauge(args.context, SettingsModel, Plugin.ActionController.GetDeckTypeById(args.device, args.payload.controller)));
 
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionDisplayGauge:OnWillAppear", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionDisplayGauge:OnWillAppear", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
         }
     }
 }

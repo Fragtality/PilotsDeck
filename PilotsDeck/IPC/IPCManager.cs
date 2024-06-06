@@ -38,7 +38,8 @@ namespace PilotsDeck
             return currentValues.ContainsKey(FormatAddress(address));
         }
 
-        public List<string> AddressList { get { return [.. currentValues.Keys]; } }
+        public ICollection<string> AddressList { get { return [.. currentValues.Keys]; } }
+        public ICollection<IPCValue> ValueList { get { return [.. currentValues.Values]; } }
 
         public IPCManager()
         {
@@ -76,10 +77,13 @@ namespace PilotsDeck
             }
         }
 
-        public static string FormatAddress(string address, bool mobi = false)
+        
+        public static string FormatAddress(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
                 return address;
+
+            bool mobi = !AppSettings.Fsuipc7LegacyLvars;
 
             if (IPCTools.rxOffset.IsMatch(address))
             {
@@ -108,16 +112,16 @@ namespace PilotsDeck
             }
             else if (IPCTools.rxLvar.IsMatch(address) && mobi)
             {
-                if (!address.StartsWith("L:"))
-                    address = address.Insert(0, "L:");
-                address = $"({address})";
-
+                var matches = IPCTools.rxLvarMobiMatch.Matches(address);
+                if (matches != null && matches.Count > 0)
+                    address = $"(L:{matches[0].Value},number)";
             }
-            else if (IPCTools.rxLvar.IsMatch(address) && !mobi && address.StartsWith("L:"))
+            else if (IPCTools.rxLvar.IsMatch(address) && !mobi)
             {
-                address = address[2..];
+                var matches = IPCTools.rxLvarMobiMatch.Matches(address);
+                if (matches != null && matches.Count > 0)
+                    address = $"L:{matches[0].Value}";
             }
-            
 
             return address;
         }
@@ -137,7 +141,7 @@ namespace PilotsDeck
                 if (type != ActionSwitchType.LUAFUNC && currentValues.TryGetValue(address, out value))
                 {
                     currentRegistrations[address]++;
-                    Logger.Log(LogLevel.Debug, "IPCManager:RegisterAddress", $"Added Registration for Address '{address}'. (Registrations: {currentRegistrations[address]})");
+                    Logger.Log(LogLevel.Verbose, "IPCManager:RegisterAddress", $"Added Registration for Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     if (value == null)
                         Logger.Log(LogLevel.Error, "IPCManager:RegisterAddress", $"Registered Address '{address}' has NULL-Reference Value! (Registrations: {currentRegistrations[address]})");
                 }
@@ -147,9 +151,9 @@ namespace PilotsDeck
 
                     if (value != null)
                     {
-                        currentValues.Add(address, value);
-                        currentRegistrations.Add(address, 1);
-                        SimConnector.SubscribeAddress(address);
+                        currentValues.TryAdd(address, value);
+                        currentRegistrations.TryAdd(address, 1);
+                        SimConnector.SubscribeAddress(address, value);
                         Logger.Log(LogLevel.Debug, "IPCManager:RegisterAddress", $"Subscribed Value for Address '{address}'. (Registrations: {currentRegistrations[address]})");
                     }
                     else
@@ -177,11 +181,11 @@ namespace PilotsDeck
 
                 if (!string.IsNullOrWhiteSpace(address) && currentValues.ContainsKey(address))
                 {
-                    if (currentRegistrations[address] >= 1)
-                    {
-                        currentRegistrations[address]--;
+                    currentRegistrations[address]--;
+                    if (currentRegistrations[address] >= 1)                        
+                        Logger.Log(LogLevel.Verbose, "IPCManager:DeregisterAddress", $"Deregistered Address '{address}'. (Registrations: {currentRegistrations[address]})");
+                   else
                         Logger.Log(LogLevel.Debug, "IPCManager:DeregisterAddress", $"Deregistered Address '{address}'. (Registrations: {currentRegistrations[address]})");
-                    }
                 }
                 else if (type != ActionSwitchType.LUAFUNC)
                     Logger.Log(LogLevel.Error, "IPCManager:DeregisterAddress", $"Could not find Address '{address}'!");
@@ -232,33 +236,35 @@ namespace PilotsDeck
                 {
                     if (ScriptManager.GlobalScriptsStopped)
                         ScriptManager.StartGlobalScripts();
-                    ScriptManager.RegisterAllVariables();
                     SimConnector.SubscribeAllAddresses();
                 }
                 if (SimConnector.IsReady && ScriptManager.GlobalScriptsStopped)
                     ScriptManager.StartGlobalScripts();
 
                 result = SimConnector.Process();
-                foreach (var value in currentValues.Values) //read Lvars
+                if (result)
                 {
-                    value.Process(SimConnector.SimType);
+                    foreach (var value in currentValues.Values) //read Lvars
+                    {
+                        value.Process(SimConnector.SimType);
+                    }
                 }
 
                 if (SimConnector.IsReady && !ScriptManager.GlobalScriptsStopped)
                 {
-                    if (lastAircraft != SimConnector.AicraftString)
+                    if (!string.IsNullOrWhiteSpace(SimConnector.AicraftPathString) && lastAircraft != SimConnector.AicraftPathString )
                         ScriptManager.StartGlobalScripts();
                     ScriptManager.RunGlobalScripts();
                 }
 
                 if (!SimConnector.IsReady && !ScriptManager.GlobalScriptsStopped)
                 {
-                    if (!SimConnector.IsPaused || lastAircraft != SimConnector.AicraftString)
+                    if (!SimConnector.IsPaused || (!string.IsNullOrWhiteSpace(SimConnector.AicraftPathString) && lastAircraft != SimConnector.AicraftPathString))
                         ScriptManager.StopGlobalScripts();
                 }
 
-                if (SimConnector.IsReady)
-                    lastAircraft = SimConnector.AicraftString;
+                if (SimConnector.IsReady && !string.IsNullOrWhiteSpace(SimConnector.AicraftPathString))
+                    lastAircraft = SimConnector.AicraftPathString;
             }
             catch (Exception ex)
             {

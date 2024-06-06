@@ -9,7 +9,7 @@ namespace PilotsDeck
         public override async Task OnWillDisappear(StreamDeckEventPayload args)
         {
             await base.OnWillDisappear(args);
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionBase:OnWillDisappear", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionBase:OnWillDisappear", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
 
             Plugin.ActionController.DeregisterAction(args.context);
         }
@@ -26,14 +26,14 @@ namespace PilotsDeck
                 Plugin.ActionController[args.context].UpdateSettingsModel = false;
             }
 
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionBase:OnDidReceiveSettings", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionBase:OnDidReceiveSettings", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
         }
 
         public override Task OnTitleParametersDidChange(StreamDeckEventPayload args)
         {
             Plugin.ActionController.SetTitleParameters(args.context, args.payload.title, args.payload.titleParameters);
 
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionBase:OnTitleParametersDidChange", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID}) (FontStyle: {args.payload.titleParameters.fontStyle.Replace("\n", "").Replace("\r", "").Replace("\t", "").Replace("\0", "")})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionBase:OnTitleParametersDidChange", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID}) (FontStyle: {args.payload.titleParameters.fontStyle.Replace("\n", "").Replace("\r", "").Replace("\t", "").Replace("\0", "")})");
 
             Plugin.ActionController[args.context].Update(true);
 
@@ -112,14 +112,14 @@ namespace PilotsDeck
 
         public override Task OnPropertyInspectorDidAppear(StreamDeckEventPayload args)
         {
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionBase:OnPropertyInspectorDidAppear", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionBase:OnPropertyInspectorDidAppear", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
 
             return Task.CompletedTask;
         }
 
         public override Task OnSendToPlugin(StreamDeckEventPayload args)
         {
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionBase:OnSendToPlugin", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionBase:OnSendToPlugin", $"(Context: {args.context}) (ActionID: {Plugin.ActionController[args.context]?.ActionID})");
 
             var action = Plugin.ActionController[args.context];
             if (args?.payload?.settings == "propertyInspectorConnected" && action != null)

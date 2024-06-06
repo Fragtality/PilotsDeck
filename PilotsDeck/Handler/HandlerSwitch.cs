@@ -163,7 +163,7 @@ namespace PilotsDeck
             {
                 if (ValueManager.HasChangedValues() || NeedRefresh)
                 {
-                    DefaultImage64 = GetGuardedImage64(ImgManager.GetImage(BaseSettings.DefaultImage, DeckType), SwitchSettings.GuardActiveValue, ValueManager[ID.Guard]);
+                    DefaultImage64 = GetGuardedImage64(ImgManager.GetImage(BaseSettings.DefaultImage, DeckType), SwitchSettings.GuardActiveValue, ValueManager[ID.Switch], ValueManager[ID.Guard]);
                     RenderImage64 = DefaultImage64;
                     NeedRedraw = true;
                 }
@@ -186,7 +186,7 @@ namespace PilotsDeck
         {
             if (HasAction && SwitchSettings.IsGuarded)
             {
-                DefaultImage64 = GetGuardedImage64(ImgManager.GetImage(BaseSettings.DefaultImage, DeckType), "0", "0");
+                DefaultImage64 = GetGuardedImage64(ImgManager.GetImage(BaseSettings.DefaultImage, DeckType), "0", "0", "0");
                 RenderImage64 = DefaultImage64;
                 NeedRedraw = true;
                 NeedRefresh = true;

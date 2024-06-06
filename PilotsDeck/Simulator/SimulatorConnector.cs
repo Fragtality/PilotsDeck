@@ -69,7 +69,7 @@ namespace PilotsDeck
 
         protected IPCManager ipcManager;
         public abstract bool Process();
-        public abstract void SubscribeAddress(string address);
+        public abstract void SubscribeAddress(string address, IPCValue value);
         public abstract void UnsubscribeAddress(string address);
         public virtual void UnsubscribeUnusedAddresses() { }
         public abstract void SubscribeAllAddresses();
@@ -147,7 +147,7 @@ namespace PilotsDeck
                 value = new IPCValueLua(address);
             else if (IPCTools.rxInternal.IsMatch(address))
                 value = new IPCValueInternal(address);
-            else if (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || IPCTools.rxLvar.IsMatch(address))
+            else if (IPCTools.rxAvar.IsMatch(address) || IPCTools.rxCalcRead.IsMatch(address) || IPCTools.rxLvar.IsMatch(address) || IPCTools.rxLvarMobi.IsMatch(address))
                 value = new IPCValueSimVar(address);
 
             return value;

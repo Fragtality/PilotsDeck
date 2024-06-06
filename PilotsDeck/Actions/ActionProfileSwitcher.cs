@@ -18,7 +18,7 @@ namespace PilotsDeck
 
             SetActionImage(Manager, args.context, SettingsModel.EnableSwitching);
 
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnWillAppear", $"(Context: {args.context})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionProfileSwitcher:OnWillAppear", $"(Context: {args.context})");
         }
 
         public override Task OnWillDisappear(StreamDeckEventPayload args)
@@ -27,7 +27,7 @@ namespace PilotsDeck
 
             Plugin.ActionController.DeregisterProfileSwitcher(args.context);
 
-            PilotsDeck.Logger.Log(LogLevel.Debug, "ActionProfileSwitcher:OnWillDisappear", $"(Context: {args.context})");
+            PilotsDeck.Logger.Log(LogLevel.Verbose, "ActionProfileSwitcher:OnWillDisappear", $"(Context: {args.context})");
             return Task.CompletedTask;
         }
 
