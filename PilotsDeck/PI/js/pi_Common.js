@@ -1,7 +1,4 @@
-﻿// global websocket, used to communicate from/to Stream Deck software
-// as well as some info about our plugin, as sent by Stream Deck software
-
-if (document.getElementById("DefaultActions") && defaultHtml)
+﻿if (document.getElementById("DefaultActions") && defaultHtml)
 	document.getElementById("DefaultActions").innerHTML = defaultHtml;
 if (document.getElementById("FormatValue") && formatHtml)
 	document.getElementById("FormatValue").innerHTML = formatHtml;
@@ -631,7 +628,7 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 				fillSelectBoxes();
 				fillActionSelectBoxes();
 
-				if (jsonObj.payload && jsonObj.payload.MappingsJson != null) {
+				if (jsonObj.payload && jsonObj.payload.EnableSwitching != null) {
 					refreshSettings(jsonObj.payload);
 					commonFormUpdate();
                 }

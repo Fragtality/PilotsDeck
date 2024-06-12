@@ -6,7 +6,7 @@ using System.Windows;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("PilotsDeck Installer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Installer for the PilotsDeck StreamDeck-Plugin")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fragtality")]
 [assembly: AssemblyProduct("PilotsDeck Installer")]

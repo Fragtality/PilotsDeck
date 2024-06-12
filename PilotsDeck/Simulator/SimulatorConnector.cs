@@ -6,11 +6,11 @@ namespace PilotsDeck
 {
     public enum SimulatorType
     {
-        FSX,
-        P3D,
-        MSFS,
-        XP,
-        UNKNOWN
+        UNKNOWN = -1,
+        FSX = 0,
+        P3D = 1,
+        MSFS = 2,
+        XP = 3,
     }
 
     public abstract class SimulatorConnector

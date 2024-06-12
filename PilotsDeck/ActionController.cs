@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using StreamDeckLib;
 using StreamDeckLib.Messages;
 using System;
@@ -40,30 +40,27 @@ namespace PilotsDeck
         private readonly int waitTicks = AppSettings.waitTicks;
         private readonly int firstTick = (int)(AppSettings.waitTicks / 7.5);
         private Stopwatch watchRefresh = new();
-        private Stopwatch watchLoading = new();
         private double averageTime = 0;
         private int imageUpdates = 0;
         private bool redrawAlways = AppSettings.redrawAlways;
+        private bool devicesExported = false;
 
-        public ModelProfileSwitcher GlobalProfileSettings { get; protected set; } = new ModelProfileSwitcher();
-        private List<string> profileSwitcherActions = [];
-        private List<string> switchedDecks = [];
-        private List<StreamDeckProfile> manifestProfiles;
+        public HandlerProfileSwitcher ProfileSwitcher { get; protected set; }
         private string lastAircraft = "";
 
 
         public ActionController()
         {
             currentActions = [];
-            ipcManager = new IPCManager();
+            ipcManager = new();
             SimConnector = SimulatorConnector.CreateConnector("", tickCounter, ipcManager);
-            imgManager = new ImageManager();
-            manifestProfiles = [];
+            imgManager = new();
+            ProfileSwitcher = new();
         }
 
         public void Init()
         {
-            if (currentActions != null && ipcManager != null && imgManager != null && manifestProfiles != null)
+            if (currentActions != null && ipcManager != null && imgManager != null)
             {
                 SimConnector = new ConnectorDummy();
                 Logger.Log(LogLevel.Information, "ActionController:Init", "Configuration Parameters:");
@@ -71,19 +68,8 @@ namespace PilotsDeck
                     Logger.Log(LogLevel.Information, "ActionController:Init", $"{key} = {ConfigurationManager.AppSettings[key]}");
             }
 
-            dynamic manifest = JObject.Parse(File.ReadAllText(@"manifest.json"));
-            if (manifest?.Profiles != null)
-            {
-                foreach (var profile in manifest.Profiles)
-                {
-                    string name = profile?.Name;
-                    if (!string.IsNullOrEmpty(name) && profile?.DeviceType != null)
-                    {
-                        manifestProfiles.Add(new StreamDeckProfile(name, (int)profile.DeviceType, "") );
-                    }
-                }
-            }
-            Logger.Log(LogLevel.Information, "ActionController:Init", $"Loaded {manifestProfiles.Count} StreamDeck Profiles from Manifest.");
+            ProfileSwitcher.LoadProfileMappings();
+            Logger.Log(LogLevel.Information, "ActionController:Init", $"Loaded {ProfileSwitcher.Count} Profile Mappings from '{ProfileMapping.PLUGIN_MAPPING_FILE}'.");
 
             AppSettings.SetLocale();
             Logger.Log(LogLevel.Information, "ActionController:Init", $"Locale is set to '{AppSettings.locale}\'. (Default: {AppSettings.fontDefault}) (Bold: {AppSettings.fontBold}) (Italic: {AppSettings.fontItalic})");
@@ -169,19 +155,7 @@ namespace PilotsDeck
 
         protected void OnDidReceiveGlobalSettings(StreamDeckEventPayload args)
         {
-            StreamDeckEventPayload.SetModelProperties(args, GlobalProfileSettings);
-            GlobalProfileSettings.UpdateSettings(manifestProfiles, DeckManager.Info.devices);
-            DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
-
-            UpdateProfileSwitchers();
-
-            //For Test/Debugging - clear GlobalSettings
-            //GlobalProfileSettings = new ModelProfileSwitcher();
-            //GlobalProfileSettings.UpdateSettings(manifestProfiles, DeckManager.Info.devices);
-            //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
-            //DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, null);
-
-            Logger.Log(LogLevel.Information, "ActionController:OnDidReceiveGlobalSettings", $"Received Configuration for Profile Switching. (Switching: {GlobalProfileSettings.EnableSwitching}) (DeviceMappings: {GlobalProfileSettings?.DeviceMappings?.Count}) (Installed: {GlobalProfileSettings.ProfilesInstalled})");
+            ProfileSwitcher.OnDidReceiveGlobalSettings(args);
         }
 
         protected void OnApplicationDidLaunch(StreamDeckEventPayload args)
@@ -199,126 +173,17 @@ namespace PilotsDeck
             SimConnector.Close();
         }
 
-        public void UpdateProfileSwitchers()
-        {
-            foreach (var switcher in profileSwitcherActions)
-                ActionProfileSwitcher.SetActionImage(DeckManager, switcher, GlobalProfileSettings.EnableSwitching);
-        }
-
-        public void RegisterProfileSwitcher(string context)
-        {
-            if (!profileSwitcherActions.Contains(context))
-            {
-                profileSwitcherActions.Add(context);
-                Logger.Log(LogLevel.Debug, "ActionController:RegisterProfileSwitcher", $"ProfileSwitcher registered. (Context: {context})");
-            }
-            else
-                Logger.Log(LogLevel.Error, "ActionController:RegisterProfileSwitcher", $"ProfileSwitcher already registered! (Context: {context})");
-        }
-
-        public void DeregisterProfileSwitcher(string context)
-        {
-            if (profileSwitcherActions.Remove(context))
-            {
-                Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher deregistered. (Context: {context})");
-            }
-            else
-                Logger.Log(LogLevel.Debug, "ActionController:DeregisterProfileSwitcher", $"ProfileSwitcher not registered or failed! (Context: {context})");
-        }
-
-        protected void SwitchProfiles()
-        {
-            foreach (var deviceMapping in GlobalProfileSettings.DeviceMappings)
-            {
-                string switchTo = "";
-
-                if (string.IsNullOrEmpty(SimConnector.AicraftString) && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
-                    switchTo = deviceMapping.DefaultProfile;
-                else if (deviceMapping.Profiles != null && deviceMapping.Profiles.Count > 0)
-                {
-                    foreach (var profile in deviceMapping.Profiles)
-                    {
-                        if (ModelProfileSwitcher.IsInProfile(profile.Mappings, SimConnector.AicraftString))
-                        {
-                            switchTo = profile.Name;
-                            break;
-                        }
-                    }
-
-                    if (switchTo == "" && deviceMapping.UseDefault && !string.IsNullOrEmpty(deviceMapping.DefaultProfile))
-                        switchTo = deviceMapping.DefaultProfile;
-                }
-
-                if (switchTo != "")
-                {
-                    Logger.Log(LogLevel.Information, "ActionController:SwitchProfiles", $"Current FSUIPC-Profile/Aircraft [{SimConnector.AicraftString}] matched! Switching to '{switchTo}' on StreamDeck '{deviceMapping.Name}'.");
-                    _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deviceMapping.ID, switchTo);
-                    if (!switchedDecks.Contains(deviceMapping.ID))
-                        switchedDecks.Add(deviceMapping.ID);
-                }
-            }
-
-            lastAircraft = SimConnector.AicraftString;
-        }
-
-        protected void SwitchToDefaultProfile()
-        {
-            if (GlobalProfileSettings.EnableSwitching && GlobalProfileSettings.ProfilesInstalled)
-            {
-                foreach (var deck in switchedDecks)
-                {
-                    Logger.Log(LogLevel.Information, "ActionController:SwitchToDefaultProfile", $"Switching back Profile on Deck {deck}.");
-                    _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, null);
-                }
-            }
-        }
-
-        public void LoadProfiles()
-        {
-            if (!GlobalProfileSettings.ProfilesInstalled)
-            {
-                var deckTypes = new int[] { (int)StreamDeckTypeEnum.StreamDeck, (int)StreamDeckTypeEnum.StreamDeckXL, (int)StreamDeckTypeEnum.StreamDeckMini, (int)StreamDeckTypeEnum.StreamDeckPlus, (int)StreamDeckTypeEnum.StreamDeckMobile };
-                List<string> decksToInstall = [];
-                foreach (int deckType in deckTypes)
-                {
-                    if (manifestProfiles.Where(p => p.Type == deckType).Any())
-                    {
-                        var decks = DeckManager.Info.devices.Where(d => d.type == deckType);
-                        foreach (var deck in decks)
-                        {
-                            decksToInstall.Add(deck.id);
-                        }
-                    }
-
-                }
-
-                foreach (var deck in decksToInstall)
-                {
-                    Logger.Log(LogLevel.Information, "ActionController:LoadProfiles", $"Profile install on deck {deck}.");
-                    DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, deck, "Profiles/install");
-                }
-
-                decksToInstall.Clear();
-
-                GlobalProfileSettings.ProfilesInstalled = true;
-                DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
-            }
-        }
-
-        public void UpdateGlobalSettings(ModelProfileSwitcher settings)
-        {
-            GlobalProfileSettings.CopySettings(settings);
-            DeckManager.SetGlobalSettingsAsync(DeckManager.PluginUUID, GlobalProfileSettings);
-        }
-
         public void Run(CancellationToken token)
         {
             watchRefresh.Restart();
             tickCounter++;
             SimConnector.TickCounter = tickCounter;
 
-            if (tickCounter == 1)
+            if (tickCounter == 15)
+            {
+                Logger.Log(LogLevel.Debug, "ActionController:Run", $"Requesting Global Settings");
                 _ = DeckManager.GetGlobalSettingsAsync(DeckManager.PluginUUID);
+            }
 
             if (tickCounter < firstTick) //wait till streamdeck<>plugin init is done ( <150> / 7.5 = 20 Ticks => 20 * <200> = 4s )
                 return;
@@ -364,8 +229,8 @@ namespace PilotsDeck
 
                     lastAircraft = "";
                     wasPaused = false;
-                    if (GlobalProfileSettings.EnableSwitching)
-                        SwitchToDefaultProfile();
+                    if (ProfileSwitcher.GlobalProfileSettings.EnableSwitching)
+                        ProfileSwitcher.SwitchToDefaultProfile();
                 }
                 else if (!isClosing && waitCounter == 0)
                     currentState = ControllerState.Idle;
@@ -467,9 +332,26 @@ namespace PilotsDeck
                 }
             }
 
-            if (SimConnector.IsRunning)
+
+            if (ProfileSwitcher.GlobalProfileSettings.EnableSwitching && ProfileSwitcher.CanSwitch)
+            {
+                Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftPathString}', searching for matching Profiles ...");
+                ProfileSwitcher.SwitchProfiles();
+                lastAircraft = SimConnector.AicraftPathString;
+            }
+            else if (SimConnector.IsRunning)
+            {
                 RefreshActions(token);
+
+                if (lastAircraft != SimConnector.AicraftPathString)
+                {
+                    lastAircraft = SimConnector.AicraftPathString;
+                    Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftPathString}'");
+                }
+            }
+            
             UpdateImages(token);
+
 
             watchRefresh.Stop();
             averageTime += watchRefresh.Elapsed.TotalMilliseconds;
@@ -485,19 +367,25 @@ namespace PilotsDeck
                 imageUpdates = 0;
             }
 
-            if (GlobalProfileSettings.EnableSwitching && !string.IsNullOrEmpty(SimConnector.AicraftString) && lastAircraft != SimConnector.AicraftString && SimConnector.IsReady && waitCounter == 0)
+            if (!devicesExported)
             {
-                Logger.Log(LogLevel.Information, "ActionController:Run", $"AircraftString changed to '{SimConnector.AicraftString}', searching for matching Profiles ...");
-                SwitchProfiles();
+                ExportDeviceInfo();
+                devicesExported = true;
             }
-            //if (!switched)
-            //{
-            //    _ = DeckManager.SwitchToProfileAsync(DeckManager.PluginUUID, "1B777F7DDE49829A65D57025BCAC4A66", "Profiles/test/test");
-            //    //MD5 of "@(1)[4057/108/CL05K1A00574]"
-            //    switched = true;
-            //}
         }
-        protected bool switched = false;
+
+        protected void ExportDeviceInfo()
+        {
+            try
+            {
+                string strJson = JsonConvert.SerializeObject(DeckManager.Info.devices, Formatting.Indented);
+                File.WriteAllText("Profiles/DeviceInfo.json", strJson);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Critical, "ActionController:ExportDeviceInfo", $"Exception '{ex.GetType}' while exporting Device Info: {ex.Message}");
+            }
+        }
 
         protected void RefreshActions(CancellationToken token)
         {

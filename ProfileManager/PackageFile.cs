@@ -1,0 +1,378 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
+
+namespace ProfileManager
+{
+    public class PackageFile(string filePath)
+    {
+        public class PackagedProfile(string filename, string profilename)
+        {
+            public string FileName { get; set; } = filename;
+            public string ProfileName { get; set; } = profilename;
+            public bool HasOldProfile { get; set; } = false;
+            public string InstallPath { get { return @$"{Parameters.PLUGIN_PROFILE_PATH}\{FileName}"; } }
+            public bool IsInstalled { get; set; } = false;
+        }
+
+        public string FullPath { get; protected set; } = filePath;
+        public string FileName { get { return Path.GetFileNameWithoutExtension(FullPath); } }
+        public PackageManifest Manifest{ get; protected set; }
+        public FileStream ArchiveStream { get; protected set; }
+        public ZipArchive Archive { get; protected set; }
+        public string Title { get { return string.IsNullOrWhiteSpace(Manifest?.Title) ? FileName : Manifest.Title; } }
+        public string Notes { get { return Manifest?.Notes; } }
+        public string Aircraft { get { return Manifest?.Aircraft; } }
+        public string VersionPackage { get { return Manifest?.VersionPackage; } }
+        public string Author { get { return Manifest?.Author; } }
+        public string URL { get { return Manifest?.URL; } }
+        public string VersionPlugin { get { return Manifest?.VersionPlugin; } }
+        public bool KeepPackageContents { get { return Manifest.KeepPackageContents; } }
+        public int CountProfiles { get { return PackagedProfiles.Count; } }
+        public int CountImages { get { return FilesImages.Count; } }
+        public int CountScripts { get { return FilesScripts.Count; } }
+        public int CountValidTotal { get { return PackagedProfiles.Count + FilesImages.Count + FilesScripts.Count; } }
+        public bool IsCompatible { get; protected set; } = false;
+        public bool IsDisposed { get; protected set; } = false;
+        public string ProfileWorkPath { get { return KeepPackageContents ? @$"{Parameters.PLUGIN_PROFILE_PATH}\{Path.GetFileNameWithoutExtension(FileName)}" : Parameters.PROFILE_WORK_PATH; } }
+        public List<PackagedProfile> PackagedProfiles { get; protected set; } = [];
+        public List<string> FilesImages { get; protected set; } = [];
+        public List<string> FilesScripts { get; protected set; } = [];
+        public List<string> FilesUnknown { get; protected set; } = [];
+
+        public bool CheckFile()
+        {
+            Logger.Log(LogLevel.Debug, $"Setting File to '{FullPath}'");
+            var task = InstallerTask.AddTask("Check File", $"Query basic File Information for '{FullPath}'");
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(FullPath))
+                {
+                    task.SetError("Empty Path passed!");
+                    return false;
+                }
+
+                string extension = Path.GetExtension(FullPath).ToLowerInvariant();
+                if (extension != Parameters.PACKAGE_EXTENSION && extension != ".zip")
+                {
+                    task.SetError("The File has the wrong Extension!");
+                    return false;
+                }
+
+                if (!File.Exists(FullPath))
+                {
+                    task.SetError("File does not exist!");
+                    return false;
+                }
+
+                var fileInfo = new FileInfo(FullPath);
+                if (fileInfo.Length == 0)
+                {
+                    task.SetError("File is empty!");
+                    return false;
+                }
+                else
+                    Logger.Log(LogLevel.Debug, $"Filesize is {fileInfo.Length}");
+
+                task.Message = "Check File Access";
+                using var stream = File.Open(FullPath, FileMode.Open);
+                if (stream == null || !stream.CanRead)
+                {
+                    task.SetError("File can not be opened for Read!");
+                    return false;
+                }
+
+                task.MessageLog("File checks done.", LogLevel.Information);
+                task.State = TaskState.COMPLETED;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                InstallerTask.CurrentTask.SetError(ex);
+                return false;
+            }
+        }
+
+        public bool LoadPackageInfo()
+        {
+            Logger.Log(LogLevel.Debug, $"Loading Package Info ...");
+            var task = InstallerTask.AddTask("Load Package Information", "Open ZIP Archive");
+
+            try
+            {
+                Logger.Log(LogLevel.Debug, $"Opening Archive ...");
+                ArchiveStream = new(FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096);
+                Archive = new(ArchiveStream, ZipArchiveMode.Read, true);
+                if (Archive == null)
+                {
+                    task.SetError("Failed to open Stream (Archive was NULL)!");
+                    return false;
+                }
+
+                if (Archive.Entries.Count == 0)
+                {
+                    task.SetError("Archive is Empty!");
+                    return false;
+                }
+
+
+                task.Message = $"Get {Parameters.PACKAGE_JSON_FILE} from Archive";
+                Logger.Log(LogLevel.Debug, task.Message);
+                var zipEntry = GetZipEntry(Parameters.PACKAGE_JSON_FILE);
+                if (zipEntry == null)
+                {
+                    Dispose();
+                    task.SetError($"The {Parameters.PACKAGE_JSON_FILE} File was not found!");
+                    return false;
+                }
+
+                task.Message = $"Read {Parameters.PACKAGE_JSON_FILE} Content";
+                Logger.Log(LogLevel.Debug, task.Message);
+                string packageStr = ReadStringFromZip(zipEntry);
+                if (!string.IsNullOrWhiteSpace(packageStr))
+                    Manifest = PackageManifest.LoadManifest(packageStr);
+                else
+                {
+                    Dispose();
+                    task.SetError($"The File {Parameters.PACKAGE_JSON_FILE} is Empty!");
+                    return false;
+                }
+
+                task.Message = "Check Plugin Version";
+                Logger.Log(LogLevel.Debug, task.Message);
+                if (!Tools.CheckVersion(Parameters.PLUGIN_VERSION, VersionPlugin, false, false, out bool wrongVersionSyntax) || wrongVersionSyntax)
+                {
+                    Dispose();
+                    if (!wrongVersionSyntax)
+                        task.SetError($"Current Plugin Version '{Parameters.PLUGIN_VERSION}' is below the required Version '{VersionPlugin}' of the Package");
+                    else
+                        task.SetError($"The Plugin Version '{VersionPlugin}' in the Package could not be matched against the Plugin Version '{Parameters.PLUGIN_VERSION}'");
+                    return false;
+                }
+                else
+                    IsCompatible = true;
+
+                task.Message = "Count Package Files";
+                Logger.Log(LogLevel.Debug, task.Message);
+                foreach (ZipArchiveEntry entry in Archive.Entries)
+                {
+                    Logger.Log(LogLevel.Debug, entry.FullName);
+
+                    if (IsProfilePath(entry.FullName))
+                    {
+                        string filename = entry.FullName.Replace($"{Parameters.PLUGIN_PROFILE_FOLDER}/", "", StringComparison.InvariantCultureIgnoreCase);
+                        string profilename = ReadProfileManifestFromZip(task, entry);
+                        if (string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(profilename))
+                            return false;
+                        else
+                            PackagedProfiles.Add(new(filename, profilename));
+                    }
+                    else if (IsImagePath(entry.FullName))
+                        FilesImages.Add(entry.FullName.Replace($"{Parameters.PLUGIN_IMAGE_FOLDER}/", "", StringComparison.InvariantCultureIgnoreCase));
+                    else if (IsScripPath(entry.FullName))
+                        FilesScripts.Add(entry.FullName.Replace($"{Parameters.PLUGIN_SCRIPTS_FOLDER}/", "", StringComparison.InvariantCultureIgnoreCase));
+                    else if (entry.FullName != Parameters.PACKAGE_JSON_FILE && !Path.EndsInDirectorySeparator(entry.FullName))
+                        FilesUnknown.Add(entry.FullName);
+                }
+                Logger.Log(LogLevel.Debug, $"-> {CountProfiles} Profiles | {CountImages} Images | {CountScripts} Scripts");
+
+                if (CountValidTotal == 0)
+                {
+                    Dispose();
+                    task.SetError("The Package does not contain any Files to install!");
+                    return false;
+                }
+
+
+                if (CountProfiles == 0)
+                    Logger.Log(LogLevel.Debug, "Image or Script only Package detected");
+
+                task.MessageLog("Package loaded.", LogLevel.Information);
+                task.State = TaskState.COMPLETED;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Dispose();
+                InstallerTask.CurrentTask.SetError(ex);
+                return false;
+            }
+        }
+
+        protected string ReadProfileManifestFromZip(InstallerTask task, ZipArchiveEntry archiveEntry)
+        {
+            task.Message = $"Open {archiveEntry.FullName} Content";
+            Logger.Log(LogLevel.Debug, task.Message);
+            string profilename = null;
+            using var tempStream = archiveEntry.Open();
+            if (tempStream == null)
+            {
+                Dispose();
+                task.SetError("Failed to open Stream (tempStream was NULL)!");
+                return profilename;
+            }
+
+            using var tempArchive = new ZipArchive(tempStream, ZipArchiveMode.Read, true);
+            if (tempArchive == null)
+            {
+                Dispose();
+                task.SetError("Failed to read Stream (tempArchive was NULL)!");
+                return profilename;
+            }
+            if (tempArchive.Entries.Count == 0)
+            {
+                Dispose();
+                task.SetError("Archive is Empty!");
+                return profilename;
+            }
+
+            task.Message = $"Get {Parameters.SD_PROFILE_MANIFEST} for Profile";
+            ZipArchiveEntry manifestEntry = null;
+            foreach (var entry in tempArchive.Entries)
+            {
+                if (entry.FullName.Contains($".sdProfile/{Parameters.SD_PROFILE_MANIFEST}", StringComparison.InvariantCultureIgnoreCase)
+                    || entry.FullName.Contains($".sdProfile\\{Parameters.SD_PROFILE_MANIFEST}", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    manifestEntry = entry;
+                    break;
+                }
+            }
+            if (manifestEntry == null)
+            {
+                Dispose();
+                task.SetError($"Failed to locate {Parameters.SD_PROFILE_MANIFEST} for Profile!");
+                return profilename;
+            }
+
+            string packageStr = ReadStringFromZip(manifestEntry);
+            if (!string.IsNullOrWhiteSpace(packageStr))
+                return ProfileManifest.LoadManifest(packageStr)?.ProfileName;
+            else
+            {
+                Dispose();
+                task.SetError($"The File {archiveEntry.FullName} is Empty!");
+                return profilename;
+            }
+        }
+
+        public bool InstallPackage()
+        {
+            try
+            {
+                Logger.Log(LogLevel.Debug, $"Install Package Files ...");
+
+                var task = InstallerTask.AddTask("Install Package Files", $"Extract Archive to Work-Directory: ({ProfileWorkPath})");                          
+
+                if (Directory.Exists(ProfileWorkPath))
+                {
+                    Logger.Log(LogLevel.Debug, $"Clean up work Folder (pre)");
+                    Directory.Delete(ProfileWorkPath, true);
+                }
+                
+                Logger.Log(LogLevel.Debug, $"Extract Archive to work dir");
+                Archive.ExtractToDirectory(ProfileWorkPath, true);
+
+                if (CountProfiles > 0)
+                    CopyValidFolderFiles(Parameters.PLUGIN_PROFILE_FOLDER, $"*{Parameters.SD_PROFILE_EXTENSION}", 0);
+                if (CountImages > 0)
+                    CopyValidFolderFiles(Parameters.PLUGIN_IMAGE_FOLDER, $"*{Parameters.PLUGIN_IMAGE_EXT}", 1);
+                if (CountScripts > 0)
+                    CopyValidFolderFiles(Parameters.PLUGIN_SCRIPTS_FOLDER, $"*{Parameters.PLUGIN_SCRIPTS_EXT}", 2);
+
+
+                if (!KeepPackageContents && Directory.Exists(ProfileWorkPath))
+                {
+                    task.Message = "Cleanup Work-Directory";
+                    Logger.Log(LogLevel.Debug, $"Clean up work Folder (post)");
+                    Directory.Delete(ProfileWorkPath, true);
+                }
+                else
+                    Logger.Log(LogLevel.Debug, $"Cleanup (post) skipped (keep {KeepPackageContents})");
+
+                Dispose();
+                task.MessageLog("Package Files placed into Plugin-Directory.", LogLevel.Information);
+                task.State = TaskState.COMPLETED;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Dispose();
+                InstallerTask.CurrentTask.SetError(ex);
+                return false;
+            }
+        }
+
+        protected void CopyValidFolderFiles(string folder, string extension, int recurseDepth = 0)
+        {
+            InstallerTask.CurrentTask.MessageLog($"Copying Files for Folder '{folder}'");
+
+
+            EnumerationOptions enumOptions = recurseDepth > 0 ? new() { RecurseSubdirectories = true, MaxRecursionDepth = recurseDepth } : new();
+            var enumDir = Directory.EnumerateFiles(@$"{ProfileWorkPath}\{folder}", $"*{extension}", enumOptions);
+            string dest;
+            foreach (var entry in enumDir)
+            {
+                dest = GetFileDestinationPath(entry);
+                if (!Directory.Exists(Path.GetDirectoryName(dest)))
+                {
+                    Logger.Log(LogLevel.Warning, $"Destination Path for '{dest}' does not exist!");
+                    Directory.CreateDirectory(Path.GetDirectoryName(dest));
+                }    
+                File.Copy(entry, GetFileDestinationPath(entry), true);
+            }
+        }
+
+        protected string GetFileDestinationPath(string sourcePath)
+        {
+            return sourcePath.Remove(0, ProfileWorkPath.Length).Insert(0, Parameters.PLUGIN_PATH);
+        }
+
+        protected static bool IsProfilePath(string filepath)
+        {
+            return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_PROFILE_FOLDER}/", Parameters.SD_PROFILE_EXTENSION);
+        }
+
+        protected static bool IsImagePath(string filepath)
+        {
+            return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_IMAGE_FOLDER}/", Parameters.PLUGIN_IMAGE_EXT);
+        }
+
+        protected static bool IsScripPath(string filepath)
+        {
+            return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_SCRIPTS_FOLDER}/", Parameters.PLUGIN_SCRIPTS_EXT);
+        }
+
+        protected static bool CheckPathBeginEnd(string filepath, string start, string end)
+        {
+            return filepath.StartsWith(start, StringComparison.InvariantCultureIgnoreCase) && filepath.EndsWith(end, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        protected ZipArchiveEntry GetZipEntry(string relPath)
+        {
+            return Archive.GetEntry(relPath);
+        }
+
+        protected static string ReadStringFromZip(ZipArchiveEntry zipEntry)
+        {
+            using StreamReader entryStream = new(zipEntry.Open(), Encoding.UTF8);
+            return entryStream.ReadToEnd();
+        }
+
+        public void Dispose()
+        {
+            if (IsDisposed)
+                return;
+
+            Logger.Log(LogLevel.Debug, "Dispose");
+            Archive?.Dispose();
+            Archive = null;
+            ArchiveStream?.Dispose();
+            ArchiveStream = null;
+
+            IsDisposed = true;
+        }
+    }
+}

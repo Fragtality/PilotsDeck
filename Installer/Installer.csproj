@@ -96,6 +96,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -115,9 +116,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="InstallerActionControl.xaml">
-      <SubType>Designer</SubType>
+    <Compile Include="Tools.cs" />
+    <Page Include="InstallerTaskView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -129,12 +131,12 @@
     </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="InstallerActionControl.xaml.cs">
-      <DependentUpon>InstallerActionControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="InstallerFunctions.cs" />
     <Compile Include="InstallerTask.cs" />
+    <Compile Include="InstallerTaskPanel.cs" />
+    <Compile Include="InstallerTaskView.xaml.cs" />
     <Compile Include="InstallerWorker.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -161,15 +163,11 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PilotsDeck-release.zip" />
     <None Include="CopyLatest.ps1" />
-    <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="PluginIcon.ico" />
@@ -187,16 +185,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FlagGreen.png" />
+    <Resource Include="images\box-arrow-in-right.png" />
+    <Resource Include="images\check-square.png" />
+    <Resource Include="images\x-square.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FlagRed.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="FlagYellow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="FlagBlue.png" />
+    <Resource Include="images\trash.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

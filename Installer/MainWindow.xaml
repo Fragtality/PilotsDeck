@@ -5,23 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Installer"
         mc:Ignorable="d"
-        Title="PilotsDeck Installer" MinHeight="700" Width="640" ResizeMode="NoResize" SizeToContent="Height">
-    <Grid Name="ViewGrid">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+        Title="PilotsDeck Installer" MinHeight="700" MinWidth="512" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+    <Grid Name="ViewGrid" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="64" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Name="descLabel" Margin="24,8,24,0" Grid.Row="0" FontSize="14" TextWrapping="WrapWithOverflow"/>
+        <TextBlock Grid.Row="0" Name="descLabel" Visibility="Visible" Margin="24,72,24,0" FontSize="14" MaxWidth="512" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center"/>
 
-        <StackPanel Name="actionPanel" Margin="24,0,24,0" Grid.Row="1" />
+        <local:InstallerTaskPanel Grid.Row="0" x:Name="TaskPanel" Visibility="Collapsed" MinWidth="512" Margin="24,16,24,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
-        <Label Name="bottomLabel" Grid.Row="3" />
-        <Button Name="InstallButton" Content="Install" Grid.Row="3" Height="28" Width="80" FontWeight="Bold" FontSize="16" Click="InstallButton_Click"/>
+        <TextBlock Name="bottomLabel" Grid.Row="1" Visibility="Collapsed" FontSize="12" Margin="0,16,0,16" FontWeight="DemiBold" TextWrapping="Wrap" MaxWidth="384" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <!--<Button Grid.Row="2" Name="InstallButton" MinHeight="32" MinWidth="80" Margin="0,16,0,16" FontWeight="Bold" FontSize="16" Click="InstallButton_Click" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <TextBlock Name="InstallButtonLabel" FontSize="16" FontWeight="Bold" TextWrapping="Wrap">
+                Install
+            </TextBlock>
+        </Button>-->
+        <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,8,0,24" VerticalAlignment="Bottom">
+            <Button Name="ButtonRemove" Click="ButtonRemove_Click" Visibility="Visible" FontWeight="DemiBold" FontSize="14" Width="96" Height="42"
+            ToolTip="Remove the Plugin from your System" HorizontalAlignment="Center" Margin="0,0,72,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontWeight="DemiBold" Margin="4,4,4,4" MinWidth="48" FontSize="14">Remove</TextBlock>
+                    <Image Height="20" Width="20" Source="images/trash.png"/>
+                </StackPanel>
+            </Button>
+            <Button Name="ButtonInstall" Click="ButtonInstall_Click" Visibility="Visible" IsEnabled="True" FontWeight="DemiBold" FontSize="14" Width="96" Height="42"
+            HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Name="LabelButtonInstall" FontWeight="DemiBold" Margin="4,4,4,4" MinWidth="48" FontSize="14">Install</TextBlock>
+                    <Image Name="ImageButtonInstall" Height="24" Width="24" Source="images/box-arrow-in-right.png"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
 
     </Grid>
 </Window>

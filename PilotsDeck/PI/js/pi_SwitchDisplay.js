@@ -1,5 +1,4 @@
-﻿// Implement settingsModel for the Action
-var settingsModel = {
+﻿var settingsModel = {
 	DefaultImage: "Images/SwitchDefault.png",
 	ErrorImage: "Images/Error.png",
 	IsEncoder: false,

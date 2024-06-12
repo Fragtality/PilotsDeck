@@ -21,13 +21,15 @@ namespace PilotsDeck
             if (data.dwRequestID == (uint)SIMCONNECT_REQUEST_ID.EnumEvents)
             {
                 List<string> receivedEvents = [];
+                receivedEvents.Add($"InputEvents for Aircraft {Plugin.ActionController.ipcManager.SimConnector.AicraftPathString}");
                 foreach (SIMCONNECT_INPUT_EVENT_DESCRIPTOR evt in data.rgData.Cast<SIMCONNECT_INPUT_EVENT_DESCRIPTOR>())
                 {
                     if (evt.eType == SIMCONNECT_INPUT_EVENT_TYPE.DOUBLE)
                     {
                         eventHashes.TryAdd("B:" + evt.Name, evt.Hash);
                         eventIndex.TryAdd(nextEventID, evt.Hash);
-                        receivedEvents.Add($"Event '{evt.Name}' has Hash: {evt.Hash} (Type: {evt.eType}) on ID {nextEventID}");
+                        Logger.Log(LogLevel.Verbose, "SimConnectInputEvents:OnRecvEnumerateInputEvents", $"Event '{evt.Name}' has Hash: {evt.Hash} (Type: {evt.eType}) on ID {nextEventID}");
+                        receivedEvents.Add($"B:{evt.Name}");
                         nextEventID++;
                     }
                 }
@@ -45,8 +47,6 @@ namespace PilotsDeck
                 catch (IOException)
                 {
                     Logger.Log(LogLevel.Warning, "SimConnectInputEvents:OnRecvEnumerateInputEvents", $"Could not write InputEvents to File!");
-                    foreach (var line in receivedEvents)
-                        Logger.Log(LogLevel.Debug, "SimConnectInputEvents:OnRecvEnumerateInputEvents", line);
                 }
             }
         }

@@ -9,11 +9,12 @@ namespace PilotsDeck
 {
     public enum StreamDeckTypeEnum
     {
-        StreamDeck,
-        StreamDeckMini,
-        StreamDeckXL,
-        StreamDeckMobile,
-        CorsairGKeys,
+        UNKNOWN = -1,
+        StreamDeck = 0,
+        StreamDeckMini = 1,
+        StreamDeckXL = 2,
+        StreamDeckMobile = 3,
+        CorsairGKeys = 4,
         StreamDeckPlus = 7
     }
 

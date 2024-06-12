@@ -22,10 +22,10 @@ namespace Extensions
 
                 if (file.Name != "")
                 {
-                    if (directory.Contains(@"\Profiles") && !File.Exists(completeFileName))
-                        file.ExtractToFile(completeFileName, true);
-                    else
-                        file.ExtractToFile(completeFileName, true);
+                    //if (directory.Contains(@"\Profiles") && !File.Exists(completeFileName))
+                    //    file.ExtractToFile(completeFileName, true);
+                    //else
+                        file.ExtractToFile(completeFileName, overwrite);
                 }
             }
         }

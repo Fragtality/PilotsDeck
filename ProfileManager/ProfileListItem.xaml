@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="ProfileManager.ProfileListItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProfileManager"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="460" Padding="8" Margin="0,0,0,1">
+    <Grid HorizontalAlignment="Stretch" MinWidth="460" MaxWidth="800">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="4,4,4,10" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0" Grid.Column="0" Name="ButtonEditProfileName" Click="ButtonEditProfileName_Click" Width="20" Height="20" ToolTip="Edit Profile Name">
+                <Image Width="16" Height="16" Source="images/pencil.png"/>
+            </Button>
+            <Button Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Name="ButtonDeleteManifest" Click="ButtonDeleteManifest_Click" Width="20" Height="20" ToolTip="Delete Profile from StreamDeck and Filesystem">
+                <Image Width="16" Height="16" Source="images/trash.png"/>
+            </Button>
+
+            <TextBlock Grid.Row="0" Grid.Column="1" Name="LabelProfileName" TextBlock.FontWeight="DemiBold" TextBlock.FontSize="16" Margin="6,-2,0,0" MinWidth="196" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Name="InputProfileName" KeyUp="InputProfileName_KeyUp" LostFocus="InputProfileName_LostFocus" Visibility="Collapsed" TextBlock.FontWeight="DemiBold" TextBlock.FontSize="12" Margin="4,0,0,0" MinWidth="196" VerticalAlignment="Center"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="1" Name="LabelDeviceInfo" TextBlock.FontSize="12" Margin="6,0,0,0" MinWidth="196" VerticalAlignment="Center"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="1" Name="LabelProfileDirectory" TextBlock.FontSize="10" Margin="8,0,0,0" MinWidth="196" VerticalAlignment="Center" TextBlock.FontWeight="Light" TextBlock.Foreground="DarkGray"/>
+        </Grid>
+
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="6,0,4,12" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Column="0" Grid.ColumnSpan="2" Name="CheckboxIsPreparedForSwitching" Click="CheckboxIsPreparedForSwitching_Click" TextBlock.FontSize="12" Margin="2,8,0,0" HorizontalAlignment="Left"
+                      ToolTip="The StreamDeck/Plugin can only switch to Profiles associated to its UUID.&#x0a;This Option will write the neccessary Data to the StreamDeck Profile and enable it for Mapping.">
+                <TextBlock TextBlock.FontWeight="Medium" TextBlock.FontSize="12" Margin="2,0,0,0">
+                    StreamDeck Profile modified for Switching
+                </TextBlock>
+            </CheckBox>
+        </Grid>
+
+        <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Name="CheckboxProfileNever" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,8,0,0" HorizontalAlignment="Left">
+            <TextBlock FontSize="12" Margin="4,0,0,0"><Underline>Never</Underline> switch to this Profile</TextBlock>
+        </CheckBox>
+
+        <CheckBox Grid.Row="3" Grid.Column="0" Name="CheckboxProfileDefault" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,20,0,0" HorizontalAlignment="Left"
+                  ToolTip="Switch to this Profile when the selected Simulator is running and no Profiles where found for the current Aircraft (per Deck).&#x0a;The first Match will be used - it is recommended to only have one per Deck!">
+            <TextBlock FontSize="12" Margin="4,0,0,0">Use as <Underline>Default</Underline> Profile for Simulator:</TextBlock>
+        </CheckBox>
+        <ComboBox Grid.Row="3" Grid.Column="1" Name="SelectDefaultSimulator" SelectedValuePath="Key" DisplayMemberPath="Value" SelectionChanged="SelectDefaultSimulator_SelectionChanged"
+                  TextBlock.FontSize="12" Margin="8,16,8,0" MinWidth="154" HorizontalAlignment="Left"/>
+
+        <CheckBox Grid.Row="4" Grid.Column="0" Name="CheckboxProfileAircraft" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,16,0,0" HorizontalAlignment="Left"
+                  ToolTip="Switch to this Profile when the current Aircraft String contains (!) one of Strings configured (per Deck).&#x0a;The first Match will be used - ensure the Aircraft Strings configured are specific enough!">
+            <TextBlock FontSize="12" Margin="4,0,0,0">Use Profile for specific <Underline>Aircraft(s)</Underline>:</TextBlock>
+        </CheckBox>
+        <Grid Grid.Row="4" Grid.Column="1" Grid.RowSpan="2" Margin="8,12,8,4" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="154" Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition MinHeight="24" Height="Auto"/>
+                <RowDefinition Height="*" MinHeight="24"/>
+            </Grid.RowDefinitions>
+
+            <TextBox Grid.Row="0" Grid.Column="0" Name="InputAircraftNew" KeyUp="InputAircraftNew_KeyUp" TextBlock.FontSize="12" VerticalContentAlignment="Center"/>
+            <ListBox Grid.Row="1" Grid.Column="0" Name="ListAircraft" TextBlock.FontSize="12" Margin="0,8,0,0"/>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Orientation="Vertical" Margin="6,0,0,0">
+                <Button Name="ButtonAircraftAdd" Click="ButtonAircraftAdd_Click" Margin="0,0,0,8" ToolTip="Add new Aircraft String for Matching">
+                    <Image Height="16" Width="16" Margin="2" Source="images/plus-circle.png"/>
+                </Button>
+                <Button Name="ButtonAircraftRemove" Click="ButtonAircraftRemove_Click" ToolTip="Remove the selected Aircraft String from the List">
+                    <Image Height="16" Width="16" Margin="2" Source="images/dash-circle.png"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Button Grid.Row="5" Grid.Column="0" Name="ButtonCopyPasteSettings" Click="ButtonCopyPasteSettings_Click" Margin="8,16,0,8" Height="24" Width="24" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                ToolTip="Copy/Paste Settings - click on Source then on Target">
+            <Image Height="16" Width="16" Margin="2" Source="images/copy.png"/>
+        </Button>
+    </Grid>
+</UserControl>

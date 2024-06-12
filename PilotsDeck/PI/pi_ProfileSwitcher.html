@@ -14,10 +14,20 @@
             <input class="sdpi-item-value" id="EnableSwitching" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
             <label for="EnableSwitching"><span></span></label>
         </div>
-        <div type="checkbox" class="sdpi-item" id="Config_ProfilesInstalled">
-            <div class="sdpi-item-label" id="lblProfilesInstalled">Profiles Installed</div>
-            <input class="sdpi-item-value" id="ProfilesInstalled" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
-            <label for="ProfilesInstalled"><span></span></label>
+
+        <div class="sdpi-heading">Current Aircraft</div>
+        <div class="sdpi-item" id="Config_AircraftPathString">
+            <div class="sdpi-item-label" id="lblAircraftPathString">Path String</div>
+            <span class="sdpi-item-value textarea">
+                <textarea class="sdpi-item-value" style="min-height: 100px" id="AircraftPathString"></textarea>
+            </span>
+        </div>
+
+        <div class="sdpi-heading">Mapped Profiles</div>
+        <div type="list" class="sdpi-item list" id="Config_LoadedMappings">
+            <div class="sdpi-item-label" id="lblLoadedMappings">Profile Names</div>
+            <ul class="sdpi-item-value no-select" id="LoadedMappings">
+            </ul>
         </div>
     </div>
     <script src="js/pi_Common.js"></script>
