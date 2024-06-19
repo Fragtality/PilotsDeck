@@ -103,9 +103,9 @@ namespace PilotsDeck
                 return new RectangleF(0, 0, canvasSize.X, canvasSize.Y);
         }
 
-        public void DrawImage(Image image)
+        public void DrawImage(ManagedImage image)
         {
-            render.DrawImage(image, new PointF(0,0));
+            render.DrawImage(image.GetImageObject(), GetImageDrawRectangle(image));
         }
 
         public void DrawImage(Image image, RectangleF drawRectangle)

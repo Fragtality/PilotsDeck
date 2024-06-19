@@ -175,26 +175,6 @@
   "URL": "https://github.com/Fragtality/PilotsDeck",
   "Version": "0.8.0",
   "SDKVersion": 2,
-  "Profiles": [
-    {
-      "Name": "Profiles/PilotsDeck - Default",
-      "DeviceType": 0,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    },
-    {
-      "Name": "Profiles/PilotsDeck - DefaultPlus",
-      "DeviceType": 7,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    },
-    {
-      "Name": "Profiles/PilotsDeck - DefaultXL",
-      "DeviceType": 2,
-      "ReadOnly": false,
-      "DontAutoSwitchWhenInstalled": true
-    }
-  ],
   "Software": {
     "MinimumVersion": "6.5"
   },

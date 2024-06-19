@@ -142,7 +142,7 @@ namespace Installer
             try
             {
                 Directory.CreateDirectory(Parameters.pluginDir + @"\log");
-                Directory.CreateDirectory(Parameters.pluginDir + @"\Profiles");
+                Directory.CreateDirectory(Parameters.profileDir);
                 Directory.CreateDirectory(Parameters.scriptDir);
                 Directory.CreateDirectory(Parameters.scriptDir + @"\global");
                 Directory.CreateDirectory(Parameters.scriptDir + @"\image");

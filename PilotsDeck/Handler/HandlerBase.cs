@@ -363,7 +363,7 @@ namespace PilotsDeck
                     if (!string.IsNullOrEmpty(guardImage))
                     {
                         ImageRenderer render = new(image, DeckType);
-                        render.DrawImage(ImgManager.GetImage(guardImage, DeckType).GetImageObject());
+                        render.DrawImage(ImgManager.GetImage(guardImage, DeckType));
                         result = render.RenderImage64();
                         render.Dispose();
                     }

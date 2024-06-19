@@ -183,7 +183,7 @@ namespace PilotsDeck
             ImageRenderer render = new(ImgManager.GetImage(TextSettings.DefaultImage, DeckType), DeckType);
 
             if (indImage != "")
-                render.DrawImage(ImgManager.GetImage(indImage, DeckType).GetImageObject());
+                render.DrawImage(ImgManager.GetImage(indImage, DeckType));
 
             if (TextSettings.DrawBox)
                 render.DrawBox(boxColor, ModelDisplayText.GetNumValue(TextSettings.BoxSize, 2), TextSettings.GetRectangleBox());
