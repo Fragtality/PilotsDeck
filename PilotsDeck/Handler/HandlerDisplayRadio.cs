@@ -117,7 +117,7 @@ namespace PilotsDeck
 
             RenderImage64 = render.RenderImage64();
             NeedRedraw = true;
-                render.Dispose();
+            render.Dispose();
         }
 
         protected override void RenderDefaultImages()
