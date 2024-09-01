@@ -15,14 +15,9 @@
 
         <TextBlock Grid.Row="0" Name="descLabel" Visibility="Visible" Margin="24,72,24,0" FontSize="14" MaxWidth="512" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center"/>
 
-        <local:InstallerTaskPanel Grid.Row="0" x:Name="TaskPanel" Visibility="Collapsed" MinWidth="512" Margin="24,16,24,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <local:InstallerTaskPanel Grid.Row="0" x:Name="TaskPanel" Visibility="Collapsed" MinWidth="512" MaxWidth="700" Margin="24,16,24,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
-        <TextBlock Name="bottomLabel" Grid.Row="1" Visibility="Collapsed" FontSize="12" Margin="0,16,0,16" FontWeight="DemiBold" TextWrapping="Wrap" MaxWidth="384" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-        <!--<Button Grid.Row="2" Name="InstallButton" MinHeight="32" MinWidth="80" Margin="0,16,0,16" FontWeight="Bold" FontSize="16" Click="InstallButton_Click" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <TextBlock Name="InstallButtonLabel" FontSize="16" FontWeight="Bold" TextWrapping="Wrap">
-                Install
-            </TextBlock>
-        </Button>-->
+        <TextBlock Name="bottomLabel" Grid.Row="1" Visibility="Collapsed" FontSize="14" Margin="0,16,0,16" FontWeight="DemiBold" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
         <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,8,0,24" VerticalAlignment="Bottom">
             <Button Name="ButtonRemove" Click="ButtonRemove_Click" Visibility="Visible" FontWeight="DemiBold" FontSize="14" Width="96" Height="42"
             ToolTip="Remove the Plugin from your System" HorizontalAlignment="Center" Margin="0,0,72,0" VerticalAlignment="Center">

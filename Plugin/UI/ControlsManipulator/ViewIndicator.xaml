@@ -1,0 +1,103 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ControlsManipulator.ViewIndicator"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ControlsManipulator"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition TextBlock.TextAlignment="Left" Width="Auto" MinWidth="124"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Indicator Address:
+        </Label>
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,8,0,0">
+            <TextBox Name="InputAddress" LostFocus="InputAddress_LostFocus" KeyUp="InputAddress_KeyUp" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" MinWidth="384" MinHeight="24"></TextBox>
+            <Label Name="LabelSyntaxCheck" Margin="8,0,0,0" MinHeight="24" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+        </StackPanel>
+
+        <Label Grid.Row="1" Grid.Column="1" Name="LabelVariable" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="-3,-4,0,0" FontSize="10" MinHeight="18"></Label>
+
+        <Label Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Indicator Scale:
+        </Label>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="InputScale" LostFocus="InputScale_LostFocus" KeyUp="InputScale_KeyUp" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center" MinWidth="64" MinHeight="24"></TextBox>
+
+        <Label Grid.Row="3" Grid.Column="0" Name="LabelReverse" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Reverse Direction:
+        </Label>
+        <CheckBox Grid.Row="3" Grid.Column="1" Name="CheckReverseDirection" Click="CheckReverseDirection_Click" Margin="0,8,0,0" MinHeight="24" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">Reverse Indicator Direction</CheckBox>
+
+        <Label Grid.Row="4" Grid.Column="0" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Indicator Type:
+        </Label>
+        <ComboBox Grid.Row="4" Grid.Column="1" Name="ComboType" SelectionChanged="ComboType_SelectionChanged" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" MinWidth="136" MinHeight="24"></ComboBox>
+
+        <Label Grid.Row="5" Grid.Column="0" Name="LabelImage" Margin="0,0,0,0" VerticalAlignment="Top" VerticalContentAlignment="Top" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Image:
+        </Label>
+        <Grid Grid.Row="5" Grid.Column="1" Name="GridImage" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Name="LabelImageBackground" Grid.Column="0" MinHeight="32" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,8,0" Background="#DBDBDB">
+                <Image Grid.Column="0" Name="InputImage" Width="36" MouseLeftButtonUp="InputImage_MouseLeftButtonUp"></Image>
+            </Label>
+            <Label Grid.Column="1" Name="LabelImageFile" MinHeight="24" VerticalAlignment="Top" VerticalContentAlignment="Top" Margin="0,-8,0,0"></Label>
+        </Grid>
+
+        <Label Grid.Row="6" Grid.Column="0" Name="LabelLineSize" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Line Size:
+        </Label>
+        <Grid Grid.Row="6" Grid.Column="1" Name="GridLineSize" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="InputLineSize" LostFocus="InputLineSize_LostFocus" KeyUp="InputLineSize_KeyUp" MinHeight="24" MinWidth="64" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
+        </Grid>
+
+        <Label Grid.Row="7" Grid.Column="0" Name="LabelColor" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Color:
+        </Label>
+        <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,8,0,0">
+            <Label Name="LabelColorSelect" MinWidth="136" MinHeight="24" VerticalAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonUp="LabelColorSelect_MouseLeftButtonUp" HorizontalAlignment="Left" BorderBrush="LightGray" BorderThickness="1">Color</Label>
+            <Button Name="ButtonIndicatorColorClipboard" Click="ButtonIndicatorColorClipboard_Click" Margin="8,0,0,0" Width="24" Height="24" VerticalAlignment="Center">
+                <Image Source="../Icons/copy.png" Width="20" Height="20"/>
+            </Button>
+        </StackPanel>
+
+        <Label Grid.Row="8" Grid.Column="0" Name="LabelFlip" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">
+            Flip Indicator:
+        </Label>
+        <CheckBox Grid.Row="8" Grid.Column="1" Name="CheckFlip" Click="CheckFlip_Click" Margin="0,8,0,0" MinHeight="24" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+            Flip Indicator vertically
+        </CheckBox>
+
+        <Label Grid.Row="9" Grid.Column="0" Margin="0,8,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left">Size / Offset:</Label>
+        <Grid Grid.Row="9" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="InputSize" LostFocus="InputSize_LostFocus" KeyUp="InputSize_KeyUp" MinHeight="24" MinWidth="64" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
+            <TextBox Grid.Column="1" Name="InputOffset" LostFocus="InputOffset_LostFocus" KeyUp="InputOffset_KeyUp" Margin="8,0,0,0" MinHeight="24" MinWidth="64" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
+        </Grid>
+    </Grid>
+</UserControl>

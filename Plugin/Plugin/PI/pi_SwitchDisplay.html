@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>PilotsDeck Property Inspector</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+    <link rel="stylesheet" href="css/property-inspector.css">
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-item" id="CopyPasteSettings">
+            <div class="sdpi-item-label">Transfer Settings</div>
+            <button onclick="clickCopy()" class="sdpi-item-value" value="Copy">Copy</button>
+            <button onclick="clickPaste()" class="sdpi-item-value" value="Paste">Paste</button>
+        </div>
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab selected" data-target="#tabVariable" title="Read Value from Sim">Value</div>
+                <div class="tab" data-target="#tabStates" title="Assign Images to Variable Values">On/Off States</div>
+                <div class="tab" data-target="#tabIndication" title="Change Appearance for a special State">Special State</div>
+            </div>
+        </div>
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab" data-target="#tabCommands" title="Send Commands to Sim">Commands</div>
+                <div class="tab" data-target="#tabGuard" title="Add a Guard Image and Command">Guard</div>
+                <div class="tab" data-target="#tabBackground" title="Change Background Image">Background</div>
+            </div>
+        </div>
+        <hr class="tab-separator" />
+
+        <div id="tabCommands" class="tab-container">
+            <div id="DefaultActions" class="inline"></div>
+
+            <div id="EncoderActions" class="hidden"></div>
+        </div>
+
+        <div id="tabVariable" class="tab-container">
+            <div class="sdpi-heading">Variable</div>
+            <div class="sdpi-item" id="Config_Address">
+                <div class="sdpi-item-label">Address</div>
+                <input id="Address" class="sdpi-item-value" type="text" required pattern="((0x){0,1}[0-9A-F]{4}:[0-9]{1,3}(:[ifs]{1}(:s)?)?){1}|((L:){0,1}[a-zA-Z0-9\x2D\x5F]+){1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
+            </div>
+        </div>
+
+        <div id="tabStates" class="tab-container">
+            <div class="sdpi-heading">On State</div>
+            <div type="checkbox" class="sdpi-item" id="Config_UseImageMapping">
+                <div class="sdpi-item-label" id="lblUseImageMapping">Image Mapping</div>
+                <input class="sdpi-item-value" id="UseImageMapping" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="UseImageMapping"><span></span>Map Images directly per Value</label>
+            </div>
+            <div class="sdpi-item" id="Config_ImageMap">
+                <div class="sdpi-item-label" id="lblImageMap">Image Map</div>
+                <input id="ImageMap" class="sdpi-item-value" type="text" pattern="^([0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+)*)|((Lua|lua|LUA){1}:[^:\s][a-zA-Z0-9\x2D\x5F]+(\.lua){0,1}(:[^:\s]+){0,1})$" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to Image Mappings" />
+            </div>
+            <div id="DefaultMapping" class="inline">
+                <div class="sdpi-item" id="Config_DirOnImage">
+                    <div class="sdpi-item-label">Image Directory</div>
+                    <select id="DirOnImage" class="sdpi-item-value select" onchange="updateImageSelectBox('OnImage', event.target.value)"></select>
+                </div>
+                <div class="sdpi-item" id="Config_OnImage">
+                    <div class="sdpi-item-label">On Image</div>
+                    <img id="Prev_OnImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="OnImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+                </div>
+                <div class="sdpi-item" id="Config_OnState">
+                    <div class="sdpi-item-label">On Value</div>
+                    <input id="OnState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to show Button as On" />
+                </div>
+                <div class="sdpi-heading">Off State</div>
+                <div class="sdpi-item" id="Config_DirOffImage">
+                    <div class="sdpi-item-label">Image Directory</div>
+                    <select id="DirOffImage" class="sdpi-item-value select" onchange="updateImageSelectBox('OffImage', event.target.value)"></select>
+                </div>
+                <div class="sdpi-item" id="Config_OffImage">
+                    <div class="sdpi-item-label">Off Image</div>
+                    <img id="Prev_OffImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="OffImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+                </div>
+                <div class="sdpi-item" id="Config_OffState">
+                    <div class="sdpi-item-label">Off Value</div>
+                    <input id="OffState" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to show Button as Off" />
+                </div>
+            </div>
+        </div>
+
+        <div id="tabIndication" class="tab-container">
+            <div class="sdpi-heading">Special State</div>
+            <div type="checkbox" class="sdpi-item" id="Config_HasIndication">
+                <div class="sdpi-item-label">Enable</div>
+                <input class="sdpi-item-value" id="HasIndication" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="HasIndication"><span></span></label>
+            </div>
+            <div class="sdpi-item" id="Config_DirIndicationImage">
+                <div class="sdpi-item-label">Image Directory</div>
+                <select id="DirIndicationImage" class="sdpi-item-value select" onchange="updateImageSelectBox('IndicationImage', event.target.value)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_IndicationImage">
+                <div class="sdpi-item-label" id="lblIndicationImage">Special Image</div>
+                <img id="Prev_IndicationImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="IndicationImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+            </div>
+            <div type="checkbox" class="sdpi-item" id="Config_IndicationValueAny">
+                <div class="sdpi-item-label" id="lblIndicationValueAny">Any Value</div>
+                <input class="sdpi-item-value" id="IndicationValueAny" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="IndicationValueAny"><span></span></label>
+            </div>
+            <div class="sdpi-item" id="Config_IndicationValue">
+                <div class="sdpi-item-label" id="lblIndicationValue">State Value</div>
+                <input id="IndicationValue" class="sdpi-item-value" type="text" onchange="setSettings(event.target.value, event.target.id)" placeholder="Value to show Button in Special State" />
+            </div>
+        </div>
+
+        <div id="tabGuard" class="tab-container">
+            <div id="GuardActions" class="inline"></div>
+        </div>
+
+        <div id="tabBackground" class="tab-container">
+            <div class="sdpi-heading">Background</div>
+            <div class="sdpi-item" id="Config_DirDefaultImage">
+                <div class="sdpi-item-label">Image Directory</div>
+                <select id="DirDefaultImage" class="sdpi-item-value select" onchange="updateImageSelectBox('DefaultImage', event.target.value)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_DefaultImage">
+                <div class="sdpi-item-label">Background Image</div>
+                <img id="Prev_DefaultImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_DefaultRect">
+                <div class="sdpi-item-label" id="lblDefaultRect">Draw Rectangle</div>
+                <input id="DefaultRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
+            </div>
+        </div>
+    </div>
+        <script src="inc_DefaultActions.html"></script>
+        <script src="inc_EncoderActions.html"></script>
+        <script src="inc_GuardActions.html"></script>
+        <script src="js/pi_Common.js"></script>
+        <script src="js/pi_SwitchDisplay.js"></script>
+</body>
+</html>

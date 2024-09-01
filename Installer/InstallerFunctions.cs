@@ -2,7 +2,6 @@
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -18,8 +17,6 @@ namespace Installer
 {
     public static class InstallerFunctions
     {
-
-
         #region Install Actions
         public static bool CheckPluginInstalled()
         {
@@ -87,11 +84,12 @@ namespace Installer
 
                 DirectoryInfo di = new DirectoryInfo(Parameters.pluginDir);
                 foreach (FileInfo file in di.GetFiles())
-                    file.Delete();
+                    if (file.Name != Parameters.pluginConfig && file.Name != Parameters.colorConfig)
+                        file.Delete();
 
-                bool filesDeleted = (new DirectoryInfo(Parameters.pluginDir)).GetFiles().Length == 0;
+                bool filesDeleted = (new DirectoryInfo(Parameters.pluginDir)).GetFiles().Length == 2;
 
-                string path = $@"{Parameters.pluginDir}\PI";
+                string path = $@"{Parameters.pluginDir}\Plugin";
                 if (Directory.Exists(path))
                     Directory.Delete(path, true);
                 bool piDeleted = !Directory.Exists(path);
@@ -103,6 +101,14 @@ namespace Installer
                     Directory.CreateDirectory(path);
                 }
                 bool logResetted = Directory.Exists(path);
+
+                path = $@"{Parameters.pluginDir}\Images\Wait{{0}}.png";
+                if (File.Exists(string.Format(path, "")))
+                    File.Delete(string.Format(path, ""));
+                if (File.Exists(string.Format(path, "@2x")))
+                    File.Delete(string.Format(path, "@2x"));
+                if (File.Exists(string.Format(path, "@3x")))
+                    File.Delete(string.Format(path, "@3x"));
 
                 return filesDeleted && piDeleted && logResetted;
             }
@@ -227,72 +233,67 @@ namespace Installer
             }
         }
 
-        public static bool CheckVersion(string versionInstalled, string versionRequired, bool majorEqual, bool ignoreBuild, out bool wrongVersionSyntax)
+        public static readonly Regex rxNumberMatch = new Regex(@"\D*(\d+)\D*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        public static string[] CleanNumbers(string[] versions)
         {
-            bool majorMatch = false;
-            bool minorMatch = false;
-            bool patchMatch = false;
-            bool prevWasEqual = false;
-
-            if (string.IsNullOrWhiteSpace(versionInstalled) || string.IsNullOrWhiteSpace(versionRequired))
+            for (int i = 0; i < versions.Length; i++)
             {
-                wrongVersionSyntax = true;
-                return false;
-            }
-
-            string[] strInst = versionInstalled.Split('.');
-            string[] strReq = versionRequired.Split('.');
-            if (strInst.Length < 3 || strReq.Length < 3)
-            {
-                wrongVersionSyntax = true;
-                return false;
-            }
-            else
-                wrongVersionSyntax = false;
-
-            for (int i = 0; i < strInst.Length; i++)
-            {
-                if (Regex.IsMatch(strInst[i], @"(\d+)\D"))
-                    strInst[i] = strInst[i].Substring(0, strInst[i].Length - 1);
-            }
-
-            //Major
-            if (int.TryParse(strInst[0], out int vInst) && int.TryParse(strReq[0], out int vReq))
-            {
-                if (majorEqual)
-                    majorMatch = vInst == vReq;
+                var match = rxNumberMatch.Match(versions[i]);
+                if (match?.Groups?.Count == 2 && !string.IsNullOrWhiteSpace(match?.Groups[1]?.Value))
+                    versions[i] = match.Groups[1].Value;
                 else
-                    majorMatch = vInst >= vReq;
-
-                prevWasEqual = vInst == vReq;
+                    return null;
             }
 
-            //Minor
-            if (int.TryParse(strInst[1], out vInst) && int.TryParse(strReq[1], out vReq))
+            return versions;
+        }
+
+        public enum VersionCompare
+        {
+            EQUAL = 1,
+            LESS,
+            LESS_EQUAL,
+            GREATER,
+            GREATER_EQUAL
+        }
+
+        public static bool CheckVersion(string leftVersion, VersionCompare comparison, string rightVersion, out bool compareable, int digits = 3)
+        {
+            compareable = false;
+
+            if (string.IsNullOrWhiteSpace(leftVersion) || string.IsNullOrWhiteSpace(rightVersion))
+                return false;
+
+            string[] leftParts = leftVersion.Split('.');
+            string[] rightParts = rightVersion.Split('.');
+            if (leftParts.Length < digits || rightParts.Length < digits)
+                return false;
+
+            leftParts = CleanNumbers(leftParts);
+            rightParts = CleanNumbers(rightParts);
+            if (leftParts == null || rightParts == null)
+                return false;
+
+            leftVersion = string.Join(".", leftParts);
+            rightVersion = string.Join(".", rightParts);
+            if (!Version.TryParse(leftVersion, out Version left) || !Version.TryParse(rightVersion, out Version right))
+                return false;
+
+            compareable = true;
+            switch(comparison)
             {
-                if (prevWasEqual)
-                    minorMatch = vInst >= vReq;
-                else
-                    minorMatch = true;
-
-                prevWasEqual = vInst == vReq;
+                case VersionCompare.LESS:
+                    return left < right;
+                case VersionCompare.LESS_EQUAL:
+                    return left <= right;
+                case VersionCompare.GREATER:
+                    return left > right;
+                case VersionCompare.GREATER_EQUAL:
+                    return left >= right;
+                default:
+                    return left == right;
             }
-
-            //Patch
-            if (!ignoreBuild)
-            {
-                if (int.TryParse(strInst[2], out vInst) && int.TryParse(strReq[2], out vReq))
-                {
-                    if (prevWasEqual)
-                        patchMatch = vInst >= vReq;
-                    else
-                        patchMatch = true;
-                }
-            }
-            else
-                patchMatch = true;
-
-            return majorMatch && minorMatch && patchMatch;
         }
 
         public static bool CheckPackageVersion(string packagePath, string packageName, string version)
@@ -308,8 +309,8 @@ namespace Installer
                         if (Parameters.wasmRegex.IsMatch(line))
                         {
                             var matches = Parameters.wasmRegex.Matches(line);
-                            if (matches.Count == 1 && matches[0].Groups.Count >= 2)
-                                return CheckVersion(matches[0].Groups[1].Value, version, false, false, out bool syntax) && !syntax;
+                            if (matches?.Count == 1 && matches[0]?.Groups?.Count >= 2)
+                                return CheckVersion(matches[0]?.Groups[1]?.Value, VersionCompare.GREATER_EQUAL, version, out bool compareable) && compareable;
                         }
                     }
                 }
@@ -351,9 +352,10 @@ namespace Installer
             return result;
         }
 
-        public static bool CheckFSUIPC7(string version = null)
+        public static bool CheckFSUIPC7(out bool isInstalled, string version = null)
         {
             bool result = false;
+            isInstalled = false;
             string ipcVersion = Parameters.ipcVersion;
             if (!string.IsNullOrEmpty(version))
                 ipcVersion = version;
@@ -363,11 +365,8 @@ namespace Installer
                 string regVersion = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegValue, null);
                 if (!string.IsNullOrWhiteSpace(regVersion))
                 {
-                    regVersion = regVersion.Substring(1);
-                    int index = regVersion.IndexOf("(beta)");
-                    if (index > 0)
-                        regVersion = regVersion.Substring(0, index).TrimEnd();
-                    result = CheckVersion(regVersion, ipcVersion, true, false, out bool syntax) && !syntax;
+                    isInstalled = true;
+                    result = CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, ipcVersion, out bool compareable) && compareable;
                 }
             }
             catch (Exception e)
@@ -395,13 +394,7 @@ namespace Installer
             {
                 string regVersion = (string)Registry.GetValue(regpath, Parameters.ipcRegValue, null);
                 if (!string.IsNullOrWhiteSpace(regVersion))
-                {
-                    regVersion = regVersion.Substring(1);
-                    int index = regVersion.IndexOf("(beta)");
-                    if (index > 0)
-                        regVersion = regVersion.Substring(0, index).TrimEnd();
-                    result = CheckVersion(regVersion, ipcVersion, true, false, out bool syntax) && !syntax;
-                }
+                    result = CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, ipcVersion, out bool compareable) && compareable;
             }
             catch (Exception e)
             {
@@ -483,7 +476,7 @@ namespace Installer
             try
             {
                 string regVersion = (string)Registry.GetValue(Parameters.sdRegPath, Parameters.sdRegValue, null);
-                if (!string.IsNullOrWhiteSpace(regVersion) && CheckVersion(regVersion, version, true, false, out bool syntax) && !syntax)
+                if (!string.IsNullOrWhiteSpace(regVersion) && CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, version, out bool compareable) && compareable)
                     return true;
                 else
                     return false;
@@ -496,48 +489,21 @@ namespace Installer
             }
         }
 
-        public static bool StringGreaterEqual(string input, int compare)
-        {
-            if (int.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out int numA) && numA >= compare)
-                return true;
-            else
-                return false;
-        }
-
-        public static bool StringEqual(string input, int compare)
-        {
-            if (int.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out int numA) && numA == compare)
-                return true;
-            else
-                return false;
-        }
-
-        public static bool StringGreater(string input, int compare)
-        {
-            if (int.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out int numA) && numA > compare)
-                return true;
-            else
-                return false;
-        }
-
         public static bool CheckDotNet()
         {
             try
             {
                 bool installedDesktop = false;
 
-                string output = Tools.RunCommand("dotnet --list-runtimes");
+                string[] output = Tools.RunCommand("dotnet --list-runtimes").Split(Environment.NewLine.ToCharArray());
 
-                var matches = Parameters.netDesktop.Matches(output);
-                foreach (Match match in matches)
+                foreach (var line in output)
                 {
-                    if (!match.Success || match.Groups.Count != 5)
-                        continue;
-                    if (!StringEqual(match.Groups[2].Value, Parameters.netMajor))
-                        continue;
-                    else if ((StringEqual(match.Groups[3].Value, Parameters.netMinor) && StringGreaterEqual(match.Groups[4].Value, Parameters.netPatch))
-                        || StringGreater(match.Groups[3].Value, Parameters.netMinor))
-                        installedDesktop = true;
+                    var match = Parameters.netDesktop.Match(line);
+                    if (match?.Groups?.Count == 2 && !string.IsNullOrWhiteSpace(match?.Groups[1]?.Value))
+                        installedDesktop = CheckVersion(match.Groups[1].Value, VersionCompare.GREATER_EQUAL, Parameters.netVersion, out bool compareable) && compareable;
+                    if (installedDesktop)
+                        break;
                 }
 
                 return installedDesktop;
@@ -548,6 +514,23 @@ namespace Installer
                 InstallerTask.CurrentTask.SetError(e);
                 return false;
             }
+        }
+
+        public static bool CheckVjoy()
+        {
+            try
+            {
+                string regVersion = (string)Registry.GetValue(Parameters.vjoyRegPath, Parameters.vjoyRegValue, null);
+                if (!string.IsNullOrWhiteSpace(regVersion) && regVersion == Parameters.vjoyDisplayVersion)
+                    return true;
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+                InstallerTask.CurrentTask.SetError(e);
+            }
+
+            return false;
         }
         #endregion
     }

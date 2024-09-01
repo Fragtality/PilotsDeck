@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ProfileManager.json;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -113,6 +114,17 @@ namespace ProfileManager
             Mapping.AircraftStrings = new(aircraftList);
             Mapping.IsChanged = true;
             UpdateModel();
+        }
+
+        public List<string> GetNewList()
+        {
+            List<string> list = [];
+            
+            if (HasMapping)
+                foreach(var aircraft in Mapping.AircraftStrings)
+                    list.Add(aircraft);
+
+            return list;
         }
 
         public void UpdateModel(bool setChangedMapping = false)

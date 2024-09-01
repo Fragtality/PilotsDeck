@@ -136,74 +136,62 @@ namespace ProfileManager
             return sb.ToString().ToUpper();
         }
 
-        public static readonly Regex versionUnclean = new(@"(\d+)\D", RegexOptions.Compiled);
+        public static readonly Regex rxNumberMatch = new(@"\D*(\d+)\D*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public static bool CheckVersion(string versionInstalled, string versionRequired, bool majorEqual, bool ignoreBuild, out bool wrongVersionSyntax)
+        public static string[] CleanNumbers(string[] versions)
         {
-            bool majorMatch = false;
-            bool minorMatch = false;
-            bool patchMatch = false;
-            bool prevWasEqual = false;
-
-            if (string.IsNullOrWhiteSpace(versionInstalled) || string.IsNullOrWhiteSpace(versionRequired))
+            for (int i = 0; i < versions.Length; i++)
             {
-                wrongVersionSyntax = true;
-                return false;
-            }
-
-            string[] strInst = versionInstalled.Split('.');
-            string[] strReq = versionRequired.Split('.');
-            if (strInst.Length < 3 || strReq.Length < 3)
-            {
-                wrongVersionSyntax = true;
-                return false;
-            }
-            else
-                wrongVersionSyntax = false;
-
-            for (int i = 0; i < strInst.Length; i++)
-            {
-                if (versionUnclean.IsMatch(strInst[i]))
-                    strInst[i] = strInst[i][..^1];
-            }
-
-            //Major
-            if (int.TryParse(strInst[0], out int vInst) && int.TryParse(strReq[0], out int vReq))
-            {
-                if (majorEqual)
-                    majorMatch = vInst == vReq;
+                var match = rxNumberMatch.Match(versions[i]);
+                if (match?.Groups?.Count == 2 && !string.IsNullOrWhiteSpace(match?.Groups[1]?.Value))
+                    versions[i] = match.Groups[1].Value;
                 else
-                    majorMatch = vInst >= vReq;
-
-                prevWasEqual = vInst == vReq;
+                    return null;
             }
 
-            //Minor
-            if (int.TryParse(strInst[1], out vInst) && int.TryParse(strReq[1], out vReq))
+            return versions;
+        }
+
+        public enum VersionCompare
+        {
+            EQUAL = 1,
+            LESS,
+            LESS_EQUAL,
+            GREATER,
+            GREATER_EQUAL
+        }
+
+        public static bool CheckVersion(string leftVersion, VersionCompare comparison, string rightVersion, out bool compareable, int digits = 3)
+        {
+            compareable = false;
+
+            if (string.IsNullOrWhiteSpace(leftVersion) || string.IsNullOrWhiteSpace(rightVersion))
+                return false;
+
+            string[] leftParts = leftVersion.Split('.');
+            string[] rightParts = rightVersion.Split('.');
+            if (leftParts.Length < digits || rightParts.Length < digits)
+                return false;
+
+            leftParts = CleanNumbers(leftParts);
+            rightParts = CleanNumbers(rightParts);
+            if (leftParts == null || rightParts == null)
+                return false;
+
+            leftVersion = string.Join(".", leftParts);
+            rightVersion = string.Join(".", rightParts);
+            if (!Version.TryParse(leftVersion, out Version left) || !Version.TryParse(rightVersion, out Version right))
+                return false;
+
+            compareable = true;
+            return comparison switch
             {
-                if (prevWasEqual)
-                    minorMatch = vInst >= vReq;
-                else
-                    minorMatch = true;
-
-                prevWasEqual = vInst == vReq;
-            }
-
-            //Patch
-            if (!ignoreBuild)
-            {
-                if (int.TryParse(strInst[2], out vInst) && int.TryParse(strReq[2], out vReq))
-                {
-                    if (prevWasEqual)
-                        patchMatch = vInst >= vReq;
-                    else
-                        patchMatch = true;
-                }
-            }
-            else
-                patchMatch = true;
-
-            return majorMatch && minorMatch && patchMatch;
+                VersionCompare.LESS => left < right,
+                VersionCompare.LESS_EQUAL => left <= right,
+                VersionCompare.GREATER => left > right,
+                VersionCompare.GREATER_EQUAL => left >= right,
+                _ => left == right,
+            };
         }
     }
 }

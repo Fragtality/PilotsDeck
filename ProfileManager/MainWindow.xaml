@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProfileManager"
         mc:Ignorable="d"
-        Title="Profile Manager" SizeToContent="WidthAndHeight" MinWidth="760" Width="760" MinHeight="675" Height="675" Closing="Window_Closing" ResizeMode="NoResize">
+        Title="Profile Manager" SizeToContent="WidthAndHeight" MinWidth="760" Width="760" MaxWidth="860" MinHeight="675" Height="675" Activated="Window_Activated" Closing="Window_Closing" ResizeMode="NoResize">
     <Grid HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -44,8 +44,8 @@
             Use the 'Profile Switcher' Action on your StreamDeck to get the Aircraft String of the current Aircraft.
         </TextBlock>
 
-        <StackPanel Grid.Row="2" Grid.Column="0" Margin="12" HorizontalAlignment="Stretch">
-            <ContentControl Name="ContentArea" />
-        </StackPanel>
+        <ScrollViewer Grid.Row="2" Grid.Column="0" Name="ContentArea" Margin="12" HorizontalAlignment="Stretch" CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            
+        </ScrollViewer>
     </Grid>
 </Window>

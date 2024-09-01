@@ -57,12 +57,5 @@ namespace ProfileManager
         public static readonly string PACKAGE_EXTENSION_NAME = "PilotsDeck Profile Package";
         public static readonly string PACKAGE_EXTENSION = ".ppp";
         public static readonly string PACKAGE_JSON_FILE = "package.json";
-
-
-
-
-
-
-
     }
 }

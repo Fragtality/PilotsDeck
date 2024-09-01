@@ -1,0 +1,223 @@
+﻿<UserControl x:Class="PilotsDeck.UI.DeveloperUI.ViewState"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.DeveloperUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold">
+                    Plugin &amp; Sim State
+                </Label>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Plugin State
+                </Label>
+                <Label Grid.Row="0" Grid.Column="1" Name="LabelPluginState" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="0" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Primary Connectors
+                </Label>
+                <Label Grid.Row="0" Grid.Column="3" Name="LabelConnectorsPrimary" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="0" Grid.Column="4" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Secondary Connectors
+                </Label>
+                <Label Grid.Row="0" Grid.Column="5" Name="LabelConnectorsSecondary" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+
+                <Label Grid.Row="1" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Sim State
+                </Label>
+                <Label Grid.Row="1" Grid.Column="1" Name="LabelSimState" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="1" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Sim Loading
+                </Label>
+                <Label Grid.Row="1" Grid.Column="3" Name="LabelSimLoading" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="1" Grid.Column="4" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Ready Process
+                </Label>
+                <Label Grid.Row="1" Grid.Column="5" Name="LabelReadyProcess" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+
+                <Label Grid.Row="2" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Session Running
+                </Label>
+                <Label Grid.Row="2" Grid.Column="1" Name="LabelSessionRunning" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="2" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Sim Paused
+                </Label>
+                <Label Grid.Row="2" Grid.Column="3" Name="LabelSimPaused" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="2" Grid.Column="4" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Ready Commands
+                </Label>
+                <Label Grid.Row="2" Grid.Column="5" Name="LabelReadyCommands" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16,0,16,16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold">
+                    Profile Mapping
+                </Label>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Profile Mappings
+                </Label>
+                <Label Grid.Row="0" Grid.Column="1" Name="LabelMappingsCount" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="0" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Profile Switch
+                </Label>
+                <Label Grid.Row="0" Grid.Column="3" Name="LabelProfileSwitch" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="0" Grid.Column="4" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Switchback
+                </Label>
+                <Label Grid.Row="0" Grid.Column="5" Name="LabelProfileSwitchback" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+
+                <Label Grid.Row="1" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Aircraft String
+                </Label>
+                <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="5" Name="LabelAircraftString" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16,0,16,16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold">
+                    Plugin Resources
+                </Label>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Actions
+                </Label>
+                <Label Grid.Row="0" Grid.Column="1" Name="LabelActions" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="0" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Variables
+                </Label>
+                <Label Grid.Row="0" Grid.Column="3" Name="LabelVariables" MouseLeftButtonUp="LabelVariables_MouseLeftButtonUp" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="0" Grid.Column="4" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Images
+                </Label>
+                <Label Grid.Row="0" Grid.Column="5" Name="LabelImages" MouseLeftButtonUp="LabelImages_MouseLeftButtonUp" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="1" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Scripts
+                </Label>
+                <Label Grid.Row="1" Grid.Column="1" Name="LabelScripts" MouseLeftButtonUp="LabelScripts_MouseLeftButtonUp"  MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="1" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Global Scripts
+                </Label>
+                <Label Grid.Row="1" Grid.Column="3" Name="LabelScriptsGlobal" MouseLeftButtonUp="LabelScriptsGlobal_MouseLeftButtonUp"  MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="1" Grid.Column="4" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Image Scripts
+                </Label>
+                <Label Grid.Row="1" Grid.Column="5" Name="LabelScriptsImage" MouseLeftButtonUp="LabelScriptsImage_MouseLeftButtonUp"  MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="3" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16,0,16,16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold">
+                    Statistics
+                </Label>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="148"/>
+                    <ColumnDefinition Width="196"/>
+                    <ColumnDefinition Width="148"/>
+                    <ColumnDefinition Width="196"/>
+                    <ColumnDefinition Width="148"/>
+                    <ColumnDefinition Width="196"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    Redraws
+                </Label>
+                <Label Grid.Row="0" Grid.Column="1" Name="LabelRedraws" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+
+                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Name="LabelStatistics" VerticalAlignment="Top" HorizontalAlignment="Left" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" FontFamily="Consolas"></Label>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="4" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16,0,16,16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold">
+                    Log Messages
+                </Label>
+            </GroupBox.Header>
+            <TextBlock Name="LabelLog" MinHeight="240" VerticalAlignment="Top" HorizontalAlignment="Left"></TextBlock>
+        </GroupBox>
+    </Grid>
+</UserControl>

@@ -8,21 +8,21 @@
              d:DesignHeight="675" d:DesignWidth="684">
     <Grid MinWidth="684" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!--NOTICE-->
         <TextBlock Grid.Row="0" Name="LabelInstallerNotice" Visibility="Collapsed" FontSize="12" FontWeight="DemiBold" Margin="0,8,0,12" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="384" Text="Note: The Installation will only continue/finish after clicking all the Links and adding the Profiles to the StreamDeck Software."/>
 
         <!--TASK STATUS-->
-        <local:InstallerTaskPanel Grid.Row="1" x:Name="AreaTaskStatus" Orientation="Vertical" MinWidth="384" Margin="0,0,0,8"/>
+        <local:InstallerTaskPanel Grid.Row="1" x:Name="AreaTaskStatus" Orientation="Vertical" MinWidth="384" Margin="0,0,0,8" Visibility="Collapsed"/>
 
 
         <!--FILE DROP-->
-        <Grid Name="AreaFileDrop" Grid.Row="2" HorizontalAlignment="Stretch" Visibility="Visible">
+        <Grid Name="AreaFileDrop" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -77,7 +77,7 @@
             <TextBox Grid.Row="5" Grid.Column="1" Name="LabelNotes" FontSize="12" Margin="10,8,4,4" TextWrapping="Wrap" IsReadOnly="True"/>            
 
             <TextBlock Grid.Row="6" Grid.Column="0" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4">Included Files:</TextBlock>
-            <TreeView Grid.Row="6" Grid.Column="1" Name="TreeFileContents" FontSize="12" Margin="6,8,4,4" BorderThickness="0"/>
+            <TreeView Grid.Row="6" Grid.Column="1" Name="TreeFileContents" FontSize="12" Margin="6,8,4,4" BorderThickness="0" PreviewMouseWheel="TreeFileContents_PreviewMouseWheel"/>
 
             <TextBlock Grid.Row="7" Grid.Column="0" Name="LabelRemoveOld" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4"
                        ToolTip="If you still have the old Profiles in your StreamDeck Software, the new Profiles will be added as a Copy by the Software.&#x0a;The Installer will delete the old Profile (kept in Trash), rename the new Profile and will copy the existing Mapping over.&#x0a;The Matching is done by the Profile's Name and the Installer will only change/remove anything when there is a 1:1 Match.">

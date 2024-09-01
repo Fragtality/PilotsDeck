@@ -1,0 +1,224 @@
+{
+  "Actions": [
+    {
+      "Icon": "Plugin/Images/ActionDisplay",
+      "Name": "Old Display Value (Deprecated)",
+      "VisibleInActionsList": false,
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_Display.html",
+      "Tooltip": "The Display Value Action combined with a Simple Button",
+      "UUID": "com.extension.pilotsdeck.action.display"
+    },
+    {
+      "Icon": "Plugin/Images/ActionDisplay",
+      "Name": "Display Value",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_DisplaySwitch.html",
+      "Tooltip": "The Display Value Action combined with a Simple Button",
+      "UUID": "com.extension.pilotsdeck.action.display.switch"
+    },
+    {
+      "Icon": "Plugin/Images/ActionSwitch",
+      "Name": "Simple Button",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "PropertyInspectorPath": "Plugin/PI/pi_Switch.html",
+      "Tooltip": "Like a static Joystick-Button, but can be used in MultiActions!",
+      "UUID": "com.extension.pilotsdeck.action.switch"
+    },
+    {
+      "Icon": "Plugin/Images/ActionSwitchDisplay",
+      "Name": "Dynamic Button",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_SwitchDisplay.html",
+      "Tooltip": "A Button with Status Indication of its current State in the Sim",
+      "UUID": "com.extension.pilotsdeck.action.switch.display"
+    },
+    {
+      "Icon": "Plugin/Images/ActionSwitchKorry",
+      "Name": "Korry Button",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_SwitchKorry.html",
+      "Tooltip": "A Button with Status Indication, with two independent Halves (top, bottom)",
+      "UUID": "com.extension.pilotsdeck.action.switch.korry"
+    },
+    {
+      "Icon": "Plugin/Images/ActionRadio",
+      "Name": "COM Radio",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "middle",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_DisplayRadio.html",
+      "Tooltip": "Can display and swap your active & standby COM Frequencies",
+      "UUID": "com.extension.pilotsdeck.action.display.radio"
+    },
+    {
+      "Icon": "Plugin/Images/ActionGaugeBar",
+      "Name": "Display Gauge",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_DisplayGauge.html",
+      "Tooltip": "Display a Value on a Bar or Arc",
+      "UUID": "com.extension.pilotsdeck.action.display.gauge"
+    },
+    {
+      "Icon": "Plugin/Images/ActionGaugeBarDual",
+      "Name": "Display Gauge (Dual)",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_DisplayGaugeDual.html",
+      "Tooltip": "A graphical representation of two Values",
+      "UUID": "com.extension.pilotsdeck.action.display.gauge.dual"
+    },
+    {
+      "Icon": "Plugin/Images/ActionMeta",
+      "Name": "Composite Action",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "Controllers": [
+        "Keypad",
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "Plugin/layout-pilotsdeck.json"
+      },
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_Meta.html",
+      "Tooltip": "Advanced Action composed of different Elements",
+      "UUID": "com.extension.pilotsdeck.action.meta"
+    },
+    {
+      "Icon": "Plugin/Images/ActionProfileSwitcher",
+      "Name": "Profile Switcher",
+      "States": [
+        {
+          "Image": "Plugin/Images/Wait",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "Plugin/PI/pi_ProfileSwitcher.html",
+      "Tooltip": "Allows to switch between StreamDeck Profiles based on the loaded Aircraft",
+      "UUID": "com.extension.pilotsdeck.action.profile.switcher"
+    }
+  ],
+  "Category": "PilotsDeck",
+  "CategoryIcon": "Plugin/Images/category",
+  "Disabled": false,
+  "Author": "Fragtality",
+  "CodePathWin": "PilotsDeck.exe",
+  "Description": "Directly control your FlightSim from your StreamDeck®!",
+  "Name": "PilotsDeck",
+  "Icon": "Plugin/Images/PluginIcon",
+  "URL": "https://github.com/Fragtality/PilotsDeck",
+  "Version": "0.8.0",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.5"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "7"
+    }
+  ]
+}

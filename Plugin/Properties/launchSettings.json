@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PilotsDeck": {
+      "commandName": "Project",
+      "hotReloadEnabled": false
+    }
+  }
+}

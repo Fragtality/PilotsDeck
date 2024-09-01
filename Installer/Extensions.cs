@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Installer;
+using System.IO;
 using System.IO.Compression;
 
 namespace Extensions
@@ -20,12 +21,9 @@ namespace Extensions
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                if (file.Name != "")
+                if (file.Name != "" && file.Name != Parameters.pluginConfig && file.Name != Parameters.colorConfig)
                 {
-                    //if (directory.Contains(@"\Profiles") && !File.Exists(completeFileName))
-                    //    file.ExtractToFile(completeFileName, true);
-                    //else
-                        file.ExtractToFile(completeFileName, overwrite);
+                    file.ExtractToFile(completeFileName, overwrite);
                 }
             }
         }

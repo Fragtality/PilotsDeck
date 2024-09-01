@@ -16,8 +16,6 @@ namespace ProfileManager
 
     public static class Logger
     {
-        //public static Queue MessageQueue = new();
-
         public static void CreateLogger()
         {
             LoggerConfiguration loggerConfiguration = new LoggerConfiguration().WriteTo.File("log/ProfileManager.log", rollingInterval: RollingInterval.Infinite, retainedFileCountLimit: 1, fileSizeLimitBytes: 1048576, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] [{SourceContext}] {Message} {NewLine}");
@@ -53,13 +51,6 @@ namespace ProfileManager
                     Serilog.Log.Logger.ForContext("SourceContext", context).Debug(message);
                     break;
             }
-            //if (level > LogLevel.Debug)
-            //{
-            //    if (message.Length > 128)
-            //        MessageQueue.Enqueue(message[0..128]);
-            //    else
-            //        MessageQueue.Enqueue(message);
-            //}
         }
 
         public static void Log(LogLevel level, string message, [CallerFilePath] string classFile = "", [CallerMemberName] string classMethod = "")

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProfileManager.json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -143,10 +144,10 @@ namespace ProfileManager
 
                 task.Message = "Check Plugin Version";
                 Logger.Log(LogLevel.Debug, task.Message);
-                if (!Tools.CheckVersion(Parameters.PLUGIN_VERSION, VersionPlugin, false, false, out bool wrongVersionSyntax) || wrongVersionSyntax)
+                if (!Tools.CheckVersion(Parameters.PLUGIN_VERSION, Tools.VersionCompare.GREATER_EQUAL, VersionPlugin, out bool compareable) || !compareable)
                 {
                     Dispose();
-                    if (!wrongVersionSyntax)
+                    if (compareable)
                         task.SetError($"Current Plugin Version '{Parameters.PLUGIN_VERSION}' is below the required Version '{VersionPlugin}' of the Package");
                     else
                         task.SetError($"The Plugin Version '{VersionPlugin}' in the Package could not be matched against the Plugin Version '{Parameters.PLUGIN_VERSION}'");

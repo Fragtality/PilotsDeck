@@ -1,12 +1,12 @@
 ﻿using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace ProfileManager
+namespace ProfileManager.json
 {
     public class DeviceInfo
     {
         [JsonPropertyName("id")]
-        public string ID {  get; set; }
+        public string ID { get; set; }
 
         [JsonPropertyName("name")]
         public string Name { get; set; }

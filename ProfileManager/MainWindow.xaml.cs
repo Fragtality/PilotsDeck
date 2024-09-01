@@ -29,6 +29,7 @@ namespace ProfileManager
                 AppTitle = Title;
 
                 ExecuteCommandLine();
+                ButtonProfileInstaller_Click(null, null);
             }
             catch (Exception ex)
             {
@@ -70,6 +71,8 @@ namespace ProfileManager
             ButtonEnable(ButtonProfileMapper);
             ButtonDisable(ButtonProfileInstaller);
             var view = new ViewProfileInstaller();
+            ContentArea.CanContentScroll = true;
+            ContentArea.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             ContentArea.Content = view;
             
             if (filename != null)
@@ -153,6 +156,8 @@ namespace ProfileManager
 
                 ButtonEnable(ButtonProfileInstaller);
                 ButtonDisable(ButtonProfileMapper);
+                ContentArea.CanContentScroll = false;
+                ContentArea.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 ContentArea.Content = new ViewProfileMapper();
             }
             catch (Exception ex)
@@ -167,6 +172,11 @@ namespace ProfileManager
                 (ContentArea.Content as ViewProfileMapper)?.Window_Closing();
             if (ContentArea.Content is ViewProfileInstaller)
                 (ContentArea.Content as ViewProfileInstaller)?.Dispose();
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            MaxHeight = SystemParameters.FullPrimaryScreenHeight - 128;
         }
     }
 }

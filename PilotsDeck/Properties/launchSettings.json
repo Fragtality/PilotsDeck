@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "PilotsDeck": {
-      "commandName": "Project",
-      "nativeDebugging": true
-    }
-  }
-}

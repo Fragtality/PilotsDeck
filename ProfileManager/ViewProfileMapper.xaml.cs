@@ -241,25 +241,6 @@ namespace ProfileManager
             {
                 SetButtonStyle(BtnProfileRefresh, BrushDefault, 1, "Setting normal State on BtnProfileRefresh");
             }
-
-            //if (ProfileController.HasChanges && BtnProfileSave.BorderBrush != BrushRed)
-            //{
-            //    SetButtonStyle(BtnProfileSave, BrushRed, 2, "Setting unsaved State on BtnProfileSave", ImgProfileSave, "file-earmark-excel-fill");
-            //    SetButtonStyle(BtnProfileRefresh, BrushOrange, 2, "Setting warning State on BtnProfileRefresh");
-            //}
-            //else if (!ProfileController.HasChanges && BtnProfileSave.BorderBrush == BrushRed)
-            //{
-            //    SetButtonStyle(BtnProfileSave, BrushDefault, 1, "Setting normal State on BtnProfileSave", ImgProfileSave, "file-earmark-check");
-            //}
-
-            //if (ProfileController.HasError && BtnProfileRefresh.BorderBrush != BrushOrange)
-            //{
-            //    SetButtonStyle(BtnProfileRefresh, BrushOrange, 2, "Setting warning State on BtnProfileRefresh");
-            //}
-            //else if (!ProfileController.HasError && !ProfileController.HasChanges && BtnProfileRefresh.BorderBrush != BrushDefault)
-            //{
-            //    SetButtonStyle(BtnProfileRefresh, BrushDefault, 1, "Setting normal State on BtnProfileRefresh");
-            //}
         }
 
         protected void SetSaveHighlight()

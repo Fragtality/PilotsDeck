@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace ProfileManager
+namespace ProfileManager.json
 {
     public class ProfileMapping
     {
@@ -19,7 +19,7 @@ namespace ProfileManager
 
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public string DeckName { get; set; } = "";
-        
+
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public StreamDeckTypeEnum DeckType { get; set; } = StreamDeckTypeEnum.UNKNOWN;
 

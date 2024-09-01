@@ -1,0 +1,15 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<Ausstehend>", Scope = "namespaceanddescendants", Target = "~N:PilotsDeck.StreamDeck.Messages")]
+[assembly: SuppressMessage("Performance", "SYSLIB1045:In „GeneratedRegexAttribute“ konvertieren.", Justification = "<Ausstehend>")]
+[assembly: SuppressMessage("Style", "IDE0066:Switch-Ausdruck verwenden", Justification = "<Ausstehend>")]
+[assembly: SuppressMessage("Performance", "CA1862:\"StringComparison\"-Methodenüberladungen verwenden, um Zeichenfolgenvergleiche ohne Beachtung der Groß-/Kleinschreibung durchzuführen", Justification = "<Ausstehend>")]
+[assembly: SuppressMessage("Performance", "CA1854:Methode „IDictionary.TryGetValue(TKey, out TValue)“ bevorzugen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Resources.ScriptManager.RegisterScript(System.String)~PilotsDeck.Resources.Scripts.ManagedScript")]
+[assembly: SuppressMessage("Performance", "CA1869:JsonSerializerOptions-Instanzen zwischenspeichern und wiederverwenden", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Plugin.PluginController.ExportDeviceInfo")]
+[assembly: SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Simulator.MSFS.MobiModule.SimConnect_OnClientData(Microsoft.FlightSimulator.SimConnect.SimConnect,Microsoft.FlightSimulator.SimConnect.SIMCONNECT_RECV_CLIENT_DATA)")]
+[assembly: SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Simulator.MSFS.SimConnectInputEvents.SimConnect_OnRecvEnumerateInputEvents(Microsoft.FlightSimulator.SimConnect.SimConnect,Microsoft.FlightSimulator.SimConnect.SIMCONNECT_RECV_ENUMERATE_INPUT_EVENTS)")]
+[assembly: SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Simulator.MSFS.SimConnectInputEvents.SimConnect_OnRecvGetInputEvents(Microsoft.FlightSimulator.SimConnect.SimConnect,Microsoft.FlightSimulator.SimConnect.SIMCONNECT_RECV_GET_INPUT_EVENT)")]
+[assembly: SuppressMessage("Interoperability", "SYSLIB1054:Verwenden Sie \\\"LibraryImportAttribute\\\" anstelle von \\\"DllImportAttribute\\\", um P/Invoke-Marshallingcode zur Kompilierzeit zu generieren.", Justification = "<Ausstehend>")]
+[assembly: SuppressMessage("Design", "CA1069:Enumerationswerte dürfen nicht dupliziert werden", Justification = "<Ausstehend>", Scope = "type", Target = "~T:PilotsDeck.Actions.Simple.ImageID")]
+[assembly: SuppressMessage("Design", "CA1069:Enumerationswerte dürfen nicht dupliziert werden", Justification = "<Ausstehend>", Scope = "type", Target = "~T:PilotsDeck.Actions.StreamDeckCommand")]
+[assembly: SuppressMessage("Style", "IDE0290:Primären Konstruktor verwenden", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Actions.Advanced.ConditionHandler.#ctor(PilotsDeck.Actions.Advanced.ConditionHandler)")]

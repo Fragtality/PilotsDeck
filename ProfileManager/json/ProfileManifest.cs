@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace ProfileManager
+namespace ProfileManager.json
 {
     public class ProfileManifest
     {
@@ -40,7 +40,7 @@ namespace ProfileManager
         [JsonPropertyName("Name")]
         public string ProfileName { get; set; }
 
-        public JsonNode Pages {  get; set; }
+        public JsonNode Pages { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string PreconfiguredName { get; set; } = null;

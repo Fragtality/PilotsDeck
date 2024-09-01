@@ -166,7 +166,8 @@ namespace ProfileManager
             bool switchedToCompleted = false;
             int waitDelay = 2000;
             int countSearches = 0;
-            while (PackageFile.PackagedProfiles.Where(p => !p.IsInstalled).Any() && !IsCanceled)
+            int searchMax = 7;
+            while (PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.HasOldProfile).Any() && !IsCanceled)
             {
                 await Task.Delay(waitDelay);
                 if (IsCanceled)
@@ -184,8 +185,17 @@ namespace ProfileManager
                     ProfileController.LoadWithoutMapping();
                     if (ProfileController.IsLoaded && !ProfileController.HasError)
                     {
-                        countSearches++;
-                        foreach (var profile in PackageFile.PackagedProfiles.Where(p => !p.IsInstalled))
+                        
+                        if (countSearches >= searchMax)
+                        {
+                            task.Message = $"Profile Search was aborted after {(int)((countSearches * waitDelay)/1000)}s";
+                            Logger.Log(LogLevel.Debug, $"Aborting Check after {countSearches} Iterations - not installed Profiles: {PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.HasOldProfile).Count()}");
+                            break;
+                        }
+                        else if (countSearches > 1)
+                            task.ReplaceLastMessage($"All Profiles clicked! Checking Profile Store ({countSearches}/{searchMax}) ...");
+
+                        foreach (var profile in PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.HasOldProfile))
                         {
                             if (ProfileController.ManifestHasCopy(profile.ProfileName))
                             {
@@ -193,6 +203,7 @@ namespace ProfileManager
                                 Logger.Log(LogLevel.Debug, $"Match found for '{profile.ProfileName}'");
                             }
                         }
+                        countSearches++;
                     }
                     else
                     {
@@ -213,7 +224,7 @@ namespace ProfileManager
                 return;
 
             Tools.SetForegroundWindow(MainWindow.AppTitle);
-            await ProfileController.SwapUpdateManifest(PackageFile.PackagedProfiles.Where(p => p.HasOldProfile).Select(p => p.ProfileName).ToList(), task);
+            await ProfileController.SwapUpdateManifest(PackageFile.PackagedProfiles.Where(p => p.HasOldProfile && p.IsInstalled).Select(p => p.ProfileName).ToList(), task);
         }
 
         public static bool SetStreamDeckWindowForeground()

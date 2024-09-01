@@ -18,11 +18,15 @@ namespace Installer
 
             this.Top = 42;
 
-            var run = new Run("This Tool will install the PilotsDeck Plugin to your StreamDeck Software.\r\nThe Software will be stopped/started during the Installation-Process.\r\nAdded/Changed Profiles, Images and Scripts will stay intact.")
+            var run = new Run("This Tool will install the PilotsDeck Plugin to your StreamDeck Software.\r\nThe Software will be stopped/started during the Installation-Process.\r\nAdded/Changed Profiles, Images and Scripts will stay intact.\r\n\r\nDO NOT run the Installer, Plugin or StreamDeck Software as Admin!")
             {
                 FontWeight = FontWeights.DemiBold
             };
             descLabel.Inlines.Add(run);
+
+            run = new Run("\r\nNOTE: Running the Simulator or FSUIPC as Admin can eventually cause Connections-Issues!");
+            descLabel.Inlines.Add(run);
+
             run = new Run("\r\n\r\n\r\nNote: PilotsDeck is 100% free and Open-Source. The Software and the Developer do not have any Affiliation to Flight Panels.\r\nIt is the actual Plugin allowing the StreamDeck to interface with the Simulator and allowing the Creation of StreamDeck Profiles for Airplanes.");
             descLabel.Inlines.Add(run);
 

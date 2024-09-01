@@ -115,7 +115,7 @@ namespace Installer
                 task.SetState($"The Runtime is not installed or outdated!\r\nDownloading Runtime ...", TaskState.WAITING);
                 if (!InstallerFunctions.DownloadFile(Parameters.netUrl, Parameters.netUrlFile, out string filepath))
                 {
-                    task.SetError("Could not download .NET 7 Runtime!");
+                    task.SetError("Could not download .NET Runtime!");
                     return false;
                 }
 
@@ -143,17 +143,31 @@ namespace Installer
                 task.SetState($"The installed Software Version mets the Minimum Requirements but is outdated.\r\nPlease consider updating the StreamDeck Software to Version {Parameters.sdVersionRecommended} or greater.\r\n",
                      TaskState.WAITING);
                 task.Hyperlink = "StreamDeck Software";
-                task.HyperlinkURL = "https://www.elgato.com/downloads\r\n";
+                task.HyperlinkURL = $"{Parameters.sdUrl}\r\n";
 
                 return true;
             }
             else
             {
-                task.SetError($"The installed Software does not match the Minimum Version {Parameters.sdVersion}.\r\nPlease update the StreamDeck Software!\r\n");
-                task.Hyperlink = "StreamDeck Software";
-                task.HyperlinkURL = "https://www.elgato.com/downloads\r\n";
+                task.SetState($"The StreamDeck Software is not installed or outdated!\r\nDownloading Installer ...", TaskState.WAITING);
+                if (!InstallerFunctions.DownloadFile(Parameters.sdUrl, Parameters.sdUrlFile, out string filepath))
+                {
+                    task.SetError("Could not download StreamDeck Installer!");
+                    return false;
+                }
 
-                return false;
+                task.Message = $"Starting interactive Installer ...";
+                Tools.RunCommand(filepath);
+                Thread.Sleep(1000);
+                File.Delete(filepath);
+
+                bool result = InstallerFunctions.CheckStreamDeckSW(Parameters.sdVersionRecommended);
+                if (result)
+                    task.SetSuccess($"StreamDeck Software {Parameters.sdVersionRecommended} installed!");
+                else
+                    task.SetError($"Setup failed.");
+
+                return result;
             }
         }
 
@@ -262,7 +276,7 @@ namespace Installer
         {
             var task = InstallerTask.AddTask("FSUIPC7 Installation", "Check State and Version of FSUIPC7 ...");
 
-            if (InstallerFunctions.CheckFSUIPC7())
+            if (InstallerFunctions.CheckFSUIPC7(out bool isInstalled))
             {
                 if (!InstallerFunctions.CheckPackageVersion(MsfsPackagePath, Parameters.wasmIpcName, Parameters.wasmIpcVersion))
                 {
@@ -273,11 +287,45 @@ namespace Installer
                 }
                 else if (!InstallerFunctions.CheckFSUIPC7Pumps())
                 {
-                    task.SetState("FSUIPC7 is installed, but the FSUIPC7.ini is missing the NumberOfPumps=0 Entry in the [General] Section (which helps to avoid Stutters)!", TaskState.ACTIVE);
+                    task.SetState("FSUIPC7 is installed, but the FSUIPC7.ini is missing the NumberOfPumps=0 Entry in the [General] Section (which helps to avoid Stutters)!", TaskState.WAITING);
                 }
                 else
                 {
                     task.SetSuccess($"FSUIPC7 at or above minimum Version {Parameters.ipcVersion}!");
+                }
+
+                return true;
+            }
+            else if (!isInstalled)
+            {
+                task.ReplaceLastMessage($"FSUIPC7 not installed!\r\n\r\nIt is not mandatory to have FSUIPC installed anymore, but still recommended - some Profiles might use Variables/Commands from that Connector.\r\nIf you do not plan to install it, please change the Parameter 'UseFsuipcForMSFS' to false in your 'PluginConfig.json' File!");
+                task.State = TaskState.WAITING;
+                bool canRunSetup = false;
+
+                string reason = "";
+                if (Tools.GetProcessRunning("FlightSimulator") || Tools.GetProcessRunning("FSUIPC7"))
+                    reason = "FlightSimulator is running.";
+                else
+                    canRunSetup = true;
+
+                if (!canRunSetup)
+                {
+                    task.Message = $"\r\nCan not run Setup: {reason}\r\nPlease install the latest Version manually.";
+                    task.Hyperlink = "\r\nFSUIPC";
+                    task.HyperlinkURL = "http://fsuipc.com/\r\n";
+                    task.SetUrlBold = true;
+                    Logger.Log(LogLevel.Error, task.Message);
+                }
+                else
+                {
+                    task.Hyperlink = "\r\nInstall FSUIPC7";
+                    task.SetUrlBold= true;
+                    task.HyperlinkURL = InstallerTask.callbackUrl;
+                    task.HyperlinkOnClick = () =>
+                    {
+                        InstallFSUIPC7(task);
+                    };
+                    task.SetCompletedOnUrl = true;
                 }
 
                 return true;
@@ -289,9 +337,9 @@ namespace Installer
                 bool canRunSetup = false;
 
                 string reason = "";
-                if (Tools.GetProcessRunning("FlightSimulator"))
-                    reason = "FlightSimulator is running.";
-                else if (MessageBox.Show($"{msg}\r\nInstall FSUIPC7 now?", "Install FSUIPC", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                if (Tools.GetProcessRunning("FlightSimulator") || Tools.GetProcessRunning("FSUIPC7"))
+                    reason = "FlightSimulator/FSUIPC7 is running.";
+                else if (MessageBox.Show($"{msg}\r\nInstall Update now?", "Update FSUIPC", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                     reason = "Installation declined by User.";
                 else
                     canRunSetup = true;
@@ -307,56 +355,61 @@ namespace Installer
                     return false;
                 }
                 
-                task.SetState($"Downloading FSUIPC Installer ...", TaskState.WAITING);
-                if (!InstallerFunctions.DownloadFile(Parameters.ipcUrl, Parameters.ipcUrlFile, out string archivePath))
-                {
-                    task.SetError("Could not download FSUIPC Installer!");
-                    return false;
-                }
-                string workDir = Path.GetDirectoryName(archivePath);
-
-                task.Message = "Extracting Installer Archive ...";
-                try
-                {
-                    Directory.Delete($@"{workDir}\{Parameters.ipcSetup}", true);
-                }
-                catch { }
-                if (!InstallerFunctions.ExtractZipFile(workDir, archivePath))
-                {
-                    task.SetError("Error while extracting FSUIPC Installer!");
-                    return false;
-                }
-
-                task.Message = $"Running FSUIPC Installer - manual Interaction required ...";
-                string binPath = $@"{workDir}\{Parameters.ipcSetup}\{Parameters.ipcSetupFile}";
-                if (!File.Exists(binPath))
-                {
-                    task.SetError("Could not locate the Installer Binary!");
-                    return false;
-                }
-
-                Tools.RunCommand(binPath);
-                Thread.Sleep(1000);
-
-                bool ioSuccessfull = true;
-                try
-                {
-                    File.Delete(archivePath);
-                    Directory.Delete($@"{workDir}\{Parameters.ipcSetup}", true);
-                }
-                catch
-                {
-                    ioSuccessfull = false;
-                }
-
-                if (ioSuccessfull)
-                    task.SetSuccess($"FSUIPC Version {Parameters.ipcVersion} was installed/updated successfully!");
-                else
-                    task.SetState($"FSUIPC Version {Parameters.ipcVersion} was installed/updated, but the temporary Files could not be removed!", TaskState.WAITING);
-
-
-                return true;
+                return InstallFSUIPC7(task);
             }
+        }
+
+        public bool InstallFSUIPC7(InstallerTask task)
+        {
+            task.SetState($"Downloading FSUIPC Installer ...", TaskState.WAITING);
+            if (!InstallerFunctions.DownloadFile(Parameters.ipcUrl, Parameters.ipcUrlFile, out string archivePath))
+            {
+                task.SetError("Could not download FSUIPC Installer!");
+                return false;
+            }
+            string workDir = Path.GetDirectoryName(archivePath);
+
+            task.Message = "Extracting Installer Archive ...";
+            try
+            {
+                Directory.Delete($@"{workDir}\{Parameters.ipcSetup}", true);
+            }
+            catch { }
+            if (!InstallerFunctions.ExtractZipFile(workDir, archivePath))
+            {
+                task.SetError("Error while extracting FSUIPC Installer!");
+                return false;
+            }
+
+            task.Message = $"Running FSUIPC Installer - manual Interaction required ...";
+            string binPath = $@"{workDir}\{Parameters.ipcSetup}\{Parameters.ipcSetupFile}";
+            if (!File.Exists(binPath))
+            {
+                task.SetError("Could not locate the Installer Binary!");
+                return false;
+            }
+
+            Tools.RunCommand(binPath);
+            Thread.Sleep(1000);
+
+            bool ioSuccessfull = true;
+            try
+            {
+                File.Delete(archivePath);
+                Directory.Delete($@"{workDir}\{Parameters.ipcSetup}", true);
+            }
+            catch
+            {
+                ioSuccessfull = false;
+            }
+
+            if (ioSuccessfull)
+                task.SetSuccess($"FSUIPC Version {Parameters.ipcVersion} was installed/updated successfully!");
+            else
+                task.SetState($"FSUIPC Version {Parameters.ipcVersion} was installed/updated, but the temporary Files could not be removed!", TaskState.WAITING);
+
+
+            return true;
         }
 
         private bool CheckFSUIPC6()
@@ -626,14 +679,23 @@ namespace Installer
 
         private void ShowVjoyInfo()
         {
-            vjoyTask = InstallerTask.AddTask("vJoy Driver", "Optional: The vJoy Driver enables the Plugin to trigger Joystick Events (recognizable by the Simulator).\r\n" +
-                                             "Note for existing Users: The vJoy Library was switched to the Brunner Fork, an Update might be required.\r\n" +
-                                             "Click the Link to run the Installer:");
-            vjoyTask.SetCallbackUrl();
-            vjoyTask.DisableLinkAfterClick = false;
-            vjoyTask.Hyperlink = Path.GetFileNameWithoutExtension(Parameters.vjoyUrlFile);
-            vjoyTask.HyperlinkOnClick = InstallVjoyDriver;
-            vjoyTask.SetCompletedOnUrl = true;
+            vjoyTask = InstallerTask.AddTask("vJoy Driver", "Checking installed Version ...");
+            if (InstallerFunctions.CheckVjoy())
+            {
+                vjoyTask.DisplayOnlyLastCompleted = true;
+                vjoyTask.SetState($"vJoy Driver Version {Parameters.vjoyDisplayVersion} installed.", TaskState.COMPLETED);
+            }
+            else
+            {
+                vjoyTask.Message = $"Optional: The vJoy Driver was not detected or does not match the recommended Version ({Parameters.vjoyDisplayVersion}).\r\n" +
+                                   "The vJoy Driver enables the Plugin to trigger Joystick Events (recognizable by the Simulator).\r\n" +
+                                   "Click the Link to run the Installer:";
+                vjoyTask.SetCallbackUrl();
+                vjoyTask.DisableLinkAfterClick = false;
+                vjoyTask.Hyperlink = Path.GetFileNameWithoutExtension(Parameters.vjoyUrlFile);
+                vjoyTask.HyperlinkOnClick = InstallVjoyDriver;
+                vjoyTask.SetCompletedOnUrl = true;
+            }
         }
     }
 }

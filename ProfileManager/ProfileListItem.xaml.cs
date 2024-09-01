@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProfileManager.json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -30,7 +31,7 @@ namespace ProfileManager
         protected Brush BrushBlue { get; } = SystemColors.HighlightBrush;
         protected Brush BrushOrange { get; } = new SolidColorBrush(Colors.Orange);
         protected Thickness ThicknessDefault { get; } = new Thickness(1);
-        protected Thickness ThicknessMarked { get; } = new Thickness(1);//new Thickness(2,1,2,1);
+        protected Thickness ThicknessMarked { get; } = new Thickness(1);
 
         public ProfileListItem(ProfileManifest manifest, Action refreshAll)
         {
@@ -249,7 +250,7 @@ namespace ProfileManager
                     DefaultProfile = ViewModel.Mapping.DefaultProfile,
                     DefaultSimulator = ViewModel.Mapping.DefaultSimulator,
                     AircraftProfile = ViewModel.Mapping.AircraftProfile,
-                    AircraftStrings = ViewModel.Mapping.AircraftStrings,
+                    AircraftStrings = ViewModel.GetNewList(),
                 };
 
                 ButtonCopyPasteSettings.Background = BrushGreen;
