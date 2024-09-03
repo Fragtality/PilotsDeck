@@ -72,12 +72,12 @@ namespace PilotsDeck.UI.ViewModels
         {
             Dictionary<ELEMENT_MANIPULATOR, string> dict = [];
 
-            dict.Add(ELEMENT_MANIPULATOR.COLOR, "Color");
             dict.Add(ELEMENT_MANIPULATOR.VISIBLE, "Visible");
             if (item?.IsTypeElementValue() == true)
                 dict.Add(ELEMENT_MANIPULATOR.FORMAT, "Format");
             if (item?.IsTypeElementGauge() == true)
                 dict.Add(ELEMENT_MANIPULATOR.INDICATOR, "Indicator");
+            dict.Add(ELEMENT_MANIPULATOR.COLOR, "Color");
             dict.Add(ELEMENT_MANIPULATOR.SIZEPOS, "Size / Position");
             dict.Add(ELEMENT_MANIPULATOR.ROTATE, "Rotate");
             dict.Add(ELEMENT_MANIPULATOR.TRANSPARENCY, "Transparency");

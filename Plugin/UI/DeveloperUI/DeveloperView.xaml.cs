@@ -50,6 +50,7 @@ namespace PilotsDeck.UI.DeveloperUI
 
         protected void LoadView(IView newView)
         {
+            Logger.Debug($"Loading View '{newView.GetType().Name}' ...");
             if (CurrentView != null)
             {
                 CurrentView?.Stop();
@@ -64,6 +65,7 @@ namespace PilotsDeck.UI.DeveloperUI
 
             SetMenuButton(ButtonMonitor, CurrentView is ViewState);
             SetMenuButton(ButtonReference, CurrentView is ViewReference);
+            Logger.Debug($"View loaded.");
         }
 
         protected static void SetMenuButton(Button button, bool selected)
@@ -80,11 +82,11 @@ namespace PilotsDeck.UI.DeveloperUI
                 CurrentView?.Stop();
                 CurrentView = null;
                 PanelView.Content = null;
-                Logger.Verbose($"GUI Hidden");
+                Logger.Debug($"GUI Hidden");
             }
             else
             {
-                Logger.Verbose($"GUI Visible");
+                Logger.Debug($"GUI Visible");
                 MaxHeight = SystemParameters.PrimaryScreenHeight;
                 Topmost = true;
                 Focus();

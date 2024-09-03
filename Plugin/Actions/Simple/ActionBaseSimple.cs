@@ -91,6 +91,7 @@ namespace PilotsDeck.Actions.Simple
             UpdateRessources();
             CheckVersion();
             CheckSettings();
+            CleanCommands();
         }
 
         protected virtual void CheckSettings()
@@ -100,9 +101,9 @@ namespace PilotsDeck.Actions.Simple
 
         protected virtual void CheckVersion()
         {
-            if (Settings.BUILD_VERSION < AppConfiguration.BuildConfigVersion)
+            if (Settings.BUILD_VERSION < AppConfiguration.BuildModelVersion)
             {
-                Logger.Information($"Converting Settings for '{ActionID}' to Version {AppConfiguration.BuildConfigVersion}");
+                Logger.Information($"Converting Settings for '{ActionID}' to Version {AppConfiguration.BuildModelVersion}");
 
                 if (Settings.BUILD_VERSION < 4)
                 {
@@ -126,7 +127,7 @@ namespace PilotsDeck.Actions.Simple
                     Logger.Debug($"Changed 'FontSize' {oldSize} => {Settings.FontSize}");
                 }
                 
-                Settings.BUILD_VERSION = AppConfiguration.BuildConfigVersion;
+                Settings.BUILD_VERSION = AppConfiguration.BuildModelVersion;
                 SettingModelUpdated = true;
             }
 
@@ -135,7 +136,10 @@ namespace PilotsDeck.Actions.Simple
                 Settings.IsNewModel = false;
                 SettingModelUpdated = true;
             }
+        }
 
+        public virtual void CleanCommands()
+        {
             if (App.Configuration.CleanInactiveCommands)
             {
                 if (!Settings.HasAction)

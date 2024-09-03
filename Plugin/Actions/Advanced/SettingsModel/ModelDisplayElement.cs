@@ -45,6 +45,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
                 ValueFormat = this.ValueFormat.Copy(),
                 Image = this.Image,
                 DrawImageBackground = this.DrawImageBackground,
+                GaugeValueScale = this.GaugeValueScale,
                 GaugeValueMin = this.GaugeValueMin,
                 GaugeValueMax = this.GaugeValueMax,
                 GaugeSizeAddress = this.GaugeSizeAddress,

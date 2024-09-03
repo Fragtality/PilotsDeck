@@ -16,7 +16,7 @@ namespace PilotsDeck.Actions.Simple
             var settings = (sdEvent?.payload?.settings?[AppConfiguration.ModelSimple]).Deserialize<SettingsModelSimple>(JsonOptions.JsonSerializerOptions);
             settings ??= new SettingsModelSimple()
             {
-                BUILD_VERSION = AppConfiguration.BuildConfigVersion
+                BUILD_VERSION = AppConfiguration.BuildModelVersion
             };
 
             return settings;

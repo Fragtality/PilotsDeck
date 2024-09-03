@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,10 @@ namespace PilotsDeck.UI.ViewModels
         {
             Colors.TryAdd(System.Drawing.ColorTranslator.ToOle(colorSelected), true);
             foreach (int color in dialogColors)
-                Colors.TryAdd(color, true);
+            {
+                if (color != 16777215 && color != 0)
+                    Colors.TryAdd(color, true);
+            }
             Save();
         }
 

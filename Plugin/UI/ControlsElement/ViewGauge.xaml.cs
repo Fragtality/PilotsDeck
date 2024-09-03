@@ -219,7 +219,7 @@ namespace PilotsDeck.UI.ControlsElement
             System.Windows.Forms.ColorDialog colorDialog = new()
             {
                 Color = RangeColor,
-                CustomColors = ModelGauge.GetCustomColors(),
+                CustomColors = ColorStore.ColorArray,
             };
 
             if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)

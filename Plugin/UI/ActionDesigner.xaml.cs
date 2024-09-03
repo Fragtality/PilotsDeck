@@ -48,7 +48,7 @@ namespace PilotsDeck.UI
 
         protected void SetManipulatorList(ISelectableItem item)
         {
-            ViewModel.SetComboBox(ComboManipulator, ViewModel.GetManipulatorTypes(item), ELEMENT_MANIPULATOR.COLOR);
+            ViewModel.SetComboBox(ComboManipulator, ViewModel.GetManipulatorTypes(item), (item?.IsTypeElementGauge() == true ? ELEMENT_MANIPULATOR.INDICATOR : ELEMENT_MANIPULATOR.VISIBLE));
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

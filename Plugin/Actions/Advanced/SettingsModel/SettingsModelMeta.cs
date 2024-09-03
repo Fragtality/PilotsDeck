@@ -49,10 +49,10 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
 
             settings.FillDictionaries();
 
-            if (settings.BUILD_VERSION < AppConfiguration.BuildConfigVersion)
+            if (settings.BUILD_VERSION < AppConfiguration.BuildModelVersion)
             {
-                Logger.Debug($"Converting Settings to Version {AppConfiguration.BuildConfigVersion}");
-                settings.BUILD_VERSION = AppConfiguration.BuildConfigVersion;
+                Logger.Debug($"Converting Settings to Version {AppConfiguration.BuildModelVersion}");
+                settings.BUILD_VERSION = AppConfiguration.BuildModelVersion;
                 updated = true;
             }
 

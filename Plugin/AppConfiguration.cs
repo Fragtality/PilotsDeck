@@ -32,7 +32,9 @@ namespace PilotsDeck
         [JsonIgnore]
         public static string ColorFile { get; } = "ColorStore.json";
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 4;
+        public static int BuildModelVersion { get; } = 4;
+        [JsonIgnore]
+        public static int BuildConfigVersion { get; } = 5;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -88,7 +90,7 @@ namespace PilotsDeck
 
 
         //ConfigFile
-        public int ConfigVersion { get; set; } = BuildConfigVersion;
+        public int ConfigVersion { get; set; } = BuildModelVersion;
         public string LogFile { get; set; } = "log/PilotsDeck.log";
         public LogLevel LogLevel { get; set; } = LogLevel.Debug;
         public RollingInterval LogInterval { get; set; } = RollingInterval.Day;
@@ -169,7 +171,7 @@ namespace PilotsDeck
         public int MsfsStateCheckInterval { get; set; } = 1000;
         public int MobiRetryDelay { get; set; } = 10;
         public int MobiVarsPerFrame { get; set; } = 50;
-        public int MobiReorderTreshold { get; set; } = 384;
+        public int MobiReorderTreshold { get; set; } = 150;
         public int CommandDelay { get; set; } = 25;
         public int InterActionDelay { get; set; } = 15;
         public int TickDelay { get; set; } = 15;
@@ -188,8 +190,12 @@ namespace PilotsDeck
             if (config.ConfigVersion < BuildConfigVersion)
             {
                 Logger.Information($"Migrating Configuration from Version '{config.ConfigVersion}' to '{BuildConfigVersion}'");
+
+                if (config.ConfigVersion == 4)
+                    config.MobiReorderTreshold = 150;
+                
                 config.ConfigVersion = BuildConfigVersion;
-                //CHANGE CONFIG VALUES AS NEEDED
+                SaveConfiguration();
             }
             else if (config.ConfigVersion > BuildConfigVersion)
             {

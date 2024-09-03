@@ -19,7 +19,10 @@ namespace PilotsDeck.UI.DeveloperUI
 
         protected static string FindLatestControlFile(string path)
         {
-            return Directory.EnumerateFiles(path, "Controls List for *.txt").FirstOrDefault();
+            if (Path.Exists(path))
+                return Directory.EnumerateFiles(path, "Controls List for *.txt").FirstOrDefault();
+            else
+                return "";
         }
 
         protected void InitializeControls()
@@ -43,12 +46,28 @@ namespace PilotsDeck.UI.DeveloperUI
             UrlHelper(LabelMsfsKvar, "MSFS SDK - SimEvents", "https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm");
 
             string path = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\FSUIPC7\";
-            UrlHelper(LabelIpc7Controls, "FSUIPC7 Controls", $"{FindLatestControlFile(path)}");
-            UrlHelper(LabelIpc7Offsets, "FSUIPC7 Offsets", @$"{path}FSUIPC7 Offsets Status.pdf");
+            if (Path.Exists(path))
+            {
+                UrlHelper(LabelIpc7Controls, "FSUIPC7 Controls", $"{FindLatestControlFile(path)}");
+                UrlHelper(LabelIpc7Offsets, "FSUIPC7 Offsets", @$"{path}FSUIPC7 Offsets Status.pdf");
+            }
+            else
+            {
+                LabelIpc7Controls.Text = "FSUIPC7 not found";
+                LabelIpc7Offsets.Text = "FSUIPC7 not found";
+            }
 
             path = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\FSUIPC6\";
-            UrlHelper(LabelIpc6Controls, "FSUIPC6 Controls", $"{FindLatestControlFile(path)}");
-            UrlHelper(LabelIpc6Offsets, "FSUIPC6 Offsets", @$"{path}FSUIPC Offsets Status.pdf");
+            if (Path.Exists(path))
+            {
+                UrlHelper(LabelIpc6Controls, "FSUIPC6 Controls", $"{FindLatestControlFile(path)}");
+                UrlHelper(LabelIpc6Offsets, "FSUIPC6 Offsets", @$"{path}FSUIPC Offsets Status.pdf");
+            }
+            else
+            {
+                LabelIpc6Controls.Text = "FSUIPC6 not found";
+                LabelIpc6Offsets.Text = "FSUIPC6 not found";
+            }
 
             UrlHelper(LabelXplaneRef, "DataRefs on x-plane.com", "https://developer.x-plane.com/datarefs/");
             UrlHelper(LabelXplaneCmdRef, "Commands by SimInnovations", "https://www.siminnovations.com/xplane/command/");
