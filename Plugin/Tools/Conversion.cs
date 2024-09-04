@@ -8,13 +8,24 @@ namespace PilotsDeck.Tools
     {
         public static string ToString(double value)
         {
-            string num = string.Format(CultureInfo.InvariantCulture, "{0:G}", value);
+            string num = string.Format(CultureInfo.InvariantCulture, "{0:G15}", value);
 
             int idxE = num.IndexOf('E');
             if (idxE < 0)
                 return num;
             else
-                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{(idxE < num.Length ? idxE - 1 : 17)}}}", value);
+                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{(idxE < num.Length ? idxE - 1 : 15)}}}", value);
+        }
+
+        public static string ToString(float value)
+        {
+            string num = string.Format(CultureInfo.InvariantCulture, "{0:G7}", value);
+
+            int idxE = num.IndexOf('E');
+            if (idxE < 0)
+                return num;
+            else
+                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{(idxE < num.Length ? idxE - 1 : 7)}}}", value);
         }
 
         public static string ToString(double value, int digits)
