@@ -376,7 +376,7 @@ namespace PilotsDeck.Simulator
             if (managedVariable == null)
                 return;
 
-            if (managedVariable is VariableInputEvent)
+            if (managedVariable is VariableInputEvent && IsReadySession)
                 SimConnectManager.InputEvents.SubscribeInputEvent(managedVariable.Address, managedVariable as VariableInputEvent);
             else if (managedVariable.IsValueMSFS())
                 SimConnectManager.MobiModule.SubscribeAddress(managedVariable.Address, managedVariable);
@@ -396,7 +396,7 @@ namespace PilotsDeck.Simulator
                     continue;
 
                 Logger.Verbose($"Subscribe Variable '{variable.Address}' of Type '{variable.Type}'");
-                if (variable is VariableInputEvent)
+                if (variable is VariableInputEvent && IsReadySession)
                     SimConnectManager.InputEvents.SubscribeInputEvent(variable.Address, variable as VariableInputEvent);
                 else
                     SimConnectManager.MobiModule.SubscribeAddress(variable.Address, variable);
@@ -476,12 +476,12 @@ namespace PilotsDeck.Simulator
             }
         }
 
-        public void RemoveUnusedVariables()
+        public void RemoveUnusedVariables(bool force)
         {
             if (!IsReadyProcess)
                 return;
 
-            SimConnectManager.MobiModule.MobiVariables.ReorderRegistrations(SimState == SimulatorState.LOADING);
+            SimConnectManager.MobiModule.MobiVariables.ReorderRegistrations(force);
         }
 
         private bool _disposed;

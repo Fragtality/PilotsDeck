@@ -59,7 +59,7 @@ namespace PilotsDeck.Simulator.MSFS
                     Logger.Error($"The Value for ID '{id}' is NULL! (Value: {GetObjectData(id, dwData)})");
             }
             else if (!RemoveList.ContainsKey(id))
-                Logger.Warning($"The received ID '{id}' has no managed Variable! (Value: {GetObjectData(id, dwData)})");
+                Logger.Debug($"The received ID '{id}' has no managed Variable! (Value: {GetObjectData(id, dwData)})");
 
             if (!RemoveList.IsEmpty)
                 RemoveList.Remove(id);

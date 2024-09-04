@@ -75,7 +75,7 @@ namespace Installer
             }
         }
 
-        public static bool DeleteOldFiles()
+        public static bool DeleteOldFiles(bool resetConfig)
         {
             try
             {
@@ -84,10 +84,11 @@ namespace Installer
 
                 DirectoryInfo di = new DirectoryInfo(Parameters.pluginDir);
                 foreach (FileInfo file in di.GetFiles())
-                    if (file.Name != Parameters.pluginConfig && file.Name != Parameters.colorConfig)
+                    if ((file.Name != Parameters.pluginConfig && file.Name != Parameters.colorConfig) || resetConfig)
                         file.Delete();
 
-                bool filesDeleted = (new DirectoryInfo(Parameters.pluginDir)).GetFiles().Length == 2;
+                int numFiles = (new DirectoryInfo(Parameters.pluginDir)).GetFiles().Length;
+                bool filesDeleted = (numFiles == 2 && !resetConfig) || (numFiles == 0 && resetConfig);
 
                 string path = $@"{Parameters.pluginDir}\Plugin";
                 if (Directory.Exists(path))

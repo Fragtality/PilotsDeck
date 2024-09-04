@@ -29,8 +29,8 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             UrlHelper(LabelReadme, "Readme", "https://github.com/Fragtality/PilotsDeck/blob/master/README.md");
             UrlHelper(LabelReadmeSyntax, "Readme: Syntax", "https://github.com/Fragtality/PilotsDeck/blob/master/README.md#12---supported-sim-commands---variables");
-            UrlHelper(LabelReadmeLua, "Readme: Lua Scripts", "https://github.com/Fragtality/PilotsDeck/blob/master/README.md#32---lua-examples");
-            UrlHelper(LabelReadmeMapping, "Readme: Profile Mapping", "https://github.com/Fragtality/PilotsDeck/blob/master/README.md#31---profile-switching");
+            UrlHelper(LabelReadmeLua, "Readme: Lua Scripts", "https://github.com/Fragtality/PilotsDeck/blob/master/README.md#35---lua-scripts");
+            UrlHelper(LabelReadmeMapping, "Readme: Profile Mapping", "https://github.com/Fragtality/PilotsDeck/blob/master/README.md#34---profile-switching");
 
             UrlHelper(LabelFolderLogs, "Log Folder", @$"{App.PLUGIN_PATH}\log");
             UrlHelper(LabelFolderImages, "Image Folder", @$"{App.PLUGIN_PATH}\Images");

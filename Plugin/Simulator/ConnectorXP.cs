@@ -617,7 +617,7 @@ namespace PilotsDeck.Simulator
             }
         }
 
-        public void RemoveUnusedVariables()
+        public void RemoveUnusedVariables(bool force)
         {
 
         }

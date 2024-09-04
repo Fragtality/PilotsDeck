@@ -173,16 +173,14 @@ namespace PilotsDeck.Plugin
             }
         }
 
-        protected void RemoveUnusedRessources(bool onlyStatistic = false)
+        protected void RemoveUnusedRessources(bool force = false)
         {
-            int count = 0;
-            if (!onlyStatistic)
-            {
-                SimController.RemoveUnusedVariables();
-                count += ScriptManager.RemoveUnused();
-                count += ImageManager.RemoveUnused();
-                count += VariableManager.RemoveUnused();
-            }
+            int count = 0;            
+            count += ScriptManager.RemoveUnused();
+            SimController.RemoveUnusedVariables(force);
+            count += ImageManager.RemoveUnused();
+            count += VariableManager.RemoveUnused();
+
             if (count > 0 && (State == PluginState.WAIT || State == PluginState.IDLE))
             {
                 GC.Collect();
@@ -234,7 +232,7 @@ namespace PilotsDeck.Plugin
                         State = PluginState.WAIT;
                         ResetImageTime = DateTime.Now + TimeSpan.FromSeconds(5);
                         ScriptManager.StopGlobalScripts();
-                        RemoveUnusedRessources();
+                        RemoveUnusedRessources(true);
                     }
 
                     if (SimController.SimState == SimulatorState.RUNNING)
@@ -266,9 +264,13 @@ namespace PilotsDeck.Plugin
                             Logger.Information("--- Plugin changed to READY ---");
                         State = PluginState.READY;
 
-                        RemoveUnusedRessources(); 
                         ScriptManager.StartGlobalScripts();
                         ActionManager.ProfileSwitcherManager.SwitchProfiles();
+                        Task.Run(async () =>
+                        {
+                            await Task.Delay(1000);
+                            RemoveUnusedRessources(true);
+                        });
                         ForcedRefresh = true;
                     }
 
@@ -314,10 +316,13 @@ namespace PilotsDeck.Plugin
                 //Ressource Checks
                 if (DateTime.Now - LastRemovedUnused > TimeSpan.FromMilliseconds(App.Configuration.IntervalUnusedRessources))
                 {
-                    if (State == PluginState.IDLE)
+                    if (State != PluginState.READY)
                         RemoveUnusedRessources();
                     else
-                        RemoveUnusedRessources(true);
+                    {
+                        LastRemovedUnused = DateTime.Now;
+                        StatisticManager.PrintRessourceStatistics();
+                    }
                 }
 
                 if (DateTime.Now - LastCheckedScripts > TimeSpan.FromMilliseconds(App.Configuration.IntervalCheckScripts))

@@ -106,6 +106,7 @@ namespace Installer
                 ButtonInstall.IsEnabled = false;
                 ButtonRemove.IsEnabled = false;
                 descLabel.Visibility = Visibility.Collapsed;
+                CheckBoxResetConfig.Visibility = Visibility.Collapsed;
                 TaskPanel.Visibility = Visibility.Visible;
                 TimerWorkerCheck.Start();
                 TaskPanel.Activate(null, null);
@@ -134,6 +135,11 @@ namespace Installer
                 TaskPanel.Activate(null, null);
                 await Task.Run(InstallWorker.RemovePlugin);
             }
+        }
+
+        private void CheckBoxResetConfig_Click(object sender, RoutedEventArgs e)
+        {
+            InstallWorker.ResetConfiguration = CheckBoxResetConfig.IsChecked == true;
         }
     }
 }

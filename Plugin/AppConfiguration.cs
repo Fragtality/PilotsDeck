@@ -90,7 +90,7 @@ namespace PilotsDeck
 
 
         //ConfigFile
-        public int ConfigVersion { get; set; } = BuildModelVersion;
+        public int ConfigVersion { get; set; } = BuildConfigVersion;
         public string LogFile { get; set; } = "log/PilotsDeck.log";
         public LogLevel LogLevel { get; set; } = LogLevel.Debug;
         public RollingInterval LogInterval { get; set; } = RollingInterval.Day;
@@ -137,7 +137,7 @@ namespace PilotsDeck
         public string StringReplace { get; set; } = "%s";
         public bool CleanInactiveCommands { get; set; } = false;
         public int DelayExit { get; set; } = 2000;
-        public int DelayStreamDeckConnect { get; set; } = 500;
+        public int DelayStreamDeckConnect { get; set; } = 750;
         public int IntervalDeckRefresh { get; set; } = 50;
         public int IntervalSimProcess { get; set; } = 50;
         public int IntervalSimMonitor { get; set; } = 5000;
@@ -170,8 +170,8 @@ namespace PilotsDeck
         public int MsfsRetryDelay { get; set; } = 30000;
         public int MsfsStateCheckInterval { get; set; } = 1000;
         public int MobiRetryDelay { get; set; } = 10;
-        public int MobiVarsPerFrame { get; set; } = 50;
-        public int MobiReorderTreshold { get; set; } = 150;
+        public int MobiVarsPerFrame { get; set; } = 100;
+        public int MobiReorderTreshold { get; set; } = 10;
         public int CommandDelay { get; set; } = 25;
         public int InterActionDelay { get; set; } = 15;
         public int TickDelay { get; set; } = 15;
@@ -192,7 +192,10 @@ namespace PilotsDeck
                 Logger.Information($"Migrating Configuration from Version '{config.ConfigVersion}' to '{BuildConfigVersion}'");
 
                 if (config.ConfigVersion == 4)
-                    config.MobiReorderTreshold = 150;
+                {
+                    config.MobiVarsPerFrame = 100;
+                    config.MobiReorderTreshold = 10;
+                }
                 
                 config.ConfigVersion = BuildConfigVersion;
                 SaveConfiguration();

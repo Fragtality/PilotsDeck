@@ -289,7 +289,6 @@ namespace PilotsDeck.UI.ViewModels
             id = Action.AddDisplayElement(DISPLAY_ELEMENT.IMAGE, null, "Swap Image");
             Action.Settings.DisplayElements[id].AddManipulator(ELEMENT_MANIPULATOR.VISIBLE);
             Action.Settings.DisplayElements[id].Image = "Images/ArrowBright.png";
-            Action.Settings.DisplayElements[id].Manipulators[0].Conditions[0].Value = "";
             id = Action.AddDisplayElement(DISPLAY_ELEMENT.VALUE, null, "Standby");
             Action.Settings.DisplayElements[id].Position = [3 * scale.X, 42 * scale.Y];
             Action.Settings.DisplayElements[id].Size = [64 * scale.X, 32 * scale.Y];

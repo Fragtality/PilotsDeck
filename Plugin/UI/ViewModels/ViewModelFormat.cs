@@ -65,7 +65,7 @@ namespace PilotsDeck.UI.ViewModels
 
         public void SetScalar(string input)
         {
-            if (Conversion.IsNumberF(input, out float num))
+            if (Conversion.IsNumber(input, out double num))
             {
                 Format.Scalar = num;
                 ModelAction.UpdateAction();
@@ -74,7 +74,7 @@ namespace PilotsDeck.UI.ViewModels
 
         public void SetOffset(string input)
         {
-            if (Conversion.IsNumberF(input, out float num))
+            if (Conversion.IsNumber(input, out double num))
             {
                 Format.Offset = num;
                 ModelAction.UpdateAction();

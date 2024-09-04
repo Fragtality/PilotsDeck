@@ -48,7 +48,7 @@ namespace Installer
         public static readonly string ipcRegValue = "DisplayVersion";
         public static readonly string ipcRegInstallDirValue = "InstallDir";
         public static readonly Regex ipcRegexVersion = new Regex(@"^v((\d+)\.(\d+)\.(\d+))$", RegexOptions.Compiled);
-        public static readonly string ipcVersion = "7.4.16";
+        public static readonly string ipcVersion = "7.4.17";
         public static readonly string ipcUrl = "https://fsuipc.simflight.com/beta/Install_FSUIPC7.zip";
         public static readonly string ipcSetup = "Install_FSUIPC7";
         public static readonly string ipcUrlFile = $"{ipcSetup}.zip";

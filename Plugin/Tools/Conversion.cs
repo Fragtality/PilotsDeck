@@ -14,7 +14,11 @@ namespace PilotsDeck.Tools
             if (idxE < 0)
                 return num;
             else
-                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{(idxE < num.Length ? idxE - 1 : 15)}}}", value);
+            {
+                double factor = double.Parse(num[0..idxE]);
+                int exponent = int.Parse(num[(idxE + 1)..]);
+                return string.Format(CultureInfo.InvariantCulture, "{0:F15}", Math.Pow(10, exponent) * factor).TrimEnd('0');
+            }
         }
 
         public static string ToString(float value)
@@ -25,7 +29,11 @@ namespace PilotsDeck.Tools
             if (idxE < 0)
                 return num;
             else
-                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{(idxE < num.Length ? idxE - 1 : 7)}}}", value);
+            {
+                double factor = float.Parse(num[0..idxE]);
+                int exponent = int.Parse(num[(idxE + 1)..]);
+                return string.Format(CultureInfo.InvariantCulture, "{0:F7}", Math.Pow(10, exponent) * factor).TrimEnd('0');
+            }
         }
 
         public static string ToString(double value, int digits)
@@ -42,7 +50,7 @@ namespace PilotsDeck.Tools
         public static double ToDouble(string valString, double def = 0)
         {
             if (double.TryParse(valString, NumberStyles.Number, new RealInvariantFormat(valString), out double numValue))
-                return numValue;
+                return Math.Round(numValue, 15);
             else if (bool.TryParse(valString, out bool boolValue))
                 return boolValue ? 1 : 0;
             else
@@ -52,7 +60,7 @@ namespace PilotsDeck.Tools
         public static float ToFloat(string valString, float def = 0)
         {
             if (float.TryParse(valString, NumberStyles.Number, new RealInvariantFormat(valString), out float numValue))
-                return numValue;
+                return MathF.Round(numValue, 6);
             else if (bool.TryParse(valString, out bool boolValue))
                 return boolValue ? 1 : 0;
             else
@@ -91,7 +99,10 @@ namespace PilotsDeck.Tools
                 return result;
             }
             else
+            {
+                numValue = Math.Round(numValue, 15);
                 return true;
+            }
         }
 
         public static bool IsNumberF(string valString, out float numValue)
@@ -103,7 +114,10 @@ namespace PilotsDeck.Tools
                 return result;
             }
             else
+            {
+                numValue = MathF.Round(numValue, 6);
                 return true;
+            }
         }
 
         public static bool IsNumberI(string valString, out int numValue)

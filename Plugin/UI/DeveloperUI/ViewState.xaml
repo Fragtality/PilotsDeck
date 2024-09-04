@@ -156,7 +156,7 @@
                 <Label Grid.Row="0" Grid.Column="1" Name="LabelActions" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
 
                 <Label Grid.Row="0" Grid.Column="2" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
-                    Variables
+                    Variables (Total / R>0 / Sub)
                 </Label>
                 <Label Grid.Row="0" Grid.Column="3" Name="LabelVariables" MouseLeftButtonUp="LabelVariables_MouseLeftButtonUp" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
 

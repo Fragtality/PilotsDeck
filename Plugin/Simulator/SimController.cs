@@ -42,7 +42,7 @@ namespace PilotsDeck.Simulator
             TimerProcess.Interval = TimeSpan.FromMilliseconds(App.Configuration.IntervalSimProcess);
             TimerProcess.Tick += Process;
 
-            TimerMonitor.Interval = TimeSpan.FromMilliseconds(App.Configuration.DelayStreamDeckConnect * 2);
+            TimerMonitor.Interval = TimeSpan.FromMilliseconds(App.Configuration.IntervalSimMonitor / 2);
             TimerMonitor.Tick += MonitorSimulators;
             Logger.Information($"Starting Monitor Timer");
             TimerMonitor.Start();
@@ -191,8 +191,8 @@ namespace PilotsDeck.Simulator
                             foreach (var value in list)
                                 Logger.Debug(value.Address);
                             UnsubscribeVariables(list);
-                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables();
-                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables();
+                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(false);
+                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(false);
                         }
                         LastUnusedCheck = DateTime.Now;
                     }
@@ -206,10 +206,10 @@ namespace PilotsDeck.Simulator
             StatisticManager.EndTrack(StatisticID.SIM_PROCESS);
         }
 
-        public void RemoveUnusedVariables()
+        public void RemoveUnusedVariables(bool force)
         {
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables();
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables();
+            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(force);
+            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(force);
         }
 
         public void SubscribeVariable(ManagedVariable managedVariable)

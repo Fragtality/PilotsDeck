@@ -18,7 +18,11 @@
         <local:InstallerTaskPanel Grid.Row="0" x:Name="TaskPanel" Visibility="Collapsed" MinWidth="512" MaxWidth="700" Margin="24,16,24,0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
         <TextBlock Name="bottomLabel" Grid.Row="1" Visibility="Collapsed" FontSize="14" Margin="0,16,0,16" FontWeight="DemiBold" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-        <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,8,0,24" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Vertical" Margin="0,8,0,24" VerticalAlignment="Bottom">
+            <CheckBox Name="CheckBoxResetConfig" Click="CheckBoxResetConfig_Click" MinHeight="24" Margin="0,8,0,16" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" VerticalContentAlignment="Center">
+                Reset Plugin Configuration to Default
+            </CheckBox>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" VerticalAlignment="Bottom">
             <Button Name="ButtonRemove" Click="ButtonRemove_Click" Visibility="Visible" FontWeight="DemiBold" FontSize="14" Width="96" Height="42"
             ToolTip="Remove the Plugin from your System" HorizontalAlignment="Center" Margin="0,0,72,0" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
@@ -33,6 +37,7 @@
                     <Image Name="ImageButtonInstall" Height="24" Width="24" Source="images/box-arrow-in-right.png"/>
                 </StackPanel>
             </Button>
+            </StackPanel>
         </StackPanel>
 
     </Grid>

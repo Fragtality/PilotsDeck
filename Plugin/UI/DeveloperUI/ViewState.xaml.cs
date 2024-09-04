@@ -58,7 +58,7 @@ namespace PilotsDeck.UI.DeveloperUI
 
            
             LabelActions.Content = ActionManager.Count;
-            LabelVariables.Content = VariableManager.ManagedVariables.Count;
+            LabelVariables.Content = $"{VariableManager.ManagedVariables.Count} / {VariableManager.ManagedVariables.Values.Count(v => v.Registrations > 0)} / {VariableManager.ManagedVariables.Values.Count(v => v.IsSubscribed)}";
             LabelImages.Content = ImageManager.Count;
             
             LabelScripts.Content = ScriptManager.Count;

@@ -29,6 +29,7 @@ namespace Installer
         public bool IsSuccess { get; set; } = false;
         public bool IsRemoved { get; set; } = false;
         public bool IsExistingInstallation { get; protected set; } = false;
+        public bool ResetConfiguration { get; set; } = false;
 
         private Dictionary<Simulator, bool> SimulatorStates { get; set; } = new Dictionary<Simulator, bool>();
         private string MsfsPackagePath  = "";
@@ -559,8 +560,12 @@ namespace Installer
             }
 
             //Delete Old Binaries
-            task.Message = "StreamDeck Software stopped. Deleting old Plugin ...";
-            if (!InstallerFunctions.DeleteOldFiles())
+            if (!ResetConfiguration)
+                task.Message = "StreamDeck Software stopped. Deleting old Plugin ...";
+            else
+                task.Message = "StreamDeck Software stopped. Deleting old Plugin (and Configuration) ...";
+
+            if (!InstallerFunctions.DeleteOldFiles(ResetConfiguration))
             {
                 task.SetError($"The old Binaries could not be removed!\r\nPlease remove them manually and try again.");
 

@@ -247,7 +247,7 @@ namespace PilotsDeck.Actions.Simple
                 return state;
             else
             {
-                Logger.Error($"No ValueState mapped to ID {id}");
+                Logger.Debug($"No ValueState mapped to ID {id}");
                 return null;
             }
         }
@@ -288,7 +288,7 @@ namespace PilotsDeck.Actions.Simple
                 return variable;
             else
             {
-                Logger.Warning($"No ManagedVariable mapped to ID {id}");
+                Logger.Debug($"No ManagedVariable mapped to ID {id}");
                 return new VariableNumeric(VariableManager.ADDRESS_EMPTY, SimValueType.INTERNAL); ;
             }
         }
@@ -352,7 +352,7 @@ namespace PilotsDeck.Actions.Simple
                 return image;
             else
             {
-                Logger.Warning($"No ManagedImage mapped to ID {id}");
+                Logger.Debug($"No ManagedImage mapped to ID {id}");
                 return ImageManager.DEFAULT_WAIT;
             }
         }
