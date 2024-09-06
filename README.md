@@ -1244,13 +1244,18 @@ To **enable Profiles** for Switching and to **map Profiles** to specific Aircraf
 <img src="img/ProfileMapping-Overview.png" width="512"><br/><br/>
 
 1. It is **recommended to stop** the StreamDeck Software (the App will ask) if you plan to make Changes!
+<br/>
 2. To **enable a Profile** for Switching, click on the Checkbox *StreamDeck Profile modified for Switching*. The Profile Files will be **modified on Disk**, so that the Plugin can switch to it (StreamDeck API Mumbo-Jumbo).
+<br/>
 3.
   - If you want configure the Profile as **Default Profile**, select the **Simulator** it is should be used for.<br/>Default Profiles will be loaded if no matching Aircraft Profile was found.
   - If you configure the Profile for a **specific Aircraft**, enter the **Search-String** to match and click on the Plus-Button.<br/>Aircraft Profiles will be loaded if any of the Search-Strings is contained in the current Aircraft-String received from the Simulator (the matching is case-insensitive).
   - If you want the Plugin to **switch back** to a certain Profile after the **Simulator has closed** (any Sim), select the Checkbox *Use as Switch-Back Profile*
+<br/>
 4. If you have multiple Profiles that should use the same Settings, you can use the **Copy/Paste Button** to transfer the Settings **to another (enabled) Profile**
+<br/>
 5. If you are finished with mapping Profiles, be sure to click the **Save** Button.
+<br/>
 6. **Done** - Your Profiles will be switched automatically from now!<br/>Use the Profile Switcher Action on the StreamDeck to enable / disable Profile Switching globally.
 
 <br/>
