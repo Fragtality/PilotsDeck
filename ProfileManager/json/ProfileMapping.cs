@@ -44,6 +44,9 @@ namespace ProfileManager.json
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public List<string> AircraftStrings { get; set; } = [];
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        public bool SwitchBackProfile { get; set; } = false;
+
         [JsonIgnore]
         public bool IsChanged { get; set; } = false;
 
@@ -51,7 +54,7 @@ namespace ProfileManager.json
         public bool DeleteFlag { get; set; } = false;
 
         [JsonIgnore]
-        public bool IsProfileNever { get { return !DefaultProfile && !AircraftProfile; } }
+        public bool IsProfileNever { get { return !DefaultProfile && !AircraftProfile && !SwitchBackProfile; } }
 
         [JsonIgnore]
         public bool HasManifest { get { return ProfileManifest != null; } }

@@ -232,14 +232,20 @@ namespace PilotsDeck.Plugin
 
         public void SwitchBack()
         {
-            if (GlobalSettings.EnableSwitching && GlobalSettings.SwitchBack)
+            if (GlobalSettings.SwitchBack)
             {
-                foreach (var deck in ActiveDecks)
+                foreach (var deck in DeckController.DeckInfo.devices)
                 {
-                    if (deck.Value != null)
+                    if (deck != null)
                     {
-                        Logger.Information($"Switching back Profile on Deck '{deck}'.");
-                        _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.Key, deck.Value);
+                        //Logger.Information($"Switching back Profile on Deck '{deck}'.");
+                        //_ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.Key, deck.Value);
+                        var profile = ProfileMappings.Where(p => p.SwitchBackProfile && p.DeckId == deck.id).FirstOrDefault() ?? null;
+                        if (profile != null)
+                        {
+                            Logger.Information($"Switching Deck '{deck.id}' to Profile '{profile.ProfileUUID}'");
+                            _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.id, profile.ProfilePath);
+                        }
                     }
                 }
 

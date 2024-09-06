@@ -40,6 +40,9 @@ namespace PilotsDeck.Plugin
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public List<string> AircraftStrings { get; set; } = [];
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        public bool SwitchBackProfile { get; set; } = false;
+
         [JsonIgnore]
         public bool IsChanged { get; set; } = false;
 

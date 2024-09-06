@@ -19,6 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="4,4,4,10" VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -66,18 +67,22 @@
             <TextBlock FontSize="12" Margin="4,0,0,0"><Underline>Never</Underline> switch to this Profile</TextBlock>
         </CheckBox>
 
-        <CheckBox Grid.Row="3" Grid.Column="0" Name="CheckboxProfileDefault" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,20,0,0" HorizontalAlignment="Left"
+        <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Name="CheckboxProfileSwitchBack" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,20,0,0" HorizontalAlignment="Left" ToolTip="The Plugin will switch to this Profile when any Simulator closes (and the Plugin return to the Idle State)&#x0a;Only works when the 'Switch Back' Option is checked in the Profile Switcher Action!">
+            <TextBlock FontSize="12" Margin="4,0,0,0">Use as <Underline>Switch-Back</Underline> Profile</TextBlock>
+        </CheckBox>
+
+        <CheckBox Grid.Row="4" Grid.Column="0" Name="CheckboxProfileDefault" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,20,0,0" HorizontalAlignment="Left"
                   ToolTip="Switch to this Profile when the selected Simulator is running and no Profiles where found for the current Aircraft (per Deck).&#x0a;The first Match will be used - it is recommended to only have one per Deck!">
             <TextBlock FontSize="12" Margin="4,0,0,0">Use as <Underline>Default</Underline> Profile for Simulator:</TextBlock>
         </CheckBox>
-        <ComboBox Grid.Row="3" Grid.Column="1" Name="SelectDefaultSimulator" SelectedValuePath="Key" DisplayMemberPath="Value" SelectionChanged="SelectDefaultSimulator_SelectionChanged"
+        <ComboBox Grid.Row="4" Grid.Column="1" Name="SelectDefaultSimulator" SelectedValuePath="Key" DisplayMemberPath="Value" SelectionChanged="SelectDefaultSimulator_SelectionChanged"
                   TextBlock.FontSize="12" Margin="8,16,8,0" MinWidth="154" HorizontalAlignment="Left"/>
 
-        <CheckBox Grid.Row="4" Grid.Column="0" Name="CheckboxProfileAircraft" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,16,0,0" HorizontalAlignment="Left"
+        <CheckBox Grid.Row="5" Grid.Column="0" Name="CheckboxProfileAircraft" Click="ProfileCheckbox_Click" TextBlock.FontSize="12" Margin="8,16,0,0" HorizontalAlignment="Left"
                   ToolTip="Switch to this Profile when the current Aircraft String contains (!) one of Strings configured (per Deck).&#x0a;The first Match will be used - ensure the Aircraft Strings configured are specific enough!">
             <TextBlock FontSize="12" Margin="4,0,0,0">Use Profile for specific <Underline>Aircraft(s)</Underline>:</TextBlock>
         </CheckBox>
-        <Grid Grid.Row="4" Grid.Column="1" Grid.RowSpan="2" Margin="8,12,8,4" HorizontalAlignment="Left">
+        <Grid Grid.Row="5" Grid.Column="1" Grid.RowSpan="2" Margin="8,12,8,4" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="154" Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -100,7 +105,7 @@
             </StackPanel>
         </Grid>
 
-        <Button Grid.Row="5" Grid.Column="0" Name="ButtonCopyPasteSettings" Click="ButtonCopyPasteSettings_Click" Margin="8,16,0,8" Height="24" Width="24" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+        <Button Grid.Row="6" Grid.Column="0" Name="ButtonCopyPasteSettings" Click="ButtonCopyPasteSettings_Click" Margin="8,16,0,8" Height="24" Width="24" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                 ToolTip="Copy/Paste Settings - click on Source then on Target">
             <Image Height="16" Width="16" Margin="2" Source="images/copy.png"/>
         </Button>

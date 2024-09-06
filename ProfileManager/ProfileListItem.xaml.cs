@@ -14,6 +14,7 @@ namespace ProfileManager
         {
             public bool DefaultProfile;
             public bool AircraftProfile;
+            public bool SwitchBack;
             public SimulatorType DefaultSimulator;
             public List<string> AircraftStrings;
         }
@@ -60,6 +61,9 @@ namespace ProfileManager
 
             CheckboxProfileNever.IsChecked = ViewModel.ProfileNever;
             CheckboxProfileNever.IsEnabled = enabled;
+
+            CheckboxProfileSwitchBack.IsChecked = ViewModel.ProfileSwitchBack;
+            CheckboxProfileSwitchBack.IsEnabled = enabled;
 
             CheckboxProfileDefault.IsChecked = ViewModel.ProfileDefault;
             CheckboxProfileDefault.IsEnabled = enabled;
@@ -181,6 +185,11 @@ namespace ProfileManager
                 ViewModel.SetProfileAircraft(true);
                 UpdateView();
             }
+            if (sender == CheckboxProfileSwitchBack && CheckboxProfileSwitchBack.IsChecked == true)
+            {
+                ViewModel.SetProfileSwitchBack(true);
+                UpdateView();
+            }
         }
 
         private void ButtonEditProfileName_Click(object sender, RoutedEventArgs e)
@@ -247,6 +256,7 @@ namespace ProfileManager
 
                 SettingClipboard = new()
                 {
+                    SwitchBack = ViewModel.Mapping.SwitchBackProfile,
                     DefaultProfile = ViewModel.Mapping.DefaultProfile,
                     DefaultSimulator = ViewModel.Mapping.DefaultSimulator,
                     AircraftProfile = ViewModel.Mapping.AircraftProfile,
@@ -264,6 +274,7 @@ namespace ProfileManager
                 if (!ViewModel.HasMapping)
                     ViewModel.PrepareProfileForSwitching();
 
+                ViewModel.SetProfileSwitchBack(SettingClipboard.SwitchBack);
                 ViewModel.SetProfileDefault(SettingClipboard.DefaultProfile);
                 ViewModel.SetProfileAircraft(SettingClipboard.AircraftProfile);
                 ViewModel.SetDefaultSimulator(SettingClipboard.DefaultSimulator);

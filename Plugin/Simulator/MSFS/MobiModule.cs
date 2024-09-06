@@ -295,6 +295,7 @@ namespace PilotsDeck.Simulator.MSFS
             try
             {
                 SimConnectManager.SimConnectMutex.TryWaitOne();
+                Logger.Debug($"Executing Calc Code: {code}");
                 SendClientWasmCmd($"MF.SimVars.Set.{code}");
                 SimConnectManager.SimConnectMutex.ReleaseMutex();
                 return true;

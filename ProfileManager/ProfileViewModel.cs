@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace ProfileManager
 {
@@ -19,6 +20,7 @@ namespace ProfileManager
         public bool IsPreparedForSwitching { get { return Manifest.IsPreparedForSwitching; } }
         public bool ProfileNever { get {  return !HasMapping || (HasMapping && Mapping.IsProfileNever); } }
         public bool ProfileDefault { get { return HasMapping && Mapping.DefaultProfile; }  }
+        public bool ProfileSwitchBack { get { return HasMapping && Mapping.SwitchBackProfile; } }
         public int DefaultSimulator { get { return (HasMapping ? (int)Mapping.DefaultSimulator : (int)SimulatorType.UNKNOWN) + 1; } }
         public bool ProfileAircraft { get { return HasMapping && Mapping.AircraftProfile; } }
         public ObservableCollection<string> AircraftCollection { get { return GetAircraftCollection(); } }
@@ -49,8 +51,12 @@ namespace ProfileManager
             if (value && HasMapping)
             {
                 bool oldValue = ProfileNever;
-                Mapping.DefaultProfile = false;
-                Mapping.AircraftProfile = false;
+                if (value)
+                {
+                    Mapping.DefaultProfile = false;
+                    Mapping.AircraftProfile = false;
+                    Mapping.SwitchBackProfile = false;
+                }
                 UpdateModel(oldValue != ProfileNever);
             }
         }
@@ -61,14 +67,22 @@ namespace ProfileManager
             {
                 bool oldValue = Mapping.DefaultProfile;
                 Mapping.DefaultProfile = value;
-                Mapping.AircraftProfile = !value;
+                if (value)
+                {
+                    Mapping.AircraftProfile = false;
+                    Mapping.SwitchBackProfile = false;
+                }
                 UpdateModel(oldValue != Mapping.DefaultProfile);
             }
             else
             {
                 PrepareProfileForSwitching();
                 Mapping.DefaultProfile = value;
-                Mapping.AircraftProfile = !value;
+                if (value)
+                {
+                    Mapping.AircraftProfile = false;
+                    Mapping.SwitchBackProfile = false;
+                }
                 UpdateModel();
             }
         }
@@ -78,15 +92,49 @@ namespace ProfileManager
             if (HasMapping)
             {
                 bool oldValue = Mapping.AircraftProfile;
-                Mapping.DefaultProfile = !value;
+                if (value)
+                {
+                    Mapping.SwitchBackProfile = false;
+                    Mapping.DefaultProfile = false;
+                }
                 Mapping.AircraftProfile = value;
                 UpdateModel(oldValue != Mapping.AircraftProfile);
             }
             else
             {
                 PrepareProfileForSwitching();
-                Mapping.DefaultProfile = !value;
+                if (value)
+                {
+                    Mapping.SwitchBackProfile = false;
+                    Mapping.DefaultProfile = false;
+                }
                 Mapping.AircraftProfile = value;
+                UpdateModel();
+            }
+        }
+
+        public void SetProfileSwitchBack(bool value)
+        {
+            if (HasMapping)
+            {
+                bool oldValue = ProfileSwitchBack;
+                if (value)
+                {
+                    Mapping.DefaultProfile = false;
+                    Mapping.AircraftProfile = false;
+                }
+                Mapping.SwitchBackProfile = value;
+                UpdateModel(oldValue != ProfileSwitchBack);
+            }
+            else
+            {
+                PrepareProfileForSwitching();
+                if (value)
+                {
+                    Mapping.DefaultProfile = false;
+                    Mapping.AircraftProfile = false;
+                }
+                Mapping.SwitchBackProfile = value;
                 UpdateModel();
             }
         }
