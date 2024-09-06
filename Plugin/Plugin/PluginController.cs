@@ -331,7 +331,7 @@ namespace PilotsDeck.Plugin
                     LastCheckedScripts = DateTime.Now;
                 }
 
-                if (!DevicesExport && DeckController.ReceivedAllDeviceInfo)
+                if (!DevicesExport && DeckController.ReceivedDevices > 0)
                 {
                     ExportDeviceInfo();
                     DevicesExport = true;

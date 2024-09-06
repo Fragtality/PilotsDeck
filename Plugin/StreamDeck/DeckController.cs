@@ -15,9 +15,8 @@ namespace PilotsDeck.StreamDeck
     {
         public bool IsConnected { get { return Socket.SocketState == WebSocketState.Open; } }
         public StreamDeckInfoMessage DeckInfo { get; protected set; }
-        public bool ReceivedAllDeviceInfo { get { return ReceivedDevices >= InitialDeviceCount; } }
         protected int InitialDeviceCount { get; set; } = 0;
-        protected int ReceivedDevices { get; set; } = 0;
+        public int ReceivedDevices { get; protected set; } = 0;
         public static string PluginContext { get { return App.CommandLineArgs["pluginUUID"]; } }
         protected StreamDeckSocket Socket { get; } = new();
 
