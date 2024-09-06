@@ -1304,7 +1304,7 @@ The following **Lua Globals** are available for Standard Scripts:
 | --- | --- |
 
 Every Variable used for reading in the Script has to be registered first.<br/>
-Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes (on any of these Globals).<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 Typically placed at the Beginning of the File (globally).<br/>
 *Example:*<br/>
 `SimVar("L:AP_VNAV_ARMED")`
@@ -1316,6 +1316,7 @@ Typically placed at the Beginning of the File (globally).<br/>
 
 Read a Variable from the Sim.<br/>
 The Plugin tries to return Value in it "native" Form - a Number will be returned as Number and a String as String.<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
 `if SimRead("L:AP_VNAV_ARMED") == 1 then --do something end`
 <br/><br/><br/>
@@ -1326,6 +1327,7 @@ The Plugin tries to return Value in it "native" Form - a Number will be returned
 
 Force to read a Variable as String - even when it a Number!<br/>
 So a Value of `1` is returned as `"1"`.<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
 `if SimReadString("L:AP_VNAV_ARMED") == "1" then --do something end`
 <br/><br/><br/>
@@ -1336,6 +1338,7 @@ So a Value of `1` is returned as `"1"`.<br/>
 
 Write a Value to a Variable (and only to Variables).<br/>
 When you only use a Variable for writing, you do not need to register it with SimVar.<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
 `SimWrite("L:AP_VNAV_ARMED", 1)`
 <br/><br/><br/>
@@ -1345,7 +1348,7 @@ When you only use a Variable for writing, you do not need to register it with Si
 | --- | --- |
 
 Send a Command to the Sim.<br/>
-Use the known Plugin Syntax to pass Parameters for Commands.<br/>
+Use the known Plugin Syntax to pass Parameters for Commands - it is required to add optional Prefixes.<br/>
 *Example:*<br/>
 `SimCommand("K:APU_GENERATOR_SWITCH_TOGGLE:1")`
 <br/><br/><br/>
@@ -1615,7 +1618,7 @@ The MapImage Statements have to be placed at the Beginning of the File (globally
 | --- | --- |
 
 Every Variable used for reading in the Script has to be registered first.<br/>
-Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes (on any of these Globals).<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 Typically placed at the Beginning of the File (globally).<br/>
 *Example:*<br/>
 `SimVar("L:S_OH_FIRE_ENG1_BUTTON")`
@@ -1627,6 +1630,7 @@ Typically placed at the Beginning of the File (globally).<br/>
 
 Read a Variable from the Sim.<br/>
 The Plugin tries to return Value in it "native" Form - a Number will be returned as Number and a String as String.<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
 `if SimRead(""L:S_OH_FIRE_ENG1_BUTTON"") == 1 then --do something end`
 <br/><br/><br/>
@@ -1637,6 +1641,7 @@ The Plugin tries to return Value in it "native" Form - a Number will be returned
 
 Force to read a Variable as String - even when it a Number!<br/>
 So a Value of `1` is returned as `"1"`.<br/>
+Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
 `if SimReadString(""L:S_OH_FIRE_ENG1_BUTTON"") == "1" then --do something end`
 <br/><br/><br/>
