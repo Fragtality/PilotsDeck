@@ -131,7 +131,7 @@ Starting with Version 0.8.0, the Plugin greatly improves Distribution and Instal
 5. The App will extract and copy the Images and Scripts to the Plugin Directory for you.<br/>The Profiles need to be installed through the StreamDeck UI: **Click on the Link** displayed in the Profile Manager App, wait for the StreamDeck UI to come up and the select the correct StreamDeck to install the clicked Profile to. Repeat for each Profile.<br/>
 You need to click every Link for the Installation to finish successfully. If you do not want or need one of the Profiles, just Cancel the Installation in the StreamDeck UI!<br/>
 <img src="img/ProfileManager-Installing.png" width="512"><br/><br/>
-6. If selected, the App will now remove the old Profiles, remove the "Copy" from the Profile Name (of the new ones) and update the Profile Mappings (if there are existing Mappings).<br/><img src="img/ProfileManager-Completed.png" width="512">
+6. If selected, the App will now remove the old Profiles (if your updating existing Profiles), remove the "Copy" from the Profile Name (of the new ones) and update the Profile Mappings (if there are existing Mappings).<br/>**NOTE**: The Update-Mechanic will only work, if you **keep the Profile Name**.<br/><img src="img/ProfileManager-Completed.png" width="512">
 
 <br/>
 
