@@ -32,6 +32,7 @@ namespace PilotsDeck.UI
         public ActionDesigner(ActionMeta action)
         {
             InitializeComponent();
+            Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             ModelAction = new(action, this);
             ShutdownCopyMonitor = new()
             {
@@ -455,7 +456,10 @@ namespace PilotsDeck.UI
             {
                 ModelAction.RemoveCommandCondition(item.DeckCommandType, item.CommandID, item.ConditionID);
             }
-            SetLastSelected(null);
+            
+            item = GetItem();
+            SetLastSelected(item);
+            SetMenuButtons(item);
         }
 
         private void ButtonMoveUp_Click(object sender, RoutedEventArgs e)
@@ -646,6 +650,14 @@ namespace PilotsDeck.UI
                     DeclinedTemplate = true;
                     SetMenuButtons(GetItem());
                 }
+        }
+        
+        private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            Logger.Error("---- ACTION DESIGNER CRASH ----");
+            Logger.LogException(e.Exception);
+            e.Handled = true;
+            this.Close();
         }
     }
 

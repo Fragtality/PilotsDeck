@@ -42,6 +42,7 @@ namespace PilotsDeck.Actions.Simple
             CanvasInfo = StreamDeckCanvasInfo.GetInfo(sdEvent);
             CheckVersion();
             CheckSettings();
+            CleanCommands();
             if (string.IsNullOrWhiteSpace(Settings.DefaultRect))
             {
                 Settings.DefaultRect = "0; 0";

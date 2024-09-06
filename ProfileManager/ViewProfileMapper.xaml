@@ -23,13 +23,21 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <ComboBox Grid.Row="0" Name="SelectProfileFilter" SelectionChanged="SelectFilter_SelectionChanged" DisplayMemberPath="Name" SelectedValuePath="Index" Margin="0,0,12,0" FontWeight="DemiBold" FontSize="12"/>
 
             <ComboBox Grid.Row="1" Name="SelectDeckFilter" SelectionChanged="SelectFilter_SelectionChanged" Margin="0,6,12,0" FontWeight="DemiBold" FontSize="12"/>
 
-            <Grid Grid.Row="2" Margin="0,4,12,0">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,6,0,0" HorizontalAlignment="Stretch">
+                <Label MinHeight="24" Margin="-5,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center">
+                    Name Filter:
+                </Label>
+                <TextBox Name="TextboxNameFilter" KeyUp="TextboxNameFilter_KeyUp" MinHeight="24" MinWidth="127" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+            </StackPanel>
+
+            <Grid Grid.Row="3" Margin="0,4,12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -38,7 +46,7 @@
                 <TextBlock Grid.Column="1" Name="CountProfileDisplayed" HorizontalAlignment="Right"></TextBlock>
             </Grid>
 
-            <Grid Grid.Row="3" Margin="-12,16,0,12" HorizontalAlignment="Center">
+            <Grid Grid.Row="4" Margin="-12,16,0,12" HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -57,7 +65,7 @@
                 </Button>
             </Grid>
 
-            <Grid Grid.Row="4" Margin="0,0,0,12">
+            <Grid Grid.Row="5" Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="32"/>
                     <ColumnDefinition/>
@@ -66,7 +74,7 @@
                 <TextBlock Grid.Column="1" Name="LabelLoadError" Visibility="Collapsed" FontWeight="Medium" VerticalAlignment="Center">Error during Load</TextBlock>
             </Grid>
 
-            <Grid Grid.Row="5" Margin="0,-4,12,0">
+            <Grid Grid.Row="6" Margin="0,-4,12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -75,7 +83,7 @@
                 <TextBlock Grid.Column="1" Name="CountProfileMappings" HorizontalAlignment="Right"></TextBlock>
             </Grid>
 
-            <Grid Grid.Row="6" Margin="0,4,12,0">
+            <Grid Grid.Row="7" Margin="0,4,12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -84,7 +92,7 @@
                 <TextBlock Grid.Column="1" Name="CountMappingsChangedRemoved" Visibility="Collapsed" HorizontalAlignment="Right"></TextBlock>
             </Grid>
 
-            <Grid Grid.Row="7" Margin="0,4,12,0">
+            <Grid Grid.Row="8" Margin="0,4,12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -93,7 +101,7 @@
                 <TextBlock Grid.Column="1" Name="CountManifestsChangedRemoved" Visibility="Collapsed" HorizontalAlignment="Right"></TextBlock>
             </Grid>
             
-            <Grid Grid.Row="8" Margin="0,4,12,0">
+            <Grid Grid.Row="9" Margin="0,4,12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -104,7 +112,7 @@
         </Grid>
 
 
-        <ScrollViewer Grid.Column="1" CanContentScroll="True" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="1" Grid.Row="0" Grid.RowSpan="10" CanContentScroll="False" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
             <StackPanel Name="ProfileListView" Orientation="Vertical" HorizontalAlignment="Stretch"/>
         </ScrollViewer>
     </Grid>

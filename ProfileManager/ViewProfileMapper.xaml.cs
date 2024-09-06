@@ -126,14 +126,16 @@ namespace ProfileManager
 
         protected void RedrawListView()
         {
+            string name = TextboxNameFilter?.Text?.ToLowerInvariant() ?? "";
+
             if (SelectProfileFilter.SelectedIndex == (int)Filter.MAPPED)
-                FilteredItems = ProfileListItems.Where(m => m.ViewModel.IsMappedProfile);
+                FilteredItems = ProfileListItems.Where(m => m.ViewModel.IsMappedProfile && m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
             else if (SelectProfileFilter.SelectedIndex == (int)Filter.UNMAPPED)
-                FilteredItems = ProfileListItems.Where(m => !m.ViewModel.IsMappedProfile);
+                FilteredItems = ProfileListItems.Where(m => !m.ViewModel.IsMappedProfile && m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
             else if (SelectProfileFilter.SelectedIndex == (int)Filter.CHANGED)
-                FilteredItems = ProfileListItems.Where(m => m.ViewModel.IsChanged);
+                FilteredItems = ProfileListItems.Where(m => m.ViewModel.IsChanged && m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
             else
-                FilteredItems = ProfileListItems;
+                FilteredItems = ProfileListItems.Where(m => m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
 
             if (SelectDeckFilter.SelectedIndex != 0 && !string.IsNullOrEmpty(SelectDeckFilter.SelectedValue?.ToString()))
                 FilteredItems = FilteredItems.Where(i => i.ViewModel.DeckName == SelectDeckFilter.SelectedValue.ToString());
@@ -334,6 +336,11 @@ namespace ProfileManager
                 if (result == MessageBoxResult.Yes)
                     ProfileController.SaveChanges();
             }
+        }
+
+        private void TextboxNameFilter_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            RedrawListView();
         }
     }
 }
