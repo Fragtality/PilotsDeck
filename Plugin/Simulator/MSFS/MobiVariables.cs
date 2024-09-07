@@ -225,7 +225,7 @@ namespace PilotsDeck.Simulator.MSFS
                         if (variable.Value is VariableNumeric varNum)
                             varNum.SetValue(0);
                         else if (variable.Value is VariableString varStr)
-                            varStr.SetValue("");
+                            varStr.SetValue("0");
                     }
                     RemoveList.Add(variable.Key);
                 }

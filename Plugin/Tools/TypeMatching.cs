@@ -32,7 +32,7 @@ namespace PilotsDeck.Tools
         public static readonly Regex rxDref = new($"^({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){{0,1}}){{1}}$", RegexOptions.Compiled);
         public static readonly string validPathXP = $"({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}){{1}}";
         public static readonly Regex rxCmdXP = new($"^({validPathXP}){{1}}(:{validPathXP})*$", RegexOptions.Compiled);
-        public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}[\w][\w/ ]+\)$", RegexOptions.Compiled);
+        public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}([\w][\w/ ]+)\)$", RegexOptions.Compiled);
         public static readonly Regex rxAvarMobiString = new(@"^\(A:[\w][\w ]+(:\d+){0,1},\s{0,1}string\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}},\\s{{0,1}}number\\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxLvarMobiMatch = new(@"([^:\s][a-zA-Z0-9\x2D\x5F\x2E\x20]{2,}([\x3A][0-9]+){0,1}){1}", RegexOptions.Compiled | RegexOptions.IgnoreCase);

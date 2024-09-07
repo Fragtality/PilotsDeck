@@ -309,6 +309,12 @@
     <None Update="Images\indicator\Arrow-Yellow.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\indicator\Dial-White.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\indicator\Dial-Yellow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Images\INOP%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

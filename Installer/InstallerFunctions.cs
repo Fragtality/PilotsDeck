@@ -88,7 +88,7 @@ namespace Installer
                         file.Delete();
 
                 int numFiles = (new DirectoryInfo(Parameters.pluginDir)).GetFiles().Length;
-                bool filesDeleted = (numFiles == 2 && !resetConfig) || (numFiles == 0 && resetConfig);
+                bool filesDeleted = (numFiles <= 2 && !resetConfig) || (numFiles == 0 && resetConfig);
 
                 string path = $@"{Parameters.pluginDir}\Plugin";
                 if (Directory.Exists(path))

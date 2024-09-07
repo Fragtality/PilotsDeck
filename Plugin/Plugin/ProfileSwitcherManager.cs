@@ -234,6 +234,7 @@ namespace PilotsDeck.Plugin
         {
             if (GlobalSettings.SwitchBack)
             {
+                Logger.Debug("Called");
                 foreach (var deck in DeckController.DeckInfo.devices)
                 {
                     if (deck != null)
@@ -248,9 +249,8 @@ namespace PilotsDeck.Plugin
                         }
                     }
                 }
-
-                LastKnownAircraft = "";
             }
+            LastKnownAircraft = "";
         }
     }
 }

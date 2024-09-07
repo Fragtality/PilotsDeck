@@ -110,7 +110,13 @@ namespace PilotsDeck.Resources
             else if (TypeMatching.rxCalcRead.IsMatch(address))
                 value = new VariableString(address, SimValueType.CALCULATOR);
             else if (TypeMatching.rxAvar.IsMatch(address))
-                value = new VariableString(address, SimValueType.AVAR);
+            {
+                var matches = TypeMatching.rxAvar.Matches(address);
+                if (matches != null && matches.Count > 0 && matches[0]?.Groups?.Count >= 4 && matches[0]?.Groups[3]?.Value?.ToLowerInvariant() == "string")
+                    value = new VariableString(address, SimValueType.AVAR);
+                else
+                    value = new VariableNumeric(address, SimValueType.AVAR);
+            }
             else if (TypeMatching.rxLvar.IsMatch(address) || TypeMatching.rxLvarMobi.IsMatch(address))
                 value = new VariableNumeric(address, SimValueType.LVAR);
             else
