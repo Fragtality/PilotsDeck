@@ -74,6 +74,8 @@ namespace PilotsDeck.Simulator
                         SimState = SimulatorState.STOPPED;
                     }
 
+                    SimConnectManager.CheckAircraftString();
+
                     await Task.Delay(App.Configuration.MsfsStateCheckInterval, App.CancellationToken);
                 }
             }
@@ -107,7 +109,6 @@ namespace PilotsDeck.Simulator
             try
             {
                 SimConnectManager.InputEvents.RequestInputEventValues();
-                SimConnectManager.CheckAircraftString();
             }
             catch (Exception ex)
             {
