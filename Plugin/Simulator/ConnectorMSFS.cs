@@ -50,6 +50,9 @@ namespace PilotsDeck.Simulator
                         continue;
                     }
 
+                    if (SimConnectManager.IsSimConnected)
+                            SimConnectManager.MobiModule?.CheckConnection(SimConnectManager.IsSessionReady);
+
                     if (SimState == SimulatorState.RUNNING && SimConnectManager.IsSimConnected && SimConnectManager.IsReceiveRunning)
                     {
                         Logger.Debug("Changed to LOADING");

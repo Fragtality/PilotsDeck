@@ -42,6 +42,7 @@ namespace PilotsDeck.Simulator.MSFS
                     LastConnectionAttempt = DateTime.Now;
                     SendMobiWasmCmd("MF.DummyCmd");
                     SendMobiWasmCmd("MF.Ping");
+                    SendMobiWasmCmd("MF.DummyCmd");
                 }
                 else if (isSessionReady && LvarList.Count == 0)
                     GetLvarList();

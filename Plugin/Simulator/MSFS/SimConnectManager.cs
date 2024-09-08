@@ -179,11 +179,7 @@ namespace PilotsDeck.Simulator.MSFS
             try
             {
                 SimConnectMutex.TryWaitOne();
-                
                 SimConnect?.ReceiveMessage();
-                if (IsSimConnected)
-                    MobiModule?.CheckConnection(IsSessionReady);
-
                 SimConnectMutex.ReleaseMutex();
             }
             catch (Exception ex)

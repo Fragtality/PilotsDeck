@@ -34,7 +34,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 4;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 5;
+        public static int BuildConfigVersion { get; } = 6;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -169,7 +169,7 @@ namespace PilotsDeck
         public int XPlaneTimeoutReceive { get; set; } = 3000;
         public int MsfsRetryDelay { get; set; } = 30000;
         public int MsfsStateCheckInterval { get; set; } = 1000;
-        public int MobiRetryDelay { get; set; } = 10;
+        public int MobiRetryDelay { get; set; } = 10000;
         public int MobiVarsPerFrame { get; set; } = 100;
         public int MobiReorderTreshold { get; set; } = 10;
         public int CommandDelay { get; set; } = 25;
@@ -195,8 +195,14 @@ namespace PilotsDeck
                 {
                     config.MobiVarsPerFrame = 100;
                     config.MobiReorderTreshold = 10;
+                    config.MobiRetryDelay = 10000;
                 }
-                
+
+                if (config.ConfigVersion == 5)
+                {
+                    config.MobiRetryDelay = 10000;
+                }
+
                 config.ConfigVersion = BuildConfigVersion;
                 SaveConfiguration();
             }
