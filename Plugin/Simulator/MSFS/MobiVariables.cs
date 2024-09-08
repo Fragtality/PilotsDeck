@@ -179,7 +179,7 @@ namespace PilotsDeck.Simulator.MSFS
             }
 
             SimConnectManager.SimConnect.RegisterStruct<SIMCONNECT_RECV_CLIENT_DATA, ClientDataValue>((SIMCONNECT_DEFINE_ID)ID);
-            MobiModule.RegisterClientData(SimConnectManager.SimConnect, ID, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_LVARS, SIMCONNECT_CLIENT_DATA_PERIOD.ON_SET);
+            MobiModule.RegisterClientData(SimConnectManager.SimConnect, ID, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_LVARS, SIMCONNECT_CLIENT_DATA_PERIOD.VISUAL_FRAME);
 
             MobiModule.SendClientWasmCmd($"MF.SimVars.Add.{address}");
         }
@@ -202,7 +202,7 @@ namespace PilotsDeck.Simulator.MSFS
             }
 
             SimConnectManager.SimConnect.RegisterStruct<SIMCONNECT_RECV_CLIENT_DATA, ClientDataStringValue>((SIMCONNECT_DEFINE_ID)ID);
-            MobiModule.RegisterClientData(SimConnectManager.SimConnect, ID, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_STRINGVARS, SIMCONNECT_CLIENT_DATA_PERIOD.ON_SET);
+            MobiModule.RegisterClientData(SimConnectManager.SimConnect, ID, PILOTSDECK_CLIENT_DATA_ID.MOBIFLIGHT_STRINGVARS, SIMCONNECT_CLIENT_DATA_PERIOD.VISUAL_FRAME);
 
             MobiModule.SendClientWasmCmd($"MF.SimVars.AddString.{address}");
         }

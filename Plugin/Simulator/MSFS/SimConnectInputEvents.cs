@@ -108,7 +108,7 @@ namespace PilotsDeck.Simulator.MSFS
             }
             else
             {
-                Logger.Debug($"No Hash available for InputEvent '{name}'");
+                Logger.Verbose($"No Hash available for InputEvent '{name}'");
             }
         }
 

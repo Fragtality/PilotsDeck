@@ -109,7 +109,8 @@ namespace PilotsDeck.UI.DeveloperUI
 
             var scrollView = new ScrollViewer
             {
-                Content = content
+                Content = content,
+                FontFamily = new System.Windows.Media.FontFamily("Consolas")
             };
             var window = new Window
             {
@@ -127,7 +128,14 @@ namespace PilotsDeck.UI.DeveloperUI
 
         private void LabelVariables_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            RessourceWindow("Variables", string.Join(Environment.NewLine, VariableManager.VariableList));
+            StringBuilder sb = new();
+            sb.AppendLine(string.Format("{0,-6} | {1,-5} | {2,-6} | {3}", "Sub", "Reg", "Abnrm", "Name"));
+            foreach (var variable in VariableManager.VariableList)
+            {
+                bool abnorm = variable.IsSubscribed && variable.Registrations <= 0;
+                sb.AppendLine(string.Format("{0,-6} | {1,-5} | {2,-6} | {3}", variable.IsSubscribed, variable.Registrations, (abnorm ? "*" : ""), variable.Address));
+            }
+            RessourceWindow("Variables", sb.ToString());
         }
 
         private void LabelImages_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
