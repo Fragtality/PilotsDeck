@@ -510,11 +510,13 @@ Or you can use the DataRefTool Plugin to explore all DataRefs (including Custom)
 
 
 #### LUAFUNC
-| Command & Variable | ALL | `lua:File:Function(Parameter, ...)` |
+| Command & Variable | ALL | `lua:File:Function(Parameter, ...) \| lua:File(:Parameter)` |
 | --- | --- | --- |
 - *File*: The File Name with or without File-Type (.lua). The `lua:` Prefix is *always* necessary! The File Name is case-insensitive.
 - *Function*: The (required) Function's Name to call in *File*. The Function Name is case-sensitive!
 - *Parameter*: An optional list of Parameters to pass to *Function* (if the Function supports that).
+
+NOTE: For Image Scripts the Syntax is different! As the Function-Name is fixed, you don't need to pass a Function-Name. The Parameter is optional (depends on the Script if it is used).
 
 *Examples*
 - `lua:fnx-a320:INIT_AIRCRAFT` - Run the Function *INIT_AIRCRAFT* in File *fnx-a320.lua*.
