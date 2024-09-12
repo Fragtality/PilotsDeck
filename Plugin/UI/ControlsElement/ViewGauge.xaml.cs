@@ -324,6 +324,8 @@ namespace PilotsDeck.UI.ControlsElement
                 var marker = ModelGauge.GaugeMarkers[ListMarker.SelectedIndex];
                 InputMarkerPos.Text = Conversion.ToString(marker.ValuePosition);
                 InputMarkerSize.Text = Conversion.ToString(marker.Size);
+                InputMarkerHeight.Text = Conversion.ToString(marker.Height);
+                InputMarkerOffset.Text = Conversion.ToString(marker.Offset);
                 MarkerColor = marker.GetColor();
                 LabelMarkerColor.Background = new SolidColorBrush(Color.FromArgb(MarkerColor.A, MarkerColor.R, MarkerColor.G, MarkerColor.B));
                 ImageAddUpdateMarker.SetButtonImage("pencil");
@@ -333,9 +335,9 @@ namespace PilotsDeck.UI.ControlsElement
         private void ButtonAddMarker_Click(object sender, RoutedEventArgs e)
         {
             if (ListMarker.SelectedIndex == -1)
-                ModelGauge.AddMarker(InputMarkerPos.Text, InputMarkerSize.Text, MarkerColor);
+                ModelGauge.AddMarker(InputMarkerPos.Text, InputMarkerSize.Text, InputMarkerHeight.Text, InputMarkerOffset.Text, MarkerColor);
             else
-                ModelGauge.UpdateMarker(ListMarker.SelectedIndex, InputMarkerPos.Text, InputMarkerSize.Text, MarkerColor);
+                ModelGauge.UpdateMarker(ListMarker.SelectedIndex, InputMarkerPos.Text, InputMarkerSize.Text, InputMarkerHeight.Text, InputMarkerOffset.Text, MarkerColor);
 
             InputMarkerPos.Text = "";
             ListMarker.SelectedIndex = -1;

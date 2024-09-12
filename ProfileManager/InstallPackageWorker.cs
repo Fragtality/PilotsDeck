@@ -17,7 +17,6 @@ namespace ProfileManager
         public PackageFile PackageFile { get; protected set; } = new(null);
 
         public bool OptionRemoveOldProfiles {  get; set; } = false;
-        public bool OptionKeepContent { get; set; } = false;
 
         public bool IsValid { get { return IsChecked && IsLoaded && IsCompatible; } }
         public bool IsChecked { get; protected set; } = false;
@@ -75,11 +74,6 @@ namespace ProfileManager
         {
             try
             {
-                if (!PackageFile.KeepPackageContents)
-                {
-                    PackageFile.Manifest.KeepPackageContents = OptionKeepContent;
-                }
-
                 FilesInstalled = PackageFile.InstallPackage();
                 PackageFile.Dispose();
                 if (!FilesInstalled)

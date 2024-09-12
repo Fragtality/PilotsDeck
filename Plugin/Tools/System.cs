@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,18 @@ namespace PilotsDeck.Tools
 {
     public static class Sys
     {
+        public static string GetRegistryValue(string path, string value)
+        {
+            try
+            {
+                return (string)Registry.GetValue(path, value, null);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static void RequestNavigateHandler(object sender, RequestNavigateEventArgs e)
         {
             try

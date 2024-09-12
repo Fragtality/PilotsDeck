@@ -23,7 +23,16 @@ namespace Installer
         public static void CreateLogger()
         {
             if (File.Exists(_filename))
-                File.Delete(_filename);
+            {
+                if ((new FileInfo(_filename)).Length != 0)
+                {
+                    if (File.Exists(_filename + ".old"))
+                        File.Delete(_filename + ".old");
+                    File.Move(_filename, _filename + ".old");
+                }
+                else
+                    File.Delete(_filename);
+            }
 
             _stream = new StreamWriter(File.OpenWrite(_filename));
         }

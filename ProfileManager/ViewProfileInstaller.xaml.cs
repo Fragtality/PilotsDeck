@@ -215,6 +215,7 @@ namespace ProfileManager
                 AddTreeItems($"{PackageFile.CountProfiles} Profiles", displayList, null, true);
                 AddTreeItems($"{PackageFile.CountImages} Images", PackageFile.FilesImages);
                 AddTreeItems($"{PackageFile.CountScripts} Scripts", PackageFile.FilesScripts);
+                AddTreeItems($"{PackageFile.CountExtras} Extras", PackageFile.FilesExtras);
                 AddTreeItems($"{PackageFile.FilesUnknown.Count} Unknown", PackageFile.FilesUnknown, new SolidColorBrush(Colors.Orange));
 
                 CheckboxRemoveOld.IsChecked = InstallWorker.OptionRemoveOldProfiles;
@@ -229,13 +230,7 @@ namespace ProfileManager
                     CheckboxRemoveOld.Visibility = Visibility.Collapsed;
                 }
 
-                if (PackageFile.Manifest.KeepPackageContents)
-                {
-                    CheckboxKeepContents.IsEnabled = false;
-                    CheckboxKeepContents.IsChecked = true;
-                }
-                else
-                    CheckboxKeepContents.IsChecked = InstallWorker.OptionKeepContent;
+                CheckboxKeepContents.IsChecked = false;
             }
             catch (Exception ex)
             {
@@ -255,7 +250,8 @@ namespace ProfileManager
 
             foreach (var item in items)
             {
-                treeitem.Items.Add(new TreeViewItem() { Header = item });
+                if (!string.IsNullOrWhiteSpace(item))
+                    treeitem.Items.Add(new TreeViewItem() { Header = item });
             }
             treeitem.IsExpanded = expand;
             TreeFileContents.Items.Add(treeitem);
@@ -357,11 +353,8 @@ namespace ProfileManager
 
         private void CheckboxKeepContents_Click(object sender, RoutedEventArgs e)
         {
-            if (CheckboxKeepContents.IsEnabled)
-            {
-                InstallWorker.OptionKeepContent = !InstallWorker.OptionKeepContent;
-                CheckboxKeepContents.IsChecked = InstallWorker.OptionKeepContent;
-            }
+            InstallWorker.PackageFile.KeepPackageContents = !InstallWorker.PackageFile.KeepPackageContents;
+            CheckboxKeepContents.IsChecked = InstallWorker.PackageFile.KeepPackageContents;
         }
 
         private void TreeFileContents_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

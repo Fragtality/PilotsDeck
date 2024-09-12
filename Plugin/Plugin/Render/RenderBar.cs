@@ -85,7 +85,7 @@ namespace PilotsDeck.Plugin.Render
             brush.Dispose();
         }
 
-        public void DrawBarLine(Color color, float size, float ratio)
+        public void DrawBarLine(Color color, float size, float height, float offset, float ratio)
         {
             RectangleF drawParams;
             if (DynamicWidth >= 0)
@@ -100,6 +100,11 @@ namespace PilotsDeck.Plugin.Render
 
             float off = drawParams.Width * ratio;
 
+            if (height <= 0)
+                height = drawParams.Height;
+            if (height <= 0)
+                return;
+
             if (!FixedMarkers && DynamicWidth >= 0 && off > DynamicWidth)
                 return;
 
@@ -107,13 +112,13 @@ namespace PilotsDeck.Plugin.Render
                 return;
 
             Pen pen = new(Color.FromArgb(GetAlpha(), color), size * (IsSquareCanvas ? DefaultScalar.Y : Renderer.NON_SQUARE_SCALE));
-            Render.DrawLine(pen, drawParams.X + off, drawParams.Y, drawParams.X + off, drawParams.Y + drawParams.Height);
+            Render.DrawLine(pen, drawParams.X + off, drawParams.Y + offset, drawParams.X + off, drawParams.Y + height);
             pen.Dispose();
         }
 
         public void DrawBarCenterLine(Color centerColor, float centerSize)
         {
-            DrawBarLine(centerColor, centerSize, 0.5f);
+            DrawBarLine(centerColor, centerSize, 0, 0, 0.5f);
         }
 
         public void DrawBarIndicatorTriangle(Color drawColor, float size, float offset, bool bottom = false)

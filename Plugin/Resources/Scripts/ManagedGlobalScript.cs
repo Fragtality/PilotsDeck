@@ -30,6 +30,7 @@ namespace PilotsDeck.Resources.Scripts
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
+            _env.GetRegistryValue = new Func<string, string, string>(GetRegistryValue);
             _env.RunInterval = new Action<int, string>(RunInterval);
             _env.RunSim = new Action<string>(RunSim);
             _env.RunAircraft = new Action<string>(RunAircraft);

@@ -162,71 +162,78 @@ namespace PilotsDeck.Plugin
             if (!GlobalSettings.EnableSwitching)
                 return;
 
-            string currentAircraft = SimController.AircraftString;
-            if (currentAircraft == LastKnownAircraft)
+            try
             {
-                Logger.Information($"Skipping Switch Request for '{currentAircraft}' (already set as LastKnownAircraft)");
-                return;
-            }
-            else
-                LastKnownAircraft = currentAircraft;
-
-            ActiveDecks = [];
-            foreach (var device in DeckController.DeckInfo.devices)
-                ActiveDecks.Add(device.id, null);
-            
-
-
-            var queryAircraft = ProfileMappings.Where(m => m.AircraftProfile && m.AircraftStrings.Count > 0);
-            Logger.Information($"Searching {queryAircraft.Count()} valid Profiles for Aircraft '{currentAircraft}' ...");
-            foreach (var deviceMapping in queryAircraft)
-            {
-                if (!ActiveDecks.TryGetValue(deviceMapping.DeckId, out string varDeck))
+                string currentAircraft = SimController.AircraftString;
+                if (currentAircraft == LastKnownAircraft)
                 {
-                    Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - not connected / not in list!");
-                    continue;
+                    Logger.Information($"Skipping Switch Request for '{currentAircraft}' (already set as LastKnownAircraft)");
+                    return;
                 }
-                else if (varDeck != null)
+                else
+                    LastKnownAircraft = currentAircraft;
+
+                ActiveDecks = [];
+                foreach (var device in DeckController.DeckInfo.devices)
+                    ActiveDecks.Add(device.id, null);
+
+
+
+                var queryAircraft = ProfileMappings.Where(m => m.AircraftProfile && m.AircraftStrings.Count > 0);
+                Logger.Information($"Searching {queryAircraft.Count()} valid Profiles for Aircraft '{currentAircraft}' ...");
+                foreach (var deviceMapping in queryAircraft)
                 {
-                    Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - already mapped!");
-                    continue;
+                    if (!ActiveDecks.TryGetValue(deviceMapping.DeckId, out string varDeck))
+                    {
+                        Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - not connected / not in list!");
+                        continue;
+                    }
+                    else if (varDeck != null)
+                    {
+                        Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - already mapped!");
+                        continue;
+                    }
+
+                    if (MatchAircraftStrings(currentAircraft, deviceMapping.AircraftStrings))
+                    {
+                        Logger.Information($"Found Match for '{deviceMapping.ProfileName}' against: {string.Join(" | ", deviceMapping.AircraftStrings)}");
+                        ActiveDecks[deviceMapping.DeckId] = deviceMapping.ProfilePath;
+                    }
                 }
 
-                if (MatchAircraftStrings(currentAircraft, deviceMapping.AircraftStrings))
+
+                var queryDefault = ProfileMappings.Where(m => m.DefaultProfile && m.DefaultSimulator == SimController.SimMainType);
+                Logger.Information($"Searching {queryDefault.Count()} valid Profiles for Simulator '{SimController.SimMainType}' ...");
+                foreach (var deviceMapping in queryDefault)
                 {
-                    Logger.Information($"Found Match for '{deviceMapping.ProfileName}' against: {string.Join(" | ", deviceMapping.AircraftStrings)}");
+                    if (!ActiveDecks.TryGetValue(deviceMapping.DeckId, out string varDeck))
+                    {
+                        Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - not connected / not in list!");
+                        continue;
+                    }
+                    else if (varDeck != null)
+                    {
+                        Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - already mapped!");
+                        continue;
+                    }
+
+                    Logger.Information($"Using first Match on '{deviceMapping.ProfileName}' for Default Simulator Profile");
                     ActiveDecks[deviceMapping.DeckId] = deviceMapping.ProfilePath;
                 }
+
+
+                foreach (var deck in ActiveDecks)
+                {
+                    if (deck.Value != null)
+                    {
+                        Logger.Information($"Switching Deck '{deck.Key}' to Profile '{deck.Value}'");
+                        _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.Key, deck.Value);
+                    }
+                }
             }
-
-
-            var queryDefault = ProfileMappings.Where(m => m.DefaultProfile && m.DefaultSimulator == SimController.SimMainType);
-            Logger.Information($"Searching {queryDefault.Count()} valid Profiles for Simulator '{SimController.SimMainType}' ...");
-            foreach (var deviceMapping in queryDefault)
+            catch (Exception ex)
             {
-                if (!ActiveDecks.TryGetValue(deviceMapping.DeckId, out string varDeck))
-                {
-                    Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - not connected / not in list!");
-                    continue;
-                }
-                else if (varDeck != null)
-                {
-                    Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - already mapped!");
-                    continue;
-                }
-
-                Logger.Information($"Using first Match on '{deviceMapping.ProfileName}' for Default Simulator Profile");
-                ActiveDecks[deviceMapping.DeckId] = deviceMapping.ProfilePath;
-            }
-
-
-            foreach (var deck in ActiveDecks)
-            {
-                if (deck.Value != null)
-                {
-                    Logger.Information($"Switching Deck '{deck.Key}' to Profile '{deck.Value}'");
-                    _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.Key, deck.Value);
-                }
+                Logger.LogException(ex);
             }
         }
 
@@ -234,20 +241,24 @@ namespace PilotsDeck.Plugin
         {
             if (GlobalSettings.SwitchBack)
             {
-                Logger.Debug("Called");
-                foreach (var deck in DeckController.DeckInfo.devices)
+                try
                 {
-                    if (deck != null)
+                    foreach (var deck in DeckController.DeckInfo.devices)
                     {
-                        //Logger.Information($"Switching back Profile on Deck '{deck}'.");
-                        //_ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.Key, deck.Value);
-                        var profile = ProfileMappings.Where(p => p.SwitchBackProfile && p.DeckId == deck.id).FirstOrDefault() ?? null;
-                        if (profile != null)
+                        if (deck != null)
                         {
-                            Logger.Information($"Switching Deck '{deck.id}' to Profile '{profile.ProfileUUID}'");
-                            _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.id, profile.ProfilePath);
+                            var profile = ProfileMappings.Where(p => p.SwitchBackProfile && p.DeckId == deck.id).FirstOrDefault() ?? null;
+                            if (profile != null)
+                            {
+                                Logger.Information($"Switching Deck '{deck.id}' to Profile '{profile.ProfileUUID}'");
+                                _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.id, profile.ProfilePath);
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogException(ex);
                 }
             }
             LastKnownAircraft = "";

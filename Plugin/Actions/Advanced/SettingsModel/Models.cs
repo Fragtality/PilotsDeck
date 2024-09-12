@@ -39,6 +39,8 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
     {
         public float ValuePosition { get; set; } = 0;
         public float Size { get; set; } = 2;
+        public float Height { get; set; } = 0;
+        public float Offset { get; set; } = 0;
         public string Color { get; set; } = "#ffffff";
 
         public MarkerDefinition()
@@ -50,13 +52,17 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         {
             ValuePosition = source.ValuePosition;
             Size = source.Size;
+            Height = source.Height;
+            Offset = source.Offset;
             Color = source.Color;
         }
 
-        public MarkerDefinition(float pos, float size, Color color)
+        public MarkerDefinition(float pos, float size, float height, float offset, Color color)
         {
             ValuePosition = pos;
             Size = size;
+            Height = height;
+            Offset = offset;
             Color = ColorTranslator.ToHtml(color);
         }
 

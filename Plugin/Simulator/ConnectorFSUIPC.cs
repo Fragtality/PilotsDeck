@@ -151,7 +151,7 @@ namespace PilotsDeck.Simulator
                         LastPaused = IsPaused;
                     }
 
-                    var lvars = VariableManager.VariableList.Where(v => v.Type == SimValueType.LVAR);
+                    var lvars = VariableManager.VariableList.Where(v => v.Type == SimValueType.LVAR && v.Registrations > 0);
                     string address;
                     foreach (var variable in lvars)
                     {

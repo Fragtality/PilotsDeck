@@ -80,7 +80,7 @@ namespace PilotsDeck.UI.ViewModels.Element
             List<string> values = [];
 
             foreach (var marker in GaugeElement.Settings.GaugeMarkers)
-                values.Add($"Pos: {Conversion.ToString(marker.ValuePosition)} - {Conversion.ToString(marker.Size)}px");
+                values.Add($"Value: {Conversion.ToString(marker.ValuePosition)} / Thickness: {Conversion.ToString(marker.Size)} / Height: {Conversion.ToString(marker.Height)} / Offset: {Conversion.ToString(marker.Offset)}");
 
             return values;
         }
@@ -196,10 +196,13 @@ namespace PilotsDeck.UI.ViewModels.Element
             }
         }
 
-        public virtual void AddMarker(string pos, string size, System.Drawing.Color color)
+        public virtual void AddMarker(string pos, string size, string height, string offset, System.Drawing.Color color)
         {
-            if (!Conversion.IsNumberF(size, out float numSize))
+            if (!Conversion.IsNumberF(size, out float numSize) || !Conversion.IsNumberF(offset, out float numOffset) || !Conversion.IsNumberF(height, out float numHeight))
                 return;
+
+            if (numHeight <= 0)
+                numHeight = GaugeElement.Size.Y;
             
             if (pos.StartsWith('$') && pos.Length > 1)
             {
@@ -211,7 +214,7 @@ namespace PilotsDeck.UI.ViewModels.Element
                     return;
 
                 for (float markerPos = start; markerPos <= end; markerPos += step)
-                    GaugeElement.Settings.GaugeMarkers.Add(new(markerPos, numSize, color));
+                    GaugeElement.Settings.GaugeMarkers.Add(new(markerPos, numSize, numHeight, numOffset, color));
 
                 SortMarkers();
                 ModelAction.UpdateAction();
@@ -219,7 +222,7 @@ namespace PilotsDeck.UI.ViewModels.Element
             }
             else if (Conversion.IsNumberF(pos, out float numPos))
             {
-                GaugeElement.Settings.GaugeMarkers.Add(new(numPos, numSize, color));
+                GaugeElement.Settings.GaugeMarkers.Add(new(numPos, numSize, numHeight, numOffset, color));
                 SortMarkers();
                 ModelAction.UpdateAction();
             }
@@ -235,11 +238,12 @@ namespace PilotsDeck.UI.ViewModels.Element
             }
         }
 
-        public virtual void UpdateMarker(int index, string pos, string size, System.Drawing.Color color)
+        public virtual void UpdateMarker(int index, string pos, string size, string height, string offset, System.Drawing.Color color)
         {
-            if (index >= 0 && index < GaugeElement.Settings.GaugeMarkers.Count && Conversion.IsNumberF(pos, out float valPos) && Conversion.IsNumberF(size, out float valSize))
+            if (index >= 0 && index < GaugeElement.Settings.GaugeMarkers.Count && Conversion.IsNumberF(pos, out float valPos)
+                && Conversion.IsNumberF(offset, out float valOffset)  && Conversion.IsNumberF(size, out float valSize) && Conversion.IsNumberF(height, out float valHeight))
             {
-                GaugeElement.Settings.GaugeMarkers[index] = new MarkerDefinition(valPos, valSize, color);
+                GaugeElement.Settings.GaugeMarkers[index] = new MarkerDefinition(valPos, valSize, valHeight, valOffset, color);
                 SortMarkers();
                 ModelAction.UpdateAction();
             }

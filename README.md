@@ -126,12 +126,14 @@ Starting with Version 0.8.0, the Plugin greatly improves Distribution and Instal
 1. Use the **Profile Manager App** found in the Plugin Directory to install Profile Packages: Open it via Plugin Icon in the System-Tray / Notification Area and drop the Package File to be installed on the big Arrow (or navigate to Package File's Location).<br/><br/>
 2. The Package File will be read and the Description (from the Author) will be displayed - **check the Notes** for additional Steps.<br/><br/>
 <img src="img/ProfileManager-PackageView.png" width="512"><br/><br/>
-3. If you already have Profiles with the same Name (as shown in the StreamDeck UI), the App will **remove the old** Profiles (and update existing Profile Mappings to the new ones). If want to keep the old Profiles, **uncheck** 'Remove old Profiles'.<br/><br/>
+3. If you already have Profiles with the same Name (as shown in the StreamDeck UI), the App will **remove the old** Profiles (and update existing Profile Mappings to the new ones). If want to keep the old Profiles, **uncheck** 'Remove old Profiles'.<br/>
+If you want to keep the extracted Package Contents, check *Keep extracted Files ...*. The Contents will be kept in Profiles Sub-Folder of the Plugin (named after the Package Name).<br/><br/>
 4. Click Install. Note that the StreamDeck Software will be automatically started and stopped as needed.<br/><br/>
 5. The App will extract and copy the Images and Scripts to the Plugin Directory for you.<br/>The Profiles need to be installed through the StreamDeck UI: **Click on the Link** displayed in the Profile Manager App, wait for the StreamDeck UI to come up and the select the correct StreamDeck to install the clicked Profile to. Repeat for each Profile.<br/>
 You need to click every Link for the Installation to finish successfully. If you do not want or need one of the Profiles, just Cancel the Installation in the StreamDeck UI!<br/>
 <img src="img/ProfileManager-Installing.png" width="512"><br/><br/>
-6. If selected, the App will now remove the old Profiles (if your updating existing Profiles), remove the "Copy" from the Profile Name (of the new ones) and update the Profile Mappings (if there are existing Mappings).<br/>**NOTE**: The Update-Mechanic will only work, if you **keep the Profile Name**.<br/><img src="img/ProfileManager-Completed.png" width="512">
+6. If selected, the App will now remove the old Profiles (if your updating existing Profiles), remove the "Copy" from the Profile Name (of the new ones) and update the Profile Mappings (if there are existing Mappings).<br/>**NOTE**: The Update-Mechanic will only work, if you **keep the Profile Name**.<br/><img src="img/ProfileManager-Completed.png" width="512"><br/><br/>
+7. The Package Author can include additional Files you might to install/use the Profiles. If so, you will find a Folder on your Desktop (named after the Package's Name) with these additional Files.
 
 <br/>
 
@@ -1034,7 +1036,15 @@ Used to specifiy at what Angle the Arc starts and how "long" the Arc is.
 
 **Color Ranges**:<br/>
 You can specifiy multiple "Sub Ranges" with their own Min, Max and Color Value on Top of the Gauge to denote "Critical" or "Warning" Ranges.<br/>
-Click on the + Button to add a Range and the - Button to remove the currently selected Range.
+Click on the + Button to add a Range and the - Button to remove the currently selected Range.<br/>
+To change a Range: select it in the List, change the Parameters as needed and click the Pencil to update the Range.
+<br/><br/>
+
+**Gauge Markers**:<br/>
+These Fields allow to define Markers/Ticks/Lines on the Gauge. Each can have it's individual Position (Value), Thickness, Offset, Height and Color.<br/>
+Click on the + Button to add a Marker and the - Button to remove the currently selected Marker.<br/>
+To change a Marker: select it in the List, change the Parameters as needed and click the Pencil to update the Marker.<br/>
+You can use a Shorthand/Template in Value to add a Range of Markers: `$step:start:end` (replace with the respective Numbers). The other Parameters (Thickness, Offset, Height, Color) will be applied to all Markers as entered.
 <br/><br/>
 
 **Grow Gauge**:<br/>
@@ -1735,6 +1745,7 @@ Requirements / Guidelines for creating Package Files:
 - **Profiles** added to the Package File need to be in the **.streamDeckProfile Format** you get when Exporting a Profile from the StreamDeck Software.
 - Please **keep the Name** of the StreamDeck Profiles **the same** (as shown in the StreamDeck UI). Else the Profile Manage can not replace old Files and transfer Profile Mappings on Profile Updates.
 - Please **make it clear** in the Profile or File Name for **which StreamDeck Type** a Profile is intended for - so that the User can choose the correct StreamDeck on Installation. There is no automatic Way because for whatever Reason, Elgato does not export that Information.
+- You can include additional Files in the Package (e.g. FSUIPC Scripts, a Readme, Simulator Modules) in the **Extras** Folder. If put there, the Profile Manager will place the Files on the User's Desktop for easier retrival (in a Folder named after the Package File's Name).
 
 <br/>
 
@@ -1749,8 +1760,7 @@ The Package Description is saved in package.json File and should look like that:
   "author": "Otto",
   "url": "https://www.google.com",  
   "notes": "A \"fancy\" Profile for an Airplane including:\r\nJust Switches, Lights & Knobs!\r\nFor Instructions on the blinking, beeping and flashing lights: consult Buck Murdock.", 
-  "versionplugin": "0.8.0",
-  "keepPackageContents": false
+  "versionplugin": "0.8.0"
 }
 ```
 
@@ -1782,16 +1792,15 @@ Be aware to escape Characters properly for the json Format! Quotation Marks must
 This is the minimum Plugin Version required to use the included Images/Scripts/Profiles.<br/>
 The Version specified will be checked agains the current Plugin Version the User has. If it is below this Minimum, the Package Installation will not be allowed<br/>
 
-*keepPackageContents* <br/>
-The Contents of the Package are extracted to the `\Profiles` Folder. Normally the Files are cleaned up after the Installation was aborted/finished.<br/>
-When set to true, the extracted Contents are kept there (in a Subfolder with named after the Package File). The User can't overwrite that Setting in the Installer when set to true.<br/>
-This Mechanic is intented if you want or need to distribute other Files with the Package File (include them in the Root Folder of the Archive - where the package.json is)<br/>
 
 <br/>
 
 **Folder Structure**<br/>
 ```
 \
+|--\Extras
+|  |--Additional Files
+|
 |--\Images
 |  |--image.png
 |  |--\imagesubfolder

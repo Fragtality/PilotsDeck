@@ -30,10 +30,11 @@ namespace ProfileManager
         public string Author { get { return Manifest?.Author; } }
         public string URL { get { return Manifest?.URL; } }
         public string VersionPlugin { get { return Manifest?.VersionPlugin; } }
-        public bool KeepPackageContents { get { return Manifest.KeepPackageContents; } }
+        public bool KeepPackageContents { get; set; }
         public int CountProfiles { get { return PackagedProfiles.Count; } }
         public int CountImages { get { return FilesImages.Count; } }
         public int CountScripts { get { return FilesScripts.Count; } }
+        public int CountExtras { get { return FilesExtras.Count; } }
         public int CountValidTotal { get { return PackagedProfiles.Count + FilesImages.Count + FilesScripts.Count; } }
         public bool IsCompatible { get; protected set; } = false;
         public bool IsDisposed { get; protected set; } = false;
@@ -41,6 +42,7 @@ namespace ProfileManager
         public List<PackagedProfile> PackagedProfiles { get; protected set; } = [];
         public List<string> FilesImages { get; protected set; } = [];
         public List<string> FilesScripts { get; protected set; } = [];
+        public List<string> FilesExtras { get; protected set; } = [];
         public List<string> FilesUnknown { get; protected set; } = [];
 
         public bool CheckFile()
@@ -173,8 +175,10 @@ namespace ProfileManager
                     }
                     else if (IsImagePath(entry.FullName))
                         FilesImages.Add(entry.FullName.Replace($"{Parameters.PLUGIN_IMAGE_FOLDER}/", "", StringComparison.InvariantCultureIgnoreCase));
-                    else if (IsScripPath(entry.FullName))
+                    else if (IsScriptPath(entry.FullName))
                         FilesScripts.Add(entry.FullName.Replace($"{Parameters.PLUGIN_SCRIPTS_FOLDER}/", "", StringComparison.InvariantCultureIgnoreCase));
+                    else if (entry.FullName.StartsWith($"{Parameters.PACKAGE_PATH_EXTRAS}/", StringComparison.InvariantCultureIgnoreCase) && !Path.EndsInDirectorySeparator(entry.FullName))
+                        FilesExtras.Add(entry.FullName.Replace($"{Parameters.PACKAGE_PATH_EXTRAS}/", "", StringComparison.InvariantCultureIgnoreCase));
                     else if (entry.FullName != Parameters.PACKAGE_JSON_FILE && !Path.EndsInDirectorySeparator(entry.FullName))
                         FilesUnknown.Add(entry.FullName);
                 }
@@ -282,7 +286,8 @@ namespace ProfileManager
                     CopyValidFolderFiles(Parameters.PLUGIN_IMAGE_FOLDER, $"*{Parameters.PLUGIN_IMAGE_EXT}", 1);
                 if (CountScripts > 0)
                     CopyValidFolderFiles(Parameters.PLUGIN_SCRIPTS_FOLDER, $"*{Parameters.PLUGIN_SCRIPTS_EXT}", 2);
-
+                if (CountExtras > 0)
+                    CopyExtraFiles();
 
                 if (!KeepPackageContents && Directory.Exists(ProfileWorkPath))
                 {
@@ -322,13 +327,39 @@ namespace ProfileManager
                     Logger.Log(LogLevel.Warning, $"Destination Path for '{dest}' does not exist!");
                     Directory.CreateDirectory(Path.GetDirectoryName(dest));
                 }    
-                File.Copy(entry, GetFileDestinationPath(entry), true);
+                File.Copy(entry, dest, true);
+            }
+        }
+
+        protected void CopyExtraFiles()
+        {
+            string folder = Parameters.PACKAGE_PATH_EXTRAS;
+            InstallerTask.CurrentTask.MessageLog($"Copying Files for Folder '{folder}' to Desktop");
+
+
+            EnumerationOptions enumOptions = new() { RecurseSubdirectories = true, MaxRecursionDepth = 5 };
+            var enumDir = Directory.EnumerateFiles(@$"{ProfileWorkPath}\{folder}", $"*.*", enumOptions);
+            string dest;
+            foreach (var entry in enumDir)
+            {
+                dest = ChangeFileDestinationPath(entry, @$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\{FileName}");
+                if (!Directory.Exists(Path.GetDirectoryName(dest)))
+                {
+                    Logger.Log(LogLevel.Debug, $"Destination Path for '{dest}' does not exist!");
+                    Directory.CreateDirectory(Path.GetDirectoryName(dest));
+                }
+                File.Copy(entry, dest, true);
             }
         }
 
         protected string GetFileDestinationPath(string sourcePath)
         {
             return sourcePath.Remove(0, ProfileWorkPath.Length).Insert(0, Parameters.PLUGIN_PATH);
+        }
+
+        protected string ChangeFileDestinationPath(string sourcePath, string destinationPath)
+        {
+            return sourcePath.Remove(0, ProfileWorkPath.Length + 1 + Parameters.PACKAGE_PATH_EXTRAS.Length).Insert(0, destinationPath);
         }
 
         protected static bool IsProfilePath(string filepath)
@@ -341,7 +372,7 @@ namespace ProfileManager
             return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_IMAGE_FOLDER}/", Parameters.PLUGIN_IMAGE_EXT);
         }
 
-        protected static bool IsScripPath(string filepath)
+        protected static bool IsScriptPath(string filepath)
         {
             return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_SCRIPTS_FOLDER}/", Parameters.PLUGIN_SCRIPTS_EXT);
         }

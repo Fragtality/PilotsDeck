@@ -53,7 +53,7 @@ namespace PilotsDeck.Actions.Advanced.Elements
             if (Settings.GaugeMarkers.Count > 0)
             {
                 foreach (var marker in Settings.GaugeMarkers)
-                    renderBar.DrawBarLine(marker.GetColor(), marker.Size, ToolsRender.NormalizedRatio(marker.ValuePosition, Settings.GaugeValueMin, Settings.GaugeValueMax));
+                    renderBar.DrawBarLine(marker.GetColor(), marker.Size, marker.Height, marker.Offset, ToolsRender.NormalizedRatio(marker.ValuePosition, Settings.GaugeValueMin, Settings.GaugeValueMax));
             }
 
             if (Settings.GaugeRevereseDirection)

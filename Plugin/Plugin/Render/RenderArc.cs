@@ -215,29 +215,33 @@ namespace PilotsDeck.Plugin.Render
             if (marker.ValuePosition < MinimumValue || marker.ValuePosition > MaximumValue)
                 return;
 
-            DrawArcLine(marker.GetColor(), marker.Size, ToolsRender.NormalizedRatio(marker.ValuePosition, MinimumValue, MaximumValue));
+            DrawArcLine(marker.GetColor(), marker.Size, marker.Height, marker.Offset, ToolsRender.NormalizedRatio(marker.ValuePosition, MinimumValue, MaximumValue));
         }
 
-        public void DrawArcLine(Color drawColor, float size, float ratio)
+        public void DrawArcLine(Color drawColor, float size, float height, float offset, float ratio)
         {
             if (Radius == 0.0f)
                 return;
 
             RectangleF drawRect = DrawRect;
-            float orgIndX = drawRect.X + drawRect.Width;
+            float orgIndX = drawRect.X + drawRect.Width + offset;
             float orgIndY = (drawRect.Y + drawRect.Width / 2.0f);
             float angle = (SweepAngle * ratio) + StartAngle;
+            if (height <= 0)
+                height = Width;
+            if (height <= 0)
+                return;
 
             Pen pen = new(Color.FromArgb(GetAlpha(), drawColor), GetIndicatorSize(size));
             Renderer.RotateCenter(angle, Offset);
-            Render.DrawLine(pen, orgIndX - (Width * (IsSquareCanvas ? DefaultScalar.X : Renderer.NON_SQUARE_SCALE) * 0.5f), orgIndY, orgIndX + (Width * (IsSquareCanvas ? DefaultScalar.X : Renderer.NON_SQUARE_SCALE) * 0.5f), orgIndY);
+            Render.DrawLine(pen, orgIndX - (height * (IsSquareCanvas ? DefaultScalar.X : Renderer.NON_SQUARE_SCALE) * 0.5f), orgIndY, orgIndX + (height * (IsSquareCanvas ? DefaultScalar.X : Renderer.NON_SQUARE_SCALE) * 0.5f), orgIndY);
             Renderer.RotateCenter(-angle, Offset);
             pen.Dispose();
         }
 
         public void DrawArcCenterLine(Color drawColor, float size)
         {
-            DrawArcLine(drawColor, size, 0.5f);
+            DrawArcLine(drawColor, size, Width, 0, 0.5f);
         }
 
         public void DrawArcRanges(Color[] colors, float[][] ranges, bool symm = false)

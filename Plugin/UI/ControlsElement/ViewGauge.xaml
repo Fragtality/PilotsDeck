@@ -108,6 +108,7 @@
         <Grid Grid.Row="4" Grid.Column="1" Name="GridMarkers" Margin="0,0,0,8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto" MinHeight="84"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -118,15 +119,21 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Margin="-3,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinHeight="24">Pos:</Label>
+            <Label Grid.Column="0" Grid.Row="0" Margin="-3,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinHeight="24" FontSize="10">Value:</Label>
             <TextBox Grid.Column="1" Grid.Row="0" Name="InputMarkerPos" MinHeight="24" MinWidth="50" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
-            <TextBox Grid.Column="2" Grid.Row="0" Name="InputMarkerSize" MinHeight="24" MinWidth="50" Margin="6,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
-            <Label Grid.Column="3" Grid.Row="0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinHeight="24" FontSize="10">px</Label>
-            <Label Grid.Column="4" Grid.Row="0" Name="LabelMarkerColor" MouseLeftButtonUp="LabelMarkerColor_MouseLeftButtonUp" MinWidth="53" MinHeight="24" Margin="6,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" BorderBrush="LightGray" BorderThickness="1" FontSize="10">Color</Label>
+            <Label Grid.Column="2" Grid.Row="0" Margin="6,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinHeight="24" FontSize="10">Thickness:</Label>
+            <TextBox Grid.Column="3" Grid.Row="0" Name="InputMarkerSize" MinHeight="24" MinWidth="50" Margin="0,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
 
-            <ListView Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="1" Name="ListMarker" SelectionChanged="ListMarker_SelectionChanged" Margin="0,6,0,0" MinHeight="84" VerticalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"></ListView>
+            <Label Grid.Column="0" Grid.Row="1" Margin="-3,6,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinHeight="24" FontSize="10">Height:</Label>
+            <TextBox Grid.Column="1" Grid.Row="1" Name="InputMarkerHeight" MinHeight="24" MinWidth="50" Margin="0,6,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
+            <Label Grid.Column="2" Grid.Row="1" Margin="6,6,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinHeight="24" FontSize="10">Offset:</Label>
+            <TextBox Grid.Column="3" Grid.Row="1" Name="InputMarkerOffset" MinHeight="24" MinWidth="50" Margin="0,6,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Center"></TextBox>
 
-            <StackPanel Grid.Column="5" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Top" Margin="8,1,0,0">
+            <Label Grid.Column="4" Grid.Row="0" Name="LabelMarkerColor" MouseLeftButtonUp="LabelMarkerColor_MouseLeftButtonUp" MinWidth="53" MinHeight="24" Margin="12,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" BorderBrush="LightGray" BorderThickness="1" FontSize="10">Color</Label>
+
+            <ListView Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="2" Name="ListMarker" SelectionChanged="ListMarker_SelectionChanged" Margin="0,6,0,0" MinHeight="84" VerticalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"></ListView>
+
+            <StackPanel Grid.Column="5" Grid.Row="1" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Top" Margin="8,6,0,0">
                 <Button Name="ButtonAddMarker" Click="ButtonAddMarker_Click" Width="24" Height="24">
                     <Image Name="ImageAddUpdateMarker" Source="../Icons/plus-circle.png" Width="20" Height="20"/>
                 </Button>

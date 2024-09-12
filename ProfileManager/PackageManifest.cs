@@ -29,9 +29,6 @@ namespace ProfileManager
         [JsonPropertyName("versionplugin")]
         public string VersionPlugin { get; set; } = "";
 
-        [JsonPropertyName("keepPackageContents")]
-        public bool KeepPackageContents { get; set; } = false;
-
         public static PackageManifest LoadManifest(string json)
         {
             var manifest = JsonSerializer.Deserialize<PackageManifest>(json);

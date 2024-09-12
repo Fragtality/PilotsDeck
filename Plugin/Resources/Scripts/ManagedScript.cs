@@ -90,6 +90,7 @@ namespace PilotsDeck.Resources.Scripts
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
+            _env.GetRegistryValue = new Func<string, string, string>(GetRegistryValue);
             _env.Sleep = new Action<int>(ScriptSleep);
             _env.UseLog = new Action<string>(UseLog);
             _env.Log = new Action<string>(WriteLog);
@@ -417,6 +418,11 @@ namespace PilotsDeck.Resources.Scripts
             {
                 Logger.LogException(ex);
             }
+        }
+
+        protected virtual string GetRegistryValue(string path, string value)
+        {
+            return Sys.GetRegistryValue(path, value) ?? "";
         }
 
         public override string ToString()
