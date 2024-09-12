@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <Nullable>annotations</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -20,6 +20,7 @@
     <PackageProjectUrl>https://github.com/Fragtality/PilotsDeck</PackageProjectUrl>
     <PackageIcon>PluginIcon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Fragtality/PilotsDeck</RepositoryUrl>
+	<WindowsSdkPackageVersion>10.0.17763.41</WindowsSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -1080,6 +1081,9 @@
     <None Update="Plugin\Images\Encoder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Plugin\Images\PluginIcon%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Plugin\Images\PluginIcon.ico">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -1192,6 +1196,12 @@
     </None>
     <None Update="Plugin\PI\pi_SwitchKorry.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="previews\Example01XL.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="previews\ExampleLayout02.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="SimConnect.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

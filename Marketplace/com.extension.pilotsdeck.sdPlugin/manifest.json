@@ -1,0 +1,37 @@
+{
+  "Actions": [
+    {
+      "Icon": "Plugin/Images/PluginIcon",
+      "Name": "Placeholder",
+      "States": [
+        {
+          "Image": "Plugin/Images/PluginIcon",
+          "TitleAlignment": "top",
+          "FontSize": "10"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "UUID": "com.extension.pilotsdeck.placeholder"
+    }
+  ],
+  "Category": "PilotsDeck",
+  "CategoryIcon": "Plugin/Images/PluginIcon",
+  "Disabled": false,
+  "Author": "Fragtality",
+  "CodePathWin": "installer/Install-PilotsDeck.exe",
+  "Description": "Directly control your FlightSim from your StreamDeck! Map Actions to Sim Events and show Sim Variables on the Buttons.\r\n\r\nNOTE FOR UPGRADES: Please use the Installer from the GitHub Page (under Releases)!",
+  "Name": "PilotsDeck",
+  "Icon": "Plugin/Images/PluginIcon",
+  "URL": "https://github.com/Fragtality/PilotsDeck",
+  "Version": "0.8.0",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.5"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ]
+}

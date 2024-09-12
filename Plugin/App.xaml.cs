@@ -302,6 +302,9 @@ namespace PilotsDeck
                 Directory.CreateDirectory(AppConfiguration.DirScriptsGlobal);
             if (!Directory.Exists(AppConfiguration.DirScriptsImage))
                 Directory.CreateDirectory(AppConfiguration.DirScriptsImage);
+
+            if (Directory.Exists("installer/"))
+                Directory.Delete("installer/", true);
         }
 
         private static bool ParseCommandLine()

@@ -95,9 +95,26 @@ namespace Installer
 
             if (IsSuccess)
             {
-                var task = InstallerTask.AddTask("Start StreamDeck", "Installation successful - starting StreamDeck Software again!");
-                InstallerFunctions.StartStreamDeckSoftware();
-                task.State = TaskState.COMPLETED;
+                if (!App.CmdLineStreamDeck)
+                {
+                    var task = InstallerTask.AddTask("Start StreamDeck", "Installation successful - starting StreamDeck Software again ...");
+                    InstallerFunctions.StartStreamDeckSoftware();
+                    task.State = TaskState.COMPLETED;
+                }
+                else
+                {
+                    int seconds = 10;
+                    string msg = "Installation successful! The StreamDeck Software will be stopped in {0}s.\nPlease start it manually again!";
+                    var task = InstallerTask.AddTask("Stop StreamDeck", "");
+                    task.State = TaskState.WAITING;
+                    for (int i = seconds; i >= 0; i--)
+                    {
+                        task.ReplaceLastMessage(string.Format(msg, i));
+                        Thread.Sleep(1000);
+                    }
+                    InstallerFunctions.StopStreamDeckSoftware();
+                    task.State = TaskState.COMPLETED;
+                }
             }
         }
 
@@ -549,21 +566,33 @@ namespace Installer
 
         private bool InstallPlugin()
         {
+            InstallerTask task;
             //Stop Deck SW
-            var task = InstallerTask.AddTask("PilotsDeck Plugin", "Stopping StreamDeck Software ...");
-            
-            if (InstallerFunctions.IsStreamDeckRunning() && !InstallerFunctions.WaitOnStreamDeckClose(10))
+            if (!App.CmdLineStreamDeck)
             {
-                task.SetError($"The StreamDeck Software could not be stopped!\r\nPlease stop it manually and try again.");
+                task = InstallerTask.AddTask("PilotsDeck Plugin", "Stopping StreamDeck Software ...");
 
-                return false;
+                if (InstallerFunctions.IsStreamDeckRunning() && !InstallerFunctions.WaitOnStreamDeckClose(10))
+                {
+                    task.SetError($"The StreamDeck Software could not be stopped!\r\nPlease stop it manually and try again.");
+
+                    return false;
+                }
+
+                //Delete Old Binaries
+                if (!ResetConfiguration)
+                    task.Message = "StreamDeck Software stopped. Deleting old Plugin ...";
+                else
+                    task.Message = "StreamDeck Software stopped. Deleting old Plugin (and Configuration) ...";
+            }
+            else
+            {
+                task = InstallerTask.AddTask("PilotsDeck Plugin", "Deleting old Plugin ...");
+                if (ResetConfiguration)
+                    task.Message = "Deleting old Plugin (and Configuration) ...";
             }
 
-            //Delete Old Binaries
-            if (!ResetConfiguration)
-                task.Message = "StreamDeck Software stopped. Deleting old Plugin ...";
-            else
-                task.Message = "StreamDeck Software stopped. Deleting old Plugin (and Configuration) ...";
+            
 
             if (!InstallerFunctions.DeleteOldFiles(ResetConfiguration))
             {

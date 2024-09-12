@@ -17,11 +17,14 @@ namespace Installer
     public static class Logger
     {
         private static StreamWriter _stream;
-        private static readonly string _filename = "PilotsDeck-Installer.log";
+        private static string _filename = "PilotsDeck-Installer.log";
         private static readonly string _format = "{0:yyyy-MM-dd HH:mm:ss} [{1}] [ {2} ] {3}\r\n";
 
         public static void CreateLogger()
         {
+            if (App.CmdLineStreamDeck)
+                _filename = $"installer/{_filename}";
+
             if (File.Exists(_filename))
             {
                 if ((new FileInfo(_filename)).Length != 0)

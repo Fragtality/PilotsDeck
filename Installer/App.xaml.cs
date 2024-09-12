@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 
 namespace Installer
@@ -6,9 +7,13 @@ namespace Installer
     public partial class App : Application
     {
         public static bool CmdLineIgnoreMSFS { get; private set; } = false;
+        public static bool CmdLineStreamDeck { get; private set; } = false;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            if (e.Args.Length > 0 && e.Args.Where(a => a.ToLowerInvariant().Contains("registerevent")).Any())
+                CmdLineStreamDeck = true;
+
             Logger.CreateLogger();
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
 

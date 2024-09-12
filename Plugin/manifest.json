@@ -206,7 +206,7 @@
   "Disabled": false,
   "Author": "Fragtality",
   "CodePathWin": "PilotsDeck.exe",
-  "Description": "Directly control your FlightSim from your StreamDeck®!",
+  "Description": "Directly control your FlightSim from your StreamDeck! Map Actions to Sim Events and show Sim Variables on the Buttons.\r\n\r\nNOTE FOR UPGRADES: Please use the Installer from the GitHub Page (under Releases)!",
   "Name": "PilotsDeck",
   "Icon": "Plugin/Images/PluginIcon",
   "URL": "https://github.com/Fragtality/PilotsDeck",
@@ -218,7 +218,7 @@
   "OS": [
     {
       "Platform": "windows",
-      "MinimumVersion": "7"
+      "MinimumVersion": "10"
     }
   ]
 }

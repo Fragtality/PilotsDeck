@@ -109,6 +109,8 @@ namespace Installer
                 CheckBoxResetConfig.Visibility = Visibility.Collapsed;
                 TaskPanel.Visibility = Visibility.Visible;
                 TimerWorkerCheck.Start();
+                if (App.CmdLineStreamDeck)
+                    bottomLabel.Visibility = Visibility.Visible;
                 TaskPanel.Activate(null, null);
                 await Task.Run(InstallWorker.Run);
             }

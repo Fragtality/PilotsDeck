@@ -101,6 +101,8 @@ namespace Installer
                     Directory.Delete(path, true);
                     Directory.CreateDirectory(path);
                 }
+                else
+                    Directory.CreateDirectory(path);
                 bool logResetted = Directory.Exists(path);
 
                 path = $@"{Parameters.pluginDir}\Images\Wait{{0}}.png";
@@ -110,6 +112,9 @@ namespace Installer
                     File.Delete(string.Format(path, "@2x"));
                 if (File.Exists(string.Format(path, "@3x")))
                     File.Delete(string.Format(path, "@3x"));
+
+                if (Directory.Exists("previews"))
+                    Directory.Delete("previews", true);
 
                 return filesDeleted && piDeleted && logResetted;
             }
