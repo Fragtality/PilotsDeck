@@ -961,6 +961,12 @@
     <None Update="Images\SwitchSmallBlackOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\SwitchSmallBlackOnYellow%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\SwitchSmallBlackOnYellow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Images\SwitchSmallBlackUpOff%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
