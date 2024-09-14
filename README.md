@@ -47,7 +47,7 @@ How Commands and Variables are configured and the different Options how they can
 
 | ID | Description | Command | Variable | Simulators               | 
 | :---: | :------------ | :---: | :---: | :-------------------- | 
-| [**MACRO**](#macro) | Execute any Macro known to FSUIPC | ✔️ | ✖️ | P3D, FSX |
+| [**MACRO**](#macro) | Execute any Macro known to FSUIPC | ✔️ | ✖️ | MSFS, P3D, FSX |
 | [**SCRIPT**](#script) | Run any Lua-Code known to FSUIPC | ✔️ | ✖️ | MSFS, P3D, FSX |
 | [**CONTROL**](#control) | Send any SimEvent defined by its numerical ID | ✔️ | ✖️ | MSFS, P3D, FSX, FS9 |
 | [**LVAR**](#lvar) | Read from / Write to any L-Var ("Local Variable") | ✔️ | ✔️ | MSFS, P3D, FSX |
