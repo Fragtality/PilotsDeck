@@ -123,7 +123,7 @@ But be aware that some older Profiles might still use Commands and Variables fro
 ## 1.5 - Installing Profile Packages (.ppp Files)
 Starting with Version 0.8.0, the Plugin greatly improves Distribution and Installatin of Profiles:<br/>
 
-1. Use the **Profile Manager App** found in the Plugin Directory to install Profile Packages: Open it via Plugin Icon in the System-Tray / Notification Area and drop the Package File to be installed on the big Arrow (or navigate to Package File's Location).<br/><img src="img/Plugin-Systray.png" width="267"<br/><br/>
+1. Use the **Profile Manager App** found in the Plugin Directory to install Profile Packages: Open it via Plugin Icon in the System-Tray / Notification Area and drop the Package File to be installed on the big Arrow (or navigate to Package File's Location).<br/><img src="img/Plugin-Systray.png" width="267"><br/><br/>
 2. The Package File will be read and the Description (from the Author) will be displayed - **check the Notes** for additional Steps.<br/><br/>
 <img src="img/ProfileManager-PackageView.png" width="512"><br/><br/>
 3. If you already have Profiles with the same Name (as shown in the StreamDeck UI), the App will **remove the old** Profiles (and update existing Profile Mappings to the new ones). If want to keep the old Profiles, **uncheck** 'Remove old Profiles'.<br/>
