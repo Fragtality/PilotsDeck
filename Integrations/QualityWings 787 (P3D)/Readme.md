@@ -4,8 +4,7 @@ My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementa
 - **PilotsDeck_QW787-XL:** XL Profile with Folders for the different Flight Phases and Folders for Lights (Int+Ext), Overhead, EFIS, MCP, CDU and MIP/Pedestal
 - **PilotsDeck_QW787-SD:** SD (15 Buttons) Profile with GSX Integration (see QualityWings2GSX), MCP, Radio and Transponder
 
-Since not everyone has a XL Deck, I made the third Profile **PilotsDeck_QW787-Lib** which contains the Contents of the XL Profile so that they are visble on the SD.<br/>
-Mix and match as you like :relaxed:<br/>
+<br/>
 
 ![Index-XL](../../img/QW_IndexXL.jpg)<br/>
 ![Index-SD](../../img/QW_IndexSD.jpg)<br/>
@@ -13,9 +12,9 @@ Mix and match as you like :relaxed:<br/>
 ![Example-MCP](../../img/QW_ExampleMCP.jpg)<br/><br/>
 
 # Installation
-- Update to at least PilotsDeck 0.6.3
+- Update to at least PilotsDeck 0.8.0
 - Make sure the QualityWings Fonts are available System-Wide (should be the Case). The Profiles / the Actions are configured to use these Fonts to add more "Style" :wink:
-- Just double-click on the Profiles to add them to your StreamDeck Software
+- Install the ppp File via the Profile Manager - check the Plugin [Readme](https://github.com/Fragtality/PilotsDeck#15---installing-profile-packages-ppp-files) for Details. After Installation you find a Folder "QW 787 v0.2" on your Desktop with the additional Files for FSUIPC.
 - Place the Files from the FSUIPC6 Folder in your FSUIPC6 Addon-Folder (the Folder where your FSUIPC6.ini is located)
 - Either start the Scripts (Auto + Sync) manually ...
 - ... or add them as Auto-Scripts to your FSUIPC6.ini. Start P3D/FSUIPC6 once so the Files are added (if you're not familiar with adding them manually). Then add the following to your FSUIPC6.ini:<br/>

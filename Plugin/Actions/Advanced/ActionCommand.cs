@@ -114,7 +114,7 @@ namespace PilotsDeck.Actions.Advanced
             return diff >= SpanAfterLastDown;
         }
 
-        public SimCommand GetSimCommand(string context, bool keyUp, int ticks)
+        public SimCommand GetSimCommand(string context, bool keyUp, int ticks, bool encoderAction = false)
         {
             ticks = ticks == 0 ? 1 : ticks;
 
@@ -125,7 +125,8 @@ namespace PilotsDeck.Actions.Advanced
                 Type = CommandType,
                 IsUp = keyUp,
                 Ticks = Math.Abs(ticks),
-                TickDelay = TickDelay,                
+                TickDelay = TickDelay,
+                EncoderAction = encoderAction
             };
 
             if (IsCode)

@@ -39,8 +39,6 @@ namespace PilotsDeck.Simulator
             }
             else if (command?.Type == SimCommandType.LUAFUNC)
             {
-                //var thread = new Thread(RunScript);
-                //thread.Start(command);
                 _ = Task.Run(() => RunScript(command));
                 return true; 
             }
@@ -81,7 +79,7 @@ namespace PilotsDeck.Simulator
             int i;
             for (i = 0; i < command.Ticks; i++)
             {
-                if (VirtualJoystick.ToggleDriverButton(command.Address))
+                if (await VirtualJoystick.ToggleDriverButton(command.Address))
                 {
                     success++;
                     if (command.Ticks > 1)
@@ -94,19 +92,9 @@ namespace PilotsDeck.Simulator
         protected async static Task<bool> RunVjoyClearSet(SimCommand command)
         {
             Logger.Debug($"Running vJoy Clear/Set '{command.Address}' (x{command.Ticks}) (IsUp {command.IsUp})");
-            if (command.Ticks == 1)
+            if (command.Ticks == 1 && !command.EncoderAction)
             {
-                var diff = DateTime.Now - command.Time;
-                var minTime = TimeSpan.FromMilliseconds(App.Configuration.VJoyMinimumPressed);
-                if (diff < minTime)
-                {
-                    if (diff.Milliseconds > 0)
-                        await Task.Delay(diff, App.CancellationToken);
-                    else
-                        await Task.Delay(minTime, App.CancellationToken);
-                }
-
-                return VirtualJoystick.ClearSetDriverButton(command.Address, command.IsDown);
+                return await VirtualJoystick.ClearSetDriverButton(command.Address, command.IsDown);
             }
             else
             {
@@ -114,11 +102,12 @@ namespace PilotsDeck.Simulator
                 int i;
                 for (i = 0; i < command.Ticks; i++)
                 {
-                    if (VirtualJoystick.ClearSetDriverButton(command.Address, true))
+                    if (await VirtualJoystick.ClearSetDriverButton(command.Address, true))
                         success++;
-                    await Task.Delay(App.Configuration.VJoyMinimumPressed, App.CancellationToken);
-                    if (VirtualJoystick.ClearSetDriverButton(command.Address, false))
+                    if (await VirtualJoystick.ClearSetDriverButton(command.Address, false))
                         success++;
+                    if (i != command.Ticks)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
                 }
 
                 return i * 2 == success;

@@ -412,7 +412,8 @@ namespace PilotsDeck.Actions.Advanced
             {
                 if (actionCmd.CompareConditions())
                 {
-                    commands.Add(actionCmd.GetSimCommand(Context, false, ticks));
+                    commands.Add(actionCmd.GetSimCommand(Context, (sdCommand != StreamDeckCommand.KEY_DOWN && sdCommand != StreamDeckCommand.DIAL_DOWN), ticks,
+                        (sdCommand == StreamDeckCommand.DIAL_LEFT || sdCommand == StreamDeckCommand.DIAL_RIGHT || sdCommand == StreamDeckCommand.TOUCH_TAP)));
                     if (ActionDelays[sdCommand] > 0)
                         commands.Add(new DelayCommand(ActionDelays[sdCommand]));
                 }
@@ -472,7 +473,7 @@ namespace PilotsDeck.Actions.Advanced
             var diff = DateTime.Now - LastKeyDown;
             LastKeyDown = DateTime.Now;
 
-            return GetTimedCommands(diff, StreamDeckCommand.DIAL_UP, sdEvent.payload.ticks);
+            return GetTimedCommands(diff, StreamDeckCommand.DIAL_UP, 1);
         }
 
         public virtual SimCommand[] OnDialRotate(StreamDeckEvent sdEvent)
@@ -494,7 +495,7 @@ namespace PilotsDeck.Actions.Advanced
             var diff = DateTime.Now - LastKeyDown;
             LastKeyDown = DateTime.Now;
 
-            return GetTimedCommands(diff, StreamDeckCommand.KEY_UP, sdEvent.payload.ticks);
+            return GetTimedCommands(diff, StreamDeckCommand.KEY_UP, 1);
         }
 
         public virtual SimCommand[] OnTouchTap(StreamDeckEvent sdEvent)

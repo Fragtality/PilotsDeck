@@ -58,12 +58,13 @@ namespace PilotsDeck.Actions.Simple
             }
         }
 
-        public SimCommand GetSimCommand(string context, int ticks, bool keyUp = true)
+        public SimCommand GetSimCommand(string context, int ticks, bool encoderAction = false, bool keyUp = true)
         {
             ticks = ticks == 0 ? 1 : ticks;
             SimCommand simCommand = new()
             {
-                Type = CommandType
+                Type = CommandType,
+                EncoderAction = encoderAction,
             };
 
             if (ToggleSwitch)

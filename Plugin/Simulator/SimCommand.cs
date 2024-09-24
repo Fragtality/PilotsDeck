@@ -27,6 +27,7 @@ namespace PilotsDeck.Simulator
     {
         public virtual string Address { get; set; } = "";
         public virtual SimCommandType Type { get; set; } = SimCommandType.MACRO;
+        public virtual bool EncoderAction { get; set; } = false;
         public virtual double NumValue { get { return Conversion.ToDouble(Value); } }
         public virtual string Value { get; set; } = "";
         public virtual bool DoNotRequest { get; set; } = false;

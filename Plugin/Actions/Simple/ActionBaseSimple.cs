@@ -419,11 +419,11 @@ namespace PilotsDeck.Actions.Simple
 
             if (Settings.IsGuarded && RessourceStore.GetState(VariableID.GuardMon)?.Compares() == true && RessourceStore.GetCommand(SwitchID.GuardCmd, out ActionCommand guardCommand) != null)
             {
-                simCommand = guardCommand?.GetSimCommand(Context, sdEvent.payload.ticks);
+                simCommand = guardCommand?.GetSimCommand(Context, sdEvent.payload.ticks, true);
             }
             else if (RessourceStore.GetCommand(SwitchID.SwitchTouch, out ActionCommand touchCommand) != null)
             {
-                simCommand = touchCommand?.GetSimCommand(Context, sdEvent.payload.ticks);
+                simCommand = touchCommand?.GetSimCommand(Context, sdEvent.payload.ticks, true);
             }
 
             if (simCommand == null)
@@ -456,11 +456,11 @@ namespace PilotsDeck.Actions.Simple
             }
             else if (sdEvent.payload.ticks < 0 && RessourceStore.GetCommand(SwitchID.SwitchLeft, out ActionCommand leftCommand) != null)
             {
-                simCommand = leftCommand?.GetSimCommand(Context, sdEvent.payload.ticks);
+                simCommand = leftCommand?.GetSimCommand(Context, sdEvent.payload.ticks, true);
             }
             else if (sdEvent.payload.ticks > 0 && RessourceStore.GetCommand(SwitchID.SwitchRight, out ActionCommand rightCommand) != null)
             {
-                simCommand = rightCommand?.GetSimCommand(Context, sdEvent.payload.ticks);
+                simCommand = rightCommand?.GetSimCommand(Context, sdEvent.payload.ticks, true);
             }
 
             if (simCommand == null)
@@ -482,11 +482,11 @@ namespace PilotsDeck.Actions.Simple
                 && RessourceStore.GetCommand(SwitchID.GuardCmd, out ActionCommand guardCommand)?.IsHoldable == true)
             {
                 GuardHoldDown = true;
-                simCommand = guardCommand?.GetSimCommand(Context, sdEvent.payload.ticks, false);
+                simCommand = guardCommand?.GetSimCommand(Context, sdEvent.payload.ticks, false, false);
             }
             else if (RessourceStore.GetCommand(SwitchID.Switch, out ActionCommand switchCommand)?.IsHoldable == true)
             {
-                simCommand = switchCommand?.GetSimCommand(Context, sdEvent.payload.ticks, false);
+                simCommand = switchCommand?.GetSimCommand(Context, sdEvent.payload.ticks, false, false);
             }
 
             if (simCommand == null)
