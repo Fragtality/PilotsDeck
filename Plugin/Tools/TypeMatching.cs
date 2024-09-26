@@ -34,7 +34,8 @@ namespace PilotsDeck.Tools
         public static readonly Regex rxCmdXP = new($"^({validPathXP}){{1}}(:{validPathXP})*$", RegexOptions.Compiled);
         public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}([\w][\w/ ]+)\)$", RegexOptions.Compiled);
         public static readonly Regex rxAvarMobiString = new(@"^\(A:[\w][\w ]+(:\d+){0,1},\s{0,1}string\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}},\\s{{0,1}}number\\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        //public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}},\\s{{0,1}}number\\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}}\\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxLvarMobiMatch = new(@"([^:\s][a-zA-Z0-9\x2D\x5F\x2E\x20]{2,}([\x3A][0-9]+){0,1}){1}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxBvarValue = new($"^(B:{validName}){{1}}$", RegexOptions.Compiled);
         public static readonly string validBvarCmd = $"((B:){{0,1}}{validName}(:[-+]?[0-9]+([,.]{{1}}[0-9]+)?){{0,1}}){{1}}";

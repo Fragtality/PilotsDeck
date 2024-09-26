@@ -50,9 +50,13 @@ namespace PilotsDeck.Resources
             }
             else if (TypeMatching.rxLvar.IsMatch(address))
             {
-                var matches = TypeMatching.rxLvarMobiMatch.Matches(address);
-                if (matches != null && matches.Count > 0)
-                    address = $"(L:{matches[0].Value},number)";
+                //var matches = TypeMatching.rxLvarMobiMatch.Matches(address);
+                //if (matches != null && matches.Count > 0)
+                //    address = $"(L:{matches[0].Value},number)";
+                if (!address.StartsWith("L:"))
+                    address = $"(L:{address})";
+                else
+                    address = $"({address})";
             }
 
             return address;

@@ -264,7 +264,7 @@ You can find a **full List** in the "*Controls List...*" Text-File in your *My D
 When used as **Command**, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable.<br/>
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
 
-NOTE for MSFS: The L-Vars will be requested in the Unit "Number" from the Sim. Depending on how the Developer writes the Variable, this can lead to strange Results (e.g. getting the Value 0.174533... for an Heading of 10). If you come across such Variables, use a [Calculator](#calculator) Variable with an Expression to read the L-Var in a different Unit!<br/><br/>
+NOTE for MSFS: The L-Vars will be requested without an Unit from the Sim. Depending on how the Developer writes the Variable, this can lead to strange Results (e.g. getting the Value 0.174533... for an Heading of 10). If you come across such Variables, use a [Calculator](#calculator) Variable with an Expression to read the L-Var in a different Unit!<br/><br/>
 
 *Background*:<br/>
 Local Variables (sometimes "Local Gauge Variables") are created and updated by the Plane. There are no standard L-Vars which could be used on every Plane. There is also no communality if and which L-Vars a specific Plane has. For some Planes it is the official Way to Read and Trigger Cockpit-Controls (e.g. Fenix, QualityWings). For some it is only for Read (e.g. PMDG). For some they exist, but are not really supported or usable sometimes (e.g. FSLabs).<br/>
