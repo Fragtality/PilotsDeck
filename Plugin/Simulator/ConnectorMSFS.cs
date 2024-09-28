@@ -111,7 +111,8 @@ namespace PilotsDeck.Simulator
         {
             try
             {
-                SimConnectManager.InputEvents.RequestInputEventValues();
+                if (SimConnectManager.IsSessionReady)
+                    SimConnectManager.InputEvents.RequestInputEventValues();
             }
             catch (Exception ex)
             {
@@ -380,9 +381,10 @@ namespace PilotsDeck.Simulator
             if (managedVariable == null)
                 return;
 
-            if (managedVariable is VariableInputEvent && IsReadySession)
+            bool inputEvent = managedVariable is VariableInputEvent;
+            if (inputEvent && IsReadySession)
                 SimConnectManager.InputEvents.SubscribeInputEvent(managedVariable.Address, managedVariable as VariableInputEvent);
-            else if (managedVariable.IsValueMSFS())
+            else if (!inputEvent && managedVariable.IsValueMSFS())
                 SimConnectManager.MobiModule.SubscribeAddress(managedVariable.Address, managedVariable);
         }        
 
@@ -394,15 +396,17 @@ namespace PilotsDeck.Simulator
             if (managedVariables == null || managedVariables.Length == 0)
                 return;
 
+            bool inputEvent;
             foreach (var variable in managedVariables)
             {
                 if (!variable.IsValueMSFS())
                     continue;
 
                 Logger.Verbose($"Subscribe Variable '{variable.Address}' of Type '{variable.Type}'");
-                if (variable is VariableInputEvent && IsReadySession)
+                inputEvent = variable is VariableInputEvent;
+                if (inputEvent && IsReadySession)
                     SimConnectManager.InputEvents.SubscribeInputEvent(variable.Address, variable as VariableInputEvent);
-                else
+                else if (!inputEvent && variable.IsValueMSFS())
                     SimConnectManager.MobiModule.SubscribeAddress(variable.Address, variable);
             }
         }

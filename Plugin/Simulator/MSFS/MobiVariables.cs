@@ -102,6 +102,7 @@ namespace PilotsDeck.Simulator.MSFS
                     SimVars.TryAdd(next, variable);
                     SimVarUsed.Add(next, true);
                     RegisterMobiVariable(next, variable);
+                    Logger.Verbose($"Subscribed MobiVariable '{address}' to ID '{next}'");
                     IncreaseID(address);
                     variable.IsChanged = true;
                 }
@@ -111,6 +112,7 @@ namespace PilotsDeck.Simulator.MSFS
                     SimVars[id] = variable;
                     variable.IsSubscribed = true;
                     variable.IsChanged = true;
+                    Logger.Verbose($"Re-Subscribed MobiVariable '{address}' to ID '{id}'");
                 }
                 else
                     Logger.Error($"Error subscribing Address '{address}' not added / already in Use! (contains: {AddressToIndex.ContainsKey(address)} | used: {SimVarUsed[id]})");
