@@ -111,7 +111,7 @@ namespace PilotsDeck.Simulator
         {
             try
             {
-                if (SimConnectManager.IsSessionReady)
+                if (SimConnectManager.IsSessionReady && !IsPaused)
                     SimConnectManager.InputEvents.RequestInputEventValues();
             }
             catch (Exception ex)

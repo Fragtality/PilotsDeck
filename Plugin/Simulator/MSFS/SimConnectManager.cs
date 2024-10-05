@@ -8,6 +8,16 @@ using System.Threading;
 
 namespace PilotsDeck.Simulator.MSFS
 {
+    enum PAUSE_FLAGS
+    {
+        OFF = 0,
+        PAUSE = 1,
+        PAUSE_LEGACY = 2,
+        PAUSE_ACTIVE = 4,
+        PAUSE_SIM = 8
+    };
+
+
     public partial class SimConnectManager
     {
         public static SimConnect SimConnect { get; set; } = null;
@@ -24,6 +34,7 @@ namespace PilotsDeck.Simulator.MSFS
         protected bool ReceiveError { get; set; } = false;
         public bool QuitReceived { get; protected set; } = false;
         public bool IsPaused { get; protected set; } = true;
+        //protected bool LastPauseWasMenu { get; set; } = false;
         public bool IsSessionReady { get { return CameraState < 11; } }
         protected uint CameraState = 11;
         public string AircraftString { get; protected set; } = "";
@@ -199,9 +210,12 @@ namespace PilotsDeck.Simulator.MSFS
         {
             if (data.dwRequestID == (int)SIMCONNECT_REQUEST_ID.InternalVariables && data.dwDefineID == (int)SIMCONNECT_REQUEST_ID.InternalVariables && data.dwData.Length >= 1)
             {
+                bool lastState = IsSessionReady;
                 CameraState = (uint)data.dwData[0];
                 Logger.Debug($"CameraState switched to '{CameraState}'");
                 EvaluateInputEvents();
+                if (!IsSessionReady && lastState)
+                    MobiModule.ClearLvarList();
             }
         }
 
@@ -227,17 +241,20 @@ namespace PilotsDeck.Simulator.MSFS
                 else if (recEvent?.uEventID == (uint)SIM_SYS_EVENTS.PAUSE)
                 {
                     Logger.Debug($"Received 'Pause' Event - dwData: {recEvent.dwData}");
-                    if (recEvent.dwData == 9 || recEvent.dwData == 4 || recEvent.dwData == 13)
+                    if (Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE) || Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE_ACTIVE) || Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE_SIM))
                         IsPaused = true;
                     else if (recEvent.dwData == 0)
                         IsPaused = false;
-                    else if (recEvent.dwData == 1 && IsSessionReady)
-                    {
-                        IsPaused = true;
-                        CameraState = 11;
-                        EvaluateInputEvents();
-                        MobiModule.ClearLvarList();
-                    }
+
+                    //if (Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE) && !Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE_SIM) && IsSessionReady && LastPauseWasMenu)
+                    //{
+                    //    IsPaused = true;
+                    //    CameraState = 11;
+                    //    EvaluateInputEvents();
+                    //    MobiModule.ClearLvarList();
+                    //}
+
+                    //LastPauseWasMenu = Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE_SIM);
                 }
                 else
                     Logger.Debug($"Received unknown Event '{recEvent.uEventID}' (dwData {recEvent.dwData})");

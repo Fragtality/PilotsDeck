@@ -48,7 +48,7 @@ namespace PilotsDeck.Actions.Advanced
 
         public bool Compare()
         {
-            if (Variable == null)
+            if (Variable == null || Variable?.Value == null)
                 return false;
 
             if (Variable.IsNumericValue && Conversion.IsNumber(Value))

@@ -15,6 +15,11 @@ namespace PilotsDeck.Tools
 {
     public static class Sys
     {
+        public static bool HasFlag(uint value, uint flag)
+        {
+            return (value & flag) == flag;
+        }
+
         public static string GetRegistryValue(string path, string value)
         {
             try
