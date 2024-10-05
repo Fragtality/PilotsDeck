@@ -54,7 +54,7 @@ namespace PilotsDeck.UI.DeveloperUI
             LabelProfileSwitch.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.EnableSwitching;
             LabelProfileSwitchback.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.SwitchBack;
             
-            LabelAircraftString.Content = SimController.AircraftString;
+            LabelAircraftString.Content = SimController.AircraftString.Replace("_","__");
 
            
             LabelActions.Content = ActionManager.Count;
