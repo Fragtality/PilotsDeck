@@ -330,6 +330,50 @@ namespace Installer
             return false;
         }
 
+        public static bool DownloadNetRuntime(string url, string file, out string fullpath, string workdir = "")
+        {
+            bool result = false;
+            try
+            {
+                if (workdir == "")
+                    workdir = Environment.GetFolderPath(Environment.SpecialFolder.InternetCache);
+
+                file = $@"{workdir}\{file}";
+                fullpath = file;
+
+                if (File.Exists(fullpath))
+                    File.Delete(fullpath);
+
+                var webClient = new WebClient();
+                webClient.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+                webClient.Headers.Add("Accept-Encoding", "gzip, deflate, br, zstd");
+                webClient.Headers.Add("Accept-Language", "en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                webClient.Headers.Add("Referer", "\r\nhttps://dotnet.microsoft.com/");
+                webClient.Headers.Add("Sec-Ch-Ua", "\"Microsoft Edge\";v=\"129\", \"Not=A?Brand\";v=\"8\", \"Chromium\";v=\"129\"");
+                webClient.Headers.Add("Sec-Ch-Ua-Mobile", "?0");
+                webClient.Headers.Add("Sec-Ch-Ua-Platform", "\"Windows\"");
+                webClient.Headers.Add("Sec-Ch-Ua-Platform-Version", "\"10.0.0\"");
+                webClient.Headers.Add("Sec-Fetch-Dest", "document");
+                webClient.Headers.Add("Sec-Fetch-Mode", "navigate");
+                webClient.Headers.Add("Sec-Fetch-Site", "same-site");
+                webClient.Headers.Add("Sec-Fetch-User", "?1");
+                webClient.Headers.Add("Upgrade-Insecure-Requests", "1");
+                webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0");
+                webClient.DownloadFile(url, file);
+                long size = (new FileInfo(file)).Length;
+                result = File.Exists(file) && size > 1;
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+                InstallerTask.CurrentTask.SetError(e);
+                fullpath = file;
+            }
+
+            return result;
+        }
+
+
         public static bool DownloadFile(string url, string file, out string fullpath, string workdir = "")
         {
             bool result = false;
@@ -346,7 +390,8 @@ namespace Installer
 
                 var webClient = new WebClient();
                 webClient.DownloadFile(url, file);
-                result = File.Exists(file);
+                long size = (new FileInfo(file)).Length;
+                result = File.Exists(file) && size > 1;
             }
             catch (Exception e)
             {

@@ -131,7 +131,7 @@ namespace Installer
             else
             {
                 task.SetState($"The Runtime is not installed or outdated!\r\nDownloading Runtime ...", TaskState.WAITING);
-                if (!InstallerFunctions.DownloadFile(Parameters.netUrl, Parameters.netUrlFile, out string filepath))
+                if (!InstallerFunctions.DownloadNetRuntime(Parameters.netUrl, Parameters.netUrlFile, out string filepath))
                 {
                     task.SetError("Could not download .NET Runtime!");
                     return false;
