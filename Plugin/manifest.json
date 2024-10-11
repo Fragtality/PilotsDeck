@@ -8,7 +8,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -30,7 +30,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -52,7 +52,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "SupportedInMultiActions": true,
@@ -67,7 +67,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -89,7 +89,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -111,7 +111,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "middle",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -133,7 +133,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -155,7 +155,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "SupportedInMultiActions": false,
@@ -170,7 +170,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "Controllers": [
@@ -192,7 +192,7 @@
         {
           "Image": "Plugin/Images/Wait",
           "TitleAlignment": "top",
-          "FontSize": "10"
+          "FontSize": 10
         }
       ],
       "SupportedInMultiActions": false,
@@ -203,14 +203,13 @@
   ],
   "Category": "PilotsDeck",
   "CategoryIcon": "Plugin/Images/category",
-  "Disabled": false,
   "Author": "Fragtality",
   "CodePathWin": "PilotsDeck.exe",
   "Description": "Directly control your FlightSim from your StreamDeck! Map Actions to Sim Events and show Sim Variables on the Buttons.\r\n\r\nNOTE FOR UPGRADES: Please use the Installer from the GitHub Page (under Releases)!",
   "Name": "PilotsDeck",
   "Icon": "Plugin/Images/PluginIcon",
   "URL": "https://github.com/Fragtality/PilotsDeck",
-  "Version": "0.8.0",
+  "Version": "0.8.0.0",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "6.5"
@@ -220,5 +219,6 @@
       "Platform": "windows",
       "MinimumVersion": "10"
     }
-  ]
+  ],
+  "UUID": "com.extension.pilotsdeck"
 }

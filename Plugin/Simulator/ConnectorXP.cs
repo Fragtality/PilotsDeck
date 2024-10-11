@@ -37,6 +37,7 @@ namespace PilotsDeck.Simulator
         public bool IsPaused { get; protected set; } = true;
         public string AircraftString { get; protected set; } = "";
         protected bool RemoteRunning { get; set; } = false;
+        public bool IsCanceled { get; protected set; } = false;
         protected CancellationTokenSource ReceiveTokenSource { get; set; } = new();      
         protected bool ReceivedAircraftString { get; set; } = false;
         protected bool RefsInternalSubscribed { get; set; } = false;
@@ -111,15 +112,28 @@ namespace PilotsDeck.Simulator
                 if (App.Configuration.XPlaneIP != "127.0.0.1")
                     RemoteRunning = true;
 
+                int count = 0;
+                int sleep = 500;
                 do
                 {
                     if (SocketError)
                     {
                         Logger.Information($"Connection NOT successful - retry in {App.Configuration.XPlaneRetryDelay / 1000.0}s");
                         Socket?.Close();
-                        await Task.Delay(App.Configuration.XPlaneRetryDelay, App.CancellationToken);
+                        count = 0;
+                        do
+                        {
+                            await Task.Delay(sleep, App.CancellationToken);
+                            count += sleep;
+                        }
+                        while (count < App.Configuration.XPlaneRetryDelay && !IsCanceled && IsRunning);
+
                         SocketError = false;
-                        continue;
+
+                        if (IsRunning && !IsCanceled)
+                            continue;
+                        else
+                            break;
                     }
 
                     if (!Socket.IsConnected)
@@ -197,6 +211,10 @@ namespace PilotsDeck.Simulator
         {
             foreach (var variable in App.PluginController.VariableManager.VariableList.Where(v => v.IsValueXP()))
                 variable.IsSubscribed = false;
+            
+            Socket?.Close();
+            ReceiveTokenSource?.Cancel();
+            IsCanceled = true;
         }
 
         protected void ClearState()
