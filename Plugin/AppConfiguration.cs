@@ -34,7 +34,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 5;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 6;
+        public static int BuildConfigVersion { get; } = 7;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -167,6 +167,7 @@ namespace PilotsDeck
         public int XPlaneRetryDelay { get; set; } = 15000;
         public int XPlaneStateCheckInterval { get; set; } = 1000;
         public int XPlaneTimeoutReceive { get; set; } = 3000;
+        public bool XPlaneUseLiveryRefOn12 { get; set; } = false;
         public int MsfsRetryDelay { get; set; } = 30000;
         public int MsfsStateCheckInterval { get; set; } = 1000;
         public int MobiRetryDelay { get; set; } = 10000;

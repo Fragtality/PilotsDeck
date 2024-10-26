@@ -255,7 +255,11 @@ namespace PilotsDeck.Simulator
 
                 int pos = DatagramXP.XP_STR_RREF.Length + 1;
                 while (DatagramXP.ParseRREF(response.Buffer, ref pos, out int index, out float value))
+                {
+                    if (App.Configuration.LogLevel == LogLevel.Verbose)
+                        Logger.Verbose($"Received RREF Datagram - Index '{index}' - Value '{value}'");
                     ProcessReceived(index, value);
+                }
             }
             catch (Exception ex)
             {
@@ -291,14 +295,14 @@ namespace PilotsDeck.Simulator
                         if (!RefAircraftSubscribed)
                         {
 
-                            if (SimVersion >= VERSIONXP12)
+                            if (SimVersion >= VERSIONXP12 && !App.Configuration.XPlaneUseLiveryRefOn12)
                             {
                                 Logger.Information("Subscribing Aircraft DataRef for Plugin (XP 12.0)");
                                 SubscribeValueInternal(AIRCRAFT_XP12_REF, AIRCRAFT_INDEX, 1, true);
                             }
                             else if (SimVersion >= VERSIONXP95)
                             {
-                                Logger.Information("Subscribing Aircraft DataRef for Plugin (XP 9.5)");
+                                Logger.Information("Subscribing Aircraft DataRef for Plugin (XP 9.5+)");
                                 SubscribeValueInternal(AIRCRAFT_XP11_REF, AIRCRAFT_INDEX, 1, true);
                             }
 
@@ -320,11 +324,21 @@ namespace PilotsDeck.Simulator
                         IsLoading = false;
                     }
 
-                    if (IndexMapping.TryGetValue(index, out var aircraftMapping))
+                    if (IndexMapping.TryGetValue(index, out var aircraftMapping) && aircraftMapping?.ValueRef is VariableString valueRef)
                     {
                         if (index == AIRCRAFT_INDEX)
-                            (aircraftMapping.ValueRef as VariableString).SetValue("");
-                        (aircraftMapping.ValueRef as VariableString).SetChar(aircraftMapping.CharIndex, value);
+                        {
+                            valueRef.SetValue("");
+                            if (!ReceivedAircraftString)
+                                Logger.Debug($"Received first Index of AircraftString");
+                        }
+
+                        valueRef.SetChar(aircraftMapping.CharIndex, value);
+                        if (!ReceivedAircraftString)
+                        {
+                            if (value != 0)
+                                Logger.Debug($"Setting Index '{aircraftMapping.CharIndex}' with '{Convert.ToChar((int)value)}'");
+                        }
 
                         if (index == INDEX_BASE_DYNAMIC - 1 && aircraftMapping.ValueRef.Value != AircraftString)
                         {
@@ -332,6 +346,8 @@ namespace PilotsDeck.Simulator
                             Logger.Information($"Aircraft String changed to '{AircraftString}'");
                         }
                     }
+                    else
+                        Logger.Warning($"Could not retrieve Aircraft Mapping or ValueRef is invalid");
                 }
                 else if (IndexMapping.TryGetValue(index, out IndexMappingXP mapping))
                 {

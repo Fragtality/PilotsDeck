@@ -35,13 +35,13 @@ namespace Installer
         public static readonly string sdRegValue = "last_started_streamdeck_version";
         public static readonly string sdRegFolder = "Folder";
         public static readonly string sdVersion = "6.5.0";
-        public static readonly string sdVersionRecommended = "6.7.2";
+        public static readonly string sdVersionRecommended = "6.7.3";
         public static readonly string sdProfilePattern = "*.streamDeckProfile";
         public static readonly string sdBinary = "StreamDeck";
         public static readonly string sdBinaryExe = "StreamDeck.exe";
         public static readonly string sdDefaultFolder = @"C:\Program Files\Elgato\";
-        public static readonly string sdUrl = "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.7.2.20986.msi";
-        public static readonly string sdUrlFile = "Stream_Deck_6.7.2.20986.msi";
+        public static readonly string sdUrl = "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.7.3.21005.msi";
+        public static readonly string sdUrlFile = "Stream_Deck_6.7.3.21005.msi";
 
         //7
         public static readonly string ipcRegPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FSUIPC7";

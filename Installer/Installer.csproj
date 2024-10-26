@@ -36,6 +36,9 @@
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>false</BootstrapperEnabled>
   </PropertyGroup>
+  <PropertyGroup>
+    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mmZ"))</SourceRevisionId>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -136,6 +139,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BuildTimestamp.cs" />
     <Compile Include="Tools.cs" />
     <Page Include="InstallerTaskView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -215,5 +219,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)CopyLatest.ps1" $(ConfigurationName)</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>echo namespace Installer { public static class Build { public static string Timestamp = "%25DATE%25 %25TIME%25".Substring(0,16);}} &gt; "$(ProjectDir)\BuildTimestamp.cs"</PreBuildEvent>
   </PropertyGroup>
 </Project>
