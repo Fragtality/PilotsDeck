@@ -76,7 +76,7 @@ All Actions work on the **Keypads** (the normal/square StreamDeck Buttons). The 
 
 |  | Action Name | Keypad / Encoder | Description |
 | :---: | :-------------- | :---------: | :----------- |
-| <img src="img/DisplayXpndr.png" width="188"> | [**Display Value**](#display-value--display-value-with-switch)\* | Keypad / Encoder | Display a Sim Variable as Number or Text (display "ON" instead of "1"). You can scale/round/format the Value as needed and customize the Font-Settings. |
+| <img src="img/DisplayXpndr.png" width="188"> | [**Display Value**](#display-value)\* | Keypad / Encoder | Display a Sim Variable as Number or Text (display "ON" instead of "1"). You can scale/round/format the Value as needed and customize the Font-Settings. |
 | <img src="img/SimpleButton.png" width="188"> | [**Simple Button**](#simple-button) | Keypad | Can only send Commands and always shows the same (configurable) Image. Supported in StreamDeck Multi-Actions! |
 | <img src="img/DynamicButtonLight.png" width="188"> | [**Dynamic Button**](#dynamic-button) | Keypad / Encoder | This Action dynamically changes the displayed Image based on a Variable (in Addition to sending Commands). Different Values trigger different Images. |
 | <img src="img/DisplaySwitchKorry.png" width="188"> | [**Korry Button**](#korry-button) | Keypad / Encoder | Intended for Korry-Switches in the Cockpit: the Action displays two "Sub-Images" independently of each other. They are shown/hidden based on their own Variable, but will not change the Image based on the Value. |
