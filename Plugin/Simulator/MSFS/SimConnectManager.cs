@@ -34,7 +34,6 @@ namespace PilotsDeck.Simulator.MSFS
         protected bool ReceiveError { get; set; } = false;
         public bool QuitReceived { get; protected set; } = false;
         public bool IsPaused { get; protected set; } = true;
-        //protected bool LastPauseWasMenu { get; set; } = false;
         public bool IsSessionReady { get { return CameraState < 11; } }
         protected uint CameraState = 11;
         public string AircraftString { get; protected set; } = "";
@@ -245,16 +244,6 @@ namespace PilotsDeck.Simulator.MSFS
                         IsPaused = true;
                     else if (recEvent.dwData == 0)
                         IsPaused = false;
-
-                    //if (Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE) && !Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE_SIM) && IsSessionReady && LastPauseWasMenu)
-                    //{
-                    //    IsPaused = true;
-                    //    CameraState = 11;
-                    //    EvaluateInputEvents();
-                    //    MobiModule.ClearLvarList();
-                    //}
-
-                    //LastPauseWasMenu = Sys.HasFlag(recEvent.dwData, (uint)PAUSE_FLAGS.PAUSE_SIM);
                 }
                 else
                     Logger.Debug($"Received unknown Event '{recEvent.uEventID}' (dwData {recEvent.dwData})");

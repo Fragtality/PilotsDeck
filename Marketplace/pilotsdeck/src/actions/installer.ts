@@ -15,9 +15,9 @@ export class Installer extends SingletonAction<Settings> {
 	override async onSendToPlugin(ev: SendToPluginEvent<Payload, Settings>) {
 		const destinationDir = os.tmpdir();
 		process.chdir(destinationDir);
-		//const { file, fileUrl } = this.getReleaseInfo(await this.fetchReleaseInfo());
-		const file = 'Install-PilotsDeck-latest.exe';
-		const fileUrl = 'https://raw.githubusercontent.com/Fragtality/PilotsDeck/refs/heads/master/' + file;
+		const { file, fileUrl } = this.getReleaseInfo(await this.fetchReleaseInfo());
+		// const file = 'Install-PilotsDeck-latest.exe';
+		// const fileUrl = 'https://raw.githubusercontent.com/Fragtality/PilotsDeck/refs/heads/master/' + file;
 
 		await this.download(fileUrl, file).then(() => {
 			spawn(file, {shell: true});
