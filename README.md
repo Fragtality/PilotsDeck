@@ -335,7 +335,7 @@ The virtual Joystick Facility of FSUIPC has nothing to do with the System Driver
 - `1:2` - The Keypad on the StreamDeck will set/clear Button *2* on the virtual Joystick *1*.
 - `2:3:t` - The Keypad on the StreamDeck will toggle Button *3* on the virtual Joystick *2* between pressed and unpressed.
 
-Non-Toggling vJoy Buttons will behave like any normal Joystick Button - they are down/set as long as the StreamDeck Key/Dial is down (and go up/cleared when the Key/Dial goes up again).<br/>
+Non-Toggling vJoy Buttons will behave like any normal Joystick Button - they are down/set as long as the StreamDeck Key/Dial is down (and go up/cleared when the Key/Dial goes up again). NOTE: On the **Composite Action**, you have to map the intended (non-toggling) vJoy Address to both the KEY_UP and KEY_DOWN (or DIAL_UP/DIAL_DOWN) Events!<br/>
 The additional **Long Press** Command will not be available when you use a non-toggling vJoy for the normal/short Press!<br/>
 The VJOYDRV Command can also be used on the **Encoders** and the Touch-Display. On these Interactions a non-toggle vJoy will be shortly pressed. A toggling vJoy will be toggled on every Interaction.<br/><br/>
 
