@@ -38,7 +38,7 @@ namespace Installer
             descLabel.Inlines.Add(link);
             descLabel.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Tools.OpenUri));
 
-            Title = $"{Title} ({Parameters.pilotsDeckVersion} @ {Build.Timestamp})";
+            Title = $"{Title} ({Parameters.pilotsDeckVersion}-{DateTime.Parse(Build.Timestamp):yyyyMMddHHmm})";
 
             TaskPanel.Visibility = Visibility.Collapsed;
 
@@ -109,8 +109,7 @@ namespace Installer
                 CheckBoxResetConfig.Visibility = Visibility.Collapsed;
                 TaskPanel.Visibility = Visibility.Visible;
                 TimerWorkerCheck.Start();
-                if (App.CmdLineStreamDeck)
-                    bottomLabel.Visibility = Visibility.Visible;
+                bottomLabel.Visibility = Visibility.Visible;
                 TaskPanel.Activate(null, null);
                 await Task.Run(InstallWorker.Run);
             }

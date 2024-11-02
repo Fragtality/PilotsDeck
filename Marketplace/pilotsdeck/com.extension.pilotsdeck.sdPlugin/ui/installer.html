@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>PilotsDeck Installer</title>
+    <meta charset="utf-8" />
+    <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
+</head>
+
+<body>
+    <script>
+        function sendInstallCommand() {
+            const { streamDeckClient } = SDPIComponents;
+            streamDeckClient.send('sendToPlugin', "{}");
+        }
+
+        function openGitHub() {
+            window.open('https://github.com/Fragtality/PilotsDeck/releases/latest');
+        }
+    </script>
+    <sdpi-item>
+        <sdpi-button onclick="sendInstallCommand()">Run Installer</sdpi-button>
+    </sdpi-item>
+    <sdpi-item>
+        <span>
+            PilotsDeck has external Software Dependencies in order to run at all and do something useful.<br>
+            It has its own Installer which checks and install all these Dependencies for you - just click 'Run Installer' and the current Release will be downloaded and executed.<br/>
+            Your StreamDeck Software will be restarted during Installation.<br/><br/>
+            NOTE: The Installer might be blocked by Windows Defender or other Anti-Virus Software. If the Installer can not be executed or you want to download it manually, you can get the Installer from GitHub (under Releases).<br/><br/>
+            Following Dependencies will be checked and installed by the Installer:<br/>
+                - Microsoft .NET 8.0 Desktop Runtime x64</br>
+                - StreamDeck Software (if below minimum)</br>
+                - If MSFS installed: MobiFlight Event Module</br>
+                - If FSX/P3D/MSFS installed: FSUIPC</br>
+                - Optional: vJoy System Driver (Brunner Fork)</br>
+        </span>
+    </sdpi-item>    
+</body>
+
+</html>

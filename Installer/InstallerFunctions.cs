@@ -75,6 +75,18 @@ namespace Installer
             }
         }
 
+        public static void DeleteDirectory(string path, bool create = false)
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+                if (create)
+                    Directory.CreateDirectory(path);
+            }
+            else if (create)
+                Directory.CreateDirectory(path);
+        }
+
         public static bool DeleteOldFiles(bool resetConfig)
         {
             try
@@ -88,21 +100,17 @@ namespace Installer
                         file.Delete();
 
                 int numFiles = (new DirectoryInfo(Parameters.pluginDir)).GetFiles().Length;
-                bool filesDeleted = (numFiles <= 2 && !resetConfig) || (numFiles == 0 && resetConfig);
+                bool streamDeckInstall = Directory.Exists($@"{Parameters.pluginDir}\previews") || numFiles == 0;
+                bool filesDeleted = (numFiles <= 2 && !resetConfig) || (numFiles == 0 && resetConfig) || (numFiles == 0 && streamDeckInstall);
 
                 string path = $@"{Parameters.pluginDir}\Plugin";
-                if (Directory.Exists(path))
-                    Directory.Delete(path, true);
+                DeleteDirectory(path);
                 bool piDeleted = !Directory.Exists(path);
 
+                DeleteDirectory($@"{Parameters.pluginDir}\logs");
+
                 path = $@"{Parameters.pluginDir}\log";
-                if (Directory.Exists(path))
-                {
-                    Directory.Delete(path, true);
-                    Directory.CreateDirectory(path);
-                }
-                else
-                    Directory.CreateDirectory(path);
+                DeleteDirectory(path, true);
                 bool logResetted = Directory.Exists(path);
 
                 path = $@"{Parameters.pluginDir}\Images\Wait{{0}}.png";
@@ -113,8 +121,9 @@ namespace Installer
                 if (File.Exists(string.Format(path, "@3x")))
                     File.Delete(string.Format(path, "@3x"));
 
-                if (Directory.Exists("previews"))
-                    Directory.Delete("previews", true);
+                DeleteDirectory($@"{Parameters.pluginDir}\bin");
+                DeleteDirectory($@"{Parameters.pluginDir}\previews");
+                DeleteDirectory($@"{Parameters.pluginDir}\ui");
 
                 return filesDeleted && piDeleted && logResetted;
             }

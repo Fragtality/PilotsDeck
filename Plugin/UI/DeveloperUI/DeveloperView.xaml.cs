@@ -23,7 +23,7 @@ namespace PilotsDeck.UI.DeveloperUI
 
             string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
-            Title = $"{Title} ({assemblyVersion} @ {GetLinkerTime(Assembly.GetEntryAssembly())})";
+            Title = $"{Title} ({assemblyVersion}-{GetLinkerTime(Assembly.GetEntryAssembly()):yyyyMMddHHmm})";
         }
 
         protected void CheckVersion()

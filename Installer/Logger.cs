@@ -22,9 +22,6 @@ namespace Installer
 
         public static void CreateLogger()
         {
-            if (App.CmdLineStreamDeck)
-                _filename = $"installer/{_filename}";
-
             if (File.Exists(_filename))
             {
                 if ((new FileInfo(_filename)).Length != 0)
