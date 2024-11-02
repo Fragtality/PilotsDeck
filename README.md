@@ -117,6 +117,9 @@ It is automatically started with the StreamDeck Software. It will spawn its own 
 **Note:** Since FSUIPC is only a "secondary" Connector for MSFS, you do not need to have it installed anymore (for MSFS). If you not plan to install/run FSUIPC7, please set the Parameter *UseFsuipcForMSFS* to *false* in the [Plugin Configuration File](#41---plugin-settings) (*PluginConfig.json*) after Installation!<br/>
 But be aware that some older Profiles might still use Commands and Variables from FSUIPC and might not fully work then.
 
+<br/><br/>
+**Note** for Users of **MobiFlight Connect** Software: The Plugin will alter L-Vars per Frame Setting of the WASM Module to 100 (default is 30).
+
 <br/><br/><br/>
 
 
