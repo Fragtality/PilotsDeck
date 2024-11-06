@@ -86,7 +86,7 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             else if (type == ELEMENT_MANIPULATOR.INDICATOR)
             {
                 element = new ManipulatorIndicator(model ?? new ModelManipulator(type), parent);
-                if (element.Settings.IsNewModel)
+                if (element.Settings.IsNewModel && parent != null)
                 {
                     if (parent.Parent.CanvasSize.Y == 100)
                     {

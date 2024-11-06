@@ -15,7 +15,7 @@ namespace PilotsDeck.Tools
                 return num;
             else
             {
-                double factor = double.Parse(num[0..idxE]);
+                double factor = double.Parse(num[0..idxE], CultureInfo.InvariantCulture);
                 int exponent = int.Parse(num[(idxE + 1)..]);
                 return string.Format(CultureInfo.InvariantCulture, "{0:F15}", Math.Pow(10, exponent) * factor).TrimEnd('0');
             }
@@ -30,7 +30,7 @@ namespace PilotsDeck.Tools
                 return num;
             else
             {
-                double factor = float.Parse(num[0..idxE]);
+                double factor = float.Parse(num[0..idxE], CultureInfo.InvariantCulture);
                 int exponent = int.Parse(num[(idxE + 1)..]);
                 return string.Format(CultureInfo.InvariantCulture, "{0:F7}", Math.Pow(10, exponent) * factor).TrimEnd('0');
             }

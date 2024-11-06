@@ -40,9 +40,13 @@ namespace PilotsDeck.Actions
 
                 if (increase && numValue + step <= limit)
                     numValue += step;
+                else if (increase && numValue < limit)
+                    numValue = limit;
 
                 if (!increase && numValue - step >= limit)
                     numValue -= step;
+                else if (!increase && numValue > limit)
+                    numValue = limit;
             }
             else if (parts.Length == 3)
             {
@@ -54,11 +58,15 @@ namespace PilotsDeck.Actions
 
                 if (increase && numValue + step <= limit)
                     numValue += step;
+                else if (increase && numValue < limit)
+                    numValue = limit;
                 else if (increase && numValue + step > limit)
                     numValue = reset;
 
                 if (!increase && numValue - step >= limit)
                     numValue -= step;
+                else if (!increase && numValue > limit)
+                    numValue = limit;
                 else if (!increase && numValue - step < limit)
                     numValue = reset;
             }
