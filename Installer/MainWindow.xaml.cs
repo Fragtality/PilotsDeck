@@ -38,7 +38,7 @@ namespace Installer
             descLabel.Inlines.Add(link);
             descLabel.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Tools.OpenUri));
 
-            Title = $"{Title} ({Parameters.pilotsDeckVersion}-{DateTime.Parse(Build.Timestamp):yyyyMMddHHmm})";
+            Title = $"{Title} ({Parameters.pilotsDeckVersion}-{DateTime.Parse(Build.Timestamp, System.Globalization.CultureInfo.InvariantCulture):yyyyMMddHHmm})";
 
             TaskPanel.Visibility = Visibility.Collapsed;
 
