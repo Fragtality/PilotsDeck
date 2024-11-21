@@ -34,7 +34,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 5;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 7;
+        public static int BuildConfigVersion { get; } = 8;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -150,7 +150,7 @@ namespace PilotsDeck
         {
             { SimulatorType.FSX, ["fsx", "fs9"] },
             { SimulatorType.P3D, ["Prepar3D"] },
-            { SimulatorType.MSFS, ["FlightSimulator"] },
+            { SimulatorType.MSFS, ["FlightSimulator", "FlightSimulator2024"] },
             { SimulatorType.XP, ["X-Plane"] },
         };
         public string BinaryFSUIPC7 { get; set; } = "FSUIPC7";

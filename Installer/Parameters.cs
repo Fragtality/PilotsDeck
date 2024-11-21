@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Installer
 {
     public static class Parameters
     {
-        public static readonly string pilotsDeckVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+        //public static readonly string pilotsDeckVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
 
         public static readonly string sdPluginDir = @"\Elgato\StreamDeck\Plugins";
         public static readonly string pluginBinary = "PilotsDeck";
@@ -26,10 +26,10 @@ namespace Installer
 
         public static readonly int netMajor = 8;
         public static readonly int netMinor = 0;
-        public static readonly int netPatch = 10;
+        public static readonly int netPatch = 11;
         public static readonly string netVersion = $"{netMajor}.{netMinor}.{netPatch}";
-        public static readonly string netUrl = "https://download.visualstudio.microsoft.com/download/pr/f398d462-9d4e-4b9c-abd3-86c54262869a/4a8e3a10ca0a9903a989578140ef0499/windowsdesktop-runtime-8.0.10-win-x64.exe";
-        public static readonly string netUrlFile = "windowsdesktop-runtime-8.0.10-win-x64.exe";
+        public static readonly string netUrl = "https://download.visualstudio.microsoft.com/download/pr/53e9e41c-b362-4598-9985-45f989518016/53c5e1919ba2fe23273f2abaff65595b/dotnet-runtime-8.0.11-win-x64.exe";
+        public static readonly string netUrlFile = "windowsdesktop-runtime-8.0.11-win-x64.exe";
 
         public static readonly string sdRegPath = @"HKEY_CURRENT_USER\SOFTWARE\Elgato Systems GmbH\StreamDeck";
         public static readonly string sdRegValue = "last_started_streamdeck_version";
@@ -72,8 +72,23 @@ namespace Installer
         public static readonly string wasmUrl = "https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/download/1.0.1/mobiflight-event-module.1.0.1.zip";
         public static readonly string wasmUrlFile = "mobiflight-event-module.1.0.1.zip";
 
-        public static readonly string msConfigStore = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalCache\UserCfg.opt";
-        public static readonly string msConfigSteam = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator\UserCfg.opt";
+        public static readonly Dictionary<Simulator, string[]> msConfigPaths = new Dictionary<Simulator, string[]>()
+        {
+            {
+                Simulator.MSFS2020,
+                new string[] {
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalCache\UserCfg.opt",
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator\UserCfg.opt"
+                }
+            },
+            {
+                Simulator.MSFS2024,
+                new string[] {
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.Limitless_8wekyb3d8bbwe\LocalCache\UserConfig.Opt",
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator 2024\UserCfg.opt"
+                }
+            },
+        };
         public static readonly string msStringPackage = "InstalledPackagesPath ";
 
         public static readonly string vjoyUrl = "https://github.com/BrunnerInnovation/vJoy/releases/download/v2.2.2.0/vJoySetup_v2.2.2.0_Win10_Win11.exe";

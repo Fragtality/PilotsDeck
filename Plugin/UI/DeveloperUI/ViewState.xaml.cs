@@ -35,52 +35,59 @@ namespace PilotsDeck.UI.DeveloperUI
 
         protected void UpdateControls()
         {
-            LabelPluginState.Content = PluginController.State;
-            var query = SimController.ActiveConnectors.Where(c => c.Value.IsPrimary).Select(c => c.Key);
-            LabelConnectorsPrimary.Content = string.Join(',', query);
-            query = SimController.ActiveConnectors.Where(c => !c.Value.IsPrimary).Select(c => c.Key);
-            LabelConnectorsSecondary.Content = string.Join(',', query);
-
-            LabelSimState.Content = SimController.SimState;
-            LabelSimLoading.Content = SimController.IsLoading;
-            LabelReadyProcess.Content = SimController.IsReadyProcess;
-            
-            LabelSessionRunning.Content = SimController.IsReadySession;
-            LabelSimPaused.Content = SimController.IsPaused;
-            LabelReadyCommands.Content = SimController.IsReadyCommand;
-
-            
-            LabelMappingsCount.Content = ActionManager.ProfileSwitcherManager.ProfileMappings.Count;
-            LabelProfileSwitch.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.EnableSwitching;
-            LabelProfileSwitchback.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.SwitchBack;
-            
-            LabelAircraftString.Content = SimController.AircraftString.Replace("_","__");
-
-           
-            LabelActions.Content = ActionManager.Count;
-            LabelVariables.Content = $"{VariableManager.ManagedVariables.Count} / {VariableManager.ManagedVariables.Values.Count(v => v.Registrations > 0)} / {VariableManager.ManagedVariables.Values.Count(v => v.IsSubscribed)}";
-            LabelImages.Content = ImageManager.Count;
-            
-            LabelScripts.Content = ScriptManager.Count;
-            LabelScriptsGlobal.Content = ScriptManager.CountGlobal;
-            LabelScriptsImage.Content = ScriptManager.CountImages;
-
-            
-            LabelRedraws.Content = StatisticManager.Redraws;
-            StringBuilder sb = new();
-            sb.AppendLine(string.Format("Timer {0:00}/{1:00}s", (DateTime.Now - StatisticManager.LastTick).TotalSeconds, App.Configuration.IntervalUnusedRessources/1000.0));
-            foreach (var tracker in StatisticManager.Tracker.Values)
-                    sb.AppendLine(tracker.GetStatistics());
-            LabelStatistics.Content = sb.ToString();
-
-
-            while (!Logger.Messages.IsEmpty)
+            try
             {
+                LabelPluginState.Content = PluginController.State;
+                var query = SimController.ActiveConnectors.Where(c => c.Value.IsPrimary).Select(c => c.Key);
+                LabelConnectorsPrimary.Content = string.Join(',', query);
+                query = SimController.ActiveConnectors.Where(c => !c.Value.IsPrimary).Select(c => c.Key);
+                LabelConnectorsSecondary.Content = string.Join(',', query);
 
-                if (LineCounter > 14)
-                    LabelLog.Text = LabelLog.Text[(LabelLog.Text.IndexOf('\n') + 1)..];
-                LabelLog.Text += (LineCounter > 0 ? "\n" : "") + Logger.Messages.Dequeue().ToString();
-                LineCounter++;
+                LabelSimState.Content = SimController.SimState;
+                LabelSimLoading.Content = SimController.IsLoading;
+                LabelReadyProcess.Content = SimController.IsReadyProcess;
+
+                LabelSessionRunning.Content = SimController.IsReadySession;
+                LabelSimPaused.Content = SimController.IsPaused;
+                LabelReadyCommands.Content = SimController.IsReadyCommand;
+
+
+                LabelMappingsCount.Content = ActionManager.ProfileSwitcherManager.ProfileMappings.Count;
+                LabelProfileSwitch.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.EnableSwitching;
+                LabelProfileSwitchback.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.SwitchBack;
+
+                LabelAircraftString.Content = SimController?.AircraftString?.Replace("_", "__") ?? "";
+
+
+                LabelActions.Content = ActionManager.Count;
+                LabelVariables.Content = $"{VariableManager.ManagedVariables.Count} / {VariableManager.ManagedVariables.Values.Count(v => v.Registrations > 0)} / {VariableManager.ManagedVariables.Values.Count(v => v.IsSubscribed)}";
+                LabelImages.Content = ImageManager.Count;
+
+                LabelScripts.Content = ScriptManager.Count;
+                LabelScriptsGlobal.Content = ScriptManager.CountGlobal;
+                LabelScriptsImage.Content = ScriptManager.CountImages;
+
+
+                LabelRedraws.Content = StatisticManager.Redraws;
+                StringBuilder sb = new();
+                sb.AppendLine(string.Format("Timer {0:00}/{1:00}s", (DateTime.Now - StatisticManager.LastTick).TotalSeconds, App.Configuration.IntervalUnusedRessources / 1000.0));
+                foreach (var tracker in StatisticManager.Tracker.Values)
+                    sb.AppendLine(tracker.GetStatistics());
+                LabelStatistics.Content = sb.ToString();
+
+
+                while (!Logger.Messages.IsEmpty)
+                {
+
+                    if (LineCounter > 14)
+                        LabelLog.Text = LabelLog.Text[(LabelLog.Text.IndexOf('\n') + 1)..];
+                    LabelLog.Text += (LineCounter > 0 ? "\n" : "") + Logger.Messages.Dequeue().ToString();
+                    LineCounter++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
             }
         }
 

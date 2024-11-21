@@ -9,7 +9,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <StartupObject>ProfileManager.App</StartupObject>
     <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
-    <Version>0.8.1</Version>
+    <Version>0.8.2</Version>
     <Authors>Fragtality</Authors>
     <Description>Install Profiles and manage Profile Switching for PilotsDeck</Description>
     <Copyright>Copyright © 2024</Copyright>
@@ -90,7 +90,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

@@ -10,20 +10,20 @@ using System.Windows;
 
 namespace Installer
 {
+    public enum Simulator
+    {
+        FSX = 0,
+        P3DV4 = 4,
+        P3DV5 = 5,
+        P3DV6 = 6,
+        MSFS2020 = 2020,
+        MSFS2024 = 2024,
+        XP11 = 11,
+        XP12 = 12,
+    }
+
     public class InstallerWorker
     {
-        public enum Simulator
-        {
-            FSX = 0,
-            P3DV4 = 4,
-            P3DV5 = 5,
-            P3DV6 = 6,
-            MSFS2020 = 2020,
-            MSFS2024 = 2024,
-            XP11 = 11,
-            XP12 = 12,
-        }
-
         public bool IsRunning { get; set; } = false;
         public bool IsCompleted { get; set; } = false;
         public bool IsSuccess { get; set; } = false;
@@ -32,7 +32,7 @@ namespace Installer
         public bool ResetConfiguration { get; set; } = false;
 
         private Dictionary<Simulator, bool> SimulatorStates { get; set; } = new Dictionary<Simulator, bool>();
-        private string MsfsPackagePath  = "";
+        private Dictionary<Simulator, string> PackagePaths { get; set; } = new Dictionary<Simulator, string>();
 
         public InstallerWorker()
         {
@@ -58,6 +58,12 @@ namespace Installer
             IsCompleted = true;
         }
 
+        private void CheckSimMSFS(Simulator simulator, string version)
+        {
+            if (SimulatorStates.ContainsKey(simulator))
+                SimulatorStates[simulator] = CheckFSUIPC7(simulator, version) && CheckMobiFlight(simulator, version);
+        }
+
         private void DoTasks()
         {
             IsSuccess = DotNetFrameWork();
@@ -70,8 +76,8 @@ namespace Installer
 
             if (CheckSimulators())
             {
-                if (SimulatorStates.ContainsKey(Simulator.MSFS2020))
-                    SimulatorStates[Simulator.MSFS2020] = CheckFSUIPC7() && CheckMobiFlight();
+                CheckSimMSFS(Simulator.MSFS2020, "2020");
+                CheckSimMSFS(Simulator.MSFS2024, "2024");
 
                 if (SimulatorStates.ContainsKey(Simulator.P3DV4))
                     SimulatorStates[Simulator.P3DV4] = CheckFSUIPC6();
@@ -105,6 +111,7 @@ namespace Installer
         {
             bool result = false;
             var task = InstallerTask.AddTask("Start StreamDeck", "");
+            task.DisplayInSummary = false;
             task.Message = "Starting StreamDeck Software ...";
             task.State = TaskState.WAITING;
             
@@ -134,6 +141,7 @@ namespace Installer
             int seconds = 3;
             string msg = "The StreamDeck Software will be stopped in {0}s!";
             var task = InstallerTask.AddTask("Stop StreamDeck", "");
+            task.DisplayInSummary = false;
             task.State = TaskState.WAITING;
             for (int i = seconds; i >= 0; i--)
             {
@@ -164,6 +172,7 @@ namespace Installer
         {
             //.NET Runtime
             var task = InstallerTask.AddTask(".NET Runtime", "Checking Runtime Version ...");
+            task.DisplayInSummary = false;
             
             if (InstallerFunctions.CheckDotNet())
             {
@@ -192,7 +201,8 @@ namespace Installer
         {
             //StreamDeck Version
             var task = InstallerTask.AddTask("StreamDeck Software", "Checking Software Version ...");
-            
+            task.DisplayInSummary = false;
+
             if (InstallerFunctions.CheckStreamDeckSW(Parameters.sdVersion) && InstallerFunctions.CheckStreamDeckSW(Parameters.sdVersionRecommended))
             {
                 task.SetSuccess($"The installed Software is at Version {Parameters.sdVersionRecommended} or greater.");
@@ -239,6 +249,25 @@ namespace Installer
                 task.Message = msg;
         }
 
+        private void CheckSimMSFS(Simulator simulator, string version, ref TaskState successState, InstallerTask task, ref int countFound)
+        {
+            if (InstallerFunctions.CheckInstalledMSFS(simulator, PackagePaths))
+            {
+                string msg = $"Found: FlightSimulator {version}";
+                if (App.CmdLineIgnore[simulator])
+                {
+                    msg += " (Requirement Check disabled by User!)";
+                    successState = TaskState.ACTIVE;
+                }
+                else
+                {
+                    SimulatorStates.Add(simulator, true);
+                }
+                AddMessageOrReplace(task, msg, countFound);
+                countFound++;
+            }
+        }
+
         private bool CheckSimulators()
         {
             var task = InstallerTask.AddTask("Installed Simulators", "Checking installed Simulators ...");
@@ -246,21 +275,8 @@ namespace Installer
             var successState = TaskState.COMPLETED;
             int countFound = 0;
 
-            if (InstallerFunctions.CheckInstalledMSFS(out MsfsPackagePath))
-            {
-                string msg = "Found: FlightSimulator 2020";
-                if (App.CmdLineIgnoreMSFS)
-                {
-                    msg += " (Requirement Check disabled by User!)";
-                    successState = TaskState.ACTIVE;
-                }
-                else
-                {
-                    SimulatorStates.Add(Simulator.MSFS2020, true);
-                }
-                AddMessageOrReplace(task, msg, countFound);
-                countFound++;
-            }
+            CheckSimMSFS(Simulator.MSFS2020, "2020", ref successState, task, ref countFound);
+            CheckSimMSFS(Simulator.MSFS2024, "2024", ref successState, task, ref countFound);
 
             var xpVersions = CheckInstalledVersionsXp();
             if (SimulatorStates.ContainsKey(Simulator.XP11) || SimulatorStates.ContainsKey(Simulator.XP12))
@@ -332,13 +348,14 @@ namespace Installer
             return versions;
         }
 
-        private bool CheckFSUIPC7()
+        private bool CheckFSUIPC7(Simulator simulator, string verion)
         {
-            var task = InstallerTask.AddTask("FSUIPC7 Installation", "Check State and Version of FSUIPC7 ...");
+            var task = InstallerTask.AddTask($"FSUIPC7 Installation [{verion}]", "Check State and Version of FSUIPC7 ...");
+            task.DisplayInSummary = false;
 
             if (InstallerFunctions.CheckFSUIPC7(out bool isInstalled))
             {
-                if (!InstallerFunctions.CheckPackageVersion(MsfsPackagePath, Parameters.wasmIpcName, Parameters.wasmIpcVersion))
+                if (!InstallerFunctions.CheckPackageVersion(PackagePaths[simulator], Parameters.wasmIpcName, Parameters.wasmIpcVersion))
                 {
                     task.SetState($"FSUIPC7 is installed, but its installed WASM Module does not match the Minimum Version {Parameters.wasmIpcVersion}!\r\nIt is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.\r\nConsider Reinstalling FSUIPC!",
                             TaskState.WAITING);
@@ -475,6 +492,7 @@ namespace Installer
         private bool CheckFSUIPC6()
         {
             var task = InstallerTask.AddTask("FSUIPC6 Installation", "Check State and Version of FSUIPC6 ...");
+            task.DisplayInSummary = false;
 
             if (InstallerFunctions.CheckFSUIPC6())
             {
@@ -560,12 +578,13 @@ namespace Installer
             }
         }
 
-        protected bool CheckMobiFlight()
+        protected bool CheckMobiFlight(Simulator simulator, string version)
         {
-            var task = InstallerTask.AddTask("MobiFlight Module", "Check State and Version of MobiFlight Event Module ...");
+            var task = InstallerTask.AddTask($"MobiFlight Module [{version}]", "Check State and Version of MobiFlight Event Module ...");
+            task.DisplayInSummary = false;
             bool result = false;
 
-            if (InstallerFunctions.CheckPackageVersion(MsfsPackagePath, Parameters.wasmMobiName, Parameters.wasmMobiVersion))
+            if (InstallerFunctions.CheckPackageVersion(PackagePaths[simulator], Parameters.wasmMobiName, Parameters.wasmMobiVersion))
             {
                 result = true;
                 task.SetSuccess($"Module at or above minimum Version {Parameters.wasmMobiVersion}!");
@@ -576,10 +595,10 @@ namespace Installer
 
             if (!Tools.GetProcessRunning("FlightSimulator"))
             {
-                if (Directory.Exists(MsfsPackagePath + @"\" + Parameters.wasmMobiName))
+                if (Directory.Exists(PackagePaths[simulator] + @"\" + Parameters.wasmMobiName))
                 {
                     task.Message = "Deleting old Version ...";
-                    Directory.Delete(MsfsPackagePath + @"\" + Parameters.wasmMobiName, true);
+                    Directory.Delete(PackagePaths[simulator] + @"\" + Parameters.wasmMobiName, true);
                 }
                 task.Message = "Downloading MobiFlight Module ...";
                 if (!InstallerFunctions.DownloadFile(Parameters.wasmUrl, Parameters.wasmUrlFile, out string filepath))
@@ -588,7 +607,7 @@ namespace Installer
                     return result;
                 }
                 task.Message = "Extracting new Version ...";
-                if (!InstallerFunctions.ExtractZipFile(MsfsPackagePath, filepath))
+                if (!InstallerFunctions.ExtractZipFile(PackagePaths[simulator], filepath))
                 {
                     task.SetError("Error while extracting MobiFlight Module!");
                     return result;

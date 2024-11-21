@@ -34,7 +34,7 @@ namespace PilotsDeck.Simulator.MSFS
         protected bool ReceiveError { get; set; } = false;
         public bool QuitReceived { get; protected set; } = false;
         public bool IsPaused { get; protected set; } = true;
-        public bool IsSessionReady { get { return CameraState < 11; } }
+        public bool IsSessionReady { get { return CameraState != 0 && (CameraState < 11 || CameraState >= 29) && !string.IsNullOrWhiteSpace(AircraftString); } }
         protected uint CameraState = 11;
         public string AircraftString { get; protected set; } = "";
 

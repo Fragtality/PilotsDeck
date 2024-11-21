@@ -49,16 +49,17 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
 
         public virtual void RemoveCondition(int id)
         {
-            if (Settings.Conditions.ContainsKey(id))
+            if (!Settings.Conditions.ContainsKey(id))
             {
-                Settings.Conditions.Remove(id);
-                var oldDict = Settings.Conditions;
-                Settings.Conditions = [];
-                int n = 0;
-                foreach (var condition in oldDict.Values)
-                    Settings.Conditions.TryAdd(n++, condition);
-                Logger.Debug($"Removed Condition for ID '{id}'");
+                return;
             }
+            Settings.Conditions.Remove(id);
+            var oldDict = Settings.Conditions;
+            Settings.Conditions = [];
+            int n = 0;
+            foreach (var condition in oldDict.Values)
+                Settings.Conditions.TryAdd(n++, condition);
+            Logger.Debug($"Removed Condition for ID '{id}'");
         }
 
         public virtual void RegisterRessources()

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -38,7 +40,9 @@ namespace Installer
             descLabel.Inlines.Add(link);
             descLabel.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Tools.OpenUri));
 
-            Title = $"{Title} ({Parameters.pilotsDeckVersion}-{DateTime.Parse(Build.Timestamp, System.Globalization.CultureInfo.InvariantCulture):yyyyMMddHHmm})";
+            string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            assemblyVersion = assemblyVersion.Substring(0, assemblyVersion.LastIndexOf('.'));
+            Title = $"{Title} ({assemblyVersion}-{GetBuildTime()})";
 
             TaskPanel.Visibility = Visibility.Collapsed;
 
@@ -53,6 +57,17 @@ namespace Installer
             TimerWorkerCheck.Interval = TimeSpan.FromMilliseconds(200);
             TimerWorkerCheck.Tick += TimerWorkerCheckTick;
             TaskPanel.DontStopOnError = true;
+        }
+
+        public string GetBuildTime()
+        {
+            try
+            {
+                return $"{DateTime.Parse(Build.Timestamp, CultureInfo.InvariantCulture):yyyyMMddHHmm}";
+            }
+            catch { }
+
+            return Build.Timestamp;
         }
 
         protected void SetButtonState(bool success, bool hideInstall, bool hideRemove = false, string caption = null, string file = null, string tooltip = null)
@@ -112,6 +127,8 @@ namespace Installer
                 bottomLabel.Visibility = Visibility.Visible;
                 TaskPanel.Activate(null, null);
                 await Task.Run(InstallWorker.Run);
+                if (InstallWorker.IsSuccess)
+                    TaskPanel.HideCompleted();
             }
             
             if (ButtonInstall.IsEnabled && !InstallWorker.IsRunning && InstallWorker.IsCompleted)

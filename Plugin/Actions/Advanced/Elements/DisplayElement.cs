@@ -211,16 +211,17 @@ namespace PilotsDeck.Actions.Advanced.Elements
 
         public virtual void RemoveManipulator(int id)
         {
-            if (Settings.Manipulators.ContainsKey(id))
+            if (!Settings.Manipulators.ContainsKey(id))
             {
-                Settings.Manipulators.Remove(id);
-                var oldDict = Settings.Manipulators;
-                Settings.Manipulators = [];
-                int n = 0;
-                foreach (var manipulator in oldDict.Values)
-                    Settings.Manipulators.TryAdd(n++, manipulator);
-                Logger.Debug($"Removed ElementManipulator for ID '{id}'");
+                return;
             }
+            Settings.Manipulators.Remove(id);
+            var oldDict = Settings.Manipulators;
+            Settings.Manipulators = [];
+            int n = 0;
+            foreach (var manipulator in oldDict.Values)
+                Settings.Manipulators.TryAdd(n++, manipulator);
+            Logger.Debug($"Removed ElementManipulator for ID '{id}'");
         }
 
         public virtual void RegisterRessources()

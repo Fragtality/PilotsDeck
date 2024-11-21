@@ -1,6 +1,7 @@
 ﻿using Extensions;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -504,23 +505,26 @@ namespace Installer
             return "";
         }
 
-        public static bool CheckInstalledMSFS(out string packagePath)
+        public static bool CheckInstalledMSFS(Simulator simulator, Dictionary<Simulator, string> packagePaths)
         {
+            bool result = false;
+
             try
             {
-                if (File.Exists(Parameters.msConfigStore))
+                foreach (var storePath in Parameters.msConfigPaths[simulator])
                 {
-                    packagePath = FindPackagePath(Parameters.msConfigStore);
-                    return !string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath);
+                    if (File.Exists(storePath))
+                    {
+                        string packagePath = FindPackagePath(storePath);
+                        if (!string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath))
+                        {
+                            packagePaths.Add(simulator, packagePath);
+                            result = true;
+                        }
+                        else
+                            packagePaths.Add(simulator, "");
+                    }
                 }
-                else if (File.Exists(Parameters.msConfigSteam))
-                {
-                    packagePath = FindPackagePath(Parameters.msConfigSteam);
-                    return !string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath);
-                }
-
-                packagePath = "";
-                return false;
             }
             catch (Exception e)
             {
@@ -528,8 +532,7 @@ namespace Installer
                 InstallerTask.CurrentTask.SetError(e);
             }
 
-            packagePath = "";
-            return false;
+            return result;
         }
 
         public static bool CheckStreamDeckSW(string version)

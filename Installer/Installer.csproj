@@ -31,7 +31,7 @@
     <PublisherName>Fragtality</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.8.1.0</ApplicationVersion>
+    <ApplicationVersion>0.8.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>false</BootstrapperEnabled>
@@ -186,6 +186,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="PilotsDeck-release.zip" />
+    <None Include="BuildTime.ps1" />
     <None Include="CopyLatest.ps1" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -221,6 +222,6 @@
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)CopyLatest.ps1" $(ConfigurationName)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>echo namespace Installer { public static class Build { public static string Timestamp = "%25DATE%25 %25TIME%25".Substring(0,16);}} &gt; "$(ProjectDir)\BuildTimestamp.cs"</PreBuildEvent>
+    <PreBuildEvent>powershell -ExecutionPolicy Unrestricted -file "$(ProjectDir)BuildTime.ps1" $(ProjectDir)</PreBuildEvent>
   </PropertyGroup>
 </Project>

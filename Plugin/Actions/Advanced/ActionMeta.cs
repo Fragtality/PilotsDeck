@@ -224,16 +224,17 @@ namespace PilotsDeck.Actions.Advanced
 
         public virtual void RemoveDisplayElement(int id)
         {
-            if (Settings.DisplayElements.ContainsKey(id))
+            if (!Settings.DisplayElements.ContainsKey(id))
             {
-                Settings.DisplayElements.Remove(id);
-                var oldDict = Settings.DisplayElements;
-                Settings.DisplayElements = [];
-                int n = 0;
-                foreach (var element in oldDict.Values)
-                    Settings.DisplayElements.TryAdd(n++, element);
-                Logger.Debug($"Removed DisplayElement for ID '{id}'");
+                return;
             }
+            Settings.DisplayElements.Remove(id);
+            var oldDict = Settings.DisplayElements;
+            Settings.DisplayElements = [];
+            int n = 0;
+            foreach (var element in oldDict.Values)
+                Settings.DisplayElements.TryAdd(n++, element);
+            Logger.Debug($"Removed DisplayElement for ID '{id}'");
         }
 
         public virtual int AddCommand(ActionCommand command, StreamDeckCommand sdCommand, int? id = null)
