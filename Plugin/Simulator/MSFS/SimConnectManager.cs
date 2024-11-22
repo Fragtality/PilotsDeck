@@ -117,7 +117,7 @@ namespace PilotsDeck.Simulator.MSFS
 
                 if (SimConnect != null)
                 {
-                    SimConnect.Dispose();
+                    try { SimConnect.Dispose(); } catch { }
                     SimConnect = null;
                 }
 

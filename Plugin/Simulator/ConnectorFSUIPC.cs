@@ -15,7 +15,7 @@ namespace PilotsDeck.Simulator
         public SimulatorType Type { get; protected set; } = type;
         public SimulatorState SimState { get; protected set; } = SimulatorState.RUNNING;
         public bool IsPrimary { get; set; } = true;
-        public bool IsRunning { get { return ISimConnector.GetRunning(Type) || (Type == SimulatorType.FSUIPC7 && (Sys.GetProcessRunning(App.Configuration.BinaryFSUIPC7) || Sys.GetProcessRunning(App.Configuration.SimBinaries[SimulatorType.MSFS].First()))); } }
+        public bool IsRunning { get { return ISimConnector.GetRunning(Type) || (Type == SimulatorType.FSUIPC7 && (Sys.GetProcessRunning(App.Configuration.BinaryFSUIPC7) || App.Configuration.SimBinaries[SimulatorType.MSFS].Where(b => Sys.GetProcessRunning(b)).Any())); } }
         public bool IsLoading { get { return SimLoading; } }
         public bool IsReadyProcess { get { return FSUIPCConnection.IsOpen && FsuipcManager.IsInitialized; } }
         protected bool LastProcess { get; set; } = false;
