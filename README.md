@@ -27,6 +27,7 @@ Other Examples can be found under [here](#51---examples).<br/>
 
 | Simulator | Supported | Tested | Connection |
 | :-------------|:-------------:|:-----:|:-----|
+| **Flight Simulator 2024** | **yes** | **yes** | SimConnect & MobiFlight WASM (Secondary: FSUIPC7) |
 | **Flight Simulator 2020** | **yes** | **yes** | SimConnect & MobiFlight WASM (Secondary: FSUIPC7) |
 | Flight Simulator X | yes | no | FSUIPC4 |
 | Flight Simulator 2004 | yes | no | FSUIPC 3 |
