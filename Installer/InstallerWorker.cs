@@ -351,10 +351,21 @@ namespace Installer
         private bool CheckFSUIPC7(Simulator simulator, string verion)
         {
             var task = InstallerTask.AddTask($"FSUIPC7 Installation [{verion}]", "Check State and Version of FSUIPC7 ...");
-            task.DisplayInSummary = false;
+            if (simulator != Simulator.MSFS2024) //TEMP
+                task.DisplayInSummary = false;
+
 
             if (InstallerFunctions.CheckFSUIPC7(out bool isInstalled))
             {
+                if (isInstalled && simulator == Simulator.MSFS2024) //TEMP
+                {
+                    task.ReplaceLastMessage($"FSUIPC7 is installed, but the Installer can not detect or update to the correct Version yet!\r\n(As there isn't a Release Version for FSUIPC7 for 2024 yet.)\r\n\r\nCheckout the Forum for the current Beta:");
+                    task.Hyperlink = "FSUIPC 7.5.0 Beta";
+                    task.HyperlinkURL = "https://forum.simflight.com/topic/99118-fsuipc7-version-750-beta-available-for-both-msfs2020-and-msfs2024/\r\n";
+                    task.State = TaskState.WAITING;
+                    return true;
+                }
+
                 if (!InstallerFunctions.CheckPackageVersion(PackagePaths[simulator], Parameters.wasmIpcName, Parameters.wasmIpcVersion))
                 {
                     task.SetState($"FSUIPC7 is installed, but its installed WASM Module does not match the Minimum Version {Parameters.wasmIpcVersion}!\r\nIt is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.\r\nConsider Reinstalling FSUIPC!",
