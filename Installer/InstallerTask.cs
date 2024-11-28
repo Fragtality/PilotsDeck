@@ -20,7 +20,7 @@ namespace Installer
 
         public string Title { get; set; } = "";
         public List<string> ListMessages { get; protected set; } = new List<string>();
-        public string Message { get { return ListMessages.LastOrDefault(); } set { ListMessages.Add(value); } }
+        public string Message { get { return ListMessages.LastOrDefault(); } set { ListMessages.Add(value); Logger.WriteLog(LogLevel.Information, value, "InstallerTask", "Message"); } }
         public TaskState State { get; set; } = TaskState.ACTIVE;
         public string Hyperlink { get; set; } = "";
         public string HyperlinkURL { get; set; } = "";
@@ -40,7 +40,10 @@ namespace Installer
         {
             Title = title;
             if (!string.IsNullOrEmpty(message))
+            {
+                Logger.WriteLog(LogLevel.Information, message, "InstallerTask", "InstallerTask");
                 ListMessages.Add(message);
+            }
         }
 
         public static InstallerTask AddTask(string title, string message)
@@ -67,6 +70,7 @@ namespace Installer
         {
             if (ListMessages.Count > 0)
                 ListMessages.RemoveAt(ListMessages.Count - 1);
+            Logger.WriteLog(LogLevel.Information, message, "InstallerTask", "ReplaceLastMessage");
             ListMessages.Add(message);
         }
 

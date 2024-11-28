@@ -493,11 +493,13 @@ namespace Installer
 
         public static string FindPackagePath(string confFile)
         {
+            Logger.Log(LogLevel.Debug, $"Getting PackagePath from {confFile}");
             string[] lines = File.ReadAllLines(confFile);
             foreach (string line in lines)
             {
                 if (line.StartsWith(Parameters.msStringPackage))
                 {
+                    Logger.Log(LogLevel.Debug, $"Found Match!");
                     return line.Replace("\"", "").Substring(Parameters.msStringPackage.Length) + "\\Community";
                 }
             }
@@ -508,22 +510,30 @@ namespace Installer
         public static bool CheckInstalledMSFS(Simulator simulator, Dictionary<Simulator, string> packagePaths)
         {
             bool result = false;
-
+            Logger.Log(LogLevel.Debug, $"Entered CheckInstalledMSFS Function with for simulator {simulator}");
             try
             {
                 foreach (var storePath in Parameters.msConfigPaths[simulator])
                 {
                     if (File.Exists(storePath))
                     {
+                        Logger.Log(LogLevel.Debug, $"storePath exists: {storePath}");
                         string packagePath = FindPackagePath(storePath);
+                        Logger.Log(LogLevel.Debug, $"returned packagePath: {packagePath}");
                         if (!string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath))
                         {
+                            Logger.Log(LogLevel.Debug, $"Path exists!");
                             packagePaths.Add(simulator, packagePath);
                             result = true;
                         }
                         else
+                        {
+                            Logger.Log(LogLevel.Debug, $"Path does not exist!");
                             packagePaths.Add(simulator, "");
+                        }
                     }
+                    else
+                        Logger.Log(LogLevel.Debug, $"storePath does not exist: {storePath}");
                 }
             }
             catch (Exception e)

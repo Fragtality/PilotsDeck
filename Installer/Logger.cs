@@ -16,7 +16,7 @@ namespace Installer
 
     public static class Logger
     {
-        private static StreamWriter _stream;
+        //private static StreamWriter _stream;
         private static readonly string _filename = "PilotsDeck-Installer.log";
         private static readonly string _format = "{0:yyyy-MM-dd HH:mm:ss} [{1}] [ {2} ] {3}\r\n";
 
@@ -34,17 +34,25 @@ namespace Installer
                     File.Delete(_filename);
             }
 
-            _stream = new StreamWriter(File.OpenWrite(_filename));
+            var stream = File.Create(_filename);
+            stream.Close();
+            stream.Dispose();
+            //_stream = new StreamWriter(File.Open(_filename, FileMode.Truncate));
         }
 
         public static void DestroyLogger()
         {
-            _stream.Flush();
-            _stream.Close();
-            _stream.Dispose();
+            //_stream.Flush();
+            //_stream.Close();
+            //_stream.Dispose();
 
-            if (File.Exists(_filename) && (new FileInfo(_filename)).Length == 0)
+            if (!App.DebugMode && File.Exists(_filename) && (new FileInfo(_filename)).Length == 0)
                 File.Delete(_filename);
+        }
+
+        private static void WriteFile(string message)
+        {
+            File.AppendAllText(_filename, message);
         }
 
         public static string GetLevelString(LogLevel level)
@@ -70,8 +78,7 @@ namespace Installer
 
         public static void WriteLog(LogLevel level, string message, string classFile, string classMethod)
         {
-            _stream.Write(string.Format(_format, DateTime.Now, GetLevelString(level), GetContext(classFile, classMethod), message));
-            _stream.Flush();
+            WriteFile(string.Format(_format, DateTime.Now, GetLevelString(level), GetContext(classFile, classMethod), message));
         }
 
         public static void Log(LogLevel level, string message, [CallerFilePath] string classFile = "", [CallerMemberName] string classMethod = "")

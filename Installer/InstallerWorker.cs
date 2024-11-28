@@ -251,8 +251,10 @@ namespace Installer
 
         private void CheckSimMSFS(Simulator simulator, string version, ref TaskState successState, InstallerTask task, ref int countFound)
         {
+            Logger.Log(LogLevel.Debug, $"Entered CheckSimMSFS Function with for simulator {simulator} and version '{version}'");
             if (InstallerFunctions.CheckInstalledMSFS(simulator, PackagePaths))
             {
+                Logger.Log(LogLevel.Debug, $"Check successful for {simulator} and returned path is {PackagePaths[simulator]}");
                 string msg = $"Found: FlightSimulator {version}";
                 if (App.CmdLineIgnore[simulator])
                 {
@@ -261,6 +263,7 @@ namespace Installer
                 }
                 else
                 {
+                    Logger.Log(LogLevel.Debug, $"Simulator {simulator} added to SimulatorStates");
                     SimulatorStates.Add(simulator, true);
                 }
                 AddMessageOrReplace(task, msg, countFound);
@@ -353,7 +356,6 @@ namespace Installer
             var task = InstallerTask.AddTask($"FSUIPC7 Installation [{verion}]", "Check State and Version of FSUIPC7 ...");
             if (simulator != Simulator.MSFS2024) //TEMP
                 task.DisplayInSummary = false;
-
 
             if (InstallerFunctions.CheckFSUIPC7(out bool isInstalled))
             {
