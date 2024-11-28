@@ -84,7 +84,7 @@ namespace Installer
             {
                 Simulator.MSFS2024,
                 new string[] {
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.Limitless_8wekyb3d8bbwe\LocalCache\UserConfig.Opt",
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.Limitless_8wekyb3d8bbwe\LocalCache\UserCfg.Opt",
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator 2024\UserCfg.opt"
                 }
             },
