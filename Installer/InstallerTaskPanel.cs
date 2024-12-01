@@ -48,7 +48,7 @@ namespace Installer
 
         public void HideCompleted()
         {
-            foreach (var view in TaskViewList.Where(v => !v.DisplayInSummary && v.InstallerTask.State == TaskState.COMPLETED))
+            foreach (var view in TaskViewList.Where(v => !v.DisplayMessagesInSummary && v.InstallerTask.State == TaskState.COMPLETED))
                 view.Visibility = System.Windows.Visibility.Collapsed;
         }
 

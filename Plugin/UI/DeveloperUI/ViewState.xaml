@@ -124,7 +124,7 @@
                 <Label Grid.Row="1" Grid.Column="0" MinHeight="24" MinWidth="148" FontWeight="DemiBold" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
                     Aircraft String
                 </Label>
-                <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="5" Name="LabelAircraftString" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
+                <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="5" Name="LabelAircraftString" MinHeight="24" MinWidth="196" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left" IsReadOnly="True" IsReadOnlyCaretVisible="False" Background="Transparent" BorderThickness="0"></TextBox>
             </Grid>
         </GroupBox>
 

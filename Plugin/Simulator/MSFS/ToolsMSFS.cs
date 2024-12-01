@@ -6,6 +6,19 @@ namespace PilotsDeck.Simulator.MSFS
 {
     public static class ToolsMSFS
     {
+        public static string GetAircraftStringShort(string current)
+        {
+            if (string.IsNullOrWhiteSpace(current) || App.SimController.SimMainType != SimulatorType.MSFS)
+                return current;
+
+            current = current.ToLowerInvariant();
+            int index = current.IndexOf("simobjects");
+            if (index > 0)
+                return current[index..];
+            else
+                return current;
+        }
+
         public static bool IsCalculatorTemplate(SimCommandType? type, string address)
         {
             return type == SimCommandType.CALCULATOR && address?.StartsWith('$') == true;

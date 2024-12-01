@@ -2,6 +2,7 @@
 using PilotsDeck.Plugin;
 using PilotsDeck.Resources;
 using PilotsDeck.Simulator;
+using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.Tools;
 using System;
 using System.Linq;
@@ -56,7 +57,7 @@ namespace PilotsDeck.UI.DeveloperUI
                 LabelProfileSwitch.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.EnableSwitching;
                 LabelProfileSwitchback.Content = ActionManager.ProfileSwitcherManager.GlobalSettings.SwitchBack;
 
-                LabelAircraftString.Content = SimController?.AircraftString?.Replace("_", "__") ?? "";
+                LabelAircraftString.Text = ToolsMSFS.GetAircraftStringShort(SimController?.AircraftString) ?? "";
 
 
                 LabelActions.Content = ActionManager.Count;

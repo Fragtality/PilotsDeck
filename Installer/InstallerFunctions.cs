@@ -277,6 +277,7 @@ namespace Installer
         public static bool CheckVersion(string leftVersion, VersionCompare comparison, string rightVersion, out bool compareable, int digits = 3)
         {
             compareable = false;
+            Logger.Log(LogLevel.Debug, $"Comparing '{leftVersion}' {comparison} '{rightVersion}'");
 
             if (string.IsNullOrWhiteSpace(leftVersion) || string.IsNullOrWhiteSpace(rightVersion))
                 return false;
@@ -369,7 +370,9 @@ namespace Installer
                 webClient.Headers.Add("Sec-Fetch-User", "?1");
                 webClient.Headers.Add("Upgrade-Insecure-Requests", "1");
                 webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0");
+                Logger.Log(LogLevel.Debug, $"Starting Download of {url} to {file}");
                 webClient.DownloadFile(url, file);
+                Logger.Log(LogLevel.Debug, $"Download finished");
                 long size = (new FileInfo(file)).Length;
                 result = File.Exists(file) && size > 1;
             }
@@ -400,7 +403,9 @@ namespace Installer
 
                 var webClient = new WebClient();
                 webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0");
+                Logger.Log(LogLevel.Debug, $"Starting Download of {url} to {file}");
                 webClient.DownloadFile(url, file);
+                Logger.Log(LogLevel.Debug, $"Download finished");
                 long size = (new FileInfo(file)).Length;
                 result = File.Exists(file) && size > 1;
             }
@@ -409,6 +414,20 @@ namespace Installer
                 Logger.LogException(e);
                 InstallerTask.CurrentTask.SetError(e);
                 fullpath = file;
+            }
+
+            return result;
+        }
+
+        public static string GetRegValueFSUIPC(string key, object defaultValue = null)
+        {
+            string result = "";
+            foreach (string path in Parameters.ipcRegPaths)
+            {
+                result = (string)Registry.GetValue(path, key, defaultValue);
+                Logger.Log(LogLevel.Debug, $"Result for Key '{key}' on Path '{path}' - '{result}'");
+                if (!string.IsNullOrWhiteSpace(result))
+                    break;
             }
 
             return result;
@@ -424,12 +443,15 @@ namespace Installer
 
             try
             {
-                string regVersion = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegValue, null);
+                string regVersion = GetRegValueFSUIPC(Parameters.ipcRegValue);
+
                 if (!string.IsNullOrWhiteSpace(regVersion))
                 {
                     isInstalled = true;
                     result = CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, ipcVersion, out bool compareable) && compareable;
                 }
+                else
+                    Logger.Log(LogLevel.Warning, "The FSUIPC Registry Path returned NULL!");
             }
             catch (Exception e)
             {
@@ -457,6 +479,8 @@ namespace Installer
                 string regVersion = (string)Registry.GetValue(regpath, Parameters.ipcRegValue, null);
                 if (!string.IsNullOrWhiteSpace(regVersion))
                     result = CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, ipcVersion, out bool compareable) && compareable;
+                else
+                    Logger.Log(LogLevel.Information, $"The FSUIPC Registry Path '{regpath}' returned NULL!");
             }
             catch (Exception e)
             {
@@ -473,7 +497,7 @@ namespace Installer
 
             try
             { 
-                string regPath = (string)Registry.GetValue(Parameters.ipcRegPath, Parameters.ipcRegInstallDirValue, null) + "\\" + "FSUIPC7.ini";
+                string regPath = GetRegValueFSUIPC(Parameters.ipcRegInstallDirValue) + "\\" + "FSUIPC7.ini";
 
                 if (File.Exists(regPath))
                 {
@@ -510,7 +534,6 @@ namespace Installer
         public static bool CheckInstalledMSFS(Simulator simulator, Dictionary<Simulator, string> packagePaths)
         {
             bool result = false;
-            Logger.Log(LogLevel.Debug, $"Entered CheckInstalledMSFS Function with for simulator {simulator}");
             try
             {
                 foreach (var storePath in Parameters.msConfigPaths[simulator])
@@ -550,6 +573,7 @@ namespace Installer
             try
             {
                 string regVersion = (string)Registry.GetValue(Parameters.sdRegPath, Parameters.sdRegValue, null);
+                Logger.Log(LogLevel.Debug, $"Returned Registry Value: {regVersion}");
                 if (!string.IsNullOrWhiteSpace(regVersion) && CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, version, out bool compareable) && compareable)
                     return true;
                 else
@@ -573,6 +597,7 @@ namespace Installer
 
                 foreach (var line in output)
                 {
+                    Logger.Log(LogLevel.Debug, $"Installed Runtime: {line}");
                     var match = Parameters.netDesktop.Match(line);
                     if (match?.Groups?.Count == 2 && !string.IsNullOrWhiteSpace(match?.Groups[1]?.Value))
                         installedDesktop = CheckVersion(match.Groups[1].Value, VersionCompare.GREATER_EQUAL, Parameters.netVersion, out bool compareable) && compareable;

@@ -111,7 +111,7 @@ namespace Installer
         {
             bool result = false;
             var task = InstallerTask.AddTask("Start StreamDeck", "");
-            task.DisplayInSummary = false;
+            task.DisplayMessagesInSummary = false;
             task.Message = "Starting StreamDeck Software ...";
             task.State = TaskState.WAITING;
             
@@ -141,7 +141,7 @@ namespace Installer
             int seconds = 3;
             string msg = "The StreamDeck Software will be stopped in {0}s!";
             var task = InstallerTask.AddTask("Stop StreamDeck", "");
-            task.DisplayInSummary = false;
+            task.DisplayMessagesInSummary = false;
             task.State = TaskState.WAITING;
             for (int i = seconds; i >= 0; i--)
             {
@@ -172,7 +172,7 @@ namespace Installer
         {
             //.NET Runtime
             var task = InstallerTask.AddTask(".NET Runtime", "Checking Runtime Version ...");
-            task.DisplayInSummary = false;
+            task.DisplayMessagesInSummary = false;
             
             if (InstallerFunctions.CheckDotNet())
             {
@@ -201,7 +201,7 @@ namespace Installer
         {
             //StreamDeck Version
             var task = InstallerTask.AddTask("StreamDeck Software", "Checking Software Version ...");
-            task.DisplayInSummary = false;
+            task.DisplayMessagesInSummary = false;
 
             if (InstallerFunctions.CheckStreamDeckSW(Parameters.sdVersion) && InstallerFunctions.CheckStreamDeckSW(Parameters.sdVersionRecommended))
             {
@@ -251,7 +251,6 @@ namespace Installer
 
         private void CheckSimMSFS(Simulator simulator, string version, ref TaskState successState, InstallerTask task, ref int countFound)
         {
-            Logger.Log(LogLevel.Debug, $"Entered CheckSimMSFS Function with for simulator {simulator} and version '{version}'");
             if (InstallerFunctions.CheckInstalledMSFS(simulator, PackagePaths))
             {
                 Logger.Log(LogLevel.Debug, $"Check successful for {simulator} and returned path is {PackagePaths[simulator]}");
@@ -315,6 +314,7 @@ namespace Installer
             {
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 string[] files = Directory.EnumerateFiles(path, "*.prf").ToArray();
+                Logger.Log(LogLevel.Debug, $"Enumerated {files?.Length} Files in {path}");
 
                 foreach (var file in files)
                 {
@@ -338,7 +338,10 @@ namespace Installer
             {
                 try
                 {
-                    if ((int)Registry.GetValue($@"{Parameters.prepRegPath}\{Parameters.prepRegFolderPrefix}{version}", Parameters.prepRegValueInstalled, null) == 1)
+                    string path = $@"{Parameters.prepRegPath}\{Parameters.prepRegFolderPrefix}{version}";
+                    int result = (int)Registry.GetValue(path, Parameters.prepRegValueInstalled, null);
+                    Logger.Log(LogLevel.Debug, $"Path '{path}' returned '{result}'");
+                    if (result == 1)
                     {
                         if (!SimulatorStates.ContainsKey((Simulator)version))
                             SimulatorStates.Add((Simulator)version, true);
@@ -354,23 +357,23 @@ namespace Installer
         private bool CheckFSUIPC7(Simulator simulator, string verion)
         {
             var task = InstallerTask.AddTask($"FSUIPC7 Installation [{verion}]", "Check State and Version of FSUIPC7 ...");
-            if (simulator != Simulator.MSFS2024) //TEMP
-                task.DisplayInSummary = false;
+            if (simulator != Simulator.MSFS2024)
+                task.DisplayMessagesInSummary = false;
 
             if (InstallerFunctions.CheckFSUIPC7(out bool isInstalled))
             {
                 if (isInstalled && simulator == Simulator.MSFS2024) //TEMP
                 {
-                    task.ReplaceLastMessage($"FSUIPC7 is installed, but the Installer can not detect or update to the correct Version yet!\r\n(As there isn't a Release Version for FSUIPC7 for 2024 yet.)\r\n\r\nCheckout the Forum for the current Beta:");
+                    task.ReplaceLastMessage($"FSUIPC7 is installed, but is still in Beta for 2024 and needs to be installed manually.\r\nCheck the Forum for the latest Beta Version:\r\n");
                     task.Hyperlink = "FSUIPC 7.5.0 Beta";
-                    task.HyperlinkURL = "https://forum.simflight.com/topic/99118-fsuipc7-version-750-beta-available-for-both-msfs2020-and-msfs2024/\r\n";
+                    task.HyperlinkURL = "https://forum.simflight.com/topic/99162-fsuipc7-version-750-beta-installer-now-available-for-msfs2020-and-msfs2024";
                     task.State = TaskState.WAITING;
                     return true;
                 }
 
                 if (!InstallerFunctions.CheckPackageVersion(PackagePaths[simulator], Parameters.wasmIpcName, Parameters.wasmIpcVersion))
                 {
-                    task.SetState($"FSUIPC7 is installed, but its installed WASM Module does not match the Minimum Version {Parameters.wasmIpcVersion}!\r\nIt is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.\r\nConsider Reinstalling FSUIPC!",
+                    task.SetState($"FSUIPC7 is installed, but its WASM Module does not match the Minimum Version {Parameters.wasmIpcVersion}!\r\nIt is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.\r\nConsider Reinstalling FSUIPC!",
                             TaskState.WAITING);
                     task.Hyperlink = "\r\nFSUIPC";
                     task.HyperlinkURL = "http://fsuipc.com/\r\n";
@@ -505,7 +508,7 @@ namespace Installer
         private bool CheckFSUIPC6()
         {
             var task = InstallerTask.AddTask("FSUIPC6 Installation", "Check State and Version of FSUIPC6 ...");
-            task.DisplayInSummary = false;
+            task.DisplayMessagesInSummary = false;
 
             if (InstallerFunctions.CheckFSUIPC6())
             {
@@ -594,7 +597,7 @@ namespace Installer
         protected bool CheckMobiFlight(Simulator simulator, string version)
         {
             var task = InstallerTask.AddTask($"MobiFlight Module [{version}]", "Check State and Version of MobiFlight Event Module ...");
-            task.DisplayInSummary = false;
+            task.DisplayMessagesInSummary = false;
             bool result = false;
 
             if (InstallerFunctions.CheckPackageVersion(PackagePaths[simulator], Parameters.wasmMobiName, Parameters.wasmMobiVersion))

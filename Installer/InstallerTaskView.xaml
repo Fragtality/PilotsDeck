@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Border BorderBrush="DarkGray" BorderThickness="1" Margin="2" Name="TaskBorder">
-        <Grid Margin="8,0,8,8" MinHeight="48">
+        <Grid Margin="8,0,8,8">
             <Grid.RowDefinitions>
                 <RowDefinition/>
             </Grid.RowDefinitions>

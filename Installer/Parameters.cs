@@ -44,7 +44,13 @@ namespace Installer
         public static readonly string sdUrlFile = "Stream_Deck_6.7.3.21005.msi";
 
         //7
-        public static readonly string ipcRegPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FSUIPC7";
+        public static readonly string[] ipcRegPaths = new string[]
+        {
+            @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FSUIPC7",
+            @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FSUIPC7Both",
+            @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FSUIPC72024",
+        };
+
         public static readonly string ipcRegValue = "DisplayVersion";
         public static readonly string ipcRegInstallDirValue = "InstallDir";
         public static readonly Regex ipcRegexVersion = new Regex(@"^v((\d+)\.(\d+)\.(\d+))$", RegexOptions.Compiled);

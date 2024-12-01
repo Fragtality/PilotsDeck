@@ -10,7 +10,7 @@ namespace ProfileManager.json
             new KeyValuePair<int, string>((int)SimulatorType.UNKNOWN + 1, "NOT SET"),
             new KeyValuePair<int, string>((int)SimulatorType.FSX + 1, "FlightSimulator X"),
             new KeyValuePair<int, string>((int)SimulatorType.P3D + 1, "Prepar3D 4/5"),
-            new KeyValuePair<int, string>((int)SimulatorType.MSFS + 1, "FlightSimulator 2020"),
+            new KeyValuePair<int, string>((int)SimulatorType.MSFS + 1, "FlightSimulator 2020/2024"),
             new KeyValuePair<int, string>((int)SimulatorType.XP + 1, "X-Plane 11/12")
         ];
 

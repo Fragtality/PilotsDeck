@@ -34,7 +34,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 5;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 8;
+        public static int BuildConfigVersion { get; } = 9;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -202,6 +202,17 @@ namespace PilotsDeck
                 if (config.ConfigVersion == 5)
                 {
                     config.MobiRetryDelay = 10000;
+                }
+
+                if (config.ConfigVersion < 9)
+                {
+                    config.SimBinaries = new Dictionary<SimulatorType, string[]>()
+                        {
+                            { SimulatorType.FSX, ["fsx", "fs9"] },
+                            { SimulatorType.P3D, ["Prepar3D"] },
+                            { SimulatorType.MSFS, ["FlightSimulator", "FlightSimulator2024"] },
+                            { SimulatorType.XP, ["X-Plane"] },
+                        };
                 }
 
                 config.ConfigVersion = BuildConfigVersion;

@@ -19,7 +19,7 @@ namespace Installer
 
         public bool DisplayOnlyLastCompleted { get { return InstallerTask.DisplayOnlyLastCompleted; } set { InstallerTask.DisplayOnlyLastCompleted = value; } }
         public bool DisplayOnlyLastError { get { return InstallerTask.DisplayOnlyLastError; } set { InstallerTask.DisplayOnlyLastError = value; } }
-        public bool DisplayInSummary { get { return InstallerTask.DisplayInSummary; } set { InstallerTask.DisplayInSummary = value; } }
+        public bool DisplayMessagesInSummary { get { return InstallerTask.DisplayMessagesInSummary; } set { InstallerTask.DisplayMessagesInSummary = value; } }
 
         protected Brush BrushDefault { get; } = new SolidColorBrush(Colors.DarkGray);
         protected Brush BrushRed { get; } = new SolidColorBrush(Colors.Red);
@@ -96,6 +96,11 @@ namespace Installer
             LastMessageEntry = InstallerTask.ListMessages.LastOrDefault();
             LastUrl = InstallerTask.Hyperlink;
             LastState = InstallerTask.State;
+        }
+
+        public void HideMessages()
+        {
+            Message.Visibility = Visibility.Collapsed;
         }
 
         private void RequestNavigateHandler(object sender, RequestNavigateEventArgs e)

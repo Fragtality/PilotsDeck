@@ -34,7 +34,7 @@ namespace Installer
         public bool DisableLinkAfterClick { get; set; } = true;
         public bool DisplayOnlyLastCompleted { get; set; } = true;
         public bool DisplayOnlyLastError { get; set; } = true;
-        public bool DisplayInSummary { get; set; } = true;
+        public bool DisplayMessagesInSummary { get; set; } = true;
 
         public InstallerTask(string title, string message)
         {

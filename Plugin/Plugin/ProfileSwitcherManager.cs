@@ -1,5 +1,6 @@
 ﻿using PilotsDeck.Resources.Images;
 using PilotsDeck.Simulator;
+using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.StreamDeck.Messages;
 using System;
@@ -39,7 +40,7 @@ namespace PilotsDeck.Plugin
             var model = new ModelProfileSwitcherInspector(GlobalSettings)
             {
                 LoadedMappings = ProfileMappings.Select(m => m.ProfileName).ToList(),
-                AircraftPathString = SimController.AircraftString
+                AircraftPathString = ToolsMSFS.GetAircraftStringShort(SimController?.AircraftString) ?? ""
             };
 
             return model;
