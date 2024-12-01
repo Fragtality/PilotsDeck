@@ -28,7 +28,7 @@ namespace PilotsDeck.Simulator.MSFS
                 {
                     if (evt.eType == SIMCONNECT_INPUT_EVENT_TYPE.DOUBLE)
                     {
-                        EventHashes.TryAdd("B:" + evt.Name, evt.Hash);
+                        EventHashes.TryAdd("b:" + evt.Name?.ToLowerInvariant(), evt.Hash);
                         EventIndex.TryAdd(NextEventID, evt.Hash);
                         Logger.Verbose($"Event '{evt.Name}' has Hash: {evt.Hash} (Type: {evt.eType}) on ID {NextEventID}");
                         receivedEvents.Add($"B:{evt.Name}");
@@ -96,7 +96,7 @@ namespace PilotsDeck.Simulator.MSFS
 
         public void SubscribeInputEvent(string name, VariableInputEvent variable)
         {
-            if (EventHashes.TryGetValue(name, out ulong hash) && variable != null)
+            if (EventHashes.TryGetValue(name?.ToLowerInvariant(), out ulong hash) && variable != null)
             {
                 if (!EventSubscribedValues.TryAdd(EventIndex.First(kv => kv.Value == hash).Key, variable))
                     Logger.Warning($"Failed to add InputEvent '{name}' to subscribed Values!");
@@ -135,7 +135,7 @@ namespace PilotsDeck.Simulator.MSFS
         {
             try
             {
-                if (EventsEnumerated && EventHashes.TryGetValue(name, out ulong hash))
+                if (EventsEnumerated && EventHashes.TryGetValue(name?.ToLowerInvariant(), out ulong hash))
                 {
                     SimConnectManager.SimConnectMutex.TryWaitOne();
                     SimConnectManager.SimConnect.SetInputEvent(hash, value);

@@ -22,6 +22,7 @@ namespace PilotsDeck.Simulator
         public string AircraftString { get { return SimConnectManager.AircraftString; } }
         public static SimConnectManager SimConnectManager { get; protected set; }
         public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; private set; } = [];
+        protected bool LastReadyState = false;
 
         public ConnectorMSFS()
         {
@@ -51,7 +52,12 @@ namespace PilotsDeck.Simulator
                     }
 
                     if (SimConnectManager.IsSimConnected)
-                            SimConnectManager.MobiModule?.CheckConnection(SimConnectManager.IsSessionReady);
+                        SimConnectManager.MobiModule?.CheckConnection(SimConnectManager.IsSessionReady);
+                    if (!SimConnectManager.IsSessionReady && LastReadyState)
+                        SimConnectManager.MobiModule?.ClearLvarList();
+
+                    if (SimConnectManager.IsSessionReady)
+                        SimConnectManager.EvaluateInputEvents();
 
                     if (SimState == SimulatorState.RUNNING && SimConnectManager.IsSimConnected && SimConnectManager.IsReceiveRunning)
                     {
@@ -78,6 +84,7 @@ namespace PilotsDeck.Simulator
                     }
 
                     SimConnectManager.CheckAircraftString();
+                    LastReadyState = SimConnectManager.IsSessionReady;
 
                     await Task.Delay(App.Configuration.MsfsStateCheckInterval, App.CancellationToken);
                 }

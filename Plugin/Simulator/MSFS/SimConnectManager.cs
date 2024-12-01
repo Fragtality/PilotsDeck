@@ -210,16 +210,12 @@ namespace PilotsDeck.Simulator.MSFS
         {
             if (data.dwRequestID == (int)SIMCONNECT_REQUEST_ID.InternalVariables && data.dwDefineID == (int)SIMCONNECT_REQUEST_ID.InternalVariables && data.dwData.Length >= 1)
             {
-                bool lastState = IsSessionReady;
                 CameraState = (uint)data.dwData[0];
                 Logger.Debug($"CameraState switched to '{CameraState}'");
-                EvaluateInputEvents();
-                if (!IsSessionReady && lastState)
-                    MobiModule.ClearLvarList();
             }
         }
 
-        protected void EvaluateInputEvents()
+        public void EvaluateInputEvents()
         {
             if (IsSessionReady && !InputEvents.EventsEnumerated)
                 InputEvents.EnumerateInputEvents();
