@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PilotsDeck.Actions.Advanced.SettingsModel;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,6 +17,12 @@ namespace PilotsDeck.UI.ViewModels
         VALUEMAP,
         GAUGEMAP,
         GAUGEMARKER
+    }
+
+    public class GaugeMarkerSettings
+    {
+        public List<MarkerDefinition> GaugeMarkers = [];
+        public List<MarkerRangeDefinition> GaugeRangeMarkers = [];
     }
 
     public static class SettingItem

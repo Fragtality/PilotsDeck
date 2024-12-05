@@ -70,21 +70,12 @@ namespace PilotsDeck.UI.ControlsElement
                 }
             }
 
-            if (ModelGauge.GaugeElement.Settings.GaugeMarkers.Count > 0)
+            if (ModelGauge.GaugeElement.Settings.GaugeMarkers.Count > 0 || ModelGauge.GaugeElement.Settings.GaugeRangeMarkers.Count > 0)
             {
-                var colors = ModelGauge.GetMarkerColors();
-                var values = ModelGauge.GetMarkerValues();
-
-                for (int i = 0; i < colors.Count; i++)
-                {
-                    ListBoxItem item = new()
-                    {
-                        BorderBrush = new SolidColorBrush(colors[i]),
-                        IsHitTestVisible = false,
-                        Content = values[i]
-                    };
+                var items = ModelGauge.GetMarkerListBoxItems();
+                
+                foreach (var item in items)
                     ListMarker.Items.Add(item);
-                }
             }
 
             if (ModelGauge.UseDynamicSize)
@@ -319,16 +310,31 @@ namespace PilotsDeck.UI.ControlsElement
 
         private void ListMarker_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(InputMarkerPos.Text) && string.IsNullOrWhiteSpace(InputMarkerSize.Text) && ListMarker.SelectedIndex != -1)
+            if (string.IsNullOrWhiteSpace(InputMarkerPos.Text) && string.IsNullOrWhiteSpace(InputMarkerSize.Text) && ListMarker.SelectedIndex != -1 && ListMarker.SelectedItem is MarkerListBoxItem item) 
             {
-                var marker = ModelGauge.GaugeMarkers[ListMarker.SelectedIndex];
-                InputMarkerPos.Text = Conversion.ToString(marker.ValuePosition);
-                InputMarkerSize.Text = Conversion.ToString(marker.Size);
-                InputMarkerHeight.Text = Conversion.ToString(marker.Height);
-                InputMarkerOffset.Text = Conversion.ToString(marker.Offset);
-                MarkerColor = marker.GetColor();
-                LabelMarkerColor.Background = new SolidColorBrush(Color.FromArgb(MarkerColor.A, MarkerColor.R, MarkerColor.G, MarkerColor.B));
-                ImageAddUpdateMarker.SetButtonImage("pencil");
+                if (item?.IsRange == false)
+                {
+                    var marker = ModelGauge.GaugeMarkers[item.Index];
+                    InputMarkerPos.Text = Conversion.ToString(marker.ValuePosition);
+                    InputMarkerSize.Text = Conversion.ToString(marker.Size);
+                    InputMarkerHeight.Text = Conversion.ToString(marker.Height);
+                    InputMarkerOffset.Text = Conversion.ToString(marker.Offset);
+                    MarkerColor = marker.GetColor();
+                    LabelMarkerColor.Background = new SolidColorBrush(Color.FromArgb(MarkerColor.A, MarkerColor.R, MarkerColor.G, MarkerColor.B));
+                    ImageAddUpdateMarker.SetButtonImage("pencil");
+                }
+
+                if (item?.IsRange == true)
+                {
+                    var range = ModelGauge.GaugeRangeMarkers[item.Index];
+                    InputMarkerPos.Text = MarkerListBoxItem.GetRangeValueText(range);
+                    InputMarkerSize.Text = Conversion.ToString(range.Size);
+                    InputMarkerHeight.Text = Conversion.ToString(range.Height);
+                    InputMarkerOffset.Text = Conversion.ToString(range.Offset);
+                    MarkerColor = range.GetColor();
+                    LabelMarkerColor.Background = new SolidColorBrush(Color.FromArgb(MarkerColor.A, MarkerColor.R, MarkerColor.G, MarkerColor.B));
+                    ImageAddUpdateMarker.SetButtonImage("pencil");
+                }
             }
         }
 
@@ -337,7 +343,7 @@ namespace PilotsDeck.UI.ControlsElement
             if (ListMarker.SelectedIndex == -1)
                 ModelGauge.AddMarker(InputMarkerPos.Text, InputMarkerSize.Text, InputMarkerHeight.Text, InputMarkerOffset.Text, MarkerColor);
             else
-                ModelGauge.UpdateMarker(ListMarker.SelectedIndex, InputMarkerPos.Text, InputMarkerSize.Text, InputMarkerHeight.Text, InputMarkerOffset.Text, MarkerColor);
+                ModelGauge.UpdateMarker(ListMarker.SelectedItem as MarkerListBoxItem, InputMarkerPos.Text, InputMarkerSize.Text, InputMarkerHeight.Text, InputMarkerOffset.Text, MarkerColor);
 
             InputMarkerPos.Text = "";
             ListMarker.SelectedIndex = -1;
@@ -347,7 +353,7 @@ namespace PilotsDeck.UI.ControlsElement
         private void ButtonRemoveMarker_Click(object sender, RoutedEventArgs e)
         {
             if (ListMarker?.SelectedIndex != -1)
-                ModelGauge.RemoveMarker(ListMarker.SelectedIndex);
+                ModelGauge.RemoveMarker(ListMarker.SelectedItem as MarkerListBoxItem);
         }
 
         private void ButtonCopyPasteMarker_Click(object sender, RoutedEventArgs e)

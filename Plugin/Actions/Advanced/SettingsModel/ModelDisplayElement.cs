@@ -69,6 +69,9 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
             foreach (var marker in GaugeMarkers)
                 model.GaugeMarkers.Add(new MarkerDefinition(marker));
 
+            foreach (var markerRange in GaugeRangeMarkers)
+                model.GaugeRangeMarkers.Add(new MarkerRangeDefinition(markerRange));
+
             return model;
         }
 
@@ -184,6 +187,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         public virtual List<ColorRange> GaugeColorRanges { get; set; } = [];
         public virtual bool GaugeFixedMarkers { get; set; } = true;
         public virtual List<MarkerDefinition> GaugeMarkers { get; set; } = [];
+        public virtual List<MarkerRangeDefinition> GaugeRangeMarkers { get; set; } = [];
         public virtual bool GaugeIsArc { get; set; } = false;
         public virtual float GaugeAngleStart { get; set; } = 135;
         public virtual float GaugeAngleSweep { get; set; } = 180;

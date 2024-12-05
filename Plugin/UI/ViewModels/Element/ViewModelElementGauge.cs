@@ -24,15 +24,20 @@ namespace PilotsDeck.UI.ViewModels.Element
         public virtual string ArcAngleSweep { get { return Conversion.ToString(GaugeElement.Settings.GaugeAngleSweep); } }
         public virtual List<ColorRange> ColorRanges { get { return GaugeElement.Settings.GaugeColorRanges; } }
         public virtual List<MarkerDefinition> GaugeMarkers { get { return GaugeElement.Settings.GaugeMarkers; } }
+        public virtual List<MarkerRangeDefinition> GaugeRangeMarkers { get { return GaugeElement.Settings.GaugeRangeMarkers; } }
 
         public virtual List<ColorRange> GetColorRanges()
         {
             return ColorRanges;
         }
 
-        public virtual List<MarkerDefinition> GetGaugeMarkers()
+        public virtual GaugeMarkerSettings GetGaugeMarkers()
         {
-            return GaugeMarkers;
+            return new GaugeMarkerSettings()
+            {
+                GaugeMarkers = GaugeMarkers,
+                GaugeRangeMarkers = GaugeRangeMarkers
+            };
         }
 
         public virtual List<Color> GetRangeColors()
@@ -65,24 +70,36 @@ namespace PilotsDeck.UI.ViewModels.Element
             return values;
         }
 
-        public virtual List<Color> GetMarkerColors()
+        //public virtual List<Color> GetMarkerColors()
+        //{
+        //    List<Color> colors = [];
+
+        //    foreach (var color in GaugeElement.Settings.GaugeMarkers)
+        //        colors.Add(Color.FromArgb(color.GetColor().A, color.GetColor().R, color.GetColor().G, color.GetColor().B));
+
+        //    return colors;
+        //}
+
+        //public virtual List<string> GetMarkerValues()
+        //{
+        //    List<string> values = [];
+
+        //    foreach (var marker in GaugeElement.Settings.GaugeMarkers)
+        //        values.Add($"Value: {Conversion.ToString(marker.ValuePosition)} / Thickness: {Conversion.ToString(marker.Size)} / Height: {Conversion.ToString(marker.Height)} / Offset: {Conversion.ToString(marker.Offset)}");
+
+        //    return values;
+        //}
+
+        public virtual List<MarkerListBoxItem> GetMarkerListBoxItems()
         {
-            List<Color> colors = [];
+            List<MarkerListBoxItem> items = [];
+            for (int i = 0; i < GaugeElement.Settings.GaugeRangeMarkers.Count; i++)
+                items.Add(new MarkerListBoxItem(GaugeElement.Settings.GaugeRangeMarkers[i], i));
 
-            foreach (var color in GaugeElement.Settings.GaugeMarkers)
-                colors.Add(Color.FromArgb(color.GetColor().A, color.GetColor().R, color.GetColor().G, color.GetColor().B));
+            for (int i = 0; i < GaugeElement.Settings.GaugeMarkers.Count; i++)
+                items.Add(new MarkerListBoxItem(GaugeElement.Settings.GaugeMarkers[i], i));
 
-            return colors;
-        }
-
-        public virtual List<string> GetMarkerValues()
-        {
-            List<string> values = [];
-
-            foreach (var marker in GaugeElement.Settings.GaugeMarkers)
-                values.Add($"Value: {Conversion.ToString(marker.ValuePosition)} / Thickness: {Conversion.ToString(marker.Size)} / Height: {Conversion.ToString(marker.Height)} / Offset: {Conversion.ToString(marker.Offset)}");
-
-            return values;
+            return items;
         }
 
         public virtual void SetValueMin(string input)
@@ -213,8 +230,7 @@ namespace PilotsDeck.UI.ViewModels.Element
                 if (!Conversion.IsNumberF(parts[0], out float step) || !Conversion.IsNumberF(parts[1], out float start) || !Conversion.IsNumberF(parts[2], out float end))
                     return;
 
-                for (float markerPos = start; markerPos <= end; markerPos += step)
-                    GaugeElement.Settings.GaugeMarkers.Add(new(markerPos, numSize, numHeight, numOffset, color));
+                GaugeElement.Settings.GaugeRangeMarkers.Add(new(step, start, end, numSize, numHeight, numOffset, color));
 
                 SortMarkers();
                 ModelAction.UpdateAction();
@@ -228,35 +244,68 @@ namespace PilotsDeck.UI.ViewModels.Element
             }
         }
 
-        public void RemoveMarker(int index)
+        public void RemoveMarker(MarkerListBoxItem item)
         {
-            if (index >= 0 && index < GaugeElement.Settings.GaugeMarkers.Count)
+            if (item == null)
+                return;
+
+            if (!item.IsRange && item.Index >= 0 && item.Index < GaugeElement.Settings.GaugeMarkers.Count)
             {
-                GaugeElement.Settings.GaugeMarkers.RemoveAt(index);
+                GaugeElement.Settings.GaugeMarkers.RemoveAt(item.Index);
                 SortMarkers();
+                ModelAction.UpdateAction();
+            }
+
+            if (item.IsRange && item.Index >= 0 && item.Index < GaugeElement.Settings.GaugeRangeMarkers.Count)
+            {
+                GaugeElement.Settings.GaugeRangeMarkers.RemoveAt(item.Index);
                 ModelAction.UpdateAction();
             }
         }
 
-        public virtual void UpdateMarker(int index, string pos, string size, string height, string offset, System.Drawing.Color color)
+        public virtual void UpdateMarker(MarkerListBoxItem item, string pos, string size, string height, string offset, System.Drawing.Color color)
         {
-            if (index >= 0 && index < GaugeElement.Settings.GaugeMarkers.Count && Conversion.IsNumberF(pos, out float valPos)
-                && Conversion.IsNumberF(offset, out float valOffset)  && Conversion.IsNumberF(size, out float valSize) && Conversion.IsNumberF(height, out float valHeight))
+            if (item == null)
+                return;
+            if (!Conversion.IsNumberF(offset, out float valOffset) || !Conversion.IsNumberF(size, out float valSize) || !Conversion.IsNumberF(height, out float valHeight))
+                return;
+
+            if (!item.IsRange && item.Index >= 0 && item.Index < GaugeElement.Settings.GaugeMarkers.Count && Conversion.IsNumberF(pos, out float valPos))
             {
-                GaugeElement.Settings.GaugeMarkers[index] = new MarkerDefinition(valPos, valSize, valHeight, valOffset, color);
+                GaugeElement.Settings.GaugeMarkers[item.Index] = new MarkerDefinition(valPos, valSize, valHeight, valOffset, color);
                 SortMarkers();
+                ModelAction.UpdateAction();
+            }
+
+            string[] parts = null;
+            if (pos?.StartsWith('$') == true && pos?.Length > 1)
+            {
+                parts = pos.Split(':');
+                if (parts?.Length > 0)
+                    parts[0] = parts[0][1..];
+            }
+
+            if (item.IsRange && item.Index >= 0 && item.Index < GaugeElement.Settings.GaugeRangeMarkers.Count && parts?.Length == 3
+                && Conversion.IsNumberF(parts[0], out float step) && Conversion.IsNumberF(parts[1], out float start) && Conversion.IsNumberF(parts[2], out float stop))
+            {
+                GaugeElement.Settings.GaugeRangeMarkers[item.Index] = new MarkerRangeDefinition(step, start, stop, valSize, valHeight, valOffset, color);
                 ModelAction.UpdateAction();
             }
         }
 
-        public virtual void CopyMarker(List<MarkerDefinition> markers)
+        public virtual void CopyMarker(GaugeMarkerSettings settings)
         {
-            if (markers?.Count < 1)
+            if (settings == null || settings.GaugeMarkers == null || settings.GaugeRangeMarkers == null)
                 return;
 
             GaugeElement.Settings.GaugeMarkers.Clear();
-            foreach (var marker in markers)
+            foreach (var marker in settings.GaugeMarkers)
                 GaugeElement.Settings.GaugeMarkers.Add(new MarkerDefinition(marker));
+
+            GaugeElement.Settings.GaugeRangeMarkers.Clear();
+            foreach (var range in settings.GaugeRangeMarkers)
+                GaugeElement.Settings.GaugeRangeMarkers.Add(new MarkerRangeDefinition(range));
+
             ModelAction.UpdateAction();
         }
 

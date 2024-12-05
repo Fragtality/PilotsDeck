@@ -69,11 +69,14 @@ namespace Installer
             sdFolder = (string)Registry.GetValue(Parameters.sdRegPath, Parameters.sdRegFolder, null);
             if (!string.IsNullOrWhiteSpace(sdFolder))
                 return $@"{sdFolder}{Parameters.sdBinary}\{Parameters.sdBinaryExe}";
-            else
-            {
-                Logger.Log(LogLevel.Warning, "Could not get StreamDeck Folder from Registry!");
-                return $@"{Parameters.sdDefaultFolder}{Parameters.sdBinary}\{Parameters.sdBinaryExe}";
-            }
+
+            sdFolder = (string)Registry.GetValue(Parameters.sdRegInstallPath, Parameters.sdRegInstallDir, null);
+            if (!string.IsNullOrWhiteSpace(sdFolder))
+                return $@"{sdFolder}{Parameters.sdBinaryExe}";
+
+            Logger.Log(LogLevel.Warning, "Could not get StreamDeck Folder from Registry! Assuming Default");
+            sdFolder = $@"{Parameters.sdDefaultFolder}{Parameters.sdBinary}\";
+            return $@"{sdFolder}{Parameters.sdBinaryExe}";
         }
 
         public static void DeleteDirectory(string path, bool create = false)

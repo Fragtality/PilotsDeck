@@ -30,6 +30,15 @@ namespace Installer
 
         public static void StartProcess(string absolutePath, string workDirectory = null, string args = null)
         {
+            if (string.IsNullOrEmpty(absolutePath))
+                return;
+
+            if (!absolutePath.StartsWith("http") && (!File.Exists(absolutePath) || (workDirectory != null && !Directory.Exists(workDirectory))))
+            {
+                Logger.Log(LogLevel.Warning, $"The Path '{absolutePath}' does not exist! (WorkDir was: '{workDirectory}')");
+                return;
+            }
+
             var pProcess = new Process();
             pProcess.StartInfo.FileName = absolutePath;
             pProcess.StartInfo.UseShellExecute = true;

@@ -76,4 +76,53 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
             Color = ColorTranslator.ToHtml(color);
         }
     }
+
+    public class MarkerRangeDefinition
+    {
+
+        public float Step { get; set; } = 0;
+        public float Start { get; set; } = 0;
+        public float Stop { get; set; } = 0;
+        public float Size { get; set; } = 2;
+        public float Height { get; set; } = 0;
+        public float Offset { get; set; } = 0;
+        public string Color { get; set; } = "#ffffff";
+
+        public MarkerRangeDefinition()
+        {
+
+        }
+
+        public MarkerRangeDefinition(MarkerRangeDefinition source)
+        {
+            Step = source.Step;
+            Start = source.Start;
+            Stop = source.Stop;
+            Size = source.Size;
+            Height = source.Height;
+            Offset = source.Offset;
+            Color = source.Color;
+        }
+
+        public MarkerRangeDefinition(float step, float start, float stop, float size, float height, float offset, Color color)
+        {
+            Step = step;
+            Start = start;
+            Stop = stop;
+            Size = size;
+            Height = height;
+            Offset = offset;
+            Color = ColorTranslator.ToHtml(color);
+        }
+
+        public Color GetColor()
+        {
+            return ColorTranslator.FromHtml(Color);
+        }
+
+        public void SetColor(Color color)
+        {
+            Color = ColorTranslator.ToHtml(color);
+        }
+    }
 }

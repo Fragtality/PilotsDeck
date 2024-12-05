@@ -1,6 +1,7 @@
 ﻿using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Variables;
+using System;
 using System.Drawing;
 
 namespace PilotsDeck.Actions.Advanced.Elements
@@ -50,6 +51,20 @@ namespace PilotsDeck.Actions.Advanced.Elements
                 renderBar.DrawBarRanges(colors, ranges);
             }
 
+            if (Settings?.GaugeRangeMarkers?.Count > 0)
+            {
+                foreach (var range in Settings.GaugeRangeMarkers)
+                {
+                    Color color = range.GetColor();
+                    float position = MathF.Max(range.Start, Settings.GaugeValueMin);
+                    while (position <= Settings.GaugeValueMax)
+                    {
+                        renderBar.DrawBarLine(color, range.Size, range.Height, range.Offset, ToolsRender.NormalizedRatio(position, Settings.GaugeValueMin, Settings.GaugeValueMax));
+                        position += range.Step;
+                    }
+                }
+            }
+
             if (Settings.GaugeMarkers.Count > 0)
             {
                 foreach (var marker in Settings.GaugeMarkers)
@@ -88,6 +103,23 @@ namespace PilotsDeck.Actions.Advanced.Elements
             {
                 Settings.GetRanges(out Color[] colors, out float[][] ranges);
                 renderArc.DrawArcRanges(colors, ranges);
+            }
+
+            if (Settings?.GaugeRangeMarkers?.Count > 0)
+            {
+                foreach (var range in Settings.GaugeRangeMarkers)
+                {
+                    Color color = range.GetColor();
+                    float position = MathF.Max(range.Start, Settings.GaugeValueMin);
+                    while (position <= Settings.GaugeValueMax)
+                    {
+                        if (!Settings.GaugeFixedMarkers && position > renderArc.Value)
+                            continue;
+
+                        renderArc.DrawArcLine(color, range.Size, range.Height, range.Offset, ToolsRender.NormalizedRatio(position, Settings.GaugeValueMin, Settings.GaugeValueMax));
+                        position += range.Step;
+                    }
+                }
             }
 
             if (Settings.GaugeMarkers.Count > 0)
