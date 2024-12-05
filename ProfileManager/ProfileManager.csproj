@@ -9,7 +9,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <StartupObject>ProfileManager.App</StartupObject>
     <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
-    <Version>0.8.3</Version>
+    <Version>0.8.4</Version>
     <Authors>Fragtality</Authors>
     <Description>Install Profiles and manage Profile Switching for PilotsDeck</Description>
     <Copyright>Copyright © 2024</Copyright>
@@ -18,6 +18,7 @@
     <PackageIcon>PluginIcon.png</PackageIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x64</Platforms>
+    <Title>Profile Manager</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
