@@ -1048,7 +1048,7 @@ To change a Range: select it in the List, change the Parameters as needed and cl
 These Fields allow to define Markers/Ticks/Lines on the Gauge. Each can have it's individual Position (Value), Thickness, Offset, Height and Color.<br/>
 Click on the + Button to add a Marker and the - Button to remove the currently selected Marker.<br/>
 To change a Marker: select it in the List, change the Parameters as needed and click the Pencil to update the Marker.<br/>
-You can use a Shorthand/Template in Value to add a Range of Markers: `$step:start:end` (replace with the respective Numbers). The other Parameters (Thickness, Offset, Height, Color) will be applied to all Markers as entered.
+You can use a Shorthand/Template in Value to add a Range of Markers: `$step:start:end` (replace with the respective Numbers). The other Parameters (Thickness, Offset, Height, Color) will be applied to all Markers as entered. That Range of Markers will be shown and managed as on Entity - i.e. selecting it, allows you edit the whole Range.
 <br/><br/>
 
 **Grow Gauge**:<br/>
