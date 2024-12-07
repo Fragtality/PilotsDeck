@@ -452,6 +452,8 @@ namespace Installer
                 {
                     isInstalled = true;
                     result = CheckVersion(regVersion, VersionCompare.GREATER_EQUAL, ipcVersion, out bool compareable) && compareable;
+                    if (result && isInstalled && Parameters.ipcOverwriteBeta && regVersion?.Contains("beta") == true)
+                        result = false;
                 }
                 else
                     Logger.Log(LogLevel.Warning, "The FSUIPC Registry Path returned NULL!");

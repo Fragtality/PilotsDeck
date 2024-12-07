@@ -357,30 +357,22 @@ namespace Installer
         private bool CheckFSUIPC7(Simulator simulator, string verion)
         {
             var task = InstallerTask.AddTask($"FSUIPC7 Installation [{verion}]", "Check State and Version of FSUIPC7 ...");
-            if (simulator != Simulator.MSFS2024)
-                task.DisplayMessagesInSummary = false;
+            task.DisplayMessagesInSummary = false;
 
             if (InstallerFunctions.CheckFSUIPC7(out bool isInstalled))
             {
-                if (isInstalled && simulator == Simulator.MSFS2024) //TEMP
-                {
-                    task.ReplaceLastMessage($"FSUIPC7 is installed, but is still in Beta for 2024 and needs to be installed manually.\r\nCheck the Forum for the latest Beta Version:\r\n");
-                    task.Hyperlink = "FSUIPC 7.5.0 Beta";
-                    task.HyperlinkURL = "https://forum.simflight.com/topic/99162-fsuipc7-version-750-beta-installer-now-available-for-msfs2020-and-msfs2024";
-                    task.State = TaskState.WAITING;
-                    return true;
-                }
-
                 if (!InstallerFunctions.CheckPackageVersion(PackagePaths[simulator], Parameters.wasmIpcName, Parameters.wasmIpcVersion))
                 {
                     task.SetState($"FSUIPC7 is installed, but its WASM Module does not match the Minimum Version {Parameters.wasmIpcVersion}!\r\nIt is not required for the Plugin itself, but could lead to Problems with Profiles/Integrations which use Lua-Scripts and L-Vars.\r\nConsider Reinstalling FSUIPC!",
                             TaskState.WAITING);
                     task.Hyperlink = "\r\nFSUIPC";
                     task.HyperlinkURL = "http://fsuipc.com/\r\n";
+                    task.DisplayMessagesInSummary = true;
                 }
                 else if (!InstallerFunctions.CheckFSUIPC7Pumps())
                 {
                     task.SetState("FSUIPC7 is installed, but the FSUIPC7.ini is missing the NumberOfPumps=0 Entry in the [General] Section (which helps to avoid Stutters)!", TaskState.WAITING);
+                    task.DisplayMessagesInSummary = true;
                 }
                 else
                 {
@@ -407,6 +399,7 @@ namespace Installer
                     task.Hyperlink = "\r\nFSUIPC";
                     task.HyperlinkURL = "http://fsuipc.com/\r\n";
                     task.SetUrlBold = true;
+                    task.DisplayMessagesInSummary = true;
                     Logger.Log(LogLevel.Error, task.Message);
                 }
                 else
@@ -444,6 +437,7 @@ namespace Installer
                     task.HyperlinkURL = "http://fsuipc.com/\r\n";
                     task.SetUrlBold = true;
                     task.State = TaskState.ERROR;
+                    task.DisplayMessagesInSummary = true;
                     Logger.Log(LogLevel.Error, msg);
                     return false;
                 }

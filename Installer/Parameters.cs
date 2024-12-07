@@ -56,7 +56,8 @@ namespace Installer
         public static readonly string ipcRegValue = "DisplayVersion";
         public static readonly string ipcRegInstallDirValue = "InstallDir";
         public static readonly Regex ipcRegexVersion = new Regex(@"^v((\d+)\.(\d+)\.(\d+))$", RegexOptions.Compiled);
-        public static readonly string ipcVersion = "7.4.18";
+        public static readonly string ipcVersion = "7.5.0";
+        public static readonly bool ipcOverwriteBeta = true;
         public static readonly string ipcUrl = "https://fsuipc.simflight.com/beta/Install_FSUIPC7.zip";
         public static readonly string ipcSetup = "Install_FSUIPC7";
         public static readonly string ipcUrlFile = $"{ipcSetup}.zip";
@@ -74,7 +75,7 @@ namespace Installer
 
         public static readonly Regex wasmRegex = new Regex("^\\s*\"package_version\":\\s*\"([0-9\\.]+)\"\\s*,\\s*$", RegexOptions.Compiled);
         public static readonly string wasmIpcName = "fsuipc-lvar-module";
-        public static readonly string wasmIpcVersion = "1.0.5";
+        public static readonly string wasmIpcVersion = "1.0.7";
         public static readonly string wasmMobiName = "mobiflight-event-module";
         public static readonly string wasmMobiVersion = "1.0.1";
         public static readonly string wasmUrl = "https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/download/1.0.1/mobiflight-event-module.1.0.1.zip";
