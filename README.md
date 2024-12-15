@@ -1863,6 +1863,8 @@ A Note on **networked** Installations for **X-Plane**: the Plugin has no Way to 
 <br/><br/><br/>
 
 ## 4.2 - Troubleshooting
+
+### 4.2.1 - General Guidlines
 **First**, check if you see the Plugin's Actions available in the StreamDeck GUI (on the right Side). If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`.<br/>
 <br/>
 **Second**, if you see the Actions but you can not configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
@@ -1879,8 +1881,18 @@ If it still doesn't work, contact me on one of the Platforms or Forums! To help 
 - Your latest **PilotsDeck Log File** (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me that)
 - Open the Command Line and share me the Output of `dotnet --list-runtimes`
 - Try to run the Exectuable manually via PowerShell / Commandline and copy or make a **Screenshot** of the Output.
+
+<br/><br/>
+
+### 4.2.2 - Known Errors
+
+#### Does not Connect / "Out of Bound" Exception / MSFS 2024
+
+- Reasons currently unknown, likely due to the Beta State of 2024. Try if removing the Mobiflight Event Module, re-runinng the Installer and then rebooting the PC helps.
+
+<br/>
  
-<br/><br/><br/><br/>
+<br/><br/><br/>
 
 ---
 
