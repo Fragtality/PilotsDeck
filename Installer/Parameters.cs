@@ -42,8 +42,8 @@ namespace Installer
         public static readonly string sdBinary = "StreamDeck";
         public static readonly string sdBinaryExe = "StreamDeck.exe";
         public static readonly string sdDefaultFolder = @"C:\Program Files\Elgato\";
-        public static readonly string sdUrl = "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.8.0.21252.msi";
-        public static readonly string sdUrlFile = "Stream_Deck_6.8.0.21252.msi";
+        public static readonly string sdUrl = "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.8.1.21263.msi";
+        public static readonly string sdUrlFile = "Stream_Deck_6.8.1.21263.msi";
 
         //7
         public static readonly string[] ipcRegPaths = new string[]

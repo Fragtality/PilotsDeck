@@ -104,8 +104,6 @@ namespace PilotsDeck.Actions.Simple
         {
             if (Settings.BUILD_VERSION < AppConfiguration.BuildModelVersion)
             {
-                Logger.Information($"Converting Settings for '{ActionID}' to Version {AppConfiguration.BuildModelVersion}");
-
                 if (Settings.BUILD_VERSION < 4)
                 {
                     bool topEmpty = string.IsNullOrWhiteSpace(Settings.AddressTop);
@@ -122,12 +120,21 @@ namespace PilotsDeck.Actions.Simple
                         Logger.Debug($"Changed 'ShowBotImage' to false");
                     }
 
-                    var oldSize = Settings.FontSize;
-                    var size = Math.Ceiling(Conversion.ToFloat(oldSize) * 0.91666666666666f);
-                    Settings.FontSize = Conversion.ToString(size);
+                    var oldSize = Conversion.ToFloat(Settings.FontSize);
+                    var newSize = AppConfiguration.FontSizeConversionLegacy(oldSize);
+                    Settings.FontSize = Conversion.ToString(newSize);
                     Logger.Debug($"Changed 'FontSize' {oldSize} => {Settings.FontSize}");
                 }
-                
+
+                if (Settings.BUILD_VERSION >= 4 && Settings.BUILD_VERSION < 7)
+                {
+                    var oldSize = Conversion.ToFloat(Settings.FontSize);
+                    var newSize = AppConfiguration.FontSizeConversionModern(oldSize);
+                    Settings.FontSize = Conversion.ToString(newSize);
+                    Logger.Debug($"Changed 'FontSize' {oldSize} => {Settings.FontSize}");
+                }
+
+                Logger.Information($"Converted Settings for '{ActionID}' from Version {Settings.BUILD_VERSION} to {AppConfiguration.BuildModelVersion}");
                 Settings.BUILD_VERSION = AppConfiguration.BuildModelVersion;
                 SettingModelUpdated = true;
             }

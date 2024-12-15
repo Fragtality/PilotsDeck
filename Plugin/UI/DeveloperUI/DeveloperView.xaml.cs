@@ -129,7 +129,7 @@ namespace PilotsDeck.UI.DeveloperUI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
-            Hide();
+            NotifyIconViewModel.ToggleWindow();
         }
 
         private void ButtonMonitor_Click(object sender, RoutedEventArgs e)
@@ -140,6 +140,12 @@ namespace PilotsDeck.UI.DeveloperUI
         private void ButtonReference_Click(object sender, RoutedEventArgs e)
         {
             LoadView(new ViewReference());
+        }
+
+        private void ButtonProfileManager_Click(object sender, RoutedEventArgs e)
+        {
+            NotifyIconViewModel.OpenProfileManager();
+            NotifyIconViewModel.ToggleWindow();
         }
     }
 }

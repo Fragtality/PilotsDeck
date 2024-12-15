@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -32,9 +33,9 @@ namespace PilotsDeck
         [JsonIgnore]
         public static string ColorFile { get; } = "ColorStore.json";
         [JsonIgnore]
-        public static int BuildModelVersion { get; } = 6;
+        public static int BuildModelVersion { get; } = 7;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 9;
+        public static int BuildConfigVersion { get; } = 11;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -87,6 +88,10 @@ namespace PilotsDeck
         public static readonly string FILE_LVAR = "L-Vars.txt";
         [JsonIgnore]
         public static readonly string FILE_BVAR = "InputEvents.txt";
+        [JsonIgnore]
+        public float SCALE_LEGACY { get; set; } = 120.0f / 144.0f;
+        [JsonIgnore]
+        public float SCALE_SESSION { get; set; } = 1;
 
 
         //ConfigFile
@@ -134,6 +139,7 @@ namespace PilotsDeck
             else
                 return FontItalicName["en"];
         }
+        public float RenderDpi { get; set; } = 96.0f;
         public string StringReplace { get; set; } = "%s";
         public bool CleanInactiveCommands { get; set; } = false;
         public int DelayExit { get; set; } = 2000;
@@ -194,6 +200,7 @@ namespace PilotsDeck
 
                 if (config.ConfigVersion == 4)
                 {
+                    Logger.Information($"Setting Mobi Variables");
                     config.MobiVarsPerFrame = 100;
                     config.MobiReorderTreshold = 10;
                     config.MobiRetryDelay = 10000;
@@ -201,11 +208,13 @@ namespace PilotsDeck
 
                 if (config.ConfigVersion == 5)
                 {
+                    Logger.Information($"Setting Mobi Retry Delay");
                     config.MobiRetryDelay = 10000;
                 }
 
                 if (config.ConfigVersion < 9)
                 {
+                    Logger.Information($"Setting Sim Binaries");
                     config.SimBinaries = new Dictionary<SimulatorType, string[]>()
                         {
                             { SimulatorType.FSX, ["fsx", "fs9"] },
@@ -213,6 +222,12 @@ namespace PilotsDeck
                             { SimulatorType.MSFS, ["FlightSimulator", "FlightSimulator2024"] },
                             { SimulatorType.XP, ["X-Plane"] },
                         };
+                }
+
+                if (config.ConfigVersion < 11)
+                {
+                    Logger.Information($"Setting RenderDpi");
+                    config.RenderDpi = 96.0f;
                 }
 
                 config.ConfigVersion = BuildConfigVersion;
@@ -223,7 +238,20 @@ namespace PilotsDeck
                 Logger.Warning($"Existing Configuration Version '{config.ConfigVersion}' is higher then the Build Version!");
             }
 
+            using Bitmap image = new(144, 144);
+            config.SCALE_SESSION = (image.VerticalResolution / config.RenderDpi) * config.SCALE_LEGACY;
+
             return config;
+        }
+
+        public static float FontSizeConversionModern(float oldSize)
+        {
+            return MathF.Round(oldSize * App.Configuration.SCALE_SESSION, 0);
+        }
+
+        public static float FontSizeConversionLegacy(float oldSize)
+        {
+            return MathF.Round(oldSize * (96.0f / App.Configuration.RenderDpi), 0);
         }
 
         public static void SaveConfiguration(AppConfiguration config = null)

@@ -104,7 +104,7 @@ namespace ProfileManager
                 else if (InstallerTask.HyperLinkArg == null)
                     Tools.OpenUri(sender, e);
                 else
-                    Tools.OpenUriArgs(InstallerTask.HyperlinkURL, InstallerTask.HyperLinkArg);
+                    Tools.OpenUriArgs(InstallerTask.HyperlinkURL, $"\"{InstallerTask.HyperLinkArg}\"");
 
                 if (InstallerTask.SetCompletedOnUrl && InstallerTask.State != TaskState.COMPLETED)
                 {

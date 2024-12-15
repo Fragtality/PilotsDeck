@@ -28,6 +28,12 @@
                     <Image Source="../Icons/binoculars.png" Width="24" Height="24"/>
                 </StackPanel>
             </Button>
+            <Button Name="ButtonProfileManager" MinWidth="128" VerticalAlignment="Center" MinHeight="48" Click="ButtonProfileManager_Click" Margin="16,0,16,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,4,0">
+                    <Label VerticalAlignment="Center" FontWeight="DemiBold" FontSize="12">Profile Manager</Label>
+                    <Image Source="../Icons/arrow-left-right.png" Width="24" Height="24"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <ContentControl Grid.Row="2" Name="PanelView" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left"/>

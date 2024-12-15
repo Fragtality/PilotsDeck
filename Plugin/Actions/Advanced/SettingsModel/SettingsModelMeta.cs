@@ -51,7 +51,18 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
 
             if (settings.BUILD_VERSION < AppConfiguration.BuildModelVersion)
             {
-                Logger.Debug($"Converting Settings to Version {AppConfiguration.BuildModelVersion}");
+                if (settings.BUILD_VERSION < 7)
+                {
+                    foreach (var model in settings.DisplayElements.Values)
+                    {
+                        var oldSize = model.FontSize;
+                        var newSize = AppConfiguration.FontSizeConversionModern(oldSize);
+                        model.FontSize = newSize;
+                        Logger.Debug($"Changed 'FontSize' {oldSize} => {model.FontSize}");
+                    }
+                }
+
+                Logger.Information($"Converted Settings for '{sdEvent.context}' from Version {settings.BUILD_VERSION} to {AppConfiguration.BuildModelVersion}");
                 settings.BUILD_VERSION = AppConfiguration.BuildModelVersion;
                 updated = true;
             }

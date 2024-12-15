@@ -13,7 +13,6 @@ namespace PilotsDeck.Plugin.Render
     {
         public static readonly float NON_SQUARE_SCALE = 1.5f;
         public static readonly PointF DEFAULT_SIZE = new(72.0f, 72.0f);
-        public static readonly float FONT_POINT_SCALE = 120.0f / 144.0f;
         public Graphics Render { get; protected set; }
         protected Bitmap RenderImage { get; set; }
         public PointF DeviceCanvas { get; protected set; }
@@ -31,6 +30,8 @@ namespace PilotsDeck.Plugin.Render
             DefaultScalar = ToolsRender.GetScale(DeviceCanvas, DEFAULT_SIZE);
 
             RenderImage = new Bitmap((int)DeviceCanvas.X, (int)DeviceCanvas.Y);
+            RenderImage.SetResolution(App.Configuration.RenderDpi, App.Configuration.RenderDpi);
+
             Render = Graphics.FromImage(RenderImage);
             Render.SmoothingMode = SmoothingMode.AntiAlias;
             Render.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -132,11 +133,11 @@ namespace PilotsDeck.Plugin.Render
             var scalar = ToolsRender.GetScale(DeviceCanvas, new PointF(rect.Width, rect.Height));
 
             if (scale == ScaleType.DEFAULT_KEEP || scale == ScaleType.DEFAULT_STRETCH)
-                return new Font(font.Name, font.Size * DefaultScalar.Y * FONT_POINT_SCALE, font.Style, GraphicsUnit.Point);
+                return new Font(font.Name, font.Size * DefaultScalar.Y, font.Style, GraphicsUnit.Point);
             else if (scale == ScaleType.DEVICE_KEEP || scale == ScaleType.DEVICE_STRETCH)
-                return new Font(font.Name, font.Size * scalar.Y * FONT_POINT_SCALE, font.Style, GraphicsUnit.Point);
+                return new Font(font.Name, font.Size * scalar.Y, font.Style, GraphicsUnit.Point);
             else
-                return new Font(font.Name, font.Size * FONT_POINT_SCALE, font.Style, GraphicsUnit.Point);
+                return new Font(font.Name, font.Size, font.Style, GraphicsUnit.Point);
         }
 
         protected float Scale(float value, RectangleF rect, ScaleType scale)
@@ -235,7 +236,7 @@ namespace PilotsDeck.Plugin.Render
                 pos = new PointF(100, 51.0f);
 
             SolidBrush drawBrush = new(drawColor);
-            Render.DrawString(title, Scale(drawFont, new(0,0,200,100), ScaleType.NONE), drawBrush, pos, ToolsRender.DefaultStringFormat);
+            Render.DrawString(title, Scale(drawFont, new(0, 0, 200, 100), ScaleType.NONE), drawBrush, pos, ToolsRender.DefaultStringFormat);
             drawBrush.Dispose();
         }
 
