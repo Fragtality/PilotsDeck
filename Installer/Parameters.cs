@@ -37,7 +37,7 @@ namespace Installer
         public static readonly string sdRegFolder = "Folder";
         public static readonly string sdRegInstallDir = "installDir";
         public static readonly string sdVersion = "6.5.0";
-        public static readonly string sdVersionRecommended = "6.8.0";
+        public static readonly string sdVersionRecommended = "6.8.1";
         public static readonly string sdProfilePattern = "*.streamDeckProfile";
         public static readonly string sdBinary = "StreamDeck";
         public static readonly string sdBinaryExe = "StreamDeck.exe";

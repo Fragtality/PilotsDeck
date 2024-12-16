@@ -17,7 +17,7 @@ namespace PilotsDeck.Simulator
         public bool IsLoading { get { return !IsReadySession && SimConnectManager.IsConnected && SimConnectManager.IsReceiveRunning; } }
         public bool IsReadyProcess { get { return SimConnectManager.IsReceiveRunning && SimConnectManager.IsConnected; } }
         public bool IsReadyCommand { get { return IsReadyProcess && !IsPaused; } }
-        public bool IsReadySession { get { return SimConnectManager.IsSessionReady && IsReadyProcess && !string.IsNullOrWhiteSpace(AircraftString); } }              
+        public bool IsReadySession { get { return SimConnectManager.IsSessionReady && IsReadyProcess; } }              
         public bool IsPaused { get { return SimConnectManager.IsPaused; } }
         public string AircraftString { get { return SimConnectManager.AircraftString; } }
         public static SimConnectManager SimConnectManager { get; protected set; }
@@ -52,7 +52,7 @@ namespace PilotsDeck.Simulator
                     }
 
                     if (SimConnectManager.IsSimConnected)
-                        SimConnectManager.MobiModule?.CheckConnection(SimConnectManager.IsSessionReady);
+                        SimConnectManager.MobiModule?.CheckConnection(SimConnectManager.CheckCameraReadyLegacy());
                     if (!SimConnectManager.IsSessionReady && LastReadyState)
                         SimConnectManager.MobiModule?.ClearLvarList();
 
@@ -65,7 +65,7 @@ namespace PilotsDeck.Simulator
                         SimState = SimulatorState.LOADING;
                     }
 
-                    if (SimState == SimulatorState.LOADING && IsReadySession)
+                    if (SimState == SimulatorState.LOADING && IsReadySession && SimConnectManager.CheckCameraReadyLegacy())
                     {
                         Logger.Debug("Changed to SESSION");
                         SimState = SimulatorState.SESSION;
@@ -74,6 +74,7 @@ namespace PilotsDeck.Simulator
                     if (SimState == SimulatorState.SESSION && IsLoading)
                     {
                         Logger.Debug("Changed to LOADING");
+                        SimConnectManager.ResetReadyState();
                         SimState = SimulatorState.LOADING;
                     }
 

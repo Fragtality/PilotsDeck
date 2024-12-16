@@ -35,7 +35,7 @@ namespace PilotsDeck.Simulator.MSFS
         public bool QuitReceived { get; protected set; } = false;
         public bool IsPaused { get; protected set; } = true;
         public bool IsSessionReady { get { return IsCameraValid && !string.IsNullOrWhiteSpace(AircraftString); } }
-        protected bool IsCameraValid { get { return CameraState != 0 && CameraState != 32 && CameraState != 36 && (CameraState < 11 || CameraState >= 29 || CameraState == 26); } }
+        protected bool IsCameraValid { get { return CheckCameraReady(); } }
         protected uint CameraState = 11;
         public string AircraftString { get; protected set; } = "";
 
@@ -168,7 +168,7 @@ namespace PilotsDeck.Simulator.MSFS
 
         public void CheckAircraftString()
         {
-            if (string.IsNullOrEmpty(AircraftString) && IsCameraValid)
+            if (string.IsNullOrEmpty(AircraftString) && CheckCameraReadyLegacy())
             {
                 try
                 {
@@ -183,6 +183,27 @@ namespace PilotsDeck.Simulator.MSFS
                     SimConnectMutex.TryReleaseMutex();
                 }
             }
+        }
+
+        public void ResetReadyState()
+        {
+            CameraState = 11;
+            AircraftString = "";
+        }
+
+        protected bool IsNotCamStateUnpaused(float value)
+        {
+            return CameraState != value || (CameraState == value && IsPaused && !string.IsNullOrWhiteSpace(AircraftString));
+        }
+
+        public bool CheckCameraReady()
+        {
+            return CameraState != 0 && IsNotCamStateUnpaused(32) && CameraState != 36 && (CameraState < 11 || CameraState >= 29 || CameraState == 26);
+        }
+
+        public bool CheckCameraReadyLegacy()
+        {
+            return (CameraState != 0 && CameraState < 11) || (CameraState == 30 && !IsPaused && !string.IsNullOrWhiteSpace(AircraftString));
         }
 
         public void SimConnect_ReceiveMessage()
@@ -217,7 +238,7 @@ namespace PilotsDeck.Simulator.MSFS
 
         public void EvaluateInputEvents()
         {
-            if (IsSessionReady && !InputEvents.EventsEnumerated)
+            if (CheckCameraReadyLegacy() && !InputEvents.EventsEnumerated)
                 InputEvents.EnumerateInputEvents();
             else if (!IsSessionReady && InputEvents.EventsEnumerated)
                 InputEvents.RemoveAll();
