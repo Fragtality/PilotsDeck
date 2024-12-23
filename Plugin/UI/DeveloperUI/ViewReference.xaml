@@ -79,6 +79,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
 
@@ -88,28 +89,34 @@
                 <TextBlock Grid.Row="0" Grid.Column="1" Name="LabelMobi" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
                 
                 <Label Grid.Row="1" Grid.Column="0" FontWeight="DemiBold" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
-                    MSFS
+                    MSFS 2020
                 </Label>
-                <TextBlock Grid.Row="1" Grid.Column="1" Name="LabelMsfsAvar" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="2" Name="LabelMsfsKvar" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="1" Name="LabelMsfs2020Avar" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="2" Name="LabelMsfs2020Kvar" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
 
                 <Label Grid.Row="2" Grid.Column="0" FontWeight="DemiBold" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
-                    FSUIPC7
+                    MSFS 2024
                 </Label>
-                <TextBlock Grid.Row="2" Grid.Column="1" Name="LabelIpc7Controls" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="2" Name="LabelIpc7Offsets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="1" Name="LabelMsfs2024Avar" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="2" Name="LabelMsfs2024Kvar" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
 
                 <Label Grid.Row="3" Grid.Column="0" FontWeight="DemiBold" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
-                    FSUIPC6
+                    FSUIPC7
                 </Label>
-                <TextBlock Grid.Row="3" Grid.Column="1" Name="LabelIpc6Controls" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                <TextBlock Grid.Row="3" Grid.Column="2" Name="LabelIpc6Offsets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="1" Name="LabelIpc7Controls" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="2" Name="LabelIpc7Offsets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
 
                 <Label Grid.Row="4" Grid.Column="0" FontWeight="DemiBold" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                    FSUIPC6
+                </Label>
+                <TextBlock Grid.Row="4" Grid.Column="1" Name="LabelIpc6Controls" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="4" Grid.Column="2" Name="LabelIpc6Offsets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+
+                <Label Grid.Row="5" Grid.Column="0" FontWeight="DemiBold" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
                     X-Plane
                 </Label>
-                <TextBlock Grid.Row="4" Grid.Column="1" Name="LabelXplaneRef" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                <TextBlock Grid.Row="4" Grid.Column="2" Name="LabelXplaneCmdRef" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="5" Grid.Column="1" Name="LabelXplaneRef" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Grid.Row="5" Grid.Column="2" Name="LabelXplaneCmdRef" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
             </Grid>
         </GroupBox>
     </Grid>

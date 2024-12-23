@@ -44,8 +44,11 @@ namespace PilotsDeck.UI.DeveloperUI
 
 
 
-                UrlHelper(LabelMsfsAvar, "MSFS SDK - SimVars", "https://docs.flightsimulator.com/html/Programming_Tools/SimVars/Simulation_Variables.htm");
-                UrlHelper(LabelMsfsKvar, "MSFS SDK - SimEvents", "https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm");
+                UrlHelper(LabelMsfs2020Avar, "MSFS SDK - SimVars", "https://docs.flightsimulator.com/html/Programming_Tools/SimVars/Simulation_Variables.htm");
+                UrlHelper(LabelMsfs2020Kvar, "MSFS SDK - SimEvents", "https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm");
+
+                UrlHelper(LabelMsfs2024Avar, "MSFS SDK - SimVars", "https://docs.flightsimulator.com/msfs2024/html/6_Programming_APIs/SimVars/Simulation_Variables.htm");
+                UrlHelper(LabelMsfs2024Kvar, "MSFS SDK - SimEvents", "https://docs.flightsimulator.com/msfs2024/html/6_Programming_APIs/Key_Events/Key_Events.htm");
 
                 string path = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\FSUIPC7\";
                 if (Path.Exists(path))
