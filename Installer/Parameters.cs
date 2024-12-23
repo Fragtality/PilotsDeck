@@ -6,15 +6,12 @@ namespace Installer
 {
     public static class Parameters
     {
-        //public static readonly string pilotsDeckVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-
         public static readonly string sdPluginDir = @"\Elgato\StreamDeck\Plugins";
         public static readonly string pluginBinary = "PilotsDeck";
         public static readonly string pluginName = "com.extension.pilotsdeck.sdPlugin";
         public static readonly string unzipPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + sdPluginDir;
         public static readonly string pluginDir = unzipPath + "\\" + pluginName;
         public static readonly string fileName = "PilotsDeck-release.zip";
-        public static readonly string importBinary = "ImportProfiles.exe";
         public static readonly string pluginConfig = "PluginConfig.json";
         public static readonly string colorConfig = "ColorStore.json";
 
@@ -28,7 +25,7 @@ namespace Installer
         public static readonly int netMinor = 0;
         public static readonly int netPatch = 11;
         public static readonly string netVersion = $"{netMajor}.{netMinor}.{netPatch}";
-        public static readonly string netUrl = "https://download.visualstudio.microsoft.com/download/pr/53e9e41c-b362-4598-9985-45f989518016/53c5e1919ba2fe23273f2abaff65595b/dotnet-runtime-8.0.11-win-x64.exe";
+        public static readonly string netUrl = "https://download.visualstudio.microsoft.com/download/pr/27bcdd70-ce64-4049-ba24-2b14f9267729/d4a435e55182ce5424a7204c2cf2b3ea/windowsdesktop-runtime-8.0.11-win-x64.exe";
         public static readonly string netUrlFile = "windowsdesktop-runtime-8.0.11-win-x64.exe";
 
         public static readonly string sdRegPath = @"HKEY_CURRENT_USER\SOFTWARE\Elgato Systems GmbH\StreamDeck";
@@ -56,9 +53,9 @@ namespace Installer
         public static readonly string ipcRegValue = "DisplayVersion";
         public static readonly string ipcRegInstallDirValue = "InstallDir";
         public static readonly Regex ipcRegexVersion = new Regex(@"^v((\d+)\.(\d+)\.(\d+))$", RegexOptions.Compiled);
-        public static readonly string ipcVersion = "7.5.0";
+        public static readonly string ipcVersion = "7.5.1";
         public static readonly bool ipcOverwriteBeta = true;
-        public static readonly string ipcUrl = "https://fsuipc.simflight.com/beta/Install_FSUIPC7.zip";
+        public static readonly string ipcUrl = "https://www.fsuipc.com/download/Install_FSUIPC7.5.1.zip";
         public static readonly string ipcSetup = "Install_FSUIPC7";
         public static readonly string ipcUrlFile = $"{ipcSetup}.zip";
         public static readonly string ipcSetupFile = $"{ipcSetup}.exe";

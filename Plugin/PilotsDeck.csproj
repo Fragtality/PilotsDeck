@@ -12,7 +12,7 @@
     <ApplicationIcon>Plugin\Images\PluginIcon.ico</ApplicationIcon>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>x64</Platforms>
-    <Version>0.8.5</Version>
+    <Version>0.8.6</Version>
     <Title>PilotsDeck</Title>
     <Authors>Fragtality</Authors>
     <Description>Directly check &amp; control your FlightSim from the StreamDeck!</Description>
