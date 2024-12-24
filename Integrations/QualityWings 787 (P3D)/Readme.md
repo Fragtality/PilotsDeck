@@ -12,7 +12,7 @@ My Setup consists of a XL Deck as the "Main Deck" and a SD Deck with supplementa
 ![Example-MCP](../../img/QW_ExampleMCP.jpg)<br/><br/>
 
 # Installation
-- Update to at least PilotsDeck 0.8.0
+- Update to at least PilotsDeck 0.8.6
 - Make sure the QualityWings Fonts are available System-Wide (should be the Case). The Profiles / the Actions are configured to use these Fonts to add more "Style" :wink:
 - Install the ppp File via the Profile Manager - check the Plugin [Readme](https://github.com/Fragtality/PilotsDeck#15---installing-profile-packages-ppp-files) for Details. After Installation you find a Folder "QW 787 v0.2" on your Desktop with the additional Files for FSUIPC.
 - Place the Files from the FSUIPC6 Folder in your FSUIPC6 Addon-Folder (the Folder where your FSUIPC6.ini is located)
