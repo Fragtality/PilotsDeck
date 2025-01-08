@@ -56,8 +56,7 @@ namespace PilotsDeck.Simulator
                     if (!SimConnectManager.IsSessionReady && LastReadyState)
                         SimConnectManager.MobiModule?.ClearLvarList();
 
-                    if (SimConnectManager.IsSessionReady)
-                        SimConnectManager.EvaluateInputEvents();
+                    SimConnectManager.EvaluateInputEvents();
 
                     if (SimState == SimulatorState.RUNNING && SimConnectManager.IsSimConnected && SimConnectManager.IsReceiveRunning)
                     {

@@ -21,7 +21,6 @@ namespace PilotsDeck.Simulator.MSFS
     public partial class SimConnectManager
     {
         public static SimConnect SimConnect { get; set; } = null;
-        protected Thread SimConnectThread { get; set; } = null;
         public SimConnectInputEvents InputEvents { get; protected set; } = null;
         public MobiModule MobiModule { get; protected set; } = null;
 
@@ -31,7 +30,6 @@ namespace PilotsDeck.Simulator.MSFS
         public bool IsReceiveRunning { get; protected set; } = false;
         protected bool RunReceiveThread { get; set; } = false;
         public static Mutex SimConnectMutex { get; protected set; } = new();
-        protected bool ReceiveError { get; set; } = false;
         public bool QuitReceived { get; protected set; } = false;
         public bool IsPaused { get; protected set; } = true;
         public bool IsSessionReady { get { return IsCameraValid && !string.IsNullOrWhiteSpace(AircraftString); } }
@@ -85,7 +83,6 @@ namespace PilotsDeck.Simulator.MSFS
             }
             catch (Exception ex)
             {
-                SimConnectThread = null;
                 SimConnect = null;
                 IsSimConnectInitialized = false;
                 IsSimConnected = false;
@@ -114,7 +111,6 @@ namespace PilotsDeck.Simulator.MSFS
                     MobiModule?.Disconnect();
 
                 IsReceiveRunning = false;
-                ReceiveError = false;
 
                 if (SimConnect != null)
                 {
@@ -216,7 +212,6 @@ namespace PilotsDeck.Simulator.MSFS
             }
             catch (Exception ex)
             {
-                ReceiveError = true;
                 SimConnectMutex.TryReleaseMutex();
                 IsReceiveRunning = false;
 
