@@ -7,7 +7,8 @@ namespace PilotsDeck.Resources.Variables
         INTEGER,
         FLOAT,
         STRING,
-        BIT
+        BIT,
+        BYTEARRAY
     }
 
     public class OffsetParam
@@ -46,6 +47,9 @@ namespace PilotsDeck.Resources.Variables
                     case "b":
                         Type = OffsetType.BIT;
                         BitNum = 0;
+                        break;
+                    case "a":
+                        Type = OffsetType.BYTEARRAY;
                         break;
                     default:
                         Type = OffsetType.INTEGER;
