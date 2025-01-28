@@ -280,6 +280,20 @@ namespace PilotsDeck.Resources.Variables
                             return newValue;
                     }
                 }
+                else if (IsByteArray)
+                {
+                    if (newValue.StartsWith("0x"))
+                        return Convert.FromHexString(newValue[2..]);
+                    if (newValue.Length > 2 && newValue[0] == '[' && newValue[^1] == ']')
+                        return newValue.Trim('[', ']').Split(',').SelectMany(part =>
+                        {
+                            if (part.StartsWith("0x"))
+                                return Convert.FromHexString(part[2..]);
+                            return [byte.Parse(part)];
+                        }).ToArray();
+                    else
+                        return BitConverter.GetBytes(long.Parse(newValue));
+                }
                 else
                 {
                     switch (Size)
