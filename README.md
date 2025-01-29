@@ -296,7 +296,7 @@ Another great Source for L-Vars and (other Stuff) is [HubHop](https://hubhop.mob
 - `0x0D0C:2:b:1` - Read Bit *1* from the *2* Byte long Bitmask at Address *0D0C* (Nav Lights).
 - `0x5800:1024:a` - Read a *1024* byte array from Address *5800* (Reads the right CDU screen contents on PMDG aircraft)
 
-Before you use an Offset as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable. Use only 1 or 0 for Bit-Offsets.<br/>
+Before you use an Offset as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable. Use only 1 or 0 for Bit-Offsets. For byte array offsets, you can either specify the new value as a hex string prefixed with `0x` (e.g. `0xdeadbeef`) or a JSON-like array of hex strings (prefixed with `0x`) or decimal numbers (e.g. `[26,0x3f]`).<br/>
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
 
 *Background*:<br/>
