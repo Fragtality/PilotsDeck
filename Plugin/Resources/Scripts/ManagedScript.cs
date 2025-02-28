@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace PilotsDeck.Resources.Scripts
@@ -287,9 +288,17 @@ namespace PilotsDeck.Resources.Scripts
                 return SimWrite(name, numValue);
             else if (value is string)
                 return SimWrite(name, value as string);
+            else if (value is LuaTable)
+                return SimWrite(name, value as LuaTable);
             else
                 return SimWrite(name, value.ToString());
         }
+
+        protected virtual bool SimWrite(string name, LuaTable value)
+        {
+            return SimWrite(name, "[" + string.Join(",", value.ArrayList.Select(v => v.ToString())) + "]");
+        }
+
 
         protected virtual bool SimWrite(string name, double value)
         {

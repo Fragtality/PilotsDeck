@@ -2,6 +2,7 @@
 using PilotsDeck.Tools;
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace PilotsDeck.Resources.Variables
 {
@@ -14,6 +15,7 @@ namespace PilotsDeck.Resources.Variables
         public bool IsString { get { return OffsetParam.Type == OffsetType.STRING; } }
         public bool IsFloat { get { return OffsetParam.Type == OffsetType.FLOAT; } }
         public bool IsBit { get { return OffsetParam.Type == OffsetType.BIT; } }
+        public bool IsByteArray { get { return OffsetParam.Type == OffsetType.BYTEARRAY; } }
 
         public override string Value { get { return Read(); } }
         protected virtual string ValueLast { get; set; } = "";
@@ -96,6 +98,8 @@ namespace PilotsDeck.Resources.Variables
         {
             if (IsString)
                 return ReadOffsetString();
+            if (IsByteArray)
+                return $"[{string.Join(",", ReadByteArray().Select(b => Convert.ToString(b)))}]";
             else //should be float, int or bit
             {
                 var result = ReadNumber();
@@ -118,8 +122,23 @@ namespace PilotsDeck.Resources.Variables
         {
             if (IsString)
                 return ReadOffsetString();
+            if (IsByteArray)
+                return ReadByteArray();
             else //should be float, int or bit
                 return ReadNumber();
+        }
+
+        protected byte[] ReadByteArray()
+        {
+            try
+            {
+                return IpcOffset.GetValue<byte[]>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+                return Array.Empty<byte>();
+            }
         }
 
         protected string ReadOffsetString()
@@ -260,6 +279,20 @@ namespace PilotsDeck.Resources.Variables
                         default:
                             return newValue;
                     }
+                }
+                else if (IsByteArray)
+                {
+                    if (newValue.StartsWith("0x"))
+                        return Convert.FromHexString(newValue[2..]);
+                    if (newValue.Length > 2 && newValue[0] == '[' && newValue[^1] == ']')
+                        return newValue.Trim('[', ']').Split(',').SelectMany(part =>
+                        {
+                            if (part.StartsWith("0x"))
+                                return Convert.FromHexString(part[2..]);
+                            return [byte.Parse(part)];
+                        }).ToArray();
+                    else
+                        return BitConverter.GetBytes(long.Parse(newValue));
                 }
                 else
                 {
