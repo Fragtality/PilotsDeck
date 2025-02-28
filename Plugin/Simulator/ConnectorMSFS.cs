@@ -1,4 +1,12 @@
-﻿using PilotsDeck.Resources.Variables;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using CFIT.SimConnectLib;
+using CFIT.SimConnectLib.Definitions;
+using CFIT.SimConnectLib.Modules.MobiFlight;
+using CFIT.SimConnectLib.SimResources;
+using CFIT.SimConnectLib.SimVars;
+using PilotsDeck.Resources;
+using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.Tools;
 using System;
@@ -10,318 +18,205 @@ namespace PilotsDeck.Simulator
 {
     public class ConnectorMSFS : ISimConnector
     {
+        public static VariableManager VariableManager { get { return App.PluginController.VariableManager; } }
         public SimulatorType Type { get; } = SimulatorType.MSFS;
         public SimulatorState SimState { get; protected set; } = SimulatorState.RUNNING;
         public bool IsPrimary { get; set; } = true;
         public bool IsRunning { get { return ISimConnector.GetRunning(Type); } }
-        public bool IsLoading { get { return !IsReadySession && SimConnectManager.IsConnected && SimConnectManager.IsReceiveRunning; } }
-        public bool IsReadyProcess { get { return SimConnectManager.IsReceiveRunning && SimConnectManager.IsConnected; } }
-        public bool IsReadyCommand { get { return IsReadyProcess && !IsPaused; } }
-        public bool IsReadySession { get { return SimConnectManager.IsSessionReady && IsReadyProcess; } }              
-        public bool IsPaused { get { return SimConnectManager.IsPaused; } }
-        public string AircraftString { get { return SimConnectManager.AircraftString; } }
-        public static SimConnectManager SimConnectManager { get; protected set; }
-        public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; private set; } = [];
-        protected bool LastReadyState = false;
+        public bool IsLoading { get { return !IsReadySession && SimConnect.IsReceiveRunning; } }
+        public bool IsReadyProcess { get { return SimConnect.IsReceiveRunning && SimConnect.IsSimConnected; } }
+        public bool IsReadyCommand { get { return IsReadyProcess && SimConnect.IsSimRunning; } }
+        public bool IsReadySession { get { return SimConnect.IsSessionRunning; } }
+        public bool IsPaused { get { return SimConnect.IsPaused; } }
+        public string AircraftString { get { return SimConnect.AircraftString; } }
+        public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; } = [];
+        protected Dictionary<string, ISimResourceSubscription> EventSubscriptions { get; } = [];
+        protected SimConnectManager SimConnect { get; }
+        protected MobiModule MobiModule { get; }
+        protected SubManager SubManager { get; }
+        protected bool FirstRun { get; set; } = true;
+        protected bool FirstConnect { get; set; } = true;
+        protected DateTime LastConnectionAttempt { get; set; } = DateTime.MinValue;
 
         public ConnectorMSFS()
         {
-            SimConnectManager = new(OnReceiveEvent);
+            SimConnect = new(App.Configuration, typeof(IdAllocator), App.CancellationToken);
+            MobiModule = (MobiModule)SimConnect.AddModule(typeof(MobiModule), App.Configuration);
+            SubManager = new SubManager(SimConnect, MobiModule);
         }
 
         public async void Run()
         {
             try
             {
-                while (IsRunning && !App.CancellationToken.IsCancellationRequested)
+                SimConnect.WindowHook.HelperWindow = App.HelperWindow;
+                SimConnect.WindowHook.WindowHandle = App.WindowHandle;
+                SimConnect.CreateMessageHook();
+                LastConnectionAttempt = DateTime.Now;
+                while (IsRunning && !App.CancellationToken.IsCancellationRequested && !SimConnect.QuitReceived)
                 {
-                    if (!SimConnectManager.IsSimConnected && SimState != SimulatorState.STOPPED)
+                    if (!SimConnect.IsSimConnected)
                     {
-                        if (!SimConnectManager.Connect())
+                        var diff = DateTime.Now - LastConnectionAttempt;
+                        if (SimConnect.IsSimConnectInitialized && !SimConnect.IsReceiveRunning && diff >= TimeSpan.FromMilliseconds(App.Configuration.StaleTimeout))
                         {
-                            await Task.Delay(App.Configuration.MsfsRetryDelay, App.CancellationToken);
+                            if (!FirstConnect)
+                            {
+                                LastConnectionAttempt = DateTime.Now;
+                                Logger.Warning($"Stale Connection detected - force reconnect");
+                                SimConnect.Disconnect();
+                                continue;
+                            }
+                            else if (FirstConnect && diff >= TimeSpan.FromMilliseconds(App.Configuration.StaleTimeout * 6))
+                            {
+                                LastConnectionAttempt = DateTime.Now;
+                                Logger.Warning($"Stale initial Connection detected - force reconnect");
+                                SimConnect.Disconnect();
+                                continue;
+                            }
+                        }
+                        else if (!SimConnect.Connect())
+                        {
+                            LastConnectionAttempt = DateTime.Now;
+                            Logger.Information($"SimConnect not connected - Retry in {App.Configuration.RetryDelay / 1000}s");
+                            await Task.Delay(App.Configuration.RetryDelay, App.CancellationToken);
                             continue;
+                        }
+                        else if (FirstRun)
+                        {
+                            FirstRun = false;
+                            await Task.Delay(500, App.CancellationToken);
                         }
                     }
 
-                    if (!SimConnectManager.IsReceiveRunning && SimConnectManager.IsSimConnected)
+                    if (SimConnect.IsReceiveRunning && !SimConnect.IsSimConnected && FirstConnect)
+                        SimConnect.CheckResources();
+
+                    if (SimConnect.IsSimConnected && FirstConnect)
                     {
-                        SimConnectManager.Disconnect();
-                        await Task.Delay(App.Configuration.MsfsRetryDelay / 2, App.CancellationToken);
+                        Logger.Debug($"First Connection established.");
+                        FirstConnect = false;
+                    }
+
+                    if (!SimConnect.IsReceiveRunning && SimConnect.IsSimConnected)
+                    {
+                        Logger.Warning($"Receive not running while Connection established! Reconnecting in {(App.Configuration.RetryDelay / 2) / 1000}s");
+                        SimConnect.Disconnect();
+                        FirstRun = true;
+                        await Task.Delay(App.Configuration.RetryDelay / 2, App.CancellationToken);
                         continue;
                     }
 
-                    if (SimConnectManager.IsSimConnected)
-                        SimConnectManager.MobiModule?.CheckConnection(SimConnectManager.CheckCameraReadyLegacy());
-                    if (!SimConnectManager.IsSessionReady && LastReadyState)
-                        SimConnectManager.MobiModule?.ClearLvarList();
+                    SimConnect.CheckState();
 
-                    SimConnectManager.EvaluateInputEvents();
-
-                    if (SimState == SimulatorState.RUNNING && SimConnectManager.IsSimConnected && SimConnectManager.IsReceiveRunning)
+                    if (SimState == SimulatorState.RUNNING && SimConnect.IsReceiveRunning)
                     {
                         Logger.Debug("Changed to LOADING");
                         SimState = SimulatorState.LOADING;
                     }
 
-                    if (SimState == SimulatorState.LOADING && IsReadySession && SimConnectManager.CheckCameraReadyLegacy())
+                    if (SimState == SimulatorState.LOADING && SimConnect.IsSessionStarted)
                     {
                         Logger.Debug("Changed to SESSION");
                         SimState = SimulatorState.SESSION;
                     }
 
-                    if (SimState == SimulatorState.SESSION && IsLoading)
+                    if (SimState == SimulatorState.SESSION && SimConnect.IsSessionStopped)
                     {
                         Logger.Debug("Changed to LOADING");
-                        SimConnectManager.ResetReadyState();
                         SimState = SimulatorState.LOADING;
                     }
 
-                    if (SimState >= SimulatorState.LOADING && (!IsRunning || SimConnectManager.QuitReceived))
+                    if (SimState >= SimulatorState.LOADING && (!IsRunning || SimConnect.QuitReceived))
                     {
                         Logger.Debug("Changed to STOPPED");
                         SimState = SimulatorState.STOPPED;
                     }
 
-                    SimConnectManager.CheckAircraftString();
-                    LastReadyState = SimConnectManager.IsSessionReady;
-
                     await Task.Delay(App.Configuration.MsfsStateCheckInterval, App.CancellationToken);
                 }
+
+                if (IsRunning && !SimConnect.QuitReceived)
+                    SimConnect.Disconnect();
+
+                SimConnect.WindowHook.ClearHook();
             }
             catch (Exception ex)
             {
                 if (ex is not OperationCanceledException && ex is not TaskCanceledException)
                     Logger.LogException(ex);
             }
-            Logger.Information($"ConnectorMSFS Task ended");
+            Logger.Information($"ConnectorMSFS Task ended (simRunning: {IsRunning} | quitReceived: {SimConnect?.QuitReceived} | cancelled: {App.CancellationToken.IsCancellationRequested})");
         }
 
         public void Stop()
         {
-            foreach (var variable in App.PluginController.VariableManager.VariableList.Where(v => v.IsValueMSFS()))
+            foreach (var variable in VariableManager.VariableList.Where(v => v.IsValueMSFS()))
                 variable.IsSubscribed = false;
-        }
-
-        public static bool IsCommandMSFS(SimCommandType? type)
-        {
-            return type == SimCommandType.AVAR || type == SimCommandType.BVAR || type == SimCommandType.HVAR || type == SimCommandType.KVAR || type == SimCommandType.LVAR
-                || type == SimCommandType.CALCULATOR;
-        }
-
-        public bool CanRunCommand(SimCommand command)
-        {
-            return IsCommandMSFS(command?.Type);
         }
 
         public void Process()
         {
-            try
-            {
-                if (SimConnectManager.IsSessionReady && !IsPaused)
-                    SimConnectManager.InputEvents.RequestInputEventValues();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            int count = SimConnect.CheckResources();
+            if (count > 0)
+                Logger.Verbose($"Resources updated on Process: {count}");
         }
 
-        public async Task<bool> RunCommand(SimCommand command)
+        public void SubscribeVariable(ManagedVariable managedVariable)
         {
-            if (!IsReadyCommand)
-                return false;
-
-            bool result = false;
-
-            if (command.Type == SimCommandType.LVAR || command.Type == SimCommandType.AVAR)
-                result = await WriteSimVariable(command);
-            else if (command.Type == SimCommandType.KVAR)
-                result = await WriteEventVariable(command);
-            else if (command.Type == SimCommandType.BVAR)
-                result = await SendInputEvent(command);
-            else if (command.Type == SimCommandType.HVAR)
-                result = await WriteHtmlVariable(command);
-            else if (command.Type == SimCommandType.CALCULATOR)
-                result = await ExecuteCalculatorCode(command);
-
-            return result;
+            SubscribeVariables([managedVariable]);
         }
 
-        protected static async Task<bool> WriteSimVariable(SimCommand command)
+        public void SubscribeVariables(ManagedVariable[] managedVariables)
         {
-            Logger.Debug($"Running WriteSimVariable for Command ({command})");
-            int success = 0;
-            int i;
-            for (i = 0; i < command.Ticks; i++)
+            if (!IsReadyProcess)
+                return;
+
+            if (managedVariables == null || managedVariables.Length == 0)
+                return;
+
+            foreach (var variable in managedVariables)
             {
-                bool result = MobiModule.SetSimVar(command.Address, command.Value);
-                if (command.IsValueReset && command.ResetDelay > 0)
-                {
-                    await Task.Delay(command.ResetDelay, App.CancellationToken);
-                    if (MobiModule.SetSimVar(command.Address, command.ResetValue) && result)
-                        success++;
-                }
-                else if (result)
-                {
-                    success++;
-                    if (command.Ticks > 1)
-                        await Task.Delay(command.TickDelay, App.CancellationToken);
-                }
-            }
-
-            return success == command.Ticks;
-        }
-
-        protected static async Task<bool> WriteEventVariable(SimCommand command)
-        {
-            int success = 0;
-            int i;
-            for (i = 0; i < command.Ticks; i++)
-            {
-                bool result = await ToolsMSFS.WriteKvar(command);
-                if (result)
-                {
-                    success++;
-                    if (command.Ticks > 1)
-                        await Task.Delay(command.TickDelay, App.CancellationToken);
-                }
-            }
-
-            return success == command.Ticks;
-        }
-
-
-        protected static async Task<bool> SendInputEvent(SimCommand command)
-        {
-            if (command.DoNotRequest && TypeMatching.rxBvarCmd.IsMatch(command.Address))
-                return await WriteInputEventCommand(command);
-            else if (!command.DoNotRequest && TypeMatching.rxBvarValue.IsMatch(command.Address))
-                return await WriteInputEventVariable(command);
-            else
-                return false;
-        }
-
-        protected static async Task<bool> WriteInputEventVariable(SimCommand command)
-        {
-            Logger.Verbose($"Running SendInputEvent for (Value) Command ({command})");
-            if (string.IsNullOrWhiteSpace(command.Value))
-                command.Value = "1";
-
-            int success = 0;
-            int i;
-            for (i = 0; i < command.Ticks; i++)
-            {
-                bool result = SimConnectManager.InputEvents.SendInputEvent(command.Address, command.NumValue);
-                if (command.IsValueReset && command.ResetDelay > 0)
-                {
-                    await Task.Delay(command.ResetDelay, App.CancellationToken);
-                    if (SimConnectManager.InputEvents.SendInputEvent(command.Address, Conversion.ToDouble(command.ResetValue, 1)) && result)
-                        success++;
-                }
-                else if (result)
-                {
-                    success++;
-                    if (command.Ticks > 1)
-                        await Task.Delay(command.TickDelay, App.CancellationToken);
-                }
-            }
-
-            return success == command.Ticks;
-        }
-
-        protected static async Task<bool> WriteInputEventCommand(SimCommand command)
-        {
-            Logger.Verbose($"Running SendInputEvent for (Non-Value) Command ({command})");
-
-            int success = 0;
-            int i;
-            for (i = 0; i < command.Ticks; i++)
-            {
-                bool result = await WriteBvar(command);
-                if (result)
-                {
-                    success++;
-                    if (command.Ticks > 1)
-                        await Task.Delay(command.TickDelay, App.CancellationToken);
-                }
-            }
-
-            return success == command.Ticks;
-        }
-
-        protected static async Task<bool> WriteBvar(SimCommand command)
-        {
-            bool result = false;
-            string[] bVars = command.Address.Split(':');
-
-            for (int idx = 0; idx < bVars.Length; idx++)
-            {
-                if (bVars[idx] == "B")
+                if (!variable.IsValueMSFS())
                     continue;
 
-                if (!bVars[idx].StartsWith("B:"))
-                    bVars[idx] = "B:" + bVars[idx];
-
-                if (idx + 1 < bVars.Length && Conversion.IsNumber(bVars[idx + 1], out double numValue))
-                {
-                    result = SimConnectManager.InputEvents.SendInputEvent(bVars[idx], numValue);
-                    idx++;
-                }
-                else
-                    result = SimConnectManager.InputEvents.SendInputEvent(bVars[idx], 1);
-
-                if (!result)
-                    break;
-
-                if (command.CommandDelay > 0)
-                    await Task.Delay(command.CommandDelay, App.CancellationToken);
+                Logger.Verbose($"Subscribe Variable '{variable.Address}' of Type '{variable.Type}'");
+                SubManager.Subscribe(variable);
             }
-
-            return result;
         }
 
-        protected static async Task<bool> WriteHtmlVariable(SimCommand command)
+        public void UnsubscribeVariable(ManagedVariable managedVariable)
         {
-            Logger.Verbose($"Running WriteHtmlVariable for Command ({command})");
-            bool result;
-
-            int success = 0;
-            for (int n = 0; n < command.Ticks; n++)
-            {
-                if (await ToolsMSFS.WriteHvar(command))
-                {
-                    success++;
-                    if (command.Ticks > 1)
-                        await Task.Delay(command.TickDelay, App.CancellationToken);
-                }
-            }
-            result = success == command.Ticks;
-
-            return result;
+            UnsubscribeVariables([managedVariable]);
         }
 
-        protected static async Task<bool> ExecuteCalculatorCode(SimCommand command)
+        public void UnsubscribeVariables(ManagedVariable[] managedVariables)
         {
-            Logger.Debug($"Running ExecuteCalculatorCode for Command ({command})");
-            bool result;
+            if (!IsReadyProcess)
+                return;
 
-            int success = 0;
-            for (int n = 0; n < command.Ticks; n++)
+            if (managedVariables == null || managedVariables.Length == 0)
+                return;
+
+            foreach (var variable in managedVariables)
             {
-                if (MobiModule.ExecuteCode(command.Address))
-                {
-                    success++;
-                    if (command.Ticks > 1)
-                        await Task.Delay(command.TickDelay, App.CancellationToken);
-                }
-            }
-            result = success == command.Ticks;
+                if (!variable.IsValueMSFS() || !SubManager.TryGet(variable, out SubMapping mapping))
+                    continue;
 
-            return result;
+                Logger.Verbose($"Unsubscribe Variable '{variable.Address}'");
+                SubManager.Unsubscribe(mapping);
+            }
         }
 
-        public void OnReceiveEvent(string evtName, object evtData)
+        public void RemoveUnusedResources(bool force)
+        {
+            if (force)
+                SubManager.Clear();
+
+            SimConnect.ClearUnusedRessources(force);
+        }
+
+        protected void OnReceiveEvent(string evtName, object evtData)
         {
             try
             {
@@ -369,7 +264,16 @@ namespace PilotsDeck.Simulator
                 }
 
                 if (doSub)
-                    SimConnectManager.SubscribeSimConnectEvent(evtName);
+                {
+                    var sub = SimConnect.EventManager.Subscribe(evtName);
+                    if (sub == null)
+                        return false;
+
+                    sub.OnReceived += (sub, value) =>
+                    {
+                        OnReceiveEvent(sub.Name, value);
+                    };
+                }
 
                 return true;
             }
@@ -377,44 +281,6 @@ namespace PilotsDeck.Simulator
             {
                 Logger.LogException(ex);
                 return false;
-            }
-        }
-
-        public void SubscribeVariable(ManagedVariable managedVariable)
-        {
-            if (!IsReadyProcess)
-                return;
-
-            if (managedVariable == null)
-                return;
-
-            bool inputEvent = managedVariable is VariableInputEvent;
-            if (inputEvent && IsReadySession)
-                SimConnectManager.InputEvents.SubscribeInputEvent(managedVariable.Address, managedVariable as VariableInputEvent);
-            else if (!inputEvent && managedVariable.IsValueMSFS())
-                SimConnectManager.MobiModule.SubscribeAddress(managedVariable.Address, managedVariable);
-        }        
-
-        public void SubscribeVariables(ManagedVariable[] managedVariables)
-        {
-            if (!IsReadyProcess)
-                return;
-
-            if (managedVariables == null || managedVariables.Length == 0)
-                return;
-
-            bool inputEvent;
-            foreach (var variable in managedVariables)
-            {
-                if (!variable.IsValueMSFS())
-                    continue;
-
-                Logger.Verbose($"Subscribe Variable '{variable.Address}' of Type '{variable.Type}'");
-                inputEvent = variable is VariableInputEvent;
-                if (inputEvent && IsReadySession)
-                    SimConnectManager.InputEvents.SubscribeInputEvent(variable.Address, variable as VariableInputEvent);
-                else if (!inputEvent && variable.IsValueMSFS())
-                    SimConnectManager.MobiModule.SubscribeAddress(variable.Address, variable);
             }
         }
 
@@ -448,8 +314,14 @@ namespace PilotsDeck.Simulator
                 else
                     Logger.Warning($"The Event '{evtName}' is not subscribed!");
 
-                if (doSub)
-                    SimConnectManager.UnsubscribeSimConnectEvent(evtName);
+                if (doSub && EventSubscriptions.TryGetValue(evtName, out var sub))
+                {
+                    if (sub == null)
+                        return false;
+
+                    sub.Unsubscribe();
+                    EventSubscriptions.Remove(evtName);
+                }
 
                 return true;
             }
@@ -460,54 +332,242 @@ namespace PilotsDeck.Simulator
             }
         }
 
-        public void UnsubscribeVariable(ManagedVariable managedVariable)
+        public static bool IsCommandMSFS(SimCommandType? type)
         {
-            if (!IsReadyProcess)
-                return;
-
-            if (managedVariable == null)
-                return;
-
-            if (managedVariable is VariableInputEvent)
-                SimConnectManager.InputEvents.UnsubscribeInputEvent(managedVariable.Address);
-            else if (managedVariable.IsValueMSFS())
-                SimConnectManager.MobiModule.UnsubscribeAddress(managedVariable.Address);
+            return type == SimCommandType.AVAR || type == SimCommandType.BVAR || type == SimCommandType.HVAR || type == SimCommandType.KVAR || type == SimCommandType.LVAR
+                || type == SimCommandType.CALCULATOR;
         }
 
-        public void UnsubscribeVariables(ManagedVariable[] managedVariables)
+        public bool CanRunCommand(SimCommand command)
         {
-            if (!IsReadyProcess)
-                return;
+            return IsCommandMSFS(command?.Type);
+        }
 
-            if (managedVariables == null || managedVariables.Length == 0)
-                return;
+        public async Task<bool> RunCommand(SimCommand command)
+        {
+            if (!IsReadyCommand)
+                return false;
 
-            foreach (var variable in managedVariables)
+            bool result = false;
+
+            if (command.Type == SimCommandType.LVAR || command.Type == SimCommandType.AVAR)
+                result = await WriteSimVariable(command);
+            else if (command.Type == SimCommandType.KVAR)
+                result = await WriteEventVariable(command);
+            else if (command.Type == SimCommandType.BVAR)
+                result = await SendInputEvent(command);
+            else if (command.Type == SimCommandType.HVAR)
+                result = await WriteHtmlVariable(command);
+            else if (command.Type == SimCommandType.CALCULATOR)
+                result = await ExecuteCalculatorCode(command);
+
+            return result;
+        }
+
+        protected async Task<bool> WriteSimVariable(SimCommand command)
+        {
+            Logger.Debug($"Running WriteSimVariable for Command ({command})");
+            if (!VariableManager.TryGet(command.Address, out var variable))
             {
-                if (variable is VariableInputEvent)
-                    SimConnectManager.InputEvents.UnsubscribeInputEvent(variable.Address);
-                else if (variable.IsValueMSFS())
-                    SimConnectManager.MobiModule.UnsubscribeAddress(variable.Address);
+                Logger.Debug($"Need to Register Variable for Command");
+                variable = VariableManager.RegisterVariable(command.Address);
+                if (variable != null)
+                    SubscribeVariable(variable);
+                else
+                {
+                    Logger.Warning($"Could not register Variable!");
+                    return false;
+                }
             }
+
+            if (!SubManager.TryGet(variable, out var sub) || sub?.Subscription is not SimVarSubscription varSub)
+            {
+                Logger.Warning($"No SubMapping found for Variable '{variable}'");
+                return false;
+            }
+
+            if (!varSub.Resource.IsRegistered)
+            {
+                Logger.Debug($"Need to Register SimVar for Command");
+                varSub.Resource.Register();
+            }
+
+            int success = 0;
+            int i;
+            for (i = 0; i < command.Ticks; i++)
+            {
+                bool result = varSub.Resource.WriteValue(command.NumValue);
+                if (command.IsValueReset && command.ResetDelay > 0)
+                {
+                    await Task.Delay(command.ResetDelay, App.CancellationToken);
+                    if (varSub.Resource.WriteValue(command.ResetNumValue) && result)
+                        success++;
+                }
+                else if (result)
+                {
+                    success++;
+                    if (command.Ticks > 1)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
+                }
+            }
+
+            return success == command.Ticks;
         }
 
-        public void RemoveUnusedVariables(bool force)
+        protected async Task<bool> WriteEventVariable(SimCommand command)
         {
-            if (!IsReadyProcess)
-                return;
+            int success = 0;
+            int i;
+            for (i = 0; i < command.Ticks; i++)
+            {
+                bool result = await ToolsMSFS.WriteKvar(command, SimConnect.EventManager);
+                if (result)
+                {
+                    success++;
+                    if (command.Ticks > 1)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
+                }
+            }
 
-            SimConnectManager.MobiModule.MobiVariables.ReorderRegistrations(force);
+            return success == command.Ticks;
+        }
+
+        protected async Task<bool> SendInputEvent(SimCommand command)
+        {
+            if (!command.DoNotRequest && TypeMatching.rxBvarValue.IsMatch(command.Address))
+                return await WriteInputEventVariable(command);
+            else if (command.DoNotRequest && TypeMatching.rxBvarCmd.IsMatch(command.Address))
+                return await WriteInputEventCommand(command);            
+            else
+                return false;
+        }
+
+        protected async Task<bool> WriteInputEventVariable(SimCommand command)
+        {
+            Logger.Verbose($"Running SendInputEvent for (Value) Command ({command})");
+            if (string.IsNullOrWhiteSpace(command.Value))
+                command.Value = "1";
+            if (string.IsNullOrWhiteSpace(command.ResetValue))
+                command.ResetValue = "1";
+
+            int success = 0;
+            int i;
+            for (i = 0; i < command.Ticks; i++)
+            {
+                bool result = SimConnect.InputManager.SendEvent(command.Address.Name, command.NumValue);
+                if (command.IsValueReset && command.ResetDelay > 0)
+                {
+                    await Task.Delay(command.ResetDelay, App.CancellationToken);
+                    if (SimConnect.InputManager.SendEvent(command.Address.Name, command.ResetNumValue) && result)
+                        success++;
+                }
+                else if (result)
+                {
+                    success++;
+                    if (command.Ticks > 1)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
+                }
+            }
+
+            return success == command.Ticks;
+        }
+
+        protected async Task<bool> WriteInputEventCommand(SimCommand command)
+        {
+            Logger.Verbose($"Running SendInputEvent for (Non-Value) Command ({command})");
+
+            int success = 0;
+            int i;
+            for (i = 0; i < command.Ticks; i++)
+            {
+                bool result = await WriteInputEvents(command);
+                if (result)
+                {
+                    success++;
+                    if (command.Ticks > 1)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
+                }
+            }
+
+            return success == command.Ticks;
+        }
+
+        protected async Task<bool> WriteInputEvents(SimCommand command)
+        {
+            bool result = false;
+            string[] bVars = command.Address.Address.Split(':');
+
+            for (int idx = 0; idx < bVars.Length; idx++)
+            {
+                if (bVars[idx] == "B")
+                    continue;
+
+                if (idx + 1 < bVars.Length && Conversion.IsNumber(bVars[idx + 1], out double numValue))
+                {
+                    result = SimConnect.InputManager.SendEvent(bVars[idx], numValue);
+                    idx++;
+                }
+                else
+                    result = SimConnect.InputManager.SendEvent(bVars[idx], 1);
+
+                if (!result)
+                    break;
+
+                if (command.CommandDelay > 0)
+                    await Task.Delay(command.CommandDelay, App.CancellationToken);
+            }
+
+            return result;
+        }
+
+        protected async Task<bool> WriteHtmlVariable(SimCommand command)
+        {
+            Logger.Verbose($"Running WriteHtmlVariable for Command ({command})");
+            bool result;
+
+            int success = 0;
+            for (int n = 0; n < command.Ticks; n++)
+            {
+                if (await ToolsMSFS.WriteHvar(command, MobiModule))
+                {
+                    success++;
+                    if (command.Ticks > 1)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
+                }
+            }
+            result = success == command.Ticks;
+
+            return result;
+        }
+
+        protected async Task<bool> ExecuteCalculatorCode(SimCommand command)
+        {
+            Logger.Debug($"Running ExecuteCalculatorCode for Command ({command})");
+            bool result;
+
+            int success = 0;
+            for (int n = 0; n < command.Ticks; n++)
+            {
+                if (MobiModule.ExecuteCode(command.Address.Name))
+                {
+                    success++;
+                    if (command.Ticks > 1)
+                        await Task.Delay(command.TickDelay, App.CancellationToken);
+                }
+            }
+            result = success == command.Ticks;
+
+            return result;
         }
 
         private bool _disposed;
-
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
             {
                 if (disposing)
                 {
-                    SimConnectManager.Disconnect();
+                    SimConnect.Dispose();
                 }
                 _disposed = true;
             }

@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Resources.Images;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Resources.Images;
 using PilotsDeck.Simulator;
 using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.StreamDeck;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CFIT.AppLogger;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace ProfileManager.json
@@ -75,19 +76,19 @@ namespace ProfileManager.json
             {
                 ProfileManifest.PreconfiguredName = path;
                 ProfileManifest.IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected PreconfiguredName @ {ProfileManifest}");
+                Logger.Information($"Corrected PreconfiguredName @ {ProfileManifest}");
             }
             if (ProfilePath != path)
             {
                 ProfilePath = path;
                 IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected ProfilePath  @ {this}");
+                Logger.Information($"Corrected ProfilePath  @ {this}");
             }
             if (ProfileManifest.InstalledByPluginUUID != Parameters.PLUGIN_UUID)
             {
                 ProfileManifest.InstalledByPluginUUID = Parameters.PLUGIN_UUID;
                 ProfileManifest.IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected PluginUUID  @ {ProfileManifest}");
+                Logger.Information($"Corrected PluginUUID  @ {ProfileManifest}");
             }
         }
 
@@ -100,40 +101,40 @@ namespace ProfileManager.json
             {
                 DeckId = ProfileManifest.Device.Hash;
                 IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected DeckId @ {this}");
+                Logger.Information($"Corrected DeckId @ {this}");
             }
 
             if (!string.IsNullOrEmpty(ProfileManifest.Device.DeckName) && DeckName != ProfileManifest.Device.DeckName)
             {
                 DeckName = ProfileManifest.Device.DeckName;
                 IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected DeckName @ {this}");
+                Logger.Information($"Corrected DeckName @ {this}");
             }
 
             if (ProfileManifest.Device.DeckType != StreamDeckTypeEnum.UNKNOWN && DeckType != ProfileManifest.Device.DeckType)
             {
                 DeckType = ProfileManifest.Device.DeckType;
                 IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected DeckType @ {this}");
+                Logger.Information($"Corrected DeckType @ {this}");
             }
 
             if (ProfileName != ProfileManifest.ProfileName)
             {
                 ProfileName = ProfileManifest.ProfileName;
                 IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected ProfileName @ {this}");
+                Logger.Information($"Corrected ProfileName @ {this}");
             }
 
             if (ProfileUUID != ProfileManifest.ProfileDirectoryCleaned)
             {
                 ProfileUUID = ProfileManifest.ProfileDirectoryCleaned;
                 IsChanged = true;
-                Logger.Log(LogLevel.Information, $"Corrected ProfileUUID @ {this}");
+                Logger.Information($"Corrected ProfileUUID @ {this}");
             }
 
             SetCheckPath();
 
-            Logger.Log(LogLevel.Debug, $"Manifest was set @ {this}");
+            Logger.Debug($"Manifest was set @ {this}");
         }
     }
 }

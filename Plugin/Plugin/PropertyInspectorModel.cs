@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions;
 using PilotsDeck.Simulator;
 using System;
 using System.Collections.Generic;
@@ -81,15 +82,19 @@ namespace PilotsDeck.Plugin
             FontStyles.Add(FontStyle.Italic.ToString() + " + " + FontStyle.Strikeout.ToString(), FontStyle.Italic | FontStyle.Strikeout);
         }
 
-        protected void GenerateImageDictionary()
+        public static EnumerationOptions GetEnumerationOptions()
         {
-            var enumOptions = new EnumerationOptions()
+            return new EnumerationOptions()
             {
                 IgnoreInaccessible = true,
                 MatchCasing = MatchCasing.CaseInsensitive,
                 RecurseSubdirectories = false
             };
+        }
 
+        protected void GenerateImageDictionary()
+        {
+            var enumOptions = GetEnumerationOptions();
             var baseDirInfo = new DirectoryInfo(AppConfiguration.DirImages);
             AddImageDirectory("/", baseDirInfo.EnumerateFiles(AppConfiguration.ImageExtensionFilter, enumOptions).ToList());
 

@@ -1,5 +1,5 @@
-﻿using PilotsDeck.Resources.Variables;
-using PilotsDeck.Tools;
+﻿using CFIT.AppTools;
+using PilotsDeck.Resources.Variables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +59,7 @@ namespace PilotsDeck.Simulator
         public void SubscribeVariables(ManagedVariable[] managedVariables);
         public void UnsubscribeVariable(ManagedVariable managedVariable);
         public void UnsubscribeVariables(ManagedVariable[] managedVariables);
-        public void RemoveUnusedVariables(bool force);
+        public void RemoveUnusedResources(bool force);
         public bool SubscribeSimEvent(string evtName, string receiverID, EventCallback callbackFunction);
         public bool UnsubscribeSimEvent(string evtName, string receiverID);
         public bool CanRunCommand(SimCommand command);

@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Tools;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -48,7 +49,7 @@ namespace PilotsDeck.Resources.Images
 
             try
             {
-                file = Sys.InsertImageQualitySuffix(file, suffix);
+                file = Img.InsertImageQualitySuffix(file, suffix);
                 if (File.Exists(file))
                     result = file;
             }

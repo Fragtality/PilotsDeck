@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using CFIT.Installer.Tasks;
+using CFIT.Installer.UI.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
@@ -8,8 +11,9 @@ namespace ProfileManager
 {
     public class InstallerTaskPanel : StackPanel
     {
-        protected List<InstallerTaskView> TaskViewList { get; set; } = [];
+        protected List<TaskView> TaskViewList { get; set; } = [];
         protected DispatcherTimer TimerRefreshList { get; set; }
+        protected int LastCount { get; set; } = 0;
         protected Action ActionTasksCompleted { get; set; } = null;
         protected Action ActionTaskFailed { get; set; } = null;
 		public bool DontStopOnError { get; set; } = false;
@@ -27,7 +31,14 @@ namespace ProfileManager
         {
             ActionTasksCompleted = actionCompleted;
             ActionTaskFailed = actionFailed;
+            
+            TaskStore.Clear();
+            LastCount = 0;
+            
+            foreach (var view in TaskViewList)
+                view.Disable(true);
             TaskViewList.Clear();
+            
             Children.Clear();
             TimerRefreshList.Start();
         }
@@ -42,12 +53,17 @@ namespace ProfileManager
             {
                 if (!keepLast)
                 {
+                    TaskStore.Clear();
+                    LastCount = 0;
+
+                    foreach (var view in TaskViewList)
+                        view.Disable(true);
                     TaskViewList.Clear();
                     Children.Clear();
                 }
                 else
                 {
-                    var last = TaskViewList.LastOrDefault()?.InstallerTask;
+                    var last = TaskViewList.LastOrDefault()?.Model;
                     TaskViewList.Clear();
                     Children.Clear();
                     if (last != null)
@@ -60,29 +76,33 @@ namespace ProfileManager
         {
             try
             {
-                foreach (var control in TaskViewList)
-                    control.UpdateTaskView();
-
-                while (InstallerTask.TaskQueue.Count > 0)
+                if (TaskStore.Count > LastCount)
                 {
-                    if (InstallerTask.TaskQueue.TryDequeue(out var newTask))
-                        AddTaskView(newTask);
-                }
-
-                if (TaskViewList.Any(v => v.InstallerTask.State == TaskState.ERROR))
-                {
-					if (!DontStopOnError)
+                    var list = TaskStore.List;
+                    int index = LastCount;
+                    while (index < list.Count)
                     {
-						Logger.Log(LogLevel.Debug, $"Stopping Timers (Task with ERROR)");
-						TimerRefreshList.Stop();
-					}
+                        Logger.Debug($"Adding Task '{list[index].Title}'");
+                        AddTaskView(list[index]);
+                        index++;
+                    }
+                }
+                LastCount = TaskStore.Count;
+
+                if (TaskViewList.Any(v => v.Model.State == TaskState.ERROR))
+                {
+                    if (!DontStopOnError)
+                    {
+                        Logger.Debug($"Stopping Timers (Task with ERROR)");
+                        TimerRefreshList.Stop();
+                    }
 
                     ActionTaskFailed?.Invoke();
                 }
 
-                if (TaskViewList.All(v => v.InstallerTask.State == TaskState.COMPLETED))
+                if (TaskViewList.All(v => v.Model.State == TaskState.COMPLETED))
                 {
-                    Logger.Log(LogLevel.Debug, $"Stopping Timers (Tasks COMPLETED)");
+                    Logger.Debug($"Stopping Timers (Tasks COMPLETED)");
                     TimerRefreshList.Stop();
 
                     ActionTasksCompleted?.Invoke();
@@ -94,9 +114,10 @@ namespace ProfileManager
             }
         }
 
-        protected void AddTaskView(InstallerTask task)
+        protected void AddTaskView(TaskModel task)
         {
-            InstallerTaskView component = new(task);
+            TaskView component = new(task, false);
+            component.SetMinWidth(384);
             Children.Add(component);
             TaskViewList.Add(component);
         }

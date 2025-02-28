@@ -1,15 +1,13 @@
-﻿using H.NotifyIcon;
-using Microsoft.FlightSimulator.SimConnect;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using H.NotifyIcon;
 using PilotsDeck.Actions.Advanced;
 using PilotsDeck.Plugin;
 using PilotsDeck.Simulator;
-using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.Tools;
-using PilotsDeck.UI;
+using PilotsDeck.UI.ActionDesignerUI;
 using PilotsDeck.UI.DeveloperUI;
-using PilotsDeck.UI.ViewModels;
-using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -73,8 +71,19 @@ namespace PilotsDeck
                     Debugger.Launch();
                 }
 #endif
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length == 3 && args[1] == "--writeConfig")
+                {
+                    Console.WriteLine($"Writing Default Config to {args[2]} ...");
+                    AppConfiguration.SaveConfiguration(new AppConfiguration(), Path.Join(args[2], AppConfiguration.ConfigFile));
+                    Environment.Exit(0);
+                }
+
                 InitStartupLog();
-                Logger.Information($"Plugin started. Checking Version ...");
+                Logger.Information($"CFIT.AppLogger Version: {CFIT.AppLogger.LibVersion.Version}");
+                Logger.Information($"CFIT.AppTools Version: {CFIT.AppTools.LibVersion.Version}");
+                Logger.Information($"CFIT.SimConnectManager Version: {CFIT.SimConnectLib.LibVersion.Version}");
+                Logger.Information($"Plugin started. Checking Version (current {VersionTools.GetEntryAssemblyVersion(3)}) ...");
                 await CheckVersion();
 
                 Logger.Information($"Version checked. Loading Configuration ...");
@@ -83,10 +92,10 @@ namespace PilotsDeck
                 ColorStore.Load();
 
                 Logger.Information($"Configuration loaded. Loading Tray Icon ...");
-                InitSystray();                
+                InitSystray();
 
                 Logger.Information($"Tray Icon loaded. Parsing Command Line ...");
-                if (!ParseCommandLine())
+                if (!ParseCommandLine(args))
                     return;
 
                 Logger.Information($"Command Line parsed. Creating Main Window Hook ...");
@@ -99,9 +108,10 @@ namespace PilotsDeck
                     await Task.Delay(250);
 
                 Logger.Information($"StreamDeck Software connected. Starting Application Log ...");
-                Logger.CreateLogger();
+                Logger.CreateAppLoggerRotated(Configuration);
 
                 Logger.Information($"---------------------------------------------------------------------------");
+                Logger.Information($"Plugin startup completed: {VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()}");
                 Logger.Information($"Starting Plugin Controller Thread ...");
                 task = new(PluginController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
                 task.Start();
@@ -129,37 +139,7 @@ namespace PilotsDeck
         {
             var result = DefWindowProc(hwnd, msg, wParam, lParam).ToInt32();
 
-            if (msg == (int)AppConfiguration.WM_PILOTSDECK_SIMCONNECT)
-            {
-                try
-                {
-                    Logger.Verbose($"Received WM_PILOTSDECK_SIMCONNECT");
-                    ConnectorMSFS.SimConnectManager.SimConnect_ReceiveMessage();
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
-                handled = true;
-            }
-            else if (msg == (int)AppConfiguration.WM_PILOTSDECK_REQ_SIMCONNECT)
-            {
-                try
-                {
-                    Logger.Information($"Open SimConnect ...");
-                    SimConnectManager.SimConnect = new SimConnect(AppConfiguration.SC_CLIENT_NAME, WindowHandle, AppConfiguration.WM_PILOTSDECK_SIMCONNECT, null, 0);
-                    Logger.Verbose($"SimConnect Object created");
-                }
-                catch (Exception ex)
-                {
-                    if (ex is not COMException)
-                        Logger.LogException(ex);
-                    else
-                        Logger.Information($"Error while opening SimConnect - Retry in {App.Configuration.MsfsRetryDelay / 1000}s");
-                }
-                handled = true;
-            }
-            else if (msg == (int)AppConfiguration.WM_PILOTSDECK_REQ_DESIGNER && !DesignerQueue.IsEmpty)
+            if (msg == (int)AppConfiguration.WM_PILOTSDECK_REQ_DESIGNER && !DesignerQueue.IsEmpty)
             {
                 try
                 {
@@ -198,12 +178,12 @@ namespace PilotsDeck
             DoShutdown();
         }
 
-        private static bool _isShutDown = false;
+        public static bool IsAppShutDown { get; private set; } = false;
         public static void DoShutdown(bool shutdownApp = true)
         {
-            if (_isShutDown)
+            if (IsAppShutDown)
                 return;
-            _isShutDown = true;
+            IsAppShutDown = true;
 
             Logger.Information("Signal Shutdown ...");
             ColorStore.Save();
@@ -228,13 +208,7 @@ namespace PilotsDeck
 
         private static void InitStartupLog()
         {
-            if (File.Exists("log/startup.log"))
-                File.Delete("log/startup.log");
-
-            LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
-                        .WriteTo.File("log/startup.log", outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] [{SourceContext}] {Message} {NewLine}")
-                        .MinimumLevel.Verbose();
-            Log.Logger = loggerConfiguration.CreateLogger();
+            Logger.CreateAppLoggerSimple("log/startup.log", LogLevel.Verbose);
         }
 
         private void InitMainWindow()
@@ -265,7 +239,7 @@ namespace PilotsDeck
         protected void InitSystray()
         {
             NotifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
-            NotifyIcon.Icon = UpdateDetected ? Sys.GetIcon("PluginIconUpdate.ico") : Sys.GetIcon("PluginIcon.ico");
+            NotifyIcon.Icon = UpdateDetected ? Img.GetIcon("PluginIconUpdate.ico") : Img.GetIcon("PluginIcon.ico");
             NotifyIcon.ForceCreate(false);
             DeveloperView = new DeveloperView(NotifyIcon.DataContext as NotifyIconViewModel);
         }
@@ -307,10 +281,9 @@ namespace PilotsDeck
                 Directory.Delete("installer/", true);
         }
 
-        private static bool ParseCommandLine()
+        private static bool ParseCommandLine(string[] args)
         {
             bool result = true;
-            string[] args = Environment.GetCommandLineArgs();
             if (args.Length == 9)
             {
                 for (int i = 1; i < args.Length - 1; i++)
@@ -372,6 +345,7 @@ namespace PilotsDeck
                 {
                     UpdateDetected = true;
                     UpdateVersion = repoVersion.ToString(3);
+                    Logger.Information($"New Version detected: {UpdateVersion}");
                 }
             }
             catch (Exception ex)

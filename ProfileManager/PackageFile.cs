@@ -1,4 +1,6 @@
-﻿using ProfileManager.json;
+﻿using CFIT.AppLogger;
+using CFIT.Installer.Tasks;
+using ProfileManager.json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +9,13 @@ using System.Text;
 
 namespace ProfileManager
 {
+    public enum PackageClickResponse
+    {
+        NotClicked = 0,
+        Clicked = 1,
+        Ignored = 2,
+    }
+
     public class PackageFile(string filePath)
     {
         public class PackagedProfile(string filename, string profilename)
@@ -16,6 +25,8 @@ namespace ProfileManager
             public bool HasOldProfile { get; set; } = false;
             public string InstallPath { get { return @$"{Parameters.PLUGIN_PROFILE_PATH}\{FileName}"; } }
             public bool IsInstalled { get; set; } = false;
+            public PackageClickResponse ClickResponse { get; set; } = PackageClickResponse.NotClicked;
+            public bool IsLinkDisabled { get; set; } = false;
         }
 
         public string FullPath { get; protected set; } = filePath;
@@ -47,8 +58,8 @@ namespace ProfileManager
 
         public bool CheckFile()
         {
-            Logger.Log(LogLevel.Debug, $"Setting File to '{FullPath}'");
-            var task = InstallerTask.AddTask("Check File", $"Query basic File Information for '{FullPath}'");
+            Logger.Debug($"Setting File to '{FullPath}'");
+            var task = TaskStore.Add("Check File", $"Query basic File Information for '{FullPath}'");
 
             try
             {
@@ -78,7 +89,7 @@ namespace ProfileManager
                     return false;
                 }
                 else
-                    Logger.Log(LogLevel.Debug, $"Filesize is {fileInfo.Length}");
+                    Logger.Debug($"Filesize is {fileInfo.Length}");
 
                 task.Message = "Check File Access";
                 using var stream = File.Open(FullPath, FileMode.Open);
@@ -88,25 +99,25 @@ namespace ProfileManager
                     return false;
                 }
 
-                task.MessageLog("File checks done.", LogLevel.Information);
+                task.Message = "File checks done.";
                 task.State = TaskState.COMPLETED;
                 return true;
             }
             catch (Exception ex)
             {
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
                 return false;
             }
         }
 
         public bool LoadPackageInfo()
         {
-            Logger.Log(LogLevel.Debug, $"Loading Package Info ...");
-            var task = InstallerTask.AddTask("Load Package Information", "Open ZIP Archive");
+            Logger.Debug($"Loading Package Info ...");
+            var task = TaskStore.Add("Load Package Information", "Open ZIP Archive");
 
             try
             {
-                Logger.Log(LogLevel.Debug, $"Opening Archive ...");
+                Logger.Debug($"Opening Archive ...");
                 ArchiveStream = new(FullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096);
                 Archive = new(ArchiveStream, ZipArchiveMode.Read, true);
                 if (Archive == null)
@@ -123,7 +134,7 @@ namespace ProfileManager
 
 
                 task.Message = $"Get {Parameters.PACKAGE_JSON_FILE} from Archive";
-                Logger.Log(LogLevel.Debug, task.Message);
+                Logger.Debug(task.Message);
                 var zipEntry = GetZipEntry(Parameters.PACKAGE_JSON_FILE);
                 if (zipEntry == null)
                 {
@@ -133,7 +144,7 @@ namespace ProfileManager
                 }
 
                 task.Message = $"Read {Parameters.PACKAGE_JSON_FILE} Content";
-                Logger.Log(LogLevel.Debug, task.Message);
+                Logger.Debug(task.Message);
                 string packageStr = ReadStringFromZip(zipEntry);
                 if (!string.IsNullOrWhiteSpace(packageStr))
                     Manifest = PackageManifest.LoadManifest(packageStr);
@@ -145,7 +156,7 @@ namespace ProfileManager
                 }
 
                 task.Message = "Check Plugin Version";
-                Logger.Log(LogLevel.Debug, task.Message);
+                Logger.Debug(task.Message);
                 if (!Tools.CheckVersion(Parameters.PLUGIN_VERSION, Tools.VersionCompare.GREATER_EQUAL, VersionPlugin, out bool compareable) || !compareable)
                 {
                     Dispose();
@@ -159,10 +170,10 @@ namespace ProfileManager
                     IsCompatible = true;
 
                 task.Message = "Count Package Files";
-                Logger.Log(LogLevel.Debug, task.Message);
+                Logger.Debug(task.Message);
                 foreach (ZipArchiveEntry entry in Archive.Entries)
                 {
-                    Logger.Log(LogLevel.Debug, entry.FullName);
+                    Logger.Debug(entry.FullName);
 
                     if (IsProfilePath(entry.FullName))
                     {
@@ -182,7 +193,7 @@ namespace ProfileManager
                     else if (entry.FullName != Parameters.PACKAGE_JSON_FILE && !Path.EndsInDirectorySeparator(entry.FullName))
                         FilesUnknown.Add(entry.FullName);
                 }
-                Logger.Log(LogLevel.Debug, $"-> {CountProfiles} Profiles | {CountImages} Images | {CountScripts} Scripts");
+                Logger.Debug($"-> {CountProfiles} Profiles | {CountImages} Images | {CountScripts} Scripts");
 
                 if (CountValidTotal == 0)
                 {
@@ -193,24 +204,24 @@ namespace ProfileManager
 
 
                 if (CountProfiles == 0)
-                    Logger.Log(LogLevel.Debug, "Image or Script only Package detected");
+                    Logger.Debug("Image or Script only Package detected");
 
-                task.MessageLog("Package loaded.", LogLevel.Information);
+                task.Message = "Package loaded.";
                 task.State = TaskState.COMPLETED;
                 return true;
             }
             catch (Exception ex)
             {
                 Dispose();
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
                 return false;
             }
         }
 
-        protected string ReadProfileManifestFromZip(InstallerTask task, ZipArchiveEntry archiveEntry)
+        protected string ReadProfileManifestFromZip(TaskModel task, ZipArchiveEntry archiveEntry)
         {
             task.Message = $"Open {archiveEntry.FullName} Content";
-            Logger.Log(LogLevel.Debug, task.Message);
+            Logger.Debug(task.Message);
             string profilename = null;
             using var tempStream = archiveEntry.Open();
             if (tempStream == null)
@@ -267,17 +278,18 @@ namespace ProfileManager
         {
             try
             {
-                Logger.Log(LogLevel.Debug, $"Install Package Files ...");
+                Logger.Debug($"Install Package Files ...");
 
-                var task = InstallerTask.AddTask("Install Package Files", $"Extract Archive to Work-Directory: ({ProfileWorkPath})");                          
+                var task = TaskStore.Add("Install Package Files", $"Extract Archive to Work-Directory: ({ProfileWorkPath})");              
+                task.DisplayCompleted = false;
 
                 if (Directory.Exists(ProfileWorkPath))
                 {
-                    Logger.Log(LogLevel.Debug, $"Clean up work Folder (pre)");
+                    Logger.Debug($"Clean up work Folder (pre)");
                     Directory.Delete(ProfileWorkPath, true);
                 }
                 
-                Logger.Log(LogLevel.Debug, $"Extract Archive to work dir");
+                Logger.Debug($"Extract Archive to work dir");
                 Archive.ExtractToDirectory(ProfileWorkPath, true);
 
                 if (CountProfiles > 0)
@@ -292,28 +304,28 @@ namespace ProfileManager
                 if (!KeepPackageContents && Directory.Exists(ProfileWorkPath))
                 {
                     task.Message = "Cleanup Work-Directory";
-                    Logger.Log(LogLevel.Debug, $"Clean up work Folder (post)");
+                    Logger.Debug($"Clean up work Folder (post)");
                     Directory.Delete(ProfileWorkPath, true);
                 }
                 else
-                    Logger.Log(LogLevel.Debug, $"Cleanup (post) skipped (keep {KeepPackageContents})");
+                    Logger.Debug($"Cleanup (post) skipped (keep {KeepPackageContents})");
 
                 Dispose();
-                task.MessageLog("Package Files placed into Plugin-Directory.", LogLevel.Information);
-                task.State = TaskState.COMPLETED;
+                task.SetSuccess("Package Files placed into Plugin-Directory.");
+                task.IsCompleted = true;
                 return true;
             }
             catch (Exception ex)
             {
                 Dispose();
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
                 return false;
             }
         }
 
         protected void CopyValidFolderFiles(string folder, string extension, int recurseDepth = 0)
         {
-            InstallerTask.CurrentTask.MessageLog($"Copying Files for Folder '{folder}'");
+            TaskStore.CurrentTask.Message = $"Copying Files for Folder '{folder}'";
 
 
             EnumerationOptions enumOptions = recurseDepth > 0 ? new() { RecurseSubdirectories = true, MaxRecursionDepth = recurseDepth } : new();
@@ -324,7 +336,7 @@ namespace ProfileManager
                 dest = GetFileDestinationPath(entry);
                 if (!Directory.Exists(Path.GetDirectoryName(dest)))
                 {
-                    Logger.Log(LogLevel.Warning, $"Destination Path for '{dest}' does not exist!");
+                    Logger.Warning($"Destination Path for '{dest}' does not exist!");
                     Directory.CreateDirectory(Path.GetDirectoryName(dest));
                 }    
                 File.Copy(entry, dest, true);
@@ -334,7 +346,7 @@ namespace ProfileManager
         protected void CopyExtraFiles()
         {
             string folder = Parameters.PACKAGE_PATH_EXTRAS;
-            InstallerTask.CurrentTask.MessageLog($"Copying Files for Folder '{folder}' to Desktop");
+            TaskStore.CurrentTask.Message = $"Copying Files for Folder '{folder}' to Desktop";
 
 
             EnumerationOptions enumOptions = new() { RecurseSubdirectories = true, MaxRecursionDepth = 5 };
@@ -345,7 +357,7 @@ namespace ProfileManager
                 dest = ChangeFileDestinationPath(entry, @$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\{FileName}");
                 if (!Directory.Exists(Path.GetDirectoryName(dest)))
                 {
-                    Logger.Log(LogLevel.Debug, $"Destination Path for '{dest}' does not exist!");
+                    Logger.Debug($"Destination Path for '{dest}' does not exist!");
                     Directory.CreateDirectory(Path.GetDirectoryName(dest));
                 }
                 File.Copy(entry, dest, true);
@@ -398,7 +410,7 @@ namespace ProfileManager
             if (IsDisposed)
                 return;
 
-            Logger.Log(LogLevel.Debug, "Dispose");
+            Logger.Debug("Dispose");
             Archive?.Dispose();
             Archive = null;
             ArchiveStream?.Dispose();

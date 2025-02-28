@@ -1,10 +1,11 @@
-﻿using PilotsDeck.Plugin.Render;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources;
 using PilotsDeck.Resources.Images;
 using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System;
 using System.Drawing;
 using System.Text.Json.Nodes;

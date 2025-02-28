@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -23,18 +24,24 @@ namespace ProfileManager
 
             Directory.SetCurrentDirectory(Parameters.PLUGIN_PATH);
 
-            Logger.CreateLogger();
-            Logger.Log(LogLevel.Information, $"---------------------------------------------------------------------------");
-            Logger.Log(LogLevel.Information, $"Starting Profile Manager ...");
+            Logger.CreateAppLoggerRotated(Config.Instance);
+            Logger.Information($"---------------------------------------------------------------------------");
+            Logger.Information($"Starting Profile Manager ...");
 
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
 
+            Logger.Information($"Parsing Command Line ...");
             ParseCommandLine();
         }
 
         public void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs args)
         {
             Logger.LogException(args.ExceptionObject as Exception);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
         }
 
         private static void ParseCommandLine()
@@ -44,7 +51,7 @@ namespace ProfileManager
                 string[] args = Environment.GetCommandLineArgs();
                 for (int i = 1; i < args.Length; i++)
                 {
-                    Logger.Log(LogLevel.Debug, $"CommandLine args[{i}]: {args[i]}");
+                    Logger.Debug($"CommandLine args[{i}]: {args[i]}");
 
                     if (args[i].StartsWith('-') && i + 1 < args.Length)
                         CommandLineArgs.Add(args[i].Replace("-", ""), args[i + 1]);

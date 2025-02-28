@@ -1,4 +1,5 @@
-﻿using ProfileManager.json;
+﻿using CFIT.AppLogger;
+using ProfileManager.json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -127,7 +128,7 @@ namespace ProfileManager
         {
             if (!string.IsNullOrEmpty(InputAircraftNew.Text))
             {
-                Logger.Log(LogLevel.Debug, $"Adding Aircraft '{InputAircraftNew.Text}' to List @ {ViewModel.ProfileName}");
+                Logger.Debug($"Adding Aircraft '{InputAircraftNew.Text}' to List @ {ViewModel.ProfileName}");
                 ViewModel.AircraftAdd(InputAircraftNew.Text);
                 InputAircraftNew.Text = "";
                 UpdateView();
@@ -146,7 +147,7 @@ namespace ProfileManager
         {
             if (ListAircraft.SelectedItem != null)
             {
-                Logger.Log(LogLevel.Debug, $"Removing Aircraft '{ListAircraft.SelectedItem as string}' from List @ {ViewModel.ProfileName}");
+                Logger.Debug($"Removing Aircraft '{ListAircraft.SelectedItem as string}' from List @ {ViewModel.ProfileName}");
                 ViewModel.AircraftRemove(ListAircraft.SelectedItem as string);
                 UpdateView();
             }
@@ -156,7 +157,7 @@ namespace ProfileManager
         {
             if (!ViewModel.Manifest.IsPreparedForSwitching)
             {
-                Logger.Log(LogLevel.Debug, $"Enable Switching for Profile '{ViewModel.ProfileName}'");
+                Logger.Debug($"Enable Switching for Profile '{ViewModel.ProfileName}'");
                 CheckboxIsPreparedForSwitching.IsEnabled = false;
                 ViewModel.PrepareProfileForSwitching();
                 UpdateView();
@@ -212,7 +213,7 @@ namespace ProfileManager
             }
             else
             {
-                Logger.Log(LogLevel.Warning, "Empty or same Profile Name entered!");
+                Logger.Warning("Empty or same Profile Name entered!");
             }
 
             InputProfileName.Text = "";
@@ -252,7 +253,7 @@ namespace ProfileManager
         {
             if (SettingClipboard == null)
             {
-                Logger.Log(LogLevel.Debug, "Copy Settings to Clipboard");
+                Logger.Debug("Copy Settings to Clipboard");
 
                 SettingClipboard = new()
                 {
@@ -269,7 +270,7 @@ namespace ProfileManager
             }
             else
             {
-                Logger.Log(LogLevel.Debug, "Paste Settings from Clipboard");
+                Logger.Debug("Paste Settings from Clipboard");
 
                 if (!ViewModel.HasMapping)
                     ViewModel.PrepareProfileForSwitching();

@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.SettingsModel;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Variables;
 using System;
@@ -135,7 +136,7 @@ namespace PilotsDeck.Actions.Advanced.Elements
             if (Settings.UseGaugeDynamicSize && GaugeSizeVariable == null)
             {
                 Logger.Verbose($"Register Variable '{Settings.GaugeSizeAddress}'");
-                GaugeSizeVariable = App.PluginController.VariableManager.RegisterVariable(Settings.GaugeSizeAddress);
+                GaugeSizeVariable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(Settings.GaugeSizeAddress));
             }
         }
 

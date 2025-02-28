@@ -1,4 +1,5 @@
-﻿using PilotsDeck.StreamDeck.Messages;
+﻿using CFIT.AppLogger;
+using PilotsDeck.StreamDeck.Messages;
 using System;
 using System.Net.WebSockets;
 using System.Text;
@@ -40,7 +41,7 @@ namespace PilotsDeck.StreamDeck
         public async Task<string> GetMessageAsString()
         {
             var buffer = new byte[65536];
-            var segment = new ArraySegment<byte>(buffer, 0, buffer.Length); ;
+            var segment = new ArraySegment<byte>(buffer, 0, buffer.Length);
             var result = new WebSocketReceiveResult(0, WebSocketMessageType.Text, false);
             var totalCount = 0;
 

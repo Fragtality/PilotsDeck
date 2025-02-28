@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.SettingsModel;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Images;
 using System.Drawing;

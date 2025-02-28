@@ -1,4 +1,5 @@
-﻿using Neo.IronLua;
+﻿using CFIT.AppLogger;
+using Neo.IronLua;
 using PilotsDeck.Simulator;
 using System;
 using System.Collections.Generic;

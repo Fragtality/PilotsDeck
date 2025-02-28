@@ -1,9 +1,10 @@
-﻿using PilotsDeck.Actions;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Actions;
 using PilotsDeck.Plugin;
 using PilotsDeck.Resources;
 using PilotsDeck.Simulator;
 using PilotsDeck.Simulator.MSFS;
-using PilotsDeck.Tools;
 using System;
 using System.Linq;
 using System.Text;

@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using System.Collections.Generic;
@@ -47,19 +48,22 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             return (int)id;
         }
 
-        public virtual void RemoveCondition(int id)
+        public virtual bool RemoveCondition(int id)
         {
             if (!Settings.Conditions.ContainsKey(id))
-            {
-                return;
-            }
-            Settings.Conditions.Remove(id);
+                return false;
+
+            if (!Settings.Conditions.Remove(id))
+                return false;
+
             var oldDict = Settings.Conditions;
             Settings.Conditions = [];
             int n = 0;
             foreach (var condition in oldDict.Values)
                 Settings.Conditions.TryAdd(n++, condition);
             Logger.Debug($"Removed Condition for ID '{id}'");
+
+            return true;
         }
 
         public virtual void RegisterRessources()

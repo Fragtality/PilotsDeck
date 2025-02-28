@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Plugin.Render;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Plugin.Render;
 using PilotsDeck.StreamDeck.Messages;
 using System;
 

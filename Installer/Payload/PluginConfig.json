@@ -1,0 +1,83 @@
+{
+  "IdBase": 500,
+  "SizeVariables": 10000,
+  "SizeEvents": 10000,
+  "SizeSimStates": 100,
+  "SizeInputEvents": 10000,
+  "MobiSizeVariables": 10000,
+  "ConfigVersion": 12,
+  "LogDirectory": "log",
+  "LogFile": "PilotsDeck.log",
+  "LogLevel": 1,
+  "LogInterval": 3,
+  "LogCount": 2,
+  "LogTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] [{SourceContext}] {Message} {NewLine}",
+  "StreamDeckHost": "localhost",
+  "FontLocaleKey": "en",
+  "FontRegularName": {
+    "de": "Standard",
+    "en": "Regular"
+  },
+  "FontBoldName": {
+    "de": "Fett",
+    "en": "Bold"
+  },
+  "FontItalicName": {
+    "de": "Kursiv",
+    "en": "Italic"
+  },
+  "RenderDpi": 96,
+  "StringReplace": "%s",
+  "CleanInactiveCommands": false,
+  "DelayExit": 2000,
+  "DelayStreamDeckConnect": 750,
+  "IntervalDeckRefresh": 50,
+  "IntervalSimProcess": 50,
+  "IntervalSimMonitor": 5000,
+  "IntervalUnusedVariables": 60000,
+  "IntervalUnusedRessources": 60000,
+  "IntervalCheckScripts": 5000,
+  "IntervalCheckUiClose": 250,
+  "IntervalUiRefresh": 300,
+  "SimBinaries": {
+    "FSX": [
+      "fsx",
+      "fs9"
+    ],
+    "P3D": [
+      "Prepar3D"
+    ],
+    "MSFS": [
+      "FlightSimulator",
+      "FlightSimulator2024"
+    ],
+    "XP": [
+      "X-Plane"
+    ]
+  },
+  "BinaryFSUIPC7": "FSUIPC7",
+  "UseFsuipcForMSFS": true,
+  "FsuipcRetryDelay": 30000,
+  "FsuipcStateCheckInterval": 1000,
+  "FsuipcConnectDelay": 1000,
+  "FsuipcScriptFlagDelay": 10,
+  "XPlaneIP": "127.0.0.1",
+  "XPlanePort": 49000,
+  "XPlaneRemoteCheckTimeout": 1500,
+  "XPlaneRetryDelay": 15000,
+  "XPlaneStateCheckInterval": 1000,
+  "XPlaneTimeoutReceive": 3000,
+  "XPlaneUseLiveryRefOn12": false,
+  "MsfsRetryDelay": 30000,
+  "MsfsStaleTimeout": 15000,
+  "MsfsStateCheckInterval": 500,
+  "MobiRetryDelay": 10000,
+  "MobiVarsPerFrame": 100,
+  "MobiReorderTreshold": 10,
+  "CommandDelay": 25,
+  "InterActionDelay": 15,
+  "TickDelay": 15,
+  "VariableResetDelay": 100,
+  "VJoyMinimumPressed": 75,
+  "LongPressTime": 500
+}

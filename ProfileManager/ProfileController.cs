@@ -1,4 +1,8 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using CFIT.AppLogger;
+using CFIT.Installer.LibFunc;
+using CFIT.Installer.LibWorker;
+using CFIT.Installer.Tasks;
+using Microsoft.VisualBasic.FileIO;
 using ProfileManager.json;
 using System;
 using System.Collections.Generic;
@@ -28,13 +32,13 @@ namespace ProfileManager
         public int CountMappingsRemoved { get { return ProfileMappings.Where(m => m.DeleteFlag).Count() - CountMappingsUnmatched; } }
         public int CountManifestsRemoved { get { return ProfileManifests.Where(m => m.DeleteFlag).Count(); } }
 
-        public static bool AppsRunning { get { return Tools.GetProcessRunning(Parameters.SD_BINARY_NAME) || Tools.GetProcessRunning("PilotsDeck"); } }
+        public static bool AppsRunning { get { return FuncStreamDeck.IsDeckOrPluginRunning(); } }
 
         public void Load()
         {
             try
             {
-                Logger.Log(LogLevel.Debug, "Controller is loading Files ...");
+                Logger.Debug("Controller is loading Files ...");
 
                 IsLoaded = false;
                 HasError = false;
@@ -58,7 +62,7 @@ namespace ProfileManager
         {
             try
             {
-                Logger.Log(LogLevel.Debug, "Controller is loading Manifests ...");
+                Logger.Debug("Controller is loading Manifests ...");
 
                 IsLoaded = false;
                 HasError = false;
@@ -88,10 +92,10 @@ namespace ProfileManager
                 if (File.Exists(filename) && (new FileInfo(filename)).Length > 0)
                     ProfileManifests.Add(ProfileManifest.LoadManifest(filename, directory.Name, this));
                 else
-                    Logger.Log(LogLevel.Warning, $"Profile Manifest File '{directory.Name}\\{Parameters.SD_PROFILE_MANIFEST}' does not exist or is empty!");
+                    Logger.Warning($"Profile Manifest File '{directory.Name}\\{Parameters.SD_PROFILE_MANIFEST}' does not exist or is empty!");
             }
             if (log)
-                Logger.Log(LogLevel.Information, $"ProfileManifests loaded (Count {ProfileManifests.Count})");
+                Logger.Information($"ProfileManifests loaded (Count {ProfileManifests.Count})");
         }
 
         protected void LoadDeviceInfo(bool log = true)
@@ -103,12 +107,12 @@ namespace ProfileManager
             {
                 DeviceInfos = JsonSerializer.Deserialize<List<DeviceInfo>>(File.ReadAllText(path)); ;
                 if (log)
-                    Logger.Log(LogLevel.Information, $"DeviceInfos loaded (Count {DeviceInfos.Count})");
+                    Logger.Information($"DeviceInfos loaded (Count {DeviceInfos.Count})");
             }
             else
             {
                 MessageBox.Show($"The File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_DEVICEINFO}' does not exist or is empty!\r\nStart/Stop the StreamDeck Software and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Logger.Log(LogLevel.Error, $"The File '{Parameters.PLUGIN_MAPPING_DEVICEINFO}' does not exist or is empty! ({path})");
+                Logger.Error($"The File '{Parameters.PLUGIN_MAPPING_DEVICEINFO}' does not exist or is empty! ({path})");
                 HasError = true;
             }
         }
@@ -120,19 +124,19 @@ namespace ProfileManager
             string path = $@"{Parameters.PLUGIN_PROFILE_PATH}\{Parameters.PLUGIN_MAPPING_FILE}";
             if (!File.Exists(path))
             {
-                Logger.Log(LogLevel.Warning, $"Profile Mapping File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_FILE}' does not exist! ({path})");
+                Logger.Warning($"Profile Mapping File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_FILE}' does not exist! ({path})");
                 return;
             }
             if ((new FileInfo(path)).Length <= 0)
             {
-                Logger.Log(LogLevel.Warning, $"Profile Mapping File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_FILE}' is empty - delete");
+                Logger.Warning($"Profile Mapping File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_FILE}' is empty - delete");
                 File.Delete(path);
                 return;
             }
 
             ProfileMappings = JsonSerializer.Deserialize<List<ProfileMapping>>(File.ReadAllText(path));
             if (log)
-                Logger.Log(LogLevel.Information, $"ProfileMappings loaded (Count {ProfileMappings.Count})");
+                Logger.Information($"ProfileMappings loaded (Count {ProfileMappings.Count})");
         }
 
         protected void MapAndCheckData()
@@ -149,7 +153,7 @@ namespace ProfileManager
                 if (count == 1)
                     mapping.SetCheckManifest(query.FirstOrDefault());
                 else
-                    Logger.Log(LogLevel.Error, $"{count} Manifest returned for Mapping @ {mapping}");
+                    Logger.Error($"{count} Manifest returned for Mapping @ {mapping}");
             }
 
             var emptyManifests = ProfileMappings.Where(m => !m.HasManifest).ToList();
@@ -157,17 +161,17 @@ namespace ProfileManager
             if (CountMappingsUnmatched > 0)
             {
                 emptyManifests.ForEach(m => m.DeleteFlag = true);
-                Logger.Log(LogLevel.Warning, $"Found {CountMappingsUnmatched} ProfileMappings with empty Manifest - flagged for Deletion");
+                Logger.Warning($"Found {CountMappingsUnmatched} ProfileMappings with empty Manifest - flagged for Deletion");
             }
 
-            Logger.Log(LogLevel.Information, $"Profile Data mapped");
+            Logger.Information($"Profile Data mapped");
         }
 
         public void SaveChanges()
         {
             try
             {
-                Logger.Log(LogLevel.Debug, "Controller is saving Files ...");
+                Logger.Debug("Controller is saving Files ...");
 
                 if (ProfileMappings.Any(m => m.IsChanged || m.DeleteFlag))
                     SaveProfileMappings();
@@ -185,7 +189,7 @@ namespace ProfileManager
 
         protected void SaveProfileMappings()
         {
-            Logger.Log(LogLevel.Information, $"Deleting {ProfileMappings.Where(m => m.DeleteFlag).Count()} Mappings");
+            Logger.Information($"Deleting {ProfileMappings.Where(m => m.DeleteFlag).Count()} Mappings");
             ProfileMappings.RemoveAll(m => m.DeleteFlag);
 
             string path = $@"{Parameters.PLUGIN_PROFILE_PATH}\{Parameters.PLUGIN_MAPPING_FILE}";
@@ -193,7 +197,7 @@ namespace ProfileManager
 
             ProfileMappings.ForEach(m => m.IsChanged = false);
             CountMappingsUnmatched = 0;
-            Logger.Log(LogLevel.Information, $"ProfileMappings saved (Total {ProfileMappings.Count})");
+            Logger.Information($"ProfileMappings saved (Total {ProfileMappings.Count})");
         }
 
         protected void SaveProfileManifests()
@@ -204,7 +208,7 @@ namespace ProfileManager
             foreach (var manifest in deletedManifests)
             {
                 directory = $@"{Parameters.SD_PROFILE_PATH}\{manifest.ProfileDirectory}";
-                Logger.Log(LogLevel.Information, $"Deleting Manifest from Filesystem: {directory}");
+                Logger.Information($"Deleting Manifest from Filesystem: {directory}");
                 FileSystem.DeleteDirectory(directory, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
             }
             ProfileManifests.RemoveAll(m => m.DeleteFlag);
@@ -215,19 +219,19 @@ namespace ProfileManager
             foreach (var manifest in changedManifests)
             {
                 filename = $@"{Parameters.SD_PROFILE_PATH}\{manifest.ProfileDirectory}\{Parameters.SD_PROFILE_MANIFEST}";
-                Logger.Log(LogLevel.Information, $"Saving Manifest for {manifest.ProfileDirectory}");
+                Logger.Information($"Saving Manifest for {manifest.ProfileDirectory}");
                 ProfileManifest.WriteManifest(filename, manifest);
             }
 
             ProfileManifests.ForEach(m => m.IsChanged = false);
-            Logger.Log(LogLevel.Information, $"ProfileManifests saved (Changed {counterChanged} | Deleted {countDeleted})");
+            Logger.Information($"ProfileManifests saved (Changed {counterChanged} | Deleted {countDeleted})");
         }
 
         public void CleanProfileManifestFlag()
         {
             try
             {
-                Logger.Log(LogLevel.Debug, "Cleaning Plugin Flags from Profiles ...");
+                Logger.Debug("Cleaning Plugin Flags from Profiles ...");
 
                 IsLoaded = false;
                 HasError = false;
@@ -243,14 +247,14 @@ namespace ProfileManager
                 {
                     if (manifest.InstalledByPluginUUID == Parameters.PLUGIN_UUID)
                     {
-                        Logger.Log(LogLevel.Debug, $"Clear Flags from Profile '{manifest.ProfileName}' ({manifest.ProfileDirectory})");
+                        Logger.Debug($"Clear Flags from Profile '{manifest.ProfileName}' ({manifest.ProfileDirectory})");
 
                         manifest.InstalledByPluginUUID = null;
                         manifest.PreconfiguredName = null;
                         manifest.IsChanged = true;
 
                         var query = ProfileMappings.Where(m => m.ProfileUUID == manifest.ProfileDirectoryCleaned);
-                        Logger.Log(LogLevel.Debug, $"Removing {query.Count()} Mappings matching the ProfileUUID of '{manifest.ProfileName}'");
+                        Logger.Debug($"Removing {query.Count()} Mappings matching the ProfileUUID of '{manifest.ProfileName}'");
                         query.ToList().ForEach(m => m.DeleteFlag = true);
                     }
                 }
@@ -285,15 +289,30 @@ namespace ProfileManager
                 return Regex.IsMatch(value, @"^" + Regex.Escape(name) + @"\s[\w]+$");
         }
 
-        public async Task SwapUpdateManifest(List<string> updatedNames, InstallerTask task)
+        public async Task SwapUpdateManifest(List<string> updatedNames)
         {
-            Logger.Log(LogLevel.Debug, "Swapping updated Manifests ...");
+            Logger.Debug("Swapping updated Manifests ...");
             try
             {
-                if (Tools.IsStreamDeckRunning())
+                if (updatedNames.Count > 0 && FuncStreamDeck.IsDeckOrPluginRunning())
                 {
-                    await Tools.StopStreamDeckSoftware();
-                    await Tools.WaitOnTask(task, "Stop StreamDeck Software and wait {0}s", 3);
+                    var stopWorker = new WorkerStreamDeckStartStop<Config>(Config.Instance, DeckProcessOperation.KILL);
+                    await stopWorker.Run(System.Threading.CancellationToken.None);
+                }
+
+                var task = TaskStore.Add($"Swap Profiles");
+                if (updatedNames.Count == 0)
+                {
+                    task.Message = "Skip Profile Swap - no updated Profiles!";
+                    task.State = TaskState.COMPLETED;
+                    task.IsCompleted = true;
+                    return;
+                }
+                else
+                {
+                    task.Message = $"Replace {updatedNames.Count} old Profiles with updated Copies ...";
+                    task.DisplayCompleted = true;
+                    task.State = TaskState.WAITING;
                 }
 
                 LoadWithoutMapping();
@@ -310,7 +329,7 @@ namespace ProfileManager
                 int countErrors = 0;
                 foreach (var name in updatedNames)
                 {
-                    Logger.Log(LogLevel.Debug, $"Checking Name '{name}'");
+                    Logger.Debug($"Checking Name '{name}'");
                     var queryExistingWithName = ProfileManifests.Where(m => m.ProfileName == name);
                     int queryExistingWithNameCount = queryExistingWithName.Count();
                     var queryCopyWithName = ProfileManifests.Where(m => MatchManifestCopy(m.ProfileName, name));
@@ -318,13 +337,13 @@ namespace ProfileManager
                     var oldManifest = queryExistingWithName.FirstOrDefault();
                     var newManifest = queryCopyWithName.FirstOrDefault();
 
-                    Logger.Log(LogLevel.Debug, $"Counts - OLD {queryExistingWithNameCount} => NEW {queryCopyWithNameCount}");
+                    Logger.Debug($"Counts - OLD {queryExistingWithNameCount} => NEW {queryCopyWithNameCount}");
                     if (queryExistingWithNameCount == 1 && queryCopyWithNameCount == 1)
                     {
 
-                        Logger.Log(LogLevel.Debug, $"Match found - OLD {oldManifest.ProfileName} => NEW {newManifest.ProfileName}");
-                        Logger.Log(LogLevel.Debug, $"Match found - OLD {oldManifest.ProfileDirectoryCleaned} => NEW {newManifest.ProfileDirectoryCleaned}");
-                        task.Message = $"MATCH: Remove old Profile <{oldManifest.ProfileName}> and replace by new Profile <{newManifest.ProfileName}>";
+                        Logger.Debug($"Match found - OLD {oldManifest.ProfileName} => NEW {newManifest.ProfileName}");
+                        Logger.Debug($"Match found - OLD {oldManifest.ProfileDirectoryCleaned} => NEW {newManifest.ProfileDirectoryCleaned}");
+                        task.AddMessage(new TaskMessage($"{oldManifest.ProfileName} - Replace by new Profile '{newManifest.ProfileName}'", true, FontWeights.DemiBold), false, false);
 
                         newManifest.ProfileName = oldManifest.ProfileName;
                         oldManifest.DeleteFlag = true;
@@ -343,12 +362,12 @@ namespace ProfileManager
                     }
                     else if (queryCopyWithNameCount > 1)
                     {
-                        task.MessageLog($"ERROR: Found multiple Copies ({queryCopyWithNameCount}) for Profile <{oldManifest.ProfileName}>!");
+                        task.SetState($"ERROR: Found multiple Copies ({queryCopyWithNameCount}) for Profile <{oldManifest.ProfileName}>!");
                         countErrors++;
                     }
                     else
                     {
-                        task.MessageLog($"NO MATCH: Nothing to do for <{oldManifest.ProfileName}>");
+                        task.Message = $"{oldManifest.ProfileName} - Nothing to do for this Profile";
                     }
                 }
 
@@ -357,17 +376,17 @@ namespace ProfileManager
                 if (countChangedMapping > 0)
                     SaveProfileMappings();
 
-                task.MessageLog("Start StreamDeck Software");
-                Tools.StartStreamDeckSoftware();
-
                 if (countErrors > 0)
                     task.SetError($"\r\n=> Completed with {countErrors} Errors!");
                 else
                     task.SetState($"\r\n=> Completed! ({countChangedManifest} replaced)", TaskState.COMPLETED);
+
+                var startWorker = new WorkerStreamDeckStartStop<Config>(Config.Instance, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = MainWindow.AppTitle };
+                await startWorker.Run(System.Threading.CancellationToken.None);
             }
             catch (Exception ex)
             {
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
                 HasError = true;
                 MessageBox.Show($"Exception '{ex.GetType()}' while cleaning Plugin Flags from Profiles!\r\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Logger.LogException(ex);

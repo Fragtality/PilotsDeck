@@ -9,7 +9,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <StartupObject>ProfileManager.App</StartupObject>
     <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
-    <Version>0.8.7</Version>
+    <Version>$(VersionPrefix)</Version>
     <Authors>Fragtality</Authors>
     <Description>Install Profiles and manage Profile Switching for PilotsDeck</Description>
     <Copyright>Copyright © 2025</Copyright>
@@ -17,8 +17,13 @@
     <RepositoryUrl>https://github.com/Fragtality/PilotsDeck</RepositoryUrl>
     <PackageIcon>PluginIcon.png</PackageIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>x64</Platforms>
     <Title>Profile Manager</Title>
+	<WindowsSdkPackageVersion>10.0.17763.41</WindowsSdkPackageVersion>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy.MM.dd.HHmm"))</SourceRevisionId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -69,6 +74,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CFIT.Installer" Version="2025.57.23.2772" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="images\arrow-clockwise.png" />
     <Resource Include="images\arrow-down-square.png" />
     <Resource Include="images\arrow-left-right.png" />
@@ -86,12 +95,8 @@
     <Resource Include="images\x-square.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
-  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="pwsh -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)..\NuPreBuild.ps1&quot; $(SolutionDir) $(ProjectDir) &quot;ProfileManager&quot; &quot;CFIT.Installer&quot;" />
+  </Target>
 
 </Project>

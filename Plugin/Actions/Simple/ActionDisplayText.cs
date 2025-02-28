@@ -1,7 +1,8 @@
-﻿using PilotsDeck.Plugin.Render;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Images;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System;
 using System.Drawing;
 

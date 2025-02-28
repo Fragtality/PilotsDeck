@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using System;
 

@@ -1,5 +1,6 @@
-﻿using PilotsDeck.Resources.Images;
-using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Resources.Images;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

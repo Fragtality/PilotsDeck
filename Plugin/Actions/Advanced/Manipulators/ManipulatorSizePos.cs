@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Variables;
@@ -65,7 +66,7 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             if (SizePosVariable == null)
             {
                 Logger.Verbose($"Register Variable '{Settings.SizePosAddress}'");
-                SizePosVariable = App.PluginController.VariableManager.RegisterVariable(Settings.SizePosAddress);
+                SizePosVariable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(Settings.SizePosAddress));
             }
         }
 

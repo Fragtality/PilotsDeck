@@ -1,5 +1,5 @@
-﻿using PilotsDeck.Simulator;
-using PilotsDeck.Tools;
+﻿using CFIT.AppTools;
+using PilotsDeck.Simulator;
 using System;
 
 namespace PilotsDeck.Resources.Variables
@@ -14,10 +14,11 @@ namespace PilotsDeck.Resources.Variables
         AVAR = 12,
         BVAR = 13,
         LUAFUNC = 14,
-        INTERNAL = 15
+        INTERNAL = 15,
+        KVAR = 16
     }
 
-    public abstract class ManagedVariable(string address, SimValueType type) : IManagedRessource
+    public abstract class ManagedVariable(ManagedAddress address) : IManagedRessource
     {
         public virtual bool IsValueXP()
         {
@@ -46,7 +47,7 @@ namespace PilotsDeck.Resources.Variables
 
         public static bool IsValueMSFS(SimValueType? type)
         {
-            return type == SimValueType.CALCULATOR || type == SimValueType.LVAR || type == SimValueType.AVAR || type == SimValueType.BVAR;
+            return type == SimValueType.CALCULATOR || type == SimValueType.LVAR || type == SimValueType.AVAR || type == SimValueType.BVAR || type == SimValueType.KVAR;
         }
 
         public virtual bool IsValueFSUIPC()
@@ -66,12 +67,12 @@ namespace PilotsDeck.Resources.Variables
 
         public virtual bool IsValueInternal()
         {
-            return IsValueInternal(Type) || Address == VariableManager.ADDRESS_EMPTY;
+            return IsValueInternal(Type) || Address.IsEmpty;
         }
 
         public static bool IsValueInternal(ManagedVariable managedVariable)
         {
-            return IsValueInternal(managedVariable?.Type) || managedVariable?.Address == VariableManager.ADDRESS_EMPTY;
+            return IsValueInternal(managedVariable?.Type) || managedVariable?.Address?.IsEmpty == true;
         }
 
         public static bool IsValueInternal(SimValueType? type)
@@ -79,10 +80,10 @@ namespace PilotsDeck.Resources.Variables
             return type == SimValueType.NONE || type == SimValueType.INTERNAL || type == SimValueType.LUAFUNC;
         }
 
-        public virtual string UUID { get { return Address; } }
+        public virtual string UUID { get { return Address.ToString(); } }
         public virtual int Registrations { get; set; } = 1;
-        public virtual string Address { get; protected set; } = address;
-        public virtual SimValueType Type { get; set; } = type;
+        public virtual ManagedAddress Address { get; } = address;
+        public virtual SimValueType Type { get { return Address?.ReadType ?? SimValueType.NONE; } }
         public virtual bool IsNumericValue { get { return Conversion.IsNumber(Value); } }
         public abstract string Value { get; }
         public abstract double NumericValue { get; }
@@ -110,9 +111,21 @@ namespace PilotsDeck.Resources.Variables
 
         public override string ToString()
         {
-            return Address ?? "";
+            return Address.ToString();
         }
 
+        public override bool Equals(object? obj)
+        {
+            if (obj is ManagedVariable var)
+                return Address.Equals(var.Address);
+            else
+                return this?.Equals(obj) == true;
+        }
+
+        public override int GetHashCode()
+        {
+            return Address?.GetHashCode() ?? 0;
+        }
 
         protected bool _disposed = false;
 

@@ -1,5 +1,7 @@
-﻿using Neo.IronLua;
+﻿using CFIT.AppLogger;
+using Neo.IronLua;
 using PilotsDeck.Resources.Scripts;
+using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator;
 using System;
 using System.Collections.Concurrent;
@@ -42,16 +44,16 @@ namespace PilotsDeck.Resources
             return file;
         }
 
-        public static string GetFunctionName(string address)
-        {
-            if (address.StartsWith("lua:", StringComparison.InvariantCultureIgnoreCase))
-                address = address.Replace("lua:", "", StringComparison.InvariantCultureIgnoreCase);
-            string[] parts = address.Split(':');
-            if (parts.Length == 2)
-                address = parts[1];
+        //public static string GetFunctionName(string address)
+        //{
+        //    if (address.StartsWith("lua:", StringComparison.InvariantCultureIgnoreCase))
+        //        address = address.Replace("lua:", "", StringComparison.InvariantCultureIgnoreCase);
+        //    string[] parts = address.Split(':');
+        //    if (parts.Length == 2)
+        //        address = parts[1];
 
-            return address;
-        }
+        //    return address;
+        //}
 
         public static bool HasFunctionParams(string address)
         {
@@ -142,8 +144,7 @@ namespace PilotsDeck.Resources
             }
         }
 
-        public int 
-            CheckFiles()
+        public int CheckFiles()
         {
             int result = 0;
             try
@@ -162,7 +163,7 @@ namespace PilotsDeck.Resources
                 var globalDir = new DirectoryInfo(GlobalScriptFolder);
                 foreach (var file in globalDir.GetFiles())
                 {
-                    string fileName = GetRealFileName(file.Name);
+                    string fileName = file.Name.ToLowerInvariant();
 
                     if (!ManagedGlobalScripts.TryGetValue(fileName, out ManagedGlobalScript script))
                     {
@@ -211,18 +212,18 @@ namespace PilotsDeck.Resources
             }
         }
 
-        public static bool HasScript(string address)
+        public static bool HasScript(ManagedAddress address)
         {
-            string file = GetRealFileName(address);
+            string file = address.FormatLuaFile();
             return File.Exists(ScriptFolder + file) || File.Exists(GlobalScriptFolder + file);
         }
 
-        public ManagedScript RegisterScript(string file)
+        public ManagedScript RegisterScript(ManagedAddress address)
         {
             ManagedScript script = null;
             try
             {
-                file = GetRealFileName(file);
+                string file = address.FormatLuaFile();
                 bool foundScript = File.Exists(ScriptFolder + file);
                 bool foundGlobal = File.Exists(GlobalScriptFolder + file);
 
@@ -248,9 +249,9 @@ namespace PilotsDeck.Resources
                 }
                 else if (foundGlobal)
                 {
-                    if (ManagedGlobalScripts.ContainsKey(file))
+                    if (ManagedGlobalScripts.TryGetValue(file, out ManagedGlobalScript? value))
                     {
-                        script = ManagedGlobalScripts[file];
+                        script = value;
                         script.AddRegistration();
                         Logger.Debug($"Added Registration for Global Script File '{file}': {script.Registrations}");
                         return script;
@@ -275,7 +276,6 @@ namespace PilotsDeck.Resources
             ManagedImageScript script = null;
             try
             {
-                file = GetRealFileName(file);
                 if (!File.Exists(ImageScriptFolder + file))
                     Logger.Error($"Script File '{file}' does not exist!");
 
@@ -299,11 +299,11 @@ namespace PilotsDeck.Resources
             return script;
         }
 
-        public void DeregisterScript(string file)
+        public void DeregisterScript(ManagedAddress address)
         {
             try
             {
-                file = GetRealFileName(file);
+                string file = address.FormatLuaFile();
 
                 if (ManagedScripts.TryGetValue(file, out ManagedScript script))
                 {
@@ -337,8 +337,6 @@ namespace PilotsDeck.Resources
         {
             try
             {
-                file = GetRealFileName(file);
-
                 if (ManagedImageScripts.TryGetValue(file, out ManagedImageScript script))
                 {
                     script.RemoveRegistration();
@@ -383,7 +381,7 @@ namespace PilotsDeck.Resources
             return count;
         }
 
-        public string RunFunction(string address, out bool hasError, bool noReturn = true)
+        public string RunFunction(ManagedAddress address, out bool hasError, bool noReturn = true)
         {
             string result = "";
             hasError = false;
@@ -393,9 +391,9 @@ namespace PilotsDeck.Resources
                 return result;
             }
 
-            string file = GetRealFileName(address);
-            string function = GetFunctionName(address);
-            if (!HasFunctionParams(address))
+            string file = address.FormatLuaFile();
+            string function = address.Parameter;
+            if (!function.EndsWith(')'))
                 function = $"{function}()";
 
             if (!ManagedScripts.TryGetValue(file, out ManagedScript script))

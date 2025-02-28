@@ -6,6 +6,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="UI/DeveloperUI/NotifyIconResources.xaml" />
+                <ResourceDictionary Source="UI/Styles/StyleResources.xaml" />
+                <ResourceDictionary Source="UI/Styles/TreeResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

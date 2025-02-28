@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using CFIT.AppLogger;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace ProfileManager
@@ -32,7 +33,7 @@ namespace ProfileManager
         public static PackageManifest LoadManifest(string json)
         {
             var manifest = JsonSerializer.Deserialize<PackageManifest>(json);
-            Logger.Log(LogLevel.Debug, $"PackageManifest was loaded: {manifest?.Title}");
+            Logger.Debug($"PackageManifest was loaded: {manifest?.Title}");
             return manifest;
         }
     }

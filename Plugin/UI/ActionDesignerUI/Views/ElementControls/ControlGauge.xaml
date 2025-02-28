@@ -1,0 +1,218 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.ElementControls.ControlGauge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views.ElementControls"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelGauge}"
+             mc:Ignorable="d" 
+             d:DesignHeight="576" d:DesignWidth="800">
+    <Grid Margin="0,0,0,8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource DesignerLabel}">
+            Gauge Type:
+        </Label>
+        <ComboBox Grid.Row="0" Grid.Column="1" Name="ComboGaugeType" SelectedIndex="{Binding GaugeIsArc}" HorizontalAlignment="Left" MinWidth="144" Style="{StaticResource ComboboxDefault}">
+            <ComboBoxItem>Bar</ComboBoxItem>
+            <ComboBoxItem>Arc</ComboBoxItem>
+        </ComboBox>
+
+        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Min / Max Value:
+        </Label>
+        <Grid Grid.Row="1" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Grid.Row="0" Name="InputValueMin" MinWidth="64" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Name="InputValueMax" MinWidth="64" Margin="16,0,0,0" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <Label Grid.Column="2" Grid.Row="0" Style="{StaticResource LabelDefault}" HorizontalAlignment="Right" HorizontalContentAlignment="Right" Margin="13,0,0,0" FontWeight="DemiBold">Scale:</Label>
+            <TextBox Grid.Column="3" Grid.Row="0" Name="InputValueScale" MinWidth="48" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+        </Grid>
+
+        <Label Grid.Row="2" Grid.Column="0" Visibility="{Binding GaugeIsArc, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Angle Start / Sweep:
+        </Label>
+        <Grid Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding GaugeIsArc, Converter={StaticResource BoolVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Grid.Row="0" Name="InputAngleStart" MinWidth="64" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Name="InputAngleSweep" MinWidth="64" Margin="16,0,0,0" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+        </Grid>
+
+        
+        
+        
+        <Label Grid.Row="3" Grid.Column="0" Margin="0,8,0,0" Style="{StaticResource DesignerLabelTop}">
+            Colored Ranges:
+        </Label>
+        <Grid Grid.Row="3" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" MinHeight="84"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Grid.Row="0" Name="InputRangeStart" MinWidth="64" HorizontalAlignment="Center" Style="{StaticResource InputCentered}"/>
+            <Label Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Style="{StaticResource LabelDefault}">-</Label>
+            <TextBox Grid.Column="2" Grid.Row="0" Name="InputRangeEnd" MinWidth="64" Margin="1,0,0,0" HorizontalAlignment="Center" Style="{StaticResource InputCentered}"></TextBox>
+            <Label Grid.Column="3" Grid.Row="0" Name="LabelRangeColor" MinWidth="64" Margin="6,0,0,0" Style="{StaticResource LabelColorSelect}">
+                Color
+            </Label>
+
+            <ListView Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" Name="ListRanges" Margin="0,6,0,0" MinHeight="84"
+                      VerticalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1" BorderBrush="{Binding Color, Converter={StaticResource StringColorConverter}}" Margin="0" Padding="1" CornerRadius="2">
+                            <StackPanel Orientation="Horizontal" Margin="2,1,2,1" Height="16">
+                                <Label Content="{Binding}" Style="{StaticResource LabelListView}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackPanel Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Top" Margin="10,1,0,0">
+                <Button Name="ButtonAddRange" Style="{StaticResource BtnSquareSmall}">
+                    <Image Name="ImageAddUpdateRange" Source="../../../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Name="ButtonRemoveRange" Margin="0,7,0,0" Style="{StaticResource BtnSquareSmall}">
+                    <Image Source="../../../Icons/dash-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Name="ButtonCopyPasteRanges" Margin="0,7,0,0" Style="{StaticResource BtnSquareSmall}">
+                    <Image Source="../../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        
+        
+        
+
+        <Label Grid.Row="4" Grid.Column="0" Margin="0,8,0,0" Style="{StaticResource DesignerLabelTop}">
+            Gauge Markers:
+        </Label>
+        <Grid Grid.Row="4" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" MinHeight="84"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Grid.Row="0" Margin="-3,0,0,0" FontSize="10" Style="{StaticResource LabelDefaultLeft}">Value:</Label>
+            <TextBox Grid.Column="1" Grid.Row="0" Name="InputMarkerPos" MinWidth="50" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <Label Grid.Column="2" Grid.Row="0" Margin="6,0,0,0" FontSize="10" Style="{StaticResource LabelDefaultLeft}">Thickness:</Label>
+            <TextBox Grid.Column="3" Grid.Row="0" Name="InputMarkerSize" MinWidth="50" Margin="0,0,0,0" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+
+            <Label Grid.Column="0" Grid.Row="1" Margin="-3,6,0,0" FontSize="10" Style="{StaticResource LabelDefaultLeft}">Height:</Label>
+            <TextBox Grid.Column="1" Grid.Row="1" Name="InputMarkerHeight" MinWidth="50" Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <Label Grid.Column="2" Grid.Row="1" Margin="6,6,0,0" FontSize="10" Style="{StaticResource LabelDefaultLeft}">Offset:</Label>
+            <TextBox Grid.Column="3" Grid.Row="1" Name="InputMarkerOffset" MinWidth="50" Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+
+            <Label Grid.Column="4" Grid.Row="0" Name="LabelMarkerColor" MinWidth="53" Margin="12,0,0,0" Style="{StaticResource LabelColorSelect}">
+                Color
+            </Label>
+
+            <ListView Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="2" Name="ListMarker" Margin="0,6,0,0" MinHeight="84"
+                      VerticalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1" BorderBrush="{Binding Color, Converter={StaticResource StringColorConverter}}" Margin="0" Padding="1" CornerRadius="2">
+                            <StackPanel Orientation="Horizontal" Margin="2,1,2,1" Height="16">
+                                <Label Content="{Binding}" Style="{StaticResource LabelListView}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+
+
+            <StackPanel Grid.Column="5" Grid.Row="1" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Top" Margin="10,6,0,0">
+                <Button Name="ButtonAddMarker" Style="{StaticResource BtnSquareSmall}">
+                    <Image Name="ImageAddUpdateMarker" Source="../../../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Name="ButtonRemoveMarker" Margin="0,6,0,0" Style="{StaticResource BtnSquareSmall}">
+                    <Image Source="../../../Icons/dash-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Name="ButtonCopyPasteMarker" Margin="0,6,0,0" Style="{StaticResource BtnSquareSmall}">
+                    <Image Source="../../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Grow Gauge:
+        </Label>
+        <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding UseGaugeDynamicSize}" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+            Let Gauge grow in Size by Variable Value
+        </CheckBox>
+
+        <Label Grid.Row="6" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}">
+            Static Ranges:
+        </Label>
+        <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding GaugeFixedRanges}" Margin="0,8,0,0" HorizontalAlignment="Left"
+                  Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource CheckboxDefault}">
+            Always draw colored Ranges
+        </CheckBox>
+
+        <Label Grid.Row="7" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}">
+            Static Markers:
+        </Label>
+        <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding GaugeFixedMarkers}" Margin="0,8,0,0" HorizontalAlignment="Left"
+                  Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource CheckboxDefault}">
+            Always draw Gauge Markers
+        </CheckBox>
+
+        <Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}">
+            Reverse Direction:
+        </Label>
+        <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding GaugeRevereseDirection}" Margin="0,8,0,0" HorizontalAlignment="Left"
+                  Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource CheckboxDefault}">
+            Reverse Gauge Direction
+        </CheckBox>
+
+        <ContentControl Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Name="VariableControl" Margin="0,8,0,0"
+                        Visibility="{Binding UseGaugeDynamicSize, Converter={StaticResource BoolVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

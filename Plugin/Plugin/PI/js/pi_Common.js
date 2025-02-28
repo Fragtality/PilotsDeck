@@ -193,13 +193,14 @@ function setPattern(field, type, donotrequest) {
 	var regDref = `^(${regNameXP}[\\x2F]){1}(${regNameMultipleXP}[\\x2F])*(${regNameMultipleXP}(([\\x5B][0-9]+[^\\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
 	var strPathXP = `(${regNameXP}[\\x2F]){1}(${regNameMultipleXP}[\\x2F])*(${regNameMultipleXP}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
-	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
-	var regAvar = `^\\((A:){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w/ ]+\\)$`;
+	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifsa]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
+	var regAvar = `^\\(((A|E|L):){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w/ ]+\\)$`;
 	var regBvarValue = `^(B:${regName}){1}$`;
 	var strBvarCmd = `((B:){0,1}${regName}(:[\\x2D\\x2B]{0,1}[0-9]+([\\x2C\\x2E]{1}[0-9]+){0,1}){0,1}){1}`;
 	var regBvarCmd = `^(${strBvarCmd}){1}(:${strBvarCmd})*$`;
-	var strKvar = `((K:|[^:0-9]){1}${validNameKvar}(:[0-9\\x2E]+(:[0-9.]+){0,1}){0,1}){1}`
-	var regKvar = `^(${strKvar}){1}(:${strKvar})*$`;
+	var validKvar = `((?!lua:)(?!H:)(?!B:)(K:|[^:0-9]){1}${validNameKvar}){1}`;
+	var rxKvarVariable = `^K:[^0-9]${validNameKvar}$`;
+	var rxKvarCmd = `^${validKvar}:[0-9]+(:${validKvar}:[0-9]+)+$|^${validKvar}(:[0-9]+){0,5}$`;
 	var regLuaFunc = `^(Lua|lua|LUA){1}:${regName}(\\.lua){0,1}(:${regName}){1}(\\({1}[^\\)]+\\){1}){0,1}$`;
 	var regInternal = `^(X:){1}${regName}$`;
 	var regCalcRead = `^C:[^\\s].+$`
@@ -215,7 +216,7 @@ function setPattern(field, type, donotrequest) {
 	else if (type == 4)  //offset
 		document.getElementById(field).pattern = regOffset;
 	else if (type == 5) //offset | lvar | dref | avar | bvar | luafunc | internal | calcRead
-		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvarValue}|${regInternal}|${regLuaFunc}|${regCalcRead}|${regLvar}`;
+		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvarValue}|${regInternal}|${rxKvarVariable}|${regLuaFunc}|${regCalcRead}|${regLvar}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv
@@ -237,7 +238,7 @@ function setPattern(field, type, donotrequest) {
 	else if (type == 15) //Internal
 		document.getElementById(field).pattern = regInternal;
 	else if (type == 16) //Kvar
-		document.getElementById(field).pattern = regKvar;
+		document.getElementById(field).pattern = rxKvarCmd;
 	else
 		document.getElementById(field).pattern = ".*";
 }

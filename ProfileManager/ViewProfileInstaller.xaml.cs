@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using CFIT.AppLogger;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -179,7 +180,7 @@ namespace ProfileManager
         {
             try
             {
-                Logger.Log(LogLevel.Debug, $"Showing Package Info for '{InstallWorker.PackageFile?.Title}'");
+                Logger.Debug($"Showing Package Info for '{InstallWorker.PackageFile?.Title}'");
 
                 var PackageFile = InstallWorker.PackageFile;
 
@@ -274,7 +275,7 @@ namespace ProfileManager
         {
             try
             {
-                Logger.Log(LogLevel.Debug, $"Received File Drop");
+                Logger.Debug($"Received File Drop");
 
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -282,6 +283,7 @@ namespace ProfileManager
                     if (files.Length > 0)
                     {
                         SetStateLoadingPackage(files[0]);
+                        MainWindow.SetForeground();
                     }
                 }
             }
@@ -296,7 +298,7 @@ namespace ProfileManager
         {
             try
             {
-                Logger.Log(LogLevel.Debug, $"Opening File Dialog");
+                Logger.Debug($"Opening File Dialog");
 
                 OpenFileDialog openFileDialog = new()
                 {
@@ -318,14 +320,14 @@ namespace ProfileManager
 
         private void ButtonConfirmation_Click(object sender, RoutedEventArgs e)
         {
-            Logger.Log(LogLevel.Debug, $"Confirming Installation (action {ActionButtonConfirmation?.Method})");
+            Logger.Debug($"Confirming Installation (action {ActionButtonConfirmation?.Method})");
 
             ActionButtonConfirmation?.Invoke(this);
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
-            Logger.Log(LogLevel.Debug, $"Cancel Installation");
+            Logger.Debug($"Cancel Installation");
 
             try
             {

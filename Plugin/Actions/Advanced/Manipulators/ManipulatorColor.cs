@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using System.Drawing;
 
@@ -10,16 +11,9 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
 
         public override void ManipulateElement()
         {
-            Color color = Element.Settings.GetColor();
-
             if (ConditionStore.Compare())
             {
-                color = ConditionalColor;
-            }
-
-            if (color != Element.Color)
-            {
-                Element.Color = color;
+                Element.Color = ConditionalColor;
                 Logger.Verbose($"Color set to {ColorTranslator.ToHtml(Element.Color)}");
             }
         }

@@ -1,4 +1,5 @@
-﻿using PilotsDeck.StreamDeck.Messages;
+﻿using CFIT.AppLogger;
+using PilotsDeck.StreamDeck.Messages;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -90,7 +91,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         }
 
         public virtual bool IsNewModel { get; set; } = true;
-        public virtual int BUILD_VERSION { get; set; } = 4;
+        public virtual int BUILD_VERSION { get; set; } = AppConfiguration.BuildModelVersion;
         public virtual float[] CanvasSize { get; set; } = [100, 100];
         public virtual SortedDictionary<int, ModelDisplayElement> DisplayElements { get; set; } = [];
         public virtual SortedDictionary<StreamDeckCommand, SortedDictionary<int, ModelCommand>> ActionCommands { get; set; } = [];

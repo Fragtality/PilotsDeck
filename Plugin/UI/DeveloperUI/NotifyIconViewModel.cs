@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CFIT.AppLogger;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
 using System;
@@ -13,7 +14,7 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             if (App.DeveloperView.IsVisible)
                 App.DeveloperView.Hide(enableEfficiencyMode: false);
-            else
+            else if (!App.IsAppShutDown)
                 App.DeveloperView.Show(disableEfficiencyMode: true);
         }
 

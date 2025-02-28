@@ -1,0 +1,224 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.ViewElement"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelElement}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" ScrollViewer.CanContentScroll="True">
+    <Grid Margin="8,0,8,0">
+        <Grid.Resources>
+            <Style x:Key="LabelSizePosLeft" TargetType="Label" BasedOn="{StaticResource LabelDefault}">
+                <Setter Property="Width" Value="20"/>
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="HorizontalContentAlignment" Value="Right" />
+                <Setter Property="Padding" Value="0,0,2,0" />
+                <Setter Property="Margin" Value="5,0,2,0" />
+            </Style>
+            <Style x:Key="LabelSizePosInner" TargetType="Label" BasedOn="{StaticResource LabelSizePosLeft}">
+                <Setter Property="Margin" Value="3,0,2,0" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="OptionView" ScrollViewer.CanContentScroll="True"/>
+
+        <Label Grid.Row="1" Grid.Column="0" Visibility="{Binding ElementHasColor, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabel}" Margin="0">
+            Color:
+        </Label>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="{Binding ElementHasColor, Converter={StaticResource BoolVisibilityConverter}}">
+            <Label Name="LabelColorSelect" MinWidth="180" Content="{Binding HtmlColor}" Background="{Binding Color, Converter={StaticResource DrawingColorConverter}}" Style="{StaticResource LabelColorSelect}"/>
+            <Button Name="ButtonColorClipboard" Margin="10,0,0,0" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>                
+            </Button>
+        </StackPanel>
+
+
+        <Label Grid.Row="2" Grid.Column="0" Visibility="{Binding VisibilityPosition}" Style="{StaticResource DesignerLabelM8}">
+            Position:
+        </Label>
+        <Label Grid.Row="2" Grid.Column="0" Visibility="{Binding VisibilityStartEnd}" Style="{StaticResource DesignerLabelM8}">
+            Start:
+        </Label>
+        <Grid Grid.Row="2" Grid.Column="1" Margin="0,8,8,0">
+            <Grid.RowDefinitions>
+                <RowDefinition MinHeight="36"/>
+                <RowDefinition MinHeight="36"/>
+                <RowDefinition MinHeight="36"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="36"/>
+                <ColumnDefinition Width="36"/>
+                <ColumnDefinition Width="36"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource LabelSizePosLeft}">
+                X:
+            </Label>
+            <TextBox Grid.Column="1" Grid.Row="1" Name="InputPosX" Style="{StaticResource InputCentered}"/>
+
+            <Label Grid.Column="3" Grid.Row="1" Style="{StaticResource LabelSizePosInner}">
+                Y:
+            </Label>
+            <TextBox Grid.Column="4" Grid.Row="1" Name="InputPosY" Style="{StaticResource InputCentered}"/>
+
+            <Button Grid.Column="5" Grid.Row="1" Name="ButtonPosClipboard" Margin="10,0,24,0" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+
+            <Button Grid.Column="6" Grid.Row="1" Command="{Binding DecreaseCommand}" CommandParameter="PosX" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrow-left.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="7" Grid.Row="1" Command="{Binding ResetPositionCommand}" Style="{StaticResource BtnSquareSmall}" Margin="4,0,4,0">
+                <Image Source="../../Icons/arrow-repeat.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="8" Grid.Row="1" Command="{Binding IncreaseCommand}" CommandParameter="PosX" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrow-right.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+
+            <Button Grid.Column="7" Grid.Row="0" Command="{Binding DecreaseCommand}" CommandParameter="PosY" Style="{StaticResource BtnSquareSmall}" Margin="4,0,4,0">
+                <Image Source="../../Icons/arrow-up.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="7" Grid.Row="2" Command="{Binding IncreaseCommand}" CommandParameter="PosY" Style="{StaticResource BtnSquareSmall}" Margin="4,0,4,0">
+                <Image Source="../../Icons/arrow-down.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+
+            <Label Grid.Column="9" Grid.Row="1" Name="LabelCenter" Margin="16,0,8,0" MinWidth="48" Style="{StaticResource LabelDemiBold}"
+                   HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                Centering:
+            </Label>
+            <ComboBox Grid.Column="10" Grid.Row="1" ItemsSource="{Binding CenterTypes}" SelectedValue="{Binding Center}" SelectedValuePath="Key" DisplayMemberPath="Value"
+                      MinWidth="148" Style="{StaticResource ComboboxDefault}" HorizontalAlignment="Left"/>
+        </Grid>
+
+        <Label Grid.Row="3" Grid.Column="0" Visibility="{Binding VisibilityPosition}" Style="{StaticResource DesignerLabelM8}">
+            Size:
+        </Label>
+        <Label Grid.Row="3" Grid.Column="0" Visibility="{Binding VisibilityStartEnd}" Style="{StaticResource DesignerLabelM8}">
+            End:
+        </Label>
+        <Grid Grid.Row="3" Grid.Column="1" Margin="0,8,8,0">
+            <Grid.RowDefinitions>
+                <RowDefinition MinHeight="36"/>
+                <RowDefinition MinHeight="36"/>
+                <RowDefinition MinHeight="36"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="36"/>
+                <ColumnDefinition Width="36"/>
+                <ColumnDefinition Width="36"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="2" Content="{Binding CanvasString}" Margin="8,0,0,0" HorizontalAlignment="Center"
+                   HorizontalContentAlignment="Center" Style="{StaticResource LabelDefault}"/>
+
+            <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource LabelSizePosLeft}">
+                W:
+            </Label>
+            <TextBox Grid.Column="1" Grid.Row="1" Name="InputWidth" Style="{StaticResource InputCentered}"/>
+
+            <Label Grid.Column="3" Grid.Row="1" Style="{StaticResource LabelSizePosInner}">
+                H:
+            </Label>
+            <TextBox Grid.Column="4" Grid.Row="1" Name="InputHeight" Style="{StaticResource InputCentered}"/>
+
+            <Button Grid.Column="5" Grid.Row="1" Name="ButtonSizeClipboard" Margin="10,0,24,0" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+
+            <Button Grid.Column="6" Grid.Row="1" Command="{Binding DecreaseCommand}" CommandParameter="Width" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrows-collapse-vertical.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="7" Grid.Row="1" Command="{Binding ResetSizeCommand}" Style="{StaticResource BtnSquareSmall}" Margin="4,0,4,0">
+                <Image Source="../../Icons/arrow-repeat.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="8" Grid.Row="1" Command="{Binding IncreaseCommand}" CommandParameter="Width" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrows-expand-vertical.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+
+            <Button Grid.Column="7" Grid.Row="0" Command="{Binding IncreaseCommand}" CommandParameter="Height" Style="{StaticResource BtnSquareSmall}" Margin="4,0,4,0">
+                <Image Source="../../Icons/arrows-expand.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="7" Grid.Row="2" Command="{Binding DecreaseCommand}" CommandParameter="Height" Style="{StaticResource BtnSquareSmall}" Margin="4,0,4,0">
+                <Image Source="../../Icons/arrows-collapse.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+
+            <Label Grid.Column="9" Grid.Row="1" Name="LabelScale" Margin="30,0,8,0" MinWidth="48" Style="{StaticResource LabelDemiBold}"
+                    HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+                Scaling:
+            </Label>
+            <ComboBox Grid.Column="10" Grid.Row="1" ItemsSource="{Binding ScaleTypes}" SelectedValue="{Binding Scale}" SelectedValuePath="Key" DisplayMemberPath="Value"
+                      MinWidth="148" Style="{StaticResource ComboboxDefault}" HorizontalAlignment="Left"/>
+        </Grid>
+
+        <Label Grid.Row="4" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Rotation:
+        </Label>
+        <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" HorizontalAlignment="Left" Orientation="Horizontal">
+            <Button Command="{Binding DecreaseCommand}" CommandParameter="Rotation" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrow-counterclockwise.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <TextBox Name="InputRotation" Margin="4,0,4,0" Style="{StaticResource InputCentered}" HorizontalAlignment="Center"/>
+            <Button Command="{Binding IncreaseCommand}" CommandParameter="Rotation" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrow-clockwise.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Grid.Column="7" Grid.Row="1" Command="{Binding ResetRotationCommand}" Style="{StaticResource BtnSquareSmall}" Margin="8,0,4,0">
+                <Image Source="../../Icons/arrow-repeat.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+        </StackPanel>
+
+        <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Transparency:
+        </Label>
+        <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+            <Button Command="{Binding DecreaseTransparencyCommand}" CommandParameter="PosY" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrow-down.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <TextBox Name="InputTransparency" Margin="4,0,4,0" Style="{StaticResource InputCentered}" HorizontalAlignment="Center"/>
+            <Button Command="{Binding IncreaseTransparencyCommand}" CommandParameter="PosY" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../Icons/arrow-up.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Button Command="{Binding ResetTransparencyCommand}" Style="{StaticResource BtnSquareSmall}" Margin="8,0,4,0">
+                <Image Source="../../Icons/arrow-repeat.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <Label Style="{StaticResource LabelAnnotation}">
+                (1 = full visible)
+            </Label>
+        </StackPanel>
+
+        <Label Grid.Row="6" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Custom Name:
+        </Label>
+        <TextBox Grid.Row="6" Grid.Column="1" Name="InputName" Margin="0,8,0,0" MinWidth="244" HorizontalAlignment="Left" Style="{StaticResource InputLeft}"/>
+    </Grid>
+</UserControl>

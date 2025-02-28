@@ -16,6 +16,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         {
             ModelManipulator model = new(this.ManipulatorType)
             {
+                Name = this.Name,
                 IsNewModel = this.IsNewModel,
                 AnyCondition = this.AnyCondition,
                 Color = this.Color,
@@ -66,6 +67,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
 
         public virtual bool IsNewModel { get; set; } = true;
         public virtual ELEMENT_MANIPULATOR ManipulatorType { get; set; } = type;
+        public virtual string Name { get; set; } = "";
         public virtual bool AnyCondition { get; set; } = false;
         public virtual SortedDictionary<int, ConditionHandler> Conditions { get; set; } = [];
 
@@ -90,7 +92,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         public virtual string IndicatorAddress { get; set; } = "";
         public virtual float IndicatorScale { get; set; } = 1;
         public virtual IndicatorType IndicatorType { get; set; } = IndicatorType.TRIANGLE;
-        public virtual string IndicatorImage { get; set; } = "";
+        public virtual string IndicatorImage { get; set; } = "Images/indicator/Dial-White.png";
         public virtual string IndicatorColor { get; set; } = "#c7c7c7";
         public virtual float IndicatorSize { get; set; } = 10;
         public virtual float IndicatorLineSize { get; set; } = 2;

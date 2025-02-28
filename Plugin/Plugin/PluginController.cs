@@ -1,5 +1,8 @@
-﻿using PilotsDeck.Actions;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Actions;
 using PilotsDeck.Resources;
+using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.StreamDeck.Messages;
@@ -164,20 +167,21 @@ namespace PilotsDeck.Plugin
                 if (parts.Length == 2)
                 {
                     parts[0] = $"X:{parts[0]}";
-                    if (TypeMatching.rxInternal.IsMatch(parts[0]) && VariableManager.Contains(parts[0]))
+                    var address = new ManagedAddress(parts[0]);
+                    if (TypeMatching.rxInternal.IsMatch(parts[0]) && VariableManager.Contains(address))
                     {
-                        Logger.Debug($"Setting internal Variable '{parts[0]}' with Value '{parts[1]}'");
-                        VariableManager[parts[0]].SetValue(parts[1]);
+                        Logger.Debug($"Setting internal Variable '{address}' with Value '{parts[1]}'");
+                        VariableManager[address].SetValue(parts[1]);
                     }
                 }
             }
         }
 
-        protected void RemoveUnusedRessources(bool force = false)
+        protected void RemoveUnusedResources(bool force = false)
         {
             int count = 0;            
             count += ScriptManager.RemoveUnused();
-            SimController.RemoveUnusedVariables(force);
+            SimController.RemoveUnusedResources(force);
             count += ImageManager.RemoveUnused();
             count += VariableManager.RemoveUnused();
 
@@ -232,7 +236,7 @@ namespace PilotsDeck.Plugin
                         State = PluginState.WAIT;
                         ResetImageTime = DateTime.Now + TimeSpan.FromSeconds(5);
                         ScriptManager.StopGlobalScripts();
-                        RemoveUnusedRessources(true);
+                        RemoveUnusedResources(true);
                     }
 
                     if (SimController.SimState == SimulatorState.RUNNING)
@@ -252,7 +256,7 @@ namespace PilotsDeck.Plugin
                         if (LastSimState == SimulatorState.SESSION)
                         {
                             ScriptManager.StopGlobalScripts();
-                            RemoveUnusedRessources();
+                            RemoveUnusedResources();
                             ActionManager.ProfileSwitcherManager.ResetAircraft();
                         }
                     }
@@ -264,12 +268,13 @@ namespace PilotsDeck.Plugin
                             Logger.Information("--- Plugin changed to READY ---");
                         State = PluginState.READY;
 
-                        ScriptManager.StartGlobalScripts();
                         ActionManager.ProfileSwitcherManager.SwitchProfiles();
                         Task.Run(async () =>
                         {
-                            await Task.Delay(1000);
-                            RemoveUnusedRessources(true);
+                            await Task.Delay(500);
+                            RemoveUnusedResources(true);
+                            await Task.Delay(500);
+                            ScriptManager.StartGlobalScripts();
                         });
                         ForcedRefresh = true;
                     }
@@ -294,7 +299,7 @@ namespace PilotsDeck.Plugin
                     Logger.Information("--- Plugin changed to IDLE ---");
                     State = PluginState.IDLE;
                     ActionManager.ProfileSwitcherManager.SwitchBack();
-                    RemoveUnusedRessources();
+                    RemoveUnusedResources();
                     LastSimReadyCmd = false;
                     LastSimState = SimulatorState.UNKNOWN;
                     LastAircraftString = "";
@@ -317,7 +322,7 @@ namespace PilotsDeck.Plugin
                 if (DateTime.Now - LastRemovedUnused > TimeSpan.FromMilliseconds(App.Configuration.IntervalUnusedRessources))
                 {
                     if (State != PluginState.READY)
-                        RemoveUnusedRessources();
+                        RemoveUnusedResources();
                     else
                     {
                         LastRemovedUnused = DateTime.Now;

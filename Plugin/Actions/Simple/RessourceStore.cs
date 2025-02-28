@@ -1,7 +1,8 @@
-﻿using PilotsDeck.Resources;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Resources;
 using PilotsDeck.Resources.Images;
 using PilotsDeck.Resources.Variables;
-using PilotsDeck.Tools;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -62,7 +63,7 @@ namespace PilotsDeck.Actions.Simple
 
         public ConcurrentDictionary<SwitchID, ActionCommand> ActionCommands { get; } = [];
         public ConcurrentDictionary<VariableID, ManagedVariable> Variables { get; } = [];
-        public ConcurrentDictionary<string, ManagedVariable> DynamicVariables { get; } = [];
+        public ConcurrentDictionary<ManagedAddress, ManagedVariable> DynamicVariables { get; } = [];
         public ConcurrentDictionary<VariableID, ValueState> States { get; } = [];
         public ConcurrentDictionary<ImageID, ManagedImage> Images { get; } = [];
         public ConcurrentDictionary<ImageID, string> ImageRefs { get; } = [];
@@ -105,7 +106,7 @@ namespace PilotsDeck.Actions.Simple
                 ActionCommands.TryAdd(id, command);
                 if (command.CommandType == Simulator.SimCommandType.LUAFUNC)
                     App.PluginController.ScriptManager.RegisterScript(command.AddressOn);
-                if (command.CommandType == Simulator.SimCommandType.LUAFUNC && !string.IsNullOrWhiteSpace(command.AddressOff))
+                if (command.CommandType == Simulator.SimCommandType.LUAFUNC && !command.AddressOff.IsEmpty)
                     App.PluginController.ScriptManager.RegisterScript(command.AddressOff);
             }
 
@@ -136,7 +137,7 @@ namespace PilotsDeck.Actions.Simple
 
                 if (command.CommandType == Simulator.SimCommandType.LUAFUNC)
                     App.PluginController.ScriptManager.DeregisterScript(command.AddressOn);
-                if (command.CommandType == Simulator.SimCommandType.LUAFUNC && !string.IsNullOrWhiteSpace(command.AddressOff))
+                if (command.CommandType == Simulator.SimCommandType.LUAFUNC && !command.AddressOff.IsEmpty)
                     App.PluginController.ScriptManager.DeregisterScript(command.AddressOff);
             }
             else if (id == SwitchID.GuardCmd)
@@ -255,7 +256,7 @@ namespace PilotsDeck.Actions.Simple
         public ManagedVariable AddVariable(VariableID id, string address)
         {
             Logger.Verbose($"Add Variable for ID {id} ('{address}')");
-            var variable = VariableManager.RegisterVariable(address);
+            var variable = VariableManager.RegisterVariable(new ManagedAddress(address));
             if (variable != null)
                 Variables.TryAdd(id, variable);
 
@@ -289,23 +290,23 @@ namespace PilotsDeck.Actions.Simple
             else
             {
                 Logger.Debug($"No ManagedVariable mapped to ID {id}");
-                return new VariableNumeric(VariableManager.ADDRESS_EMPTY, SimValueType.INTERNAL); ;
+                return VariableManager.CreateEmptyVariable();
             }
         }
 
-        public ManagedVariable AddDynamicVariable(string name)
+        public ManagedVariable AddDynamicVariable(ManagedAddress address)
         {
-            Logger.Verbose($"Add DynamicVariable for Address {name}");
-            if (VariableManager.TryGet(name, out ManagedVariable variable))
-                DynamicVariables.TryAdd(name, variable);
+            Logger.Verbose($"Add DynamicVariable for Address {address}");
+            if (VariableManager.TryGet(address, out ManagedVariable variable))
+                DynamicVariables.TryAdd(address, variable);
 
             return variable;
         }
 
-        public void RemoveDynamicVariable(string name)
+        public void RemoveDynamicVariable(ManagedAddress address)
         {
-            Logger.Verbose($"Remove DynamicVariable for Address {name}");
-            DynamicVariables.TryRemove(name, out _);
+            Logger.Verbose($"Remove DynamicVariable for Address {address}");
+            DynamicVariables.TryRemove(address, out _);
         }
 
         public ManagedImage AddImage(ImageID id, string file)

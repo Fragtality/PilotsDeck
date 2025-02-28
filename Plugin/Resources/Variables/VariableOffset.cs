@@ -1,5 +1,6 @@
-﻿using FSUIPC;
-using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using FSUIPC;
 using System;
 using System.Globalization;
 
@@ -22,12 +23,12 @@ namespace PilotsDeck.Resources.Variables
 
         public override bool IsConnected { get { return IpcOffset?.IsConnected == true; } }
 
-        public VariableOffset(string address, string group = null, OffsetAction action = OffsetAction.Read) : base(address, SimValueType.OFFSET)
+        public VariableOffset(ManagedAddress address, string group = null, OffsetAction action = OffsetAction.Read) : base(address)
         {
             if (string.IsNullOrWhiteSpace(group))
                 group = AppConfiguration.IpcGroupRead;
 
-            OffsetParam = new OffsetParam(address);
+            OffsetParam = new OffsetParam(address.Address);
             IpcOffset = new Offset(group, OffsetParam.Address, OffsetParam.Length)
             {
                 ActionAtNextProcess = action

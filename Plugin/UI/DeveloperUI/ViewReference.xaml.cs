@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using System;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             InitializeComponent();
             InitializeControls();
-            this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Sys.RequestNavigateHandler));
+            this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Nav.RequestNavigateHandler));
         }
 
         protected static string FindLatestControlFile(string path)

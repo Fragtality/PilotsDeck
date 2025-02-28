@@ -1,4 +1,8 @@
-﻿using PilotsDeck.Simulator;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using CFIT.SimConnectLib;
+using CFIT.SimConnectLib.Modules.MobiFlight;
+using PilotsDeck.Simulator;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -11,7 +15,7 @@ using System.Text.Json.Serialization;
 
 namespace PilotsDeck
 {
-    public class AppConfiguration
+    public class AppConfiguration: ISimConnectConfig, ILoggerConfig, IMobiConfig
     {
         //Constants
         [JsonIgnore]
@@ -33,9 +37,9 @@ namespace PilotsDeck
         [JsonIgnore]
         public static string ColorFile { get; } = "ColorStore.json";
         [JsonIgnore]
-        public static int BuildModelVersion { get; } = 7;
+        public static int BuildModelVersion { get; } = 8;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 11;
+        public static int BuildConfigVersion { get; } = 12;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -93,10 +97,51 @@ namespace PilotsDeck
         [JsonIgnore]
         public float SCALE_SESSION { get; set; } = 1;
 
+        //ISimConnectConfig
+        [JsonIgnore]
+        public string ClientName { get { return SC_CLIENT_NAME; } }
+        [JsonIgnore]
+        public int RetryDelay { get { return MsfsRetryDelay; } }
+        [JsonIgnore]
+        public int StaleTimeout { get { return MsfsStaleTimeout; } }
+        [JsonIgnore]
+        public int CheckInterval { get { return MsfsStateCheckInterval; } }
+        [JsonIgnore]
+        public bool CreateWindow { get { return false; } }
+        [JsonIgnore]
+        public int MsgSimConnect { get { return (int)WM_PILOTSDECK_SIMCONNECT; } }
+        [JsonIgnore]
+        public int MsgConnectRequest { get { return (int)WM_PILOTSDECK_REQ_SIMCONNECT; } }
+
+        public uint IdBase { get; set; } = 500;
+        public uint SizeVariables { get; set; } = 10000;
+        public uint SizeEvents { get; set; } = 10000;
+        public uint SizeSimStates { get; set; } = 100;
+        public uint SizeInputEvents { get; set; } = 10000;
+
+        [JsonIgnore]
+        public bool VerboseLogging { get { return LogLevel == LogLevel.Verbose; } }
+        [JsonIgnore]
+        public string BinaryMsfs2020 { get { return SimBinaries[SimulatorType.MSFS][0]; } }
+        [JsonIgnore]
+        public string BinaryMsfs2024 { get { return SimBinaries[SimulatorType.MSFS][1]; } }
+
+        //IMobiConfig
+        [JsonIgnore]
+        public bool MobiWriteLvars { get { return !string.IsNullOrWhiteSpace(FILE_LVAR); } }
+        [JsonIgnore]
+        public string MobiLvarFile { get { return FILE_LVAR; } }
+        [JsonIgnore]
+        public bool MobiSetVarPerFrame { get { return true; } }
+        public uint MobiSizeVariables { get; set; } = 10000;
+
 
         //ConfigFile
         public int ConfigVersion { get; set; } = BuildConfigVersion;
-        public string LogFile { get; set; } = "log/PilotsDeck.log";
+        public string LogDirectory { get; set; } = "log";
+        public string LogFile { get; set; } = "PilotsDeck.log";
+        [JsonIgnore]
+        public int SizeLimit { get; set; } = -1;
         public LogLevel LogLevel { get; set; } = LogLevel.Debug;
         public RollingInterval LogInterval { get; set; } = RollingInterval.Day;
         public int LogCount { get; set; } = 2;
@@ -175,7 +220,8 @@ namespace PilotsDeck
         public int XPlaneTimeoutReceive { get; set; } = 3000;
         public bool XPlaneUseLiveryRefOn12 { get; set; } = false;
         public int MsfsRetryDelay { get; set; } = 30000;
-        public int MsfsStateCheckInterval { get; set; } = 1000;
+        public int MsfsStaleTimeout { get; set; } = 15000;
+        public int MsfsStateCheckInterval { get; set; } = 500;
         public int MobiRetryDelay { get; set; } = 10000;
         public int MobiVarsPerFrame { get; set; } = 100;
         public int MobiReorderTreshold { get; set; } = 10;
@@ -192,7 +238,7 @@ namespace PilotsDeck
             if (!File.Exists(ConfigFile))
                 File.WriteAllText(ConfigFile, "{}", Encoding.UTF8);
 
-            AppConfiguration config = JsonSerializer.Deserialize<AppConfiguration>(File.ReadAllText(ConfigFile), GetSerializerOptions()) ?? throw new NullReferenceException("The Plugin Configuration is null!");
+            AppConfiguration config = JsonSerializer.Deserialize<AppConfiguration>(File.ReadAllText(ConfigFile), JsonOptions.JsonWriteOptions) ?? throw new NullReferenceException("The Plugin Configuration is null!");
 
             if (config.ConfigVersion < BuildConfigVersion)
             {
@@ -230,6 +276,14 @@ namespace PilotsDeck
                     config.RenderDpi = 96.0f;
                 }
 
+                if (config.ConfigVersion < 12)
+                {
+                    Logger.Information($"Setting LogFile");
+                    config.LogFile = "PilotsDeck.log";
+                    Logger.Information($"Setting MsfsStateCheckInterval");
+                    config.MsfsStateCheckInterval = 500;
+                }
+
                 config.ConfigVersion = BuildConfigVersion;
                 SaveConfiguration();
             }
@@ -254,19 +308,11 @@ namespace PilotsDeck
             return MathF.Round(oldSize * (96.0f / App.Configuration.RenderDpi), 0);
         }
 
-        public static void SaveConfiguration(AppConfiguration config = null)
+        public static void SaveConfiguration(AppConfiguration config = null, string configFile = null)
         {
             config ??= App.Configuration;
-            File.WriteAllText(ConfigFile, JsonSerializer.Serialize(config, GetSerializerOptions()));
-        }
-
-        public static JsonSerializerOptions GetSerializerOptions()
-        {
-            return new()
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                WriteIndented = true
-            };
+            configFile ??= ConfigFile;
+            File.WriteAllText(configFile, JsonSerializer.Serialize(config, JsonOptions.JsonWriteOptions));
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using PilotsDeck.Simulator;
+﻿using CFIT.AppTools;
+using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System;
 using System.Drawing;
 using System.Text.Json;

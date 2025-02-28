@@ -1,5 +1,5 @@
-﻿using PilotsDeck.Resources.Variables;
-using PilotsDeck.Tools;
+﻿using CFIT.AppTools;
+using PilotsDeck.Resources.Variables;
 using System.Text.Json.Serialization;
 
 namespace PilotsDeck.Actions.Advanced
@@ -21,6 +21,7 @@ namespace PilotsDeck.Actions.Advanced
     {
         [JsonIgnore]
         public ManagedVariable Variable { get; set; } = null;
+        public string Name { get; set; } = "";
         public string Address { get; set; } = "";
         public Comparison Comparison { get; set; } = Comparison.EQUAL;
         public string Value { get; set; } = "";
@@ -28,6 +29,7 @@ namespace PilotsDeck.Actions.Advanced
         public ConditionHandler()
         {
             Variable = null;
+            Name = "";
             Address = "";
             Comparison = Comparison.EQUAL;
             Value = "";
@@ -36,6 +38,7 @@ namespace PilotsDeck.Actions.Advanced
         public ConditionHandler(ConditionHandler source)
         {
             Variable = null;
+            Name = source.Name;
             Address = new(source.Address);
             Comparison = source.Comparison;
             Value = new(source.Value);

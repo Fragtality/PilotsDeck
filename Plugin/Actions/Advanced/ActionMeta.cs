@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources;
@@ -222,19 +223,22 @@ namespace PilotsDeck.Actions.Advanced
             return id;
         }
 
-        public virtual void RemoveDisplayElement(int id)
+        public virtual bool RemoveDisplayElement(int id)
         {
             if (!Settings.DisplayElements.ContainsKey(id))
-            {
-                return;
-            }
-            Settings.DisplayElements.Remove(id);
-            var oldDict = Settings.DisplayElements;
-            Settings.DisplayElements = [];
+                return false;
+
+            if (!Settings.DisplayElements.Remove(id))
+                return false;
+            
+            var elements = Settings.DisplayElements.Values.ToList();
+            Settings.DisplayElements.Clear();
             int n = 0;
-            foreach (var element in oldDict.Values)
+            foreach (var element in elements)
                 Settings.DisplayElements.TryAdd(n++, element);
+            
             Logger.Debug($"Removed DisplayElement for ID '{id}'");
+            return true;
         }
 
         public virtual int AddCommand(ActionCommand command, StreamDeckCommand sdCommand, int? id = null)
@@ -255,18 +259,24 @@ namespace PilotsDeck.Actions.Advanced
             }
         }
 
-        public virtual void RemoveCommand(StreamDeckCommand sdCommand, int id)
+        public virtual bool RemoveCommand(StreamDeckCommand sdCommand, int id)
         {
             if (Settings.ActionCommands[sdCommand]?.ContainsKey(id) == true)
             {
-                Settings.ActionCommands[sdCommand].Remove(id);
+                if (!Settings.ActionCommands[sdCommand].Remove(id))
+                    return false;
+
                 var oldDict = Settings.ActionCommands[sdCommand];
                 Settings.ActionCommands[sdCommand] = [];
                 int n = 0;
                 foreach (var cmd in oldDict.Values)
                     Settings.ActionCommands[sdCommand].TryAdd(n++, cmd);
+                
                 Logger.Debug($"Removed Command for ID '{id}'");
+                return true;
             }
+            else
+                return false;
         }
 
         public virtual int AddActionCondition(StreamDeckCommand type, int commandID, ConditionHandler condition, int? id = null)
@@ -283,18 +293,89 @@ namespace PilotsDeck.Actions.Advanced
             return (int)id;
         }
 
-        public virtual void RemoveActionCondition(StreamDeckCommand type, int commandID, int conditionID)
+        public virtual bool RemoveActionCondition(StreamDeckCommand type, int commandID, int conditionID)
         {
             if (Settings.ActionCommands[type][commandID]?.Conditions?.ContainsKey(conditionID) == true)
             {
-                Settings.ActionCommands[type][commandID].Conditions.Remove(conditionID, out _);
+                if (!Settings.ActionCommands[type][commandID].Conditions.Remove(conditionID, out _))
+                    return false;                
+                
                 var oldDict = Settings.ActionCommands[type][commandID].Conditions;
                 Settings.ActionCommands[type][commandID].Conditions = [];
                 int n = 0;
                 foreach (var condition in oldDict.Values)
                     Settings.ActionCommands[type][commandID].Conditions.TryAdd(n++, condition);
+                
                 Logger.Debug($"Removed Condition for ID '{conditionID}'");
+                return true;
             }
+            else
+                return false;
+        }
+
+        public virtual bool SwapElement(int first, int second)
+        {
+            if (second >= 0 && second < Settings.DisplayElements.Count)
+            {
+                return Swap(Settings.DisplayElements, first, second);
+            }
+            else
+                return false;
+        }
+
+        public virtual bool SwapManipulator(int elementID, int first, int second)
+        {
+            if (second >= 0 && second < Settings.DisplayElements[elementID].Manipulators.Count)
+            {
+                return Swap(Settings.DisplayElements[elementID].Manipulators, first, second);
+            }
+            else
+                return false;
+        }
+
+        public virtual bool SwapManipulatorCondition(int elementID, int manipulatorID, int first, int second)
+        {
+            if (second >= 0 && second < Settings.DisplayElements[elementID].Manipulators[manipulatorID].Conditions.Count)
+            {
+                return Swap(Settings.DisplayElements[elementID].Manipulators[manipulatorID].Conditions, first, second);
+            }
+            else
+                return false;
+        }
+
+        public virtual bool SwapActionCondition(StreamDeckCommand type, int cmdID, int first, int second)
+        {
+            if (second >= 0 && second < Settings.ActionCommands[type][cmdID].Conditions.Count)
+            {
+                return Swap(Settings.ActionCommands[type][cmdID].Conditions, first, second);
+            }
+            else
+                return false;
+        }
+
+        public virtual bool SwapCommand(StreamDeckCommand type, int first, int second)
+        {
+            if (second >= 0 && second < Settings.ActionCommands[type].Count)
+            {
+                return Swap(Settings.ActionCommands[type], first, second);
+            }
+            else
+                return false;
+        }
+
+        protected virtual bool Swap<E>(SortedDictionary<int, E> dict, int first, int second)
+        {
+            if (dict.TryGetValue(first, out E firstElement) && dict.TryGetValue(second, out E secondElement))
+            {
+                dict.Remove(first);
+                dict.Remove(second);
+                dict.Add(first, secondElement);
+                dict.Add(second, firstElement);
+                UpdateRessources(true);
+                return true;
+            }
+            else
+                return false;
         }
 
         public virtual void SetTitleParameters(string title, StreamDeckEvent.TitleParameters titleParameters)

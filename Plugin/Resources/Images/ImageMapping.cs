@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Simple;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Simple;
 using PilotsDeck.Resources.Scripts;
 using PilotsDeck.Tools;
 using System;

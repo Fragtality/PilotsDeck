@@ -1,4 +1,5 @@
-﻿using FSUIPC;
+﻿using CFIT.AppLogger;
+using FSUIPC;
 using PilotsDeck.Resources.Variables;
 using System;
 using System.Linq;
@@ -71,10 +72,10 @@ namespace PilotsDeck.Simulator.FSUIPC
 
         protected void CreateInternalOffsets()
         {
-            OffsetInMenu = new(AppConfiguration.IpcInMenuAddr);
-            OffsetInMenuFsx = new(AppConfiguration.IpcInMenuFsxAddr);
-            OffsetIsPaused = new(AppConfiguration.IpcIsPausedAddr);
-            OffsetAircraftPath = new(AppConfiguration.IpcAircraftPathAddr);
+            OffsetInMenu = new(new ManagedAddress(AppConfiguration.IpcInMenuAddr));
+            OffsetInMenuFsx = new(new ManagedAddress(AppConfiguration.IpcInMenuFsxAddr));
+            OffsetIsPaused = new(new ManagedAddress(AppConfiguration.IpcIsPausedAddr));
+            OffsetAircraftPath = new(new ManagedAddress(AppConfiguration.IpcAircraftPathAddr));
         }
 
         protected void ResetInternalOffsets()

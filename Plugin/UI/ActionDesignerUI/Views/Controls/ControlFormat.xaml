@@ -1,0 +1,200 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.Controls.ControlFormat"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views.Controls"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelFormat}"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="TextBox" x:Key="FormatInputDefault" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="MinWidth" Value="64" />
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Preferred Type:
+        </Label>
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,8,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsTypeString}" Command="{Binding SetPreferrenceCommand}" CommandParameter="STRING"
+                      HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                String
+            </CheckBox>
+            <CheckBox IsChecked="{Binding IsTypeNumber}" Command="{Binding SetPreferrenceCommand}" CommandParameter="NUMBER"
+                      Margin="16,0,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                Number
+            </CheckBox>
+        </StackPanel>
+
+        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Decode BCD:
+        </Label>
+        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding DecodeBCD}" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+            Decode from Binary Coded Decimal
+        </CheckBox>
+
+        <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Absolute Value:
+        </Label>
+        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding UseAbsoluteValue}" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+            Use the absolute Value
+        </CheckBox>
+
+        <Label Grid.Row="3" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Scale:
+        </Label>
+        <TextBox Grid.Row="3" Grid.Column="1" Name="InputScalar" Margin="0,8,0,0" Style="{StaticResource FormatInputDefault}" />
+
+        <Label Grid.Row="4" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Offset:
+        </Label>
+        <Grid Grid.Row="4" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="InputOffset" Style="{StaticResource FormatInputDefault}"/>
+            <CheckBox Grid.Column="1" IsChecked="{Binding OffsetFirst}" Margin="14,0,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">Apply Offset before Scale</CheckBox>
+        </Grid>
+
+        <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource DesignerLabelTop}" Margin="0,8,0,0">
+            Round:
+        </Label>
+        <Grid Grid.Row="5" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBox Name="InputRound" Style="{StaticResource FormatInputDefault}"/>
+                <Label Style="{StaticResource LabelAnnotation}">
+                    Fractional Digits
+                </Label>
+            </StackPanel>
+
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding RoundCeiling}" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                Use Ceiling Function
+            </CheckBox>
+            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding RoundFloor}" Margin="14,0,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                Use Floor Function
+            </CheckBox>
+        </Grid>
+
+        <Label Grid.Row="6" Grid.Column="0" Style="{StaticResource DesignerLabelTop}" Margin="0,8,0,0">
+            Digits:
+        </Label>
+        <Grid Grid.Row="6" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBox Name="InputDigits" Style="{StaticResource FormatInputDefault}"/>
+                <Label Margin="19.5,0,19.5,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Style="{StaticResource LabelDefault}">.</Label>
+                <TextBox Name="InputDigitsTrailing" Style="{StaticResource FormatInputDefault}"/>
+                <Label Style="{StaticResource LabelAnnotation}">
+                    Leading . Trailing
+                </Label>
+            </StackPanel>
+
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding InsertSign}" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                Insert + Sign for positive Values
+            </CheckBox>
+            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding InsertSpace}" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                Insert Space Character
+            </CheckBox>
+            <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding LimitDigits}" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+                Cut off Digits
+            </CheckBox>
+        </Grid>
+
+        <Label Grid.Row="7" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Sub-String:
+        </Label>
+        <Grid Grid.Row="7" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="InputSubIndex" Style="{StaticResource FormatInputDefault}"/>
+            <Label Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="18,0,18.5,0" Style="{StaticResource LabelDefault}">..</Label>
+            <TextBox Grid.Column="2" Name="InputSubLength" Style="{StaticResource FormatInputDefault}"/>
+        </Grid>
+
+        <Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelTop}" Margin="0,8,0,0">
+            Value Mappings:
+        </Label>
+        <Grid Grid.Row="8" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" MinHeight="84"/>
+            </Grid.RowDefinitions>
+             
+            <TextBox Grid.Column="0" Grid.Row="0" Name="InputMappingValue" Style="{StaticResource FormatInputDefault}"/>
+            <Label Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="16,0,17.5,0" Style="{StaticResource LabelDefault}">=</Label>
+            <TextBox Grid.Column="2" Grid.Row="0" Name="InputMappingString" Style="{StaticResource FormatInputDefault}"/>
+
+            <StackPanel Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Top" Margin="8,1,0,0">
+                <Button Name="ButtonAddMapping" Style="{StaticResource BtnSquareSmall}">
+                    <Image Name="ImageAddUpdateMapping" Source="../../../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Name="ButtonRemoveMapping" Margin="0,7,0,0" Style="{StaticResource BtnSquareSmall}">
+                    <Image Source="../../../Icons/dash-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Name="ButtonCopyPasteMapping" Margin="0,7,0,0" Style="{StaticResource BtnSquareSmall}">
+                    <Image Source="../../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+            </StackPanel>
+
+            <ListView Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" Name="ListMappings" Margin="0,6,0,0" MinHeight="84" MinWidth="180"
+                      VerticalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                
+            </ListView>
+        </Grid>
+
+        <Label Grid.Row="9" Grid.Column="0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="0,8,0,8">
+            String-Insertion:
+        </Label>
+        <TextBox Grid.Row="9" Grid.Column="1" Name="InputFormat" MinWidth="180" Margin="0,8,0,8" HorizontalAlignment="Left" Style="{StaticResource InputLeft}"/>
+    </Grid>
+</UserControl>

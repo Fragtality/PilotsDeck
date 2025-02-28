@@ -1,8 +1,7 @@
-﻿using PilotsDeck.Tools;
-
+﻿using CFIT.AppTools;
 namespace PilotsDeck.Resources.Variables
 {
-    public class VariableNumeric(string address, SimValueType type) : ManagedVariable(address, type)
+    public class VariableNumeric(ManagedAddress address) : ManagedVariable(address)
     {
         protected double DoubleValue { get; set; } = 0;
         protected double ValueLast { get; set; } = 0;

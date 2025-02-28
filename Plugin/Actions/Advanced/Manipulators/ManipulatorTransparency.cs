@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Variables;
@@ -47,7 +48,7 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             if (TransparencyVariable == null && Settings.DynamicTransparency)
             {
                 Logger.Verbose($"Register Variable '{Settings.TransparencyAddress}'");
-                TransparencyVariable = App.PluginController.VariableManager.RegisterVariable(Settings.TransparencyAddress);
+                TransparencyVariable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(Settings.TransparencyAddress));
             }
         }
 

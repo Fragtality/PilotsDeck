@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.Controls.ControlAddress"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views.Controls"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Address"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelAddress}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="TextBox" x:Key="DisableFocusBorder">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    
+                                </Trigger>
+                                <Trigger Property="IsFocused" Value="true">
+                                    
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Content="{Binding LabelDescription}" Style="{StaticResource DesignerLabelTop}"/>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <TextBox Name="InputAddress" MinWidth="384" MaxWidth="768" HorizontalAlignment="Left" Style="{StaticResource DisableFocusBorder}"/>
+            <Label Content="{Binding LabelInputCheck}" Margin="8,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" FontSize="10" Style="{StaticResource LabelDefault}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <Label Content="{Binding LabelType}"
+                   VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="0,-4,0,0" FontSize="10" MinHeight="18"/>
+            <Label Content="{Binding LabelValue}" Visibility="{Binding HasValue, Converter={StaticResource BoolVisibilityConverter}}"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="12,-4,0,0" FontSize="10" MinHeight="18"/>
+        </StackPanel>
+        
+    </Grid>
+</UserControl>

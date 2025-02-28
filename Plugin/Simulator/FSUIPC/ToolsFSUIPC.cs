@@ -1,4 +1,5 @@
-﻿using FSUIPC;
+﻿using CFIT.AppLogger;
+using FSUIPC;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Tools;
 using System;
@@ -9,21 +10,10 @@ namespace PilotsDeck.Simulator.FSUIPC
 {
     public static class ToolsFSUIPC
     {
-        public static string FormatLvarAddress(string address)
-        {
-            string result = null;
-
-            var match = TypeMatching.rxLvarMobiMatch.Match(address);
-            if (match?.Captures?.Count == 1 && !string.IsNullOrWhiteSpace(match?.Captures[0]?.Value))
-                return match.Captures[0].Value;
-
-            return result;
-        }
-
         public async static Task<bool> RunMacros(SimCommand command)
         {
             bool result = false;
-            string address = command.Address;
+            string address = command.Address.Address;
 
             string[] tokens = address.Split(':');
             if (tokens.Length == 2)
@@ -65,9 +55,9 @@ namespace PilotsDeck.Simulator.FSUIPC
             return true;
         }
 
-        public static bool WriteOffset(string address, string value)
+        public static bool WriteOffset(ManagedAddress address, string value)
         {
-            if (string.IsNullOrEmpty(address) || !FSUIPCConnection.IsOpen)
+            if (address == null || address.IsEmpty == true || !FSUIPCConnection.IsOpen)
                 return false;
 
             bool result = false;
@@ -90,12 +80,12 @@ namespace PilotsDeck.Simulator.FSUIPC
             return result;
         }
 
-        public static bool WriteLvar(string address, double value)
+        public static bool WriteLvar(ManagedAddress address, double value)
         {
             bool result = false;
             try
             {
-                FSUIPCConnection.WriteLVar(address, value);
+                FSUIPCConnection.WriteLVar(address.FormatFsuipcLvar(), value);
                 result = true;
             }
             catch (Exception ex)
@@ -110,7 +100,7 @@ namespace PilotsDeck.Simulator.FSUIPC
         {
             try
             {
-                string[] parts = command.Address.Split(':');
+                string[] parts = command.Address.Address.Split(':');
                 if (parts.Length == 3 && int.TryParse(parts[2], out int result))    //Script with flag
                     return RunSingleScript(parts[0] + ":" + parts[1], result);
                 if (parts.Length == 2)                                              //Script
@@ -180,19 +170,17 @@ namespace PilotsDeck.Simulator.FSUIPC
 
         public async static Task<bool> RunVjoy(SimCommand command)
         {
-            if (SimCommand.IsVjoyToggle(command?.Address, command?.Type))
+            if (command.Address.HasParameter)
             {
                 return RunVjoyToggle(command.Address);
             }
-            else if (SimCommand.IsVjoyClearSet(command?.Address, command?.Type))
+            else
             {
                 return await RunVjoyClearSet(command.Address);
             }
-
-            return false;
         }
 
-        public async static Task<bool> RunVjoyClearSet(string address)
+        public async static Task<bool> RunVjoyClearSet(ManagedAddress address) //TODO acts differently than vjoy Drv?!
         {
             bool result = false;
             if (VjoyClearSet(address, false))
@@ -205,7 +193,7 @@ namespace PilotsDeck.Simulator.FSUIPC
             return result;
         }
 
-        public static bool VjoyClearSet(string address, bool clear)
+        public static bool VjoyClearSet(ManagedAddress address, bool clear)
         {
             if (clear)
                 return SendVjoy(address, 2);
@@ -213,18 +201,16 @@ namespace PilotsDeck.Simulator.FSUIPC
                 return SendVjoy(address, 1);
         }
 
-        public static bool RunVjoyToggle(string address)
+        public static bool RunVjoyToggle(ManagedAddress address)
         {
             return SendVjoy(address, 0);
         }
 
-        public static bool SendVjoy(string address, byte action)
+        public static bool SendVjoy(ManagedAddress address, byte action)
         {
             try
             {
-                address = address.ToLowerInvariant().Replace("vjoy:","");
-
-                string[] parts = address.Split(':');
+                string[] parts = address.Name.Split(':');
                 byte[] offValue = new byte[4];
 
                 offValue[3] = 0;
@@ -232,7 +218,7 @@ namespace PilotsDeck.Simulator.FSUIPC
                 offValue[1] = Convert.ToByte(parts[0]); //joy
                 offValue[0] = Convert.ToByte(parts[1]); //btn
 
-                return WriteOffset("0x29F0:4:i", BitConverter.ToUInt32(offValue, 0).ToString());
+                return WriteOffset(new ManagedAddress("0x29F0:4:i"), BitConverter.ToUInt32(offValue, 0).ToString());
             }
             catch (Exception ex)
             {
@@ -243,11 +229,11 @@ namespace PilotsDeck.Simulator.FSUIPC
 
         public async static Task<bool> SendControls(SimCommand command)
         {
-            string address = command.Address;
+            string address = command.Address.Address;
             if (!address.Contains('=') && address.Contains(':') && TypeMatching.rxControlSeq.IsMatch(address))
                 return await SendControlsSeq(command);
             else if (!address.Contains('=') && !address.Contains(':'))
-                return SendControl(command.Address);
+                return SendControl(address);
 
             int fails = 0;
 
@@ -277,7 +263,7 @@ namespace PilotsDeck.Simulator.FSUIPC
         public async static Task<bool> SendControlsSeq(SimCommand command)
         {
             int fails = 0;
-            string address = command.Address;
+            string address = command.Address.Address;
             string codeControl;
             while (address.Length > 0)
             {

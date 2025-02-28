@@ -1,6 +1,6 @@
-﻿using PilotsDeck.Actions.Advanced.SettingsModel;
+﻿using CFIT.AppTools;
+using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Actions.Simple;
-using PilotsDeck.Tools;
 using System.Drawing;
 
 namespace PilotsDeck.Plugin.Render

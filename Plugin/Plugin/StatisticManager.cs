@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 

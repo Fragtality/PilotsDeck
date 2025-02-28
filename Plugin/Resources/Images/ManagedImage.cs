@@ -1,4 +1,5 @@
-﻿using PilotsDeck.StreamDeck;
+﻿using CFIT.AppLogger;
+using PilotsDeck.StreamDeck;
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;

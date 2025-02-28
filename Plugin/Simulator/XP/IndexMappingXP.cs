@@ -16,7 +16,7 @@ namespace PilotsDeck.Simulator.XP
             return new()
             {
                 SimIndex = nextIndex,
-                Address = managedVariable.Address,
+                Address = managedVariable.Address.Address,
                 ValueRef = managedVariable,
                 IsString = false
             };

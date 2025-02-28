@@ -1,7 +1,6 @@
-﻿using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using System;
-using System.Globalization;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -21,9 +20,7 @@ namespace PilotsDeck.UI.DeveloperUI
             NotifyModel = notifyModel;
             InitializeComponent();
 
-            string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
-            Title = $"{Title} ({assemblyVersion}-{GetLinkerTime(Assembly.GetEntryAssembly()):yyyyMMddHHmm})";
+            Title = $"{Title} ({VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()})";
         }
 
         protected void CheckVersion()
@@ -43,7 +40,7 @@ namespace PilotsDeck.UI.DeveloperUI
                     };
                     LabelVersionCheck.Inlines.Add(hyperlink);
                     LabelVersionCheck.Inlines.Add(" available!");
-                    this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Sys.RequestNavigateHandler));
+                    this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Nav.RequestNavigateHandler));
 
                     LabelVersionCheck.Visibility = Visibility.Visible;
                 }
@@ -52,31 +49,6 @@ namespace PilotsDeck.UI.DeveloperUI
             {
                 Logger.LogException(ex);
             }
-        }
-
-        protected static DateTime GetLinkerTime(Assembly assembly)
-        {
-            const string BuildVersionMetadataPrefix = "+build";
-            const string dateFormat = "yyyy-MM-ddTHH:mmZ";
-
-            var attribute = assembly
-              .GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-
-            if (attribute?.InformationalVersion != null)
-            {
-                var value = attribute.InformationalVersion;
-                var index = value.IndexOf(BuildVersionMetadataPrefix);
-                if (index > 0)
-                {
-                    value = value[(index + BuildVersionMetadataPrefix.Length)..];
-
-                    return DateTime.ParseExact(
-                        value,
-                      dateFormat,
-                      CultureInfo.InvariantCulture);
-                }
-            }
-            return default;
         }
 
         protected void LoadView(IView newView)

@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Images;
@@ -71,7 +72,7 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             if (IndicatorVariable == null)
             {
                 Logger.Verbose($"Register Variable '{Settings.IndicatorAddress}'");
-                IndicatorVariable = App.PluginController.VariableManager.RegisterVariable(Settings.IndicatorAddress);
+                IndicatorVariable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(Settings.IndicatorAddress));
             }
 
             if (Settings.IndicatorType == IndicatorType.IMAGE && IndicatorImage == null)

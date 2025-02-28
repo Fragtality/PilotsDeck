@@ -14,12 +14,10 @@ node_modules/
 Marketplace/com.extension.pilotsdeck.sdPlugin/installer
 Marketplace/com.extension.pilotsdeck.sdPlugin/Plugin
 desktop.ini
-BuildPlugin.ps1
 CopyLatest.ps1
 build.lck
 Release.ps1
 export.ps1
-DistributionTool.exe
 RELEASE ORDER.txt
 
 # User-specific files

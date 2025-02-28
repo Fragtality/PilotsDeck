@@ -1,0 +1,144 @@
+﻿<Window x:Class="PilotsDeck.UI.ActionDesignerUI.ActionDesigner"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI"
+        xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels"
+        d:DataContext="{d:DesignInstance Type=model:ViewModelAction}"
+        mc:Ignorable="d"
+        Title="ActionDesigner" MinHeight="960" MinWidth="1024" SizeToContent="WidthAndHeight" WindowState="Normal">
+    <Grid Margin="16" Name="MainGrid">
+        <Grid.Resources>
+            <Style x:Key="ButtonTreeMenu" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="Width" Value="32" />
+            </Style>
+            <Style x:Key="ImageTreeMenu" TargetType="Image">
+                <Setter Property="Height" Value="28" />
+                <Setter Property="Width" Value="28" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" MinWidth="256"/>
+            <ColumnDefinition Width="3*" TextBlock.TextAlignment="Left"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <!-- MENU -->
+        <Grid Grid.Row="0" Grid.Column="0" MinWidth="240">
+            <!-- Item Modification -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="1,0,0,0">
+                <Button Name="ButtonRemove" IsEnabled="{Binding IsItemModifiable}" Command="{Binding RemoveCommand}" Style="{StaticResource ButtonTreeMenu}">
+                    <Image Source="../Icons/trash.png" Style="{StaticResource ImageTreeMenu}"/>
+                </Button>
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="ButtonMoveUp" IsEnabled="{Binding IsItemModifiable}" Command="{Binding MoveUpCommand}" Style="{StaticResource ButtonTreeMenu}" Margin="0,0,8,0">
+                    <Image Source="../Icons/caret-up-fill.png" Style="{StaticResource ImageTreeMenu}"/>
+                </Button>
+                <Button Name="ButtonMoveDown" IsEnabled="{Binding IsItemModifiable}" Command="{Binding MoveDownCommand}" Style="{StaticResource ButtonTreeMenu}" Margin="8,0,8,0">
+                    <Image Source="../Icons/caret-down-fill.png" Style="{StaticResource ImageTreeMenu}"/>
+                </Button>
+                <Button Name="ButtonCopyPaste" DataContext="{Binding Clipboard}" Command="{Binding CopyPasteCommand}" CommandParameter="{Binding ModelAction.CurrentItem}"
+                        IsEnabled="{Binding IsCopyPasteAllowed}" BorderThickness="{Binding ThicknessCopyPaste}" BorderBrush="{Binding BrushCopyPaste}" Style="{StaticResource ButtonTreeMenu}" Margin="8,0,1,0">
+                    <Image Source="../Icons/copy.png" Style="{StaticResource ImageTreeMenu}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Orientation="Horizontal">
+            <!-- Add Item -->
+            <ComboBox Name="CombobBoxType" ItemsSource="{Binding ItemsType}" SelectedValuePath="Key" SelectedIndex="0" Visibility="{Binding VisibilityType}"
+                      MinWidth="124" MinHeight="32" Style="{StaticResource ComboboxDefault}" Margin="12,0,0,0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Key, Converter={StaticResource TypeIconConverter}}" Style="{StaticResource TreeImageType}" Margin="0,0,4,0"/>
+                            <Label Content="{Binding Value}" Style="{StaticResource DesignerLabel}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Name="ButtonAdd" Command="{Binding AddItemCommand}" Visibility="{Binding VisibilityAdd}" Margin="12,0,0,0"
+                    MinWidth="96" VerticalAlignment="Center" Height="32">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,4,0">
+                    <Image Width="20" Height="20" Margin="0,0,4,0" Visibility="{Binding VisibilityTypeIcon}" Source="{Binding TypeIcon}"/>
+                    <Label Name="LabelAdd" Content="{Binding NameTypeAdd}"
+                           VerticalAlignment="Center" FontWeight="DemiBold"/>
+                    <Image Source="../Icons/plus-circle.png" Width="20" Height="20" Margin="4,0,0,0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+
+        <!-- TREE VIEWS -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,12,0,0" Orientation="Vertical">
+            <Border Name="TreeBorderElements" Style="{StaticResource TreeBorder}">
+                <!-- ELEMENTS -->
+                <DockPanel>
+                    <DockPanel.Resources>
+                        <Style x:Key="ElementRoot_Border" TargetType="Border">
+                            <Setter Property="BorderBrush" Value="{x:Static SystemColors.WindowBrush}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="CornerRadius" Value="6"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource MouseOverBrush}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DockPanel.Resources>
+                    
+                        <DockPanel DockPanel.Dock="Top" Style="{StaticResource TreeHeaderPanel}">
+                            <ToggleButton Name="ExpanderElements" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=VisibilityElements}" Margin="4,0,0,0" Style="{StaticResource ExpanderDownHeaderStyle}"/>
+                        <Border Style="{StaticResource ElementRoot_Border}">
+                            <StackPanel Orientation="Horizontal" Name="PanelElementRoot" HorizontalAlignment="Stretch" Background="Transparent">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Image">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Image Source="../Icons/Elements.png" Style="{StaticResource TreeHeaderImage}"/>
+                                <Label Style="{StaticResource TreeHeaderLabel}">Elements</Label>
+                                <Image Source="../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}" Margin="2,0,0,0"
+                                       Name="ImageElementAdd" Visibility="Hidden">
+                                    <!--<Image.Resources>
+
+
+                                    </Image.Resources>-->
+                                </Image>
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Name="ControlElements" Visibility="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=VisibilityElements, Converter={StaticResource BoolVisibilityConverter}}"/>
+                </DockPanel>
+            </Border>
+
+            <Border Name="TreeBorderCommands" Margin="0,12,0,0" Style="{StaticResource TreeBorder}">
+                <!-- COMMANDS -->
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Style="{StaticResource TreeHeaderPanel}">
+                        <ToggleButton Name="ExpanderCommands" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=VisibilityCommands}" Margin="4,0,0,0" Style="{StaticResource ExpanderDownHeaderStyle}"/>
+                        <Image Source="../Icons/Commands.png" Style="{StaticResource TreeHeaderImage}"/>
+                        <Label Style="{StaticResource TreeHeaderLabel}">Commands</Label>
+                    </DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Name="ControlCommands" Visibility="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=VisibilityCommands, Converter={StaticResource BoolVisibilityConverter}}"/>
+                </DockPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- ITEM VIEW -->
+        <ScrollViewer Grid.Row="1" Grid.Column="1" Name="ElementView" Margin="4,16,0,0" VerticalAlignment="Top" CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+
+        </ScrollViewer>
+    </Grid>
+</Window>

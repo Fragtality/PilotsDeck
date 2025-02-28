@@ -1,4 +1,6 @@
-﻿using Neo.IronLua;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using Neo.IronLua;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator;
 using PilotsDeck.Tools;
@@ -20,7 +22,7 @@ namespace PilotsDeck.Resources.Scripts
         public virtual LuaChunk LuaChunk { get; set; }
         public virtual string FileName { get; set; }
         public virtual DateTime LastWriteTime { get; set; }
-        public virtual Dictionary<string, bool> Variables { get; set; } = [];
+        public virtual Dictionary<ManagedAddress, bool> Variables { get; set; } = [];
         public virtual int Registrations { get; set; } = 1;
         public virtual bool LogUseDefault { get; set; } = true;
         protected virtual Serilog.Core.Logger Log { get; set; }
@@ -87,6 +89,7 @@ namespace PilotsDeck.Resources.Scripts
             _env.SimReadString = new Func<string, string>(SimReadString);
             _env.SimWrite = new Func<string, dynamic, bool>(SimWrite);
             _env.SimCommand = new Func<string, bool>(SimCommand);
+            _env.JoystickCommand = new Func<string, string, bool>(JoystickCommand);
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
@@ -178,24 +181,25 @@ namespace PilotsDeck.Resources.Scripts
         protected virtual bool RegisterVariable(string name)
         {
             Logger.Verbose($"SimVar Request from Script File '{FileName}' for Variable '{name}'");
+            var address = new ManagedAddress(name);
 
-            if (Variables.TryGetValue(name, out bool value))
+            if (Variables.TryGetValue(address, out bool value))
             {
                 if (value)
-                    Logger.Warning($"Variable '{name}' is already registered for Script File '{FileName}'");
+                    Logger.Warning($"Variable '{address}' is already registered for Script File '{FileName}'");
                 else
-                    Variables[name] = VariableManager.RegisterVariable(name) != null;
+                    Variables[address] = VariableManager.RegisterVariable(address) != null;
             }
-            else if (VariableManager.RegisterVariable(name) != null)
+            else if (VariableManager.RegisterVariable(address) != null)
             {
-                Variables.Add(name, true);
-                Logger.Verbose($"Registered Variable '{name}' for Script File '{FileName}'");
+                Variables.Add(address, true);
+                Logger.Verbose($"Registered Variable '{address}' for Script File '{FileName}'");
                 return true;
             }
             else
             {
-                Variables.Add(name, false);
-                Logger.Error($"Could not register Variable '{name}' for Script File '{FileName}'");
+                Variables.Add(address, false);
+                Logger.Error($"Could not register Variable '{address}' for Script File '{FileName}'");
             }
 
             return false;
@@ -203,7 +207,7 @@ namespace PilotsDeck.Resources.Scripts
 
         protected virtual dynamic SimRead(string name)
         {
-            ManagedVariable value = VariableManager[name];
+            ManagedVariable value = VariableManager[new ManagedAddress(name)];
             if (value == null)
             {
                 Log?.Warning(ScriptManager.FormatLogMessage(FileName, $"The requested Variable '{name}' is not registered!"));
@@ -225,7 +229,7 @@ namespace PilotsDeck.Resources.Scripts
 
         protected virtual string SimReadString(string name)
         {
-            ManagedVariable value = VariableManager[name];
+            ManagedVariable value = VariableManager[new ManagedAddress(name)];
             if (value == null)
             {
                 Log?.Warning(ScriptManager.FormatLogMessage(FileName, $"The requested Variable '{name}' is not registered!"));
@@ -304,7 +308,7 @@ namespace PilotsDeck.Resources.Scripts
 
             SimCommand command = new()
             {
-                Address = name,
+                Address = new ManagedAddress(name, (SimCommandType)actionType, true),
                 Type = (SimCommandType)actionType,
                 Value = value,
             };
@@ -315,30 +319,43 @@ namespace PilotsDeck.Resources.Scripts
         protected virtual bool SimCommand(string name)
         {
             SimCommandType? actionType = TypeMatching.GetCommandOnlyType(name);
-            if (actionType == null)
+            if (actionType == null || actionType == SimCommandType.VJOY || actionType == SimCommandType.VJOYDRV)
                 return false;
-            bool isVjoy = (actionType == SimCommandType.VJOY || actionType == SimCommandType.VJOYDRV) && !PilotsDeck.Simulator.SimCommand.IsVjoyToggle(name, actionType);
 
             SimCommand command = new()
             {
-                Address = name,
+                Address = new ManagedAddress(name, (SimCommandType)actionType, true),
                 Type = (SimCommandType)actionType,
-                IsUp = !isVjoy,
+                IsUp = true,
             };
             SimController.CommandChannel.TryWrite(command);
 
-            if (isVjoy)
-            {
-                Thread.Sleep(App.Configuration.VJoyMinimumPressed);
-                command = new()
-                {
-                    Address = name,
-                    Type = (SimCommandType)actionType,
-                    IsUp = true,
-                };
+            return true;
+        }
 
-                SimController.CommandChannel.TryWrite(command);
-            }
+        protected virtual bool JoystickCommand(string name, string operation) //TODO test new command for vJoy
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(operation))
+                return false;
+            operation = operation.ToLowerInvariant();
+
+            SimCommandType? actionType = TypeMatching.GetCommandOnlyType(name);
+            if (actionType == null || (actionType != SimCommandType.VJOY && actionType != SimCommandType.VJOYDRV))
+                return false;
+
+            bool isUp = true;
+            if (operation == "down")
+                isUp = false;
+            else if (operation == "toggle")
+                name = $"{name}:t";
+
+            SimCommand command = new()
+            {
+                Address = new ManagedAddress(name, (SimCommandType)actionType, true),
+                Type = (SimCommandType)actionType,
+                IsUp = isUp,
+            };
+            SimController.CommandChannel.TryWrite(command);
 
             return true;
         }
@@ -347,7 +364,7 @@ namespace PilotsDeck.Resources.Scripts
         {
             SimCommand command = new()
             {
-                Address = code,
+                Address = new ManagedAddress(code, SimCommandType.CALCULATOR, true),
                 Type = SimCommandType.CALCULATOR
             };
             _ = SimController.CommandChannel.WriteAsync(command).AsTask();
@@ -422,7 +439,7 @@ namespace PilotsDeck.Resources.Scripts
 
         protected virtual string GetRegistryValue(string path, string value)
         {
-            return Sys.GetRegistryValue(path, value) ?? "";
+            return Sys.GetRegistryValue<string>(path, value) ?? "";
         }
 
         public override string ToString()

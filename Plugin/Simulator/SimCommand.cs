@@ -1,4 +1,6 @@
-﻿using PilotsDeck.Tools;
+﻿using CFIT.AppTools;
+using PilotsDeck.Resources.Variables;
+using PilotsDeck.Tools;
 using System;
 
 namespace PilotsDeck.Simulator
@@ -25,7 +27,7 @@ namespace PilotsDeck.Simulator
 
     public class SimCommand
     {
-        public virtual string Address { get; set; } = "";
+        public virtual ManagedAddress Address { get; set; } = ManagedAddress.CreateEmptyCommand();
         public virtual SimCommandType Type { get; set; } = SimCommandType.MACRO;
         public virtual bool EncoderAction { get; set; } = false;
         public virtual double NumValue { get { return Conversion.ToDouble(Value); } }
@@ -33,6 +35,7 @@ namespace PilotsDeck.Simulator
         public virtual bool DoNotRequest { get; set; } = false;
         public virtual bool IsValueReset { get; set; } = false;
         public virtual int ResetDelay { get; set; } = 0;
+        public virtual double ResetNumValue { get { return Conversion.ToDouble(ResetValue); } }
         public virtual string ResetValue { get; set; } = "";
         public virtual string Context { get; set; } = "";
         public virtual int Ticks { get; set; } = 1;
@@ -46,7 +49,7 @@ namespace PilotsDeck.Simulator
         {
             get
             {
-                return IsValidAddressForType(Address, Type, DoNotRequest);
+                return IsValidAddressForType(Address.Address, Type, DoNotRequest);
             }
         }
 
@@ -108,15 +111,15 @@ namespace PilotsDeck.Simulator
                 || (type == SimCommandType.BVAR && donotrequest) || type == SimCommandType.KVAR;
         }
 
-        public static bool IsVjoyClearSet(string address, SimCommandType? type)
+        public static bool IsVjoyClearSet(ManagedAddress address)
         {
-            return (type == SimCommandType.VJOYDRV || type == SimCommandType.VJOY) && address?.Contains(":t", StringComparison.InvariantCultureIgnoreCase) == false;
+            return (address.CommandType == SimCommandType.VJOYDRV || address.CommandType == SimCommandType.VJOY) && !address.HasParameter;
         }
 
-        public static bool IsVjoyToggle(string address, SimCommandType? type)
-        {
-            return (type == SimCommandType.VJOYDRV || type == SimCommandType.VJOY) && address?.Contains(":t", StringComparison.InvariantCultureIgnoreCase) == true;
-        }
+        //public static bool IsVjoyToggle(string address, SimCommandType? type)
+        //{
+        //    return (type == SimCommandType.VJOYDRV || type == SimCommandType.VJOY) && address?.Contains(":t", StringComparison.InvariantCultureIgnoreCase) == true;
+        //}
 
         public static bool IsValidBvarAddress(string address, bool donotrequest)
         {
@@ -143,7 +146,7 @@ namespace PilotsDeck.Simulator
                 SimCommandType.XPWREF => TypeMatching.rxDref.IsMatch(address),
                 SimCommandType.AVAR => TypeMatching.rxAvar.IsMatch(address),
                 SimCommandType.BVAR => IsValidBvarAddress(address, donotrequest),
-                SimCommandType.KVAR => TypeMatching.rxKvar.IsMatch(address),
+                SimCommandType.KVAR => TypeMatching.rxKvarCmd.IsMatch(address),
                 SimCommandType.LVAR => TypeMatching.rxLvar.IsMatch(address),
                 SimCommandType.INTERNAL => TypeMatching.rxInternal.IsMatch(address),
                 _ => false,

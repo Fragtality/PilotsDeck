@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -71,7 +72,7 @@ namespace ProfileManager.json
         {
             Device.DeckName = deviceInfo.Name;
             Device.DeckType = deviceInfo.Type;
-            Logger.Log(LogLevel.Verbose, $"DeviceInfo was set @ {this}");
+            Logger.Verbose($"DeviceInfo was set @ {this}");
         }
 
         public static ProfileManifest LoadManifest(string json)
@@ -89,7 +90,7 @@ namespace ProfileManager.json
             manifest.ProfileDirectory = folder;
             manifest.Device.Hash = Tools.CreateMD5(manifest.Device.UUID);
             manifest.ProfileController = controller;
-            Logger.Log(LogLevel.Verbose, $"Manifest was loaded: {manifest}");
+            Logger.Verbose($"Manifest was loaded: {manifest}");
 
             return manifest;
         }
@@ -98,7 +99,7 @@ namespace ProfileManager.json
         {
             File.WriteAllText(path, JsonSerializer.Serialize(manifest));
             manifest.IsChanged = false;
-            Logger.Log(LogLevel.Debug, $"Manifest was saved: {manifest}");
+            Logger.Debug($"Manifest was saved: {manifest}");
         }
     }
 }

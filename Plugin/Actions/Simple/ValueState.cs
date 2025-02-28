@@ -1,5 +1,6 @@
-﻿using PilotsDeck.Resources.Variables;
-using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Resources.Variables;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

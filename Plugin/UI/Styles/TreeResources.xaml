@@ -1,0 +1,438 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="clr-namespace:PilotsDeck.UI.Converter"
+                    xmlns:tree="clr-namespace:PilotsDeck.UI.ActionDesignerUI.TreeViews">
+    <!-- Highlight Border -->
+    <SolidColorBrush x:Key="HightlightBrush" Color="{x:Static SystemColors.HighlightColor}" Opacity="0.4"/>
+
+    <SolidColorBrush x:Key="MouseOverBrush" Color="{x:Static SystemColors.HighlightColor}" Opacity="0.1"/>
+
+    <!-- Item ID Background -->
+    <ImageBrush x:Key="ItemKeyBrush" ImageSource="../Icons/ItemKey.png" Opacity="0.55"/>
+
+    <!-- Icon Converter -->
+    <conv:TypeIconConverter x:Key="TypeIconConverter"/>
+
+    <!-- Data Template Selector -->
+    <tree:TreeTemplateSelector x:Key="TreeTemplateSelector"/>
+
+    <!-- TreeView -->
+    <Style x:Key="TreeViewControl" TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- TreeView ToggleButton -->
+    <Style x:Key="ExpanderDownHeaderStyle" TargetType="ToggleButton">
+        <Setter Property="IsChecked" Value="{Binding Path=IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" />
+        <Setter Property="ClickMode" Value="Press" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid HorizontalAlignment="Left" VerticalAlignment="Center" Background="Transparent" Name="Grid">
+                        <Image Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Source="../Icons/Collapsed.png" Name="icon" Opacity="0.6" Width="16" Height="16" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Source" Value="../Icons/Expanded.png" TargetName="icon" />
+                            <Setter Property="Opacity" Value="0.5" TargetName="icon" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Source" Value="../Icons/Collapsed.png" TargetName="icon" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource MouseOverBrush}" TargetName="Grid"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ExpanderDownChildStyle" TargetType="ToggleButton" BasedOn="{StaticResource ExpanderDownHeaderStyle}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- TreeView Container -->
+    <Style x:Name="TemplateTreeContainer" x:Key="TemplateTreeContainer" TargetType="{x:Type TreeViewItem}">
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                    <Border x:Name="Selection_Border" BorderBrush="{x:Static SystemColors.WindowBrush}" BorderThickness="1" Padding="2" CornerRadius="6">
+                        <Grid Background="{x:Static SystemColors.WindowBrush}" Name="GridContainer" Opacity="0.6" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ContentPresenter Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <ItemsPresenter Grid.Row="1" Grid.Column="1" x:Name="ItemsHost" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="GridContainer" Property="Opacity" Value="1"/>
+                            <Setter TargetName="Selection_Border" Property="BorderBrush" Value="{StaticResource HightlightBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="GridContainer" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsExpanded" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" TargetName="ItemsHost" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Selection_Border" Property="Background" Value="{StaticResource MouseOverBrush}"/>
+                            <Setter TargetName="GridContainer" Property="Opacity" Value="1"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Styles DataTemplate - Element Layer -->
+    <Style x:Key="TreeColumnWidth" TargetType="ColumnDefinition">
+        <Setter Property="Width" Value="Auto" />
+    </Style>
+    <Style x:Key="TreeIconColumnWidth" TargetType="ColumnDefinition">
+        <Setter Property="MaxWidth" Value="24" />
+    </Style>
+
+    <Style x:Key="TreeRowHeight" TargetType="RowDefinition">
+        <Setter Property="Height" Value="26" />
+    </Style>
+
+    <Style x:Key="TreeLabelItemKey" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{StaticResource ItemKeyBrush}" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+
+    <Style x:Key="TreeImageType" TargetType="Image">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Source" Value="{Binding DisplayType, Converter={StaticResource TypeIconConverter}}" />
+    </Style>
+
+    <Style x:Key="TreeLabelItemName" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="MinWidth" Value="124" />
+        <Setter Property="Margin" Value="4,0,0,1" />
+    </Style>
+
+    <Style x:Key="TreePanelChilds" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4,0,0,0" />
+    </Style>
+
+    <Style x:Key="TreeLabelChildInfo" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="MinWidth" Value="48"/>
+        <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style x:Key="TreeLabelChildCount" TargetType="Label" BasedOn="{StaticResource TreeLabelChildInfo}">
+        <Setter Property="MinWidth" Value="20"/>
+    </Style>
+
+    <Style x:Key="TreeButtonPaste" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Command" Value="{Binding PasteCommand}"/>
+        <Setter Property="CommandParameter" Value="{Binding}"/>
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Green"/>
+    </Style>
+
+    <Style x:Key="TreeImagePaste" TargetType="Image">
+        <Setter Property="Source" Value="../Icons/copy.png"/>
+        <Setter Property="Width" Value="16"/>
+        <Setter Property="Height" Value="16"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Styles DataTemplate - Manipulator Layer -->
+    <Style x:Key="TreeLabelSubItemKey" TargetType="Label" BasedOn="{StaticResource TreeLabelItemKey}">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontWeight" Value="DemiBold" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+
+    <Style x:Key="TreeLabelSubItemName" TargetType="Label" BasedOn="{StaticResource TreeLabelItemName}">
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontWeight" Value="DemiBold" />
+        <Setter Property="MinWidth" Value="138" />
+    </Style>
+
+    <!-- Styles DataTemplate - Condition Layer -->
+    <Style x:Key="TreeLabelConditionKey" TargetType="Label" BasedOn="{StaticResource TreeLabelSubItemKey}">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+
+    <Style x:Key="TreeLabelConditionName" TargetType="Label" BasedOn="{StaticResource TreeLabelSubItemName}">
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="MinWidth" Value="114" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+    
+
+    <!-- DATA TEMPLATES ELEMENTS -->
+
+    <!-- Display Element -->
+    <HierarchicalDataTemplate x:Key="TemplateElement" ItemsSource="{Binding Children}" >
+        <Grid Margin="2,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ElementID}" Style="{StaticResource TreeLabelItemKey}"/>
+            <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Style="{StaticResource TreeImageType}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
+
+            <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
+            <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
+                <Label Content="Manipulators:" Style="{StaticResource TreeLabelChildInfo}"/>
+                <Label Name="LabelChildCount" Content="{Binding Children.Count}" Style="{StaticResource TreeLabelChildCount}"/>
+                <Button Name="ButtonPaste" Style="{StaticResource TreeButtonPaste}">
+                    <Image Style="{StaticResource TreeImagePaste}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsPasteActive}" Value="True">
+                <Setter Property="Visibility" Value="Visible" TargetName="PanelChilds" />
+                <Setter Property="Grid.RowSpan" Value="1" TargetName="ImageType" />
+                <Setter Property="Grid.RowSpan" Value="1" TargetName="LabelName" />
+                <Setter Property="Visibility" Value="Collapsed" TargetName="LabelChildCount" />
+                <Setter Property="Visibility" Value="Visible" TargetName="ButtonPaste" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Children.Count}" Value="0"/>
+                    <Condition Binding="{Binding IsPasteActive}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Visibility" Value="Collapsed" TargetName="PanelChilds" />
+                    <Setter Property="Grid.RowSpan" Value="2" TargetName="ImageType" />
+                    <Setter Property="Grid.RowSpan" Value="2" TargetName="LabelName" />
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding Children.Count}" Value="0">
+                <Setter Property="Visibility" Value="Hidden" TargetName="Expander" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+
+    <!-- Manipulator -->
+    <HierarchicalDataTemplate x:Key="TemplateManipulator" ItemsSource="{Binding Children}">
+        <Grid Margin="32,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ManipulatorID}" Style="{StaticResource TreeLabelSubItemKey}"/>
+            <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Style="{StaticResource TreeImageType}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelSubItemName}"/>
+
+            <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
+            <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
+                <Label Content="Conditions:" Style="{StaticResource TreeLabelChildInfo}"/>
+                <Label Name="LabelChildCount" Content="{Binding Children.Count}" Style="{StaticResource TreeLabelChildCount}"/>
+                <Button Name="ButtonPaste" Style="{StaticResource TreeButtonPaste}">
+                    <Image Style="{StaticResource TreeImagePaste}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsPasteActive}" Value="True">
+                <Setter Property="Visibility" Value="Visible" TargetName="PanelChilds" />
+                <Setter Property="Grid.RowSpan" Value="1" TargetName="ImageType" />
+                <Setter Property="Grid.RowSpan" Value="1" TargetName="LabelName" />
+                <Setter Property="Visibility" Value="Collapsed" TargetName="LabelChildCount" />
+                <Setter Property="Visibility" Value="Visible" TargetName="ButtonPaste" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Children.Count}" Value="0"/>
+                    <Condition Binding="{Binding IsPasteActive}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Visibility" Value="Collapsed" TargetName="PanelChilds" />
+                    <Setter Property="Grid.RowSpan" Value="2" TargetName="ImageType" />
+                    <Setter Property="Grid.RowSpan" Value="2" TargetName="LabelName" />
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding Children.Count}" Value="0">
+                <Setter Property="Visibility" Value="Hidden" TargetName="Expander" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+
+    <!-- Manipulator Condition -->
+    <HierarchicalDataTemplate x:Key="TemplateManipulatorCondition">
+        <Grid Margin="56,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ConditionID}" Style="{StaticResource TreeLabelConditionKey}"/>
+            <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Source="../Icons/Condition.png" Style="{StaticResource TreeImageType}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelConditionName}"/>
+        </Grid>
+    </HierarchicalDataTemplate>
+
+    
+    <!-- DATA TEMPLATES Commands -->
+    
+    <!-- Command Type -->
+    <HierarchicalDataTemplate x:Key="TemplateCommandType" ItemsSource="{Binding Children}" >
+        <Grid Margin="2,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+            </Grid.RowDefinitions>
+
+            <ToggleButton Grid.Row="0" Grid.Column="0" Name="Expander" Style="{StaticResource ExpanderDownHeaderStyle}"/>
+            <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Width="20" Height="20" Margin="4,0,0,0" Style="{StaticResource TreeImageType}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" FontSize="13.5" MinHeight="28" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
+        </Grid>
+
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Children.Count}" Value="0">
+                <Setter Property="Visibility" Value="Hidden" TargetName="Expander" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+
+    <!-- Command -->
+    <HierarchicalDataTemplate x:Key="TemplateCommand" ItemsSource="{Binding Children}">
+        <Grid Margin="16,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeIconColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding CommandID}" Style="{StaticResource TreeLabelItemKey}"/>
+            <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="LabelName" Content="{Binding DisplayName}" MinWidth="168" Style="{StaticResource TreeLabelItemName}"/>
+
+            <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
+            <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
+                <Label Content="Conditions:" Style="{StaticResource TreeLabelChildInfo}"/>
+                <Label Name="LabelChildCount" Content="{Binding Children.Count}" Style="{StaticResource TreeLabelChildCount}"/>
+                <Button Name="ButtonPaste" Style="{StaticResource TreeButtonPaste}">
+                    <Image Style="{StaticResource TreeImagePaste}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsPasteActive}" Value="True">
+                <Setter Property="Visibility" Value="Visible" TargetName="PanelChilds" />
+                <Setter Property="Grid.RowSpan" Value="1" TargetName="LabelName" />
+                <Setter Property="Visibility" Value="Collapsed" TargetName="LabelChildCount" />
+                <Setter Property="Visibility" Value="Visible" TargetName="ButtonPaste" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Children.Count}" Value="0"/>
+                    <Condition Binding="{Binding IsPasteActive}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Visibility" Value="Collapsed" TargetName="PanelChilds" />
+                    <Setter Property="Grid.RowSpan" Value="2" TargetName="LabelName" />
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding Children.Count}" Value="0">
+                <Setter Property="Visibility" Value="Hidden" TargetName="Expander" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+
+    <!-- Command Condition -->
+    <HierarchicalDataTemplate x:Key="TemplateCommandCondition">
+        <Grid Margin="48,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeIconColumnWidth}"/>
+                <ColumnDefinition Style="{StaticResource TreeColumnWidth}"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Style="{StaticResource TreeRowHeight}"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ConditionID}" Style="{StaticResource TreeLabelConditionKey}"/>
+            <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Source="../Icons/Condition.png" Style="{StaticResource TreeImageType}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" MinWidth="122" Style="{StaticResource TreeLabelConditionName}"/>
+        </Grid>
+    </HierarchicalDataTemplate>
+</ResourceDictionary>

@@ -1,6 +1,7 @@
-﻿using PilotsDeck.Plugin;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Plugin;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System;
 using System.Linq;
 using System.Net.WebSockets;

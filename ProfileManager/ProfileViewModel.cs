@@ -1,4 +1,5 @@
-﻿using ProfileManager.json;
+﻿using CFIT.AppLogger;
+using ProfileManager.json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -182,21 +183,21 @@ namespace ProfileManager
                 if (setChangedMapping)
                 {
                     Mapping.IsChanged = setChangedMapping;
-                    Logger.Log(LogLevel.Debug, $"setChangedMapping was true");
+                    Logger.Debug($"setChangedMapping was true");
                 }
 
                 if (Mapping.DefaultSimulator < SimulatorType.UNKNOWN || Mapping.DefaultSimulator > SimulatorType.XP)
                 {
-                    Logger.Log(LogLevel.Warning, $"Unknown SimulatorType - corrected to Unknown! @ {this}");
+                    Logger.Warning($"Unknown SimulatorType - corrected to Unknown! @ {this}");
                     Mapping.DefaultSimulator = SimulatorType.UNKNOWN;
                     Mapping.IsChanged = true;
                 }
 
                 if (Mapping.DefaultProfile && Mapping.AircraftProfile)
-                    Logger.Log(LogLevel.Error, $"Illegal ProfileState - both true! (Count: {Mapping.AircraftStrings.Count}) @ {this}");
+                    Logger.Error($"Illegal ProfileState - both true! (Count: {Mapping.AircraftStrings.Count}) @ {this}");
             }
             if (changedBefore || IsChanged)
-                Logger.Log(LogLevel.Debug, $"ViewModel Updated {changedBefore} -> {IsChanged} @ {this}");
+                Logger.Debug($"ViewModel Updated {changedBefore} -> {IsChanged} @ {this}");
         }
 
         public void PrepareProfileForSwitching()
@@ -205,19 +206,19 @@ namespace ProfileManager
             if (Manifest.ProfileController.ProfileMappings.Where(m => m.ProfileUUID == Manifest.ProfileDirectoryCleaned).Any())
             {
                 Mapping = Manifest.ProfileController.ProfileMappings.Where(m => m.ProfileUUID == Manifest.ProfileDirectoryCleaned).First();
-                Logger.Log(LogLevel.Information, $"Reused existing Mapping  @ {Manifest}");
+                Logger.Information($"Reused existing Mapping  @ {Manifest}");
             }
             else
             {
                 Manifest.ProfileController.ProfileMappings.Add(Mapping);
-                Logger.Log(LogLevel.Information, $"Added new Mapping  @ {Manifest}");
+                Logger.Information($"Added new Mapping  @ {Manifest}");
             }
 
             Mapping.SetCheckManifest(Manifest);
             Mapping.IsChanged = true;
 
             Manifest.InstalledByPluginUUID = Parameters.PLUGIN_UUID;
-            Logger.Log(LogLevel.Information, $"Corrected UUID  @ {Manifest}");
+            Logger.Information($"Corrected UUID  @ {Manifest}");
             Manifest.IsChanged = true;
 
             
@@ -227,7 +228,7 @@ namespace ProfileManager
         {
             Manifest.ProfileName = name;
             Manifest.IsChanged = true;
-            Logger.Log(LogLevel.Information, $"Set new ProfileName @ {Manifest}");
+            Logger.Information($"Set new ProfileName @ {Manifest}");
 
             if (HasMapping)
                 Mapping.SetCheckManifest(Manifest);
@@ -237,37 +238,37 @@ namespace ProfileManager
         {
             if (!HasMapping)
             {
-                Logger.Log(LogLevel.Error, $"Calling while Mapping is NOT set @ {Mapping}");
+                Logger.Error($"Calling while Mapping is NOT set @ {Mapping}");
                 return;
             }
 
             Mapping.AircraftStrings.Add(Aircraft);
             Mapping.IsChanged = true;
-            Logger.Log(LogLevel.Information, $"Added new Aircraft @ {Mapping}");
+            Logger.Information($"Added new Aircraft @ {Mapping}");
         }
 
         public void AircraftRemove(string Aircraft)
         {
             if (!HasMapping)
             {
-                Logger.Log(LogLevel.Error, $"Calling while Mapping is NOT set @ {Mapping}");
+                Logger.Error($"Calling while Mapping is NOT set @ {Mapping}");
                 return;
             }
 
             Mapping.AircraftStrings.Remove(Aircraft);
             Mapping.IsChanged = true;
-            Logger.Log(LogLevel.Information, $"Removed Aircraft @ {Mapping}");
+            Logger.Information($"Removed Aircraft @ {Mapping}");
         }
 
         public void ToggleDeleteFlag()
         {
             Manifest.DeleteFlag = !Manifest.DeleteFlag;
-            Logger.Log(LogLevel.Debug, $"Toggled Delete Flag -> {Manifest.DeleteFlag} @ {Manifest}");
+            Logger.Debug($"Toggled Delete Flag -> {Manifest.DeleteFlag} @ {Manifest}");
 
             if (HasMapping)
             {
                 Mapping.DeleteFlag = Manifest.DeleteFlag;
-                Logger.Log(LogLevel.Debug, $"Toggled Delete Flag -> {Mapping.DeleteFlag} @ {Mapping}");
+                Logger.Debug($"Toggled Delete Flag -> {Mapping.DeleteFlag} @ {Mapping}");
             }
         }
     }

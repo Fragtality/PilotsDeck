@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -211,7 +212,7 @@ namespace ProfileManager
         protected static void SetButtonStyle(Button button, Brush brush, double thickness, string log = null, Image image = null, string file = null)
         {
             if (!string.IsNullOrWhiteSpace(log))
-                Logger.Log(LogLevel.Debug, log);
+                Logger.Debug(log);
 
             button.BorderBrush = brush;
             button.BorderThickness = new Thickness(thickness);
@@ -279,7 +280,7 @@ namespace ProfileManager
 
             if (!IsSaveStateValid())
             {
-                Logger.Log(LogLevel.Error, $"Save Requested while Controller is in a Bad Sate! (Changes: {ProfileController.HasChanges} | Errors: {ProfileController.HasError} | Loaded: {ProfileController.IsLoaded} | Apps: {ProfileController.AppsRunning})");
+                Logger.Error($"Save Requested while Controller is in a Bad Sate! (Changes: {ProfileController.HasChanges} | Errors: {ProfileController.HasError} | Loaded: {ProfileController.IsLoaded} | Apps: {ProfileController.AppsRunning})");
                 return;
             }
 
@@ -288,7 +289,7 @@ namespace ProfileManager
 
             if (doLoad)
             {
-                Logger.Log(LogLevel.Debug, "Deleted Manifests/Mappings - Reload after Save");
+                Logger.Debug("Deleted Manifests/Mappings - Reload after Save");
                 LoadProfileData();
             }
 
@@ -302,14 +303,14 @@ namespace ProfileManager
 
             if (ProfileController.AppsRunning)
             {
-                Logger.Log(LogLevel.Error, $"Refresh clicked while App running!");
+                Logger.Error($"Refresh clicked while App running!");
                 return;
             }
 
             bool doLoad = true;
             if (ProfileController.HasChanges)
             {
-                Logger.Log(LogLevel.Warning, $"Refresh clicked with unsaved Changes");
+                Logger.Warning($"Refresh clicked with unsaved Changes");
                 var result = MessageBox.Show("There are unsaved Changes to your Profiles!\r\nContinue with Refresh?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.No)
                     doLoad = false;
@@ -331,7 +332,7 @@ namespace ProfileManager
         {
             if (IsSaveStateValid())
             {
-                Logger.Log(LogLevel.Warning, $"Close requested with unsaved Changes");
+                Logger.Warning($"Close requested with unsaved Changes");
                 var result = MessageBox.Show("There are unsaved Changes to your Profiles!\r\nSave before closing?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                     ProfileController.SaveChanges();

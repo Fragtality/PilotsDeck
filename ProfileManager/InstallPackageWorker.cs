@@ -1,18 +1,26 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using CFIT.Installer.LibFunc;
+using CFIT.Installer.LibWorker;
+using CFIT.Installer.Tasks;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace ProfileManager
 {
     public class InstallPackageWorker
     {
-        protected List<InstallerTask> ProfileTaskList { get; } = [];
+        protected List<TaskModel> ProfileTaskList { get; } = [];
+        protected Dictionary<string, TaskModel> ProfileTasks { get; } = [];
         protected bool ProfileTasksCompleted { get { return ProfileTaskList.All(t => t.State == TaskState.COMPLETED); } }
         protected DispatcherTimer SwapTimer { get; set; }
         protected ProfileController ProfileController { get; set; } = new();
+        protected FuncStreamDeck StreamDeck { get; set; } = new();
         protected bool IsCanceled { get; set; } = false;
         public PackageFile PackageFile { get; protected set; } = new(null);
 
@@ -47,7 +55,7 @@ namespace ProfileManager
             }
             catch (Exception ex)
             {
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
             }
 
             return IsValid;
@@ -55,14 +63,14 @@ namespace ProfileManager
 
         public void CheckExistingProfiles()
         {
-            var checkTask = InstallerTask.AddTask($"Check existing Profiles", "");
-            checkTask.DisplayOnlyLastCompleted = false;
+            var checkTask = TaskStore.Add($"Check existing Profiles", "");
+            checkTask.DisplayCompleted = false;
             ProfileController.Load();
             foreach (var profile in PackageFile.PackagedProfiles)
             {
                 if (!string.IsNullOrEmpty(profile.ProfileName) && ProfileController.ManifestNameExits(profile.ProfileName))
                 {
-                    checkTask.MessageLog($"Found match for '{profile.ProfileName}' (File: {profile.FileName})");
+                    checkTask.Message = $"Found match for '{profile.ProfileName}' (File: {profile.FileName})";
                     profile.HasOldProfile = true;
                 }
             }
@@ -81,155 +89,190 @@ namespace ProfileManager
 
                 if (PackageFile.CountProfiles > 0)
                 {
-                    if (await AddStreamDeckProfilesAsync() && OptionRemoveOldProfiles)
+                    if (await AddStreamDeckProfilesAsync() && await CheckProfilesInstalled() && OptionRemoveOldProfiles)
+                    {
+                        MainWindow.SetForeground();
                         await SwapProfilesAsync();
+                    }
+                    else
+                        MainWindow.SetForeground();
                 }
                 else
-                    Logger.Log(LogLevel.Debug, $"Skipping Add & Swap for Package with no Profiles!");
+                    Logger.Debug($"Skipping Add & Swap for Package with no Profiles!");
             }
             catch (Exception ex)
             {
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
             }
         }
 
         protected async Task<bool> AddStreamDeckProfilesAsync()
         {
-            Logger.Log(LogLevel.Debug, $"Installing Profiles in StreamDeck Software ...");
+            Logger.Debug($"Installing Profiles in StreamDeck Software ...");
             bool result = false;
             try
             {
-                if (!Tools.IsStreamDeckRunning())
+                if (!FuncStreamDeck.IsDeckAndPluginRunning())
                 {
-                    Logger.Log(LogLevel.Debug, $"Starting StreamDeck Software ...");
-                    var streamDeckTask = InstallerTask.AddTask($"Start StreamDeck Software", $"");
-
-                    Tools.StartStreamDeckSoftware();
-                    await Tools.WaitOnTask(streamDeckTask, "Start StreamDeck Software and wait {0}s", 3);
-
-                    Tools.SetForegroundWindow(MainWindow.AppTitle);
-                    if (Tools.IsStreamDeckRunning())
-                        streamDeckTask.SetState("StreamDeck Software running.", TaskState.COMPLETED);
-                    else
-                        streamDeckTask.SetState("StreamDeck Software NOT running.", TaskState.WAITING);
+                    var worker = new WorkerStreamDeckStartStop<Config>(Config.Instance, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = MainWindow.AppTitle };
+                    await worker.Run(System.Threading.CancellationToken.None);
                 }
 
-                string sdBinary = Tools.GetStreamDeckBinaryPath(out _);
+                string sdBinary = StreamDeck.BinaryPath;
                 string file;
+                bool disableLinks = false;
                 foreach (var profile in PackageFile.PackagedProfiles)
                 {
                     file = Path.GetFileNameWithoutExtension(profile.FileName);
-                    Logger.Log(LogLevel.Debug, $"Adding Task for '{profile.FileName}'");
-                    var task = InstallerTask.AddTask($"Add Profile '{profile.ProfileName}' to StreamDeck", $"Click the Link and select the StreamDeck Type:");
-                    task.Hyperlink = profile.FileName;
-                    task.HyperlinkURL = sdBinary;
-                    task.HyperLinkArg = profile.InstallPath;
+                    Logger.Debug($"Adding Task for '{profile.FileName}'");
+                    var task = TaskStore.Add($"Add Profile '{profile.ProfileName}' to StreamDeck");
+                    task.AddMessage("Click the Link and select the StreamDeck in the UI (or click Ignore):", true, false, false, FontWeights.DemiBold);
                     task.State = TaskState.WAITING;
-                    task.DisableLinkAfterClick = false;
-                    task.SetCompletedOnUrl = true;
-                    task.SetUrlBold = true;
-                    task.SetUrlFontSize = 12;
-                    task.HyperlinkOnClick = SetStreamDeckWindowForeground;
+                    task.DisplayCompleted = true;
+                    var link = task.AddLink(profile.FileName, sdBinary, profile.InstallPath);
+                    task.DisableAllLinksOnClick = disableLinks;
+                    link.DisableLinkOnClick = disableLinks;
+                    link.LinkStyleBold = true;
+                    link.LinkFontSize = 12;
+                    link.StateOnLinkClicked = TaskState.ACTIVE;
+                    link.ClickedCallback = () => { SetStreamDeckWindowForeground(); profile.ClickResponse = PackageClickResponse.Clicked; Logger.Debug($"Clicked Install for on '{profile.FileName}'"); };
+                    link = task.AddLink("Ignore", null);
+                    link.DisableLinkOnClick = disableLinks;
+                    link.LinkStyleBold = true;
+                    link.LinkFontSize = 12;
+                    link.StateOnLinkClicked = TaskState.COMPLETED;
+                    link.ClickedCallback = () => { profile.ClickResponse = PackageClickResponse.Ignored; Logger.Debug($"Clicked Ignore for on '{profile.FileName}'"); };
                     ProfileTaskList.Add(task);
+                    ProfileTasks.Add(profile.FileName, task);
                 }
                 return true;
             }
             catch (Exception ex)
             {
-                InstallerTask.CurrentTask.SetError(ex);
+                TaskStore.CurrentTask.SetError(ex);
                 result = false;
             }
 
             return result;
         }
 
-        protected async Task SwapProfilesAsync()
+        private static void MessageWaitForProfilesInstalled(IEnumerable<PackageFile.PackagedProfile> query, TaskModel task)
         {
-            if (CountProfileUpdates == 0)
+            string msg = "Wait for Profiles to be added to StreamDeck:";
+            foreach (var profile in query)
+                msg += $"\r\n{profile.FileName}";
+            task.ReplaceLastMessage(msg);
+        }
+
+        protected void CompleteTasks(IEnumerable<PackageFile.PackagedProfile> query)
+        {
+            foreach (var profile in query)
             {
-                Logger.Log(LogLevel.Debug, $"No Profiles to swap!");
-                return;
+                if (!ProfileTasks.TryGetValue(profile.FileName, out var task))
+                    continue;
+
+                foreach (var link in task.Links)
+                    link.WasNavigated = true;
+                profile.IsLinkDisabled = true;
+                task.State = TaskState.COMPLETED;
+                task.IsCompleted = true;
             }
-            else
-                Logger.Log(LogLevel.Debug, $"Swapping {CountProfileUpdates} Profiles");
-            var task = InstallerTask.AddTask($"Replace {CountProfileUpdates} old Profiles with updated Copies", "Wait for Profiles to be clicked & installed ...");
-            task.DisplayOnlyLastCompleted = false;
-            task.DisplayOnlyLastError = false;
+        }
+
+        protected async Task<bool> CheckProfilesInstalled()
+        {   
+            var task = TaskStore.Add($"Install {PackageFile.PackagedProfiles.Count} Profiles to StreamDeck", "Wait for all Profiles to be clicked ...");
+            task.DisplayCompleted = false;
             task.State = TaskState.WAITING;
 
-            bool switchedToCompleted = false;
-            int waitDelay = 2000;
-            int countSearches = 0;
-            int searchMax = 7;
-            while (PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.HasOldProfile).Any() && !IsCanceled)
+            try
             {
-                await Task.Delay(waitDelay);
-                if (IsCanceled)
-                    return;
-
-                if (ProfileTasksCompleted && !switchedToCompleted)
+                int waitDelay = 1000;
+                while (PackageFile.PackagedProfiles.Where(p => p.ClickResponse == PackageClickResponse.NotClicked).Any() && !IsCanceled)
                 {
-                    switchedToCompleted = true;
-                    task.ReplaceLastMessage("All Profiles clicked! Checking Profile Store ...");
-                    Logger.Log(LogLevel.Debug, "All Profiles completed => switchedToCompleted");
+                    await Task.Delay(waitDelay);
+                    CompleteTasks(PackageFile.PackagedProfiles.Where(p => p.ClickResponse == PackageClickResponse.Ignored && !p.IsLinkDisabled));
+
+                    if (!QueryProfilesInstalled(task, PackageFile.PackagedProfiles.Where(p => p.ClickResponse == PackageClickResponse.Clicked && !p.IsInstalled)))
+                        return false;
+
+                    CompleteTasks(PackageFile.PackagedProfiles.Where(p => p.IsInstalled && !p.IsLinkDisabled));
+                }
+                task.ReplaceLastMessage("All profiles clicked!");
+
+                var query = PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.ClickResponse != PackageClickResponse.Ignored);
+                waitDelay = 1000;
+                while (query.Any() && !IsCanceled)
+                {
+                    MessageWaitForProfilesInstalled(query, task);
+                    await Task.Delay(waitDelay);
+
+                    if (!QueryProfilesInstalled(task, query))
+                        return false;
+
+                    CompleteTasks(PackageFile.PackagedProfiles.Where(p => p.IsInstalled && !p.IsLinkDisabled));
+                    CompleteTasks(PackageFile.PackagedProfiles.Where(p => p.ClickResponse == PackageClickResponse.Ignored && !p.IsLinkDisabled));
+                    query = PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.ClickResponse != PackageClickResponse.Ignored);
                 }
 
-                if (switchedToCompleted)
-                {
-                    ProfileController.LoadWithoutMapping();
-                    if (ProfileController.IsLoaded && !ProfileController.HasError)
-                    {
-                        
-                        if (countSearches >= searchMax)
-                        {
-                            task.Message = $"Profile Search was aborted after {(int)((countSearches * waitDelay)/1000)}s";
-                            Logger.Log(LogLevel.Debug, $"Aborting Check after {countSearches} Iterations - not installed Profiles: {PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.HasOldProfile).Count()}");
-                            break;
-                        }
-                        else if (countSearches > 1)
-                            task.ReplaceLastMessage($"All Profiles clicked! Checking Profile Store ({countSearches}/{searchMax}) ...");
+                CompleteTasks(PackageFile.PackagedProfiles.Where(p => !p.IsLinkDisabled));
+                task.SetSuccess("All Profiles installed (or ignored)!");
+                task.IsCompleted = true;
+            }
+            catch (Exception ex)
+            {
+                TaskStore.CurrentTask.SetError(ex);
+                return false;
+            }
 
-                        foreach (var profile in PackageFile.PackagedProfiles.Where(p => !p.IsInstalled && p.HasOldProfile))
-                        {
-                            if (ProfileController.ManifestHasCopy(profile.ProfileName))
-                            {
-                                profile.IsInstalled = true;
-                                Logger.Log(LogLevel.Debug, $"Match found for '{profile.ProfileName}'");
-                            }
-                        }
-                        countSearches++;
-                    }
-                    else
+            return true;
+        }
+
+        protected bool QueryProfilesInstalled(TaskModel task, IEnumerable<PackageFile.PackagedProfile> query)
+        {
+            ProfileController.LoadWithoutMapping();
+            if (ProfileController.IsLoaded && !ProfileController.HasError)
+            {
+                foreach (var profile in query)
+                {
+                    if ((profile.HasOldProfile && ProfileController.ManifestHasCopy(profile.ProfileName))
+                        || (!profile.HasOldProfile && ProfileController.ManifestNameExits(profile.ProfileName)))
                     {
-                        task.SetError("Unable to read Profile Data from StreamDeck!");
-                        break;
+                        profile.IsInstalled = true;
+                        Logger.Debug($"Match found for '{profile.ProfileName}'");
                     }
                 }
             }
-            if (countSearches > 1)
-                await Task.Delay(1000);
             else
             {
-                Logger.Log(LogLevel.Debug, "Match on first search, use higher Delay");
-                await Tools.WaitOnTask(task, "All Profiles installed - waiting {0}s", 10);
+                task.SetError("Unable to read Profile Data from StreamDeck!");
+                return false;
             }
 
-            if (IsCanceled)
-                return;
+            return true;
+        }
 
-            Tools.SetForegroundWindow(MainWindow.AppTitle);
-            await ProfileController.SwapUpdateManifest(PackageFile.PackagedProfiles.Where(p => p.HasOldProfile && p.IsInstalled).Select(p => p.ProfileName).ToList(), task);
+        protected async Task SwapProfilesAsync()
+        {
+            var query = PackageFile.PackagedProfiles.Where(p => p.IsInstalled && p.HasOldProfile);
+            if (!query.Any())
+            {
+                Logger.Debug($"No Profiles to swap!");
+                return;
+            }
+
+            await ProfileController.SwapUpdateManifest(query.Select(p => p.ProfileName).ToList());
         }
 
         public static bool SetStreamDeckWindowForeground()
         {
-            Tools.SetForegroundWindow(Parameters.SD_WINDOW_NAME);
+            Sys.SetForegroundWindow(Parameters.SD_WINDOW_NAME);
             return true;
         }
 
         public void Dispose()
         {
-            Logger.Log(LogLevel.Debug, "Dispose");
+            Logger.Debug("Dispose");
             ProfileTaskList.Clear();
             IsCanceled = true;
             SwapTimer?.Stop();

@@ -1,5 +1,7 @@
-﻿using PilotsDeck.Actions.Advanced.Manipulators;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Manipulators;
 using PilotsDeck.Actions.Advanced.SettingsModel;
+using PilotsDeck.Resources.Variables;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -58,7 +60,7 @@ namespace PilotsDeck.Actions.Advanced
                 if (condition.Variable == null)
                 {
                     Logger.Verbose($"Register Variable '{condition.Address}'");
-                    condition.Variable = App.PluginController.VariableManager.RegisterVariable(condition.Address);
+                    condition.Variable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(condition.Address));
                 }
             }
         }

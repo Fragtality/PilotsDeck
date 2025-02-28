@@ -1,8 +1,9 @@
-﻿using FSUIPC;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using FSUIPC;
 using PilotsDeck.Resources;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator.FSUIPC;
-using PilotsDeck.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,7 +156,7 @@ namespace PilotsDeck.Simulator
                     string address;
                     foreach (var variable in lvars)
                     {
-                        address = ToolsFSUIPC.FormatLvarAddress(variable.Address);
+                        address = variable.Address.FormatFsuipcLvar();
                         if (!string.IsNullOrWhiteSpace(address))
                         {
                             try { variable.SetValue(FSUIPCConnection.ReadLVar(address)); }
@@ -403,7 +404,7 @@ namespace PilotsDeck.Simulator
             }
         }
 
-        public void RemoveUnusedVariables(bool force)
+        public void RemoveUnusedResources(bool force)
         {
             
         }

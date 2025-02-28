@@ -1,0 +1,139 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls.ControlIndicator"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Manipulators"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelIndicator}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.Resources>
+            <Style x:Key="InputIndicator" TargetType="TextBox" BasedOn="{StaticResource InputCenteredLeft}">
+                <Setter Property="Margin" Value="0,8,0,0" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="VariableControl" Margin="0,8,0,0"/>
+
+        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Indicator Scale:
+        </Label>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="InputScale" Style="{StaticResource InputIndicator}"/>
+
+        <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Reverse Direction:
+        </Label>
+        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding IndicatorReverse}" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+            Reverse Indicator Direction
+        </CheckBox>
+
+        <Label Grid.Row="3" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Indicator Type:
+        </Label>
+        <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" HorizontalAlignment="Left" MinWidth="132" Style="{StaticResource ComboboxDefault}"
+                  ItemsSource="{Binding IndicatorTypes}" SelectedValue="{Binding IndicatorType}" DisplayMemberPath="Value" SelectedValuePath="Key"/>
+
+        <Label Grid.Row="4" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsImage, Converter={StaticResource BoolVisibilityConverter}}">
+            Image:
+        </Label>
+        <Grid Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding IsImage, Converter={StaticResource BoolVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" MinHeight="32" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,8,0" Background="#DBDBDB">
+                <Image Grid.Column="0" Name="InputImage" Width="36" Source="{Binding ImageSource}"/>
+            </Label>
+            <Label Grid.Column="1" Content="{Binding ImageFile}" MinHeight="24" VerticalAlignment="Top" VerticalContentAlignment="Top" Margin="0,0,0,0"/>
+        </Grid>
+
+        <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding HasLineSize, Converter={StaticResource BoolVisibilityConverter}}">
+            Line Size:
+        </Label>
+        <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,8,0,0"
+                    Visibility="{Binding HasLineSize, Converter={StaticResource BoolVisibilityConverter}}">
+            <Button Command="{Binding DecreaseLineCommand}" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/arrows-collapse.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <TextBox Name="InputLineSize" Margin="10,0,10,0" Style="{StaticResource InputCentered}"/>
+            <Button Command="{Binding IncreaseLineCommand}" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/arrows-expand.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+        </StackPanel>
+
+        <Label Grid.Row="6" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding HasColor, Converter={StaticResource BoolVisibilityConverter}}">
+            Color:
+        </Label>
+        <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,8,0,0"
+                    Visibility="{Binding HasColor, Converter={StaticResource BoolVisibilityConverter}}">
+            <Label Name="LabelColorSelect" MinWidth="132" Content="{Binding HtmlColor}" Background="{Binding IndicatorColor, Converter={StaticResource DrawingColorConverter}}" Style="{StaticResource LabelColorSelect}"/>
+            <Button Name="ButtonIndicatorColorClipboard" Margin="10,0,0,0" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/copy.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+        </StackPanel>
+
+        <Label Grid.Row="7" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding CanFlip, Converter={StaticResource BoolVisibilityConverter}}">
+            Flip Indicator:
+        </Label>
+        <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding IndicatorFlip}" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}"
+                  Visibility="{Binding CanFlip, Converter={StaticResource BoolVisibilityConverter}}">
+            Flip Indicator vertically
+        </CheckBox>
+
+        <Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Size:
+        </Label>
+        <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,8,0,0">
+            <Button Command="{Binding DecreaseSizeCommand}" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/arrows-collapse.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <TextBox Name="InputSize" Margin="10,0,10,0" Style="{StaticResource InputCentered}"/>
+            <Button Command="{Binding IncreaseSizeCommand}" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/arrows-expand.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+        </StackPanel>
+
+        <Label Grid.Row="9" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Offset:
+        </Label>
+        <StackPanel Grid.Row="9" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,8,0,0">
+            <Button Command="{Binding DecreaseOffsetCommand}" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/arrows-collapse.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+            <TextBox Name="InputOffset" Margin="10,0,10,0" Style="{StaticResource InputCentered}"/>
+            <Button Command="{Binding IncreaseOffsetCommand}" Style="{StaticResource BtnSquareSmall}">
+                <Image Source="../../../Icons/arrows-expand.png" Style="{StaticResource ImgSquareSmall}"/>
+            </Button>
+        </StackPanel>
+
+        <!--<Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Size / Offset:
+        </Label>
+        <Grid Grid.Row="8" Grid.Column="1" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="InputSize" Margin="0,0,4,0" Style="{StaticResource InputIndicator}"/>
+            <TextBox Grid.Column="1" Name="InputOffset" Margin="4,0,0,0" Style="{StaticResource InputIndicator}"/>
+        </Grid>-->
+    </Grid>
+</UserControl>

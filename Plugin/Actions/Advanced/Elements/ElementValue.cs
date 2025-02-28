@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.SettingsModel;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Variables;
 using System.Drawing;
@@ -38,7 +39,7 @@ namespace PilotsDeck.Actions.Advanced.Elements
             if (Variable == null)
             {
                 Logger.Verbose($"Register Variable '{Settings.ValueAddress}'");
-                Variable = App.PluginController.VariableManager.RegisterVariable(Settings.ValueAddress);
+                Variable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(Settings.ValueAddress));
             }
         }
 

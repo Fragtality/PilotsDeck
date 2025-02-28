@@ -1,12 +1,12 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("PilotsDeck Installer")]
-[assembly: AssemblyDescription("Installer for the PilotsDeck StreamDeck-Plugin")]
+[assembly: AssemblyTitle("PilotsDeck Installer v0.8.7.0 (2025.02.26.2303)")]
+[assembly: AssemblyDescription("Installer Application for PilotsDeck")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fragtality")]
 [assembly: AssemblyProduct("PilotsDeck Installer")]
@@ -37,8 +37,6 @@ using System.Windows;
                                               //(wird verwendet, wenn eine Ressource auf der Seite nicht gefunden wird,
                                               // designspezifischen Ressourcenwörterbuch nicht gefunden werden kann.)
 )]
-[assembly: AssemblyVersion("0.8.7.0")]
-[assembly: AssemblyFileVersion("0.8.7.0")]
 
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
@@ -48,7 +46,5 @@ using System.Windows;
 //      Buildnummer
 //      Revision
 //
-// Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
-// indem Sie "*" wie unten gezeigt eingeben:
-// [assembly: AssemblyVersion("1.0.*")]
-
+[assembly: AssemblyVersion("0.8.7.0")]
+[assembly: AssemblyFileVersion("0.8.7.0")]

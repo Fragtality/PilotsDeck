@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Elements;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Elements;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources.Variables;
@@ -46,7 +47,7 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             if (RotateVariable == null && Settings.RotateContinous)
             {
                 Logger.Verbose($"Register Variable '{Settings.RotateAddress}'");
-                RotateVariable = App.PluginController.VariableManager.RegisterVariable(Settings.RotateAddress);
+                RotateVariable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(Settings.RotateAddress));
             }
         }
 

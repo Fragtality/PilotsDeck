@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls.ControlSizePos"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Manipulators"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelSizePos}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.Resources>
+            <Style x:Key="CheckSizePos" TargetType="CheckBox" BasedOn="{StaticResource CheckboxDefault}">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="MinWidth" Value="164" />
+            </Style>
+            <Style x:Key="PanelSizePos" TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,8,0,0" />
+            </Style>
+            <Style x:Key="InputSizePos" TargetType="TextBox" BasedOn="{StaticResource InputCentered}">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Margin" Value="8,0,0,0" />
+            </Style>
+        </Grid.Resources>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Change X:
+        </Label>
+        <StackPanel Grid.Row="0" Grid.Column="1" Style="{StaticResource PanelSizePos}">
+            <CheckBox IsChecked="{Binding ChangeX}" Style="{StaticResource CheckSizePos}">
+                Modify Position on X-Axis
+            </CheckBox>
+            <TextBox Name="InputValueX" IsEnabled="{Binding StaticSizePos}" Style="{StaticResource InputSizePos}"/>
+        </StackPanel>
+
+        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Change Y:
+        </Label>
+        <StackPanel Grid.Row="1" Grid.Column="1" Style="{StaticResource PanelSizePos}">
+            <CheckBox IsChecked="{Binding ChangeY}" Style="{StaticResource CheckSizePos}">
+                Modify Position on Y-Axis
+            </CheckBox>
+            <TextBox Name="InputValueY" IsEnabled="{Binding StaticSizePos}" Style="{StaticResource InputSizePos}"/>
+        </StackPanel>
+
+        <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Change W:
+        </Label>
+        <StackPanel Grid.Row="2" Grid.Column="1" Style="{StaticResource PanelSizePos}">
+            <CheckBox IsChecked="{Binding ChangeW}" Style="{StaticResource CheckSizePos}">
+                Modify Size - Width
+            </CheckBox>
+            <TextBox Name="InputValueW" IsEnabled="{Binding StaticSizePos}" Style="{StaticResource InputSizePos}"/>
+        </StackPanel>
+
+        <Label Grid.Row="3" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Change H:
+        </Label>
+        <StackPanel Grid.Row="3" Grid.Column="1" Style="{StaticResource PanelSizePos}">
+            <CheckBox IsChecked="{Binding ChangeH}" Style="{StaticResource CheckSizePos}">
+                Modify Size - Height
+            </CheckBox>
+            <TextBox Name="InputValueH" IsEnabled="{Binding StaticSizePos}" Style="{StaticResource InputSizePos}"/>
+        </StackPanel>
+
+        <Label Grid.Row="4" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Dynamic Change:
+        </Label>
+        <CheckBox Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" IsChecked="{Binding ChangeSizePosDynamic}" Style="{StaticResource CheckSizePos}">
+            Change Size/Position dynamically by Value
+        </CheckBox>
+
+        <ContentControl Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Name="VariableControl" Margin="0,8,0,0"
+                        Visibility="{Binding ChangeSizePosDynamic, Converter={StaticResource BoolVisibilityConverter}}"/>
+
+        <Label Grid.Row="6" Grid.Column="0" Visibility="{Binding ChangeSizePosDynamic, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Min Value:
+        </Label>
+        <TextBox Grid.Row="6" Grid.Column="1" Name="InputSizePosMinValue" Margin="0,8,0,0" Style="{StaticResource InputSizePos}"
+                 Visibility="{Binding ChangeSizePosDynamic, Converter={StaticResource BoolVisibilityConverter}}"/>
+
+        <Label Grid.Row="7" Grid.Column="0" Visibility="{Binding ChangeSizePosDynamic, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Max Value:
+        </Label>
+        <TextBox Grid.Row="7" Grid.Column="1" Name="InputSizePosMaxValue" Margin="0,8,0,0" Style="{StaticResource InputSizePos}"
+                 Visibility="{Binding ChangeSizePosDynamic, Converter={StaticResource BoolVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

@@ -1,5 +1,10 @@
-﻿using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using CFIT.SimConnectLib.Modules.MobiFlight;
+using CFIT.SimConnectLib.SimEvents;
+using PilotsDeck.Tools;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PilotsDeck.Simulator.MSFS
@@ -127,10 +132,10 @@ namespace PilotsDeck.Simulator.MSFS
             return code;
         }
 
-        public async static Task<bool> WriteHvar(SimCommand command)
+        public async static Task<bool> WriteHvar(SimCommand command, MobiModule module)
         {
             bool result = false;
-            string[] hVars = command.Address.Split(':');
+            string[] hVars = command.Address.ToString().Split(':');
 
             for (int idx = 0; idx < hVars.Length; idx++)
             {
@@ -139,11 +144,11 @@ namespace PilotsDeck.Simulator.MSFS
 
                 if (idx + 1 < hVars.Length && Conversion.IsNumberI(hVars[idx + 1], out _))
                 {
-                    result = WriteSingleHvar(hVars[idx], hVars[idx + 1]);
+                    result = WriteSingleHvar(hVars[idx], hVars[idx + 1], module);
                     idx++;
                 }
                 else
-                    result = WriteSingleHvar(hVars[idx]);
+                    result = WriteSingleHvar(hVars[idx], null, module);
 
                 if (!result)
                     break;
@@ -155,7 +160,7 @@ namespace PilotsDeck.Simulator.MSFS
             return result;
         }
 
-        public static bool WriteSingleHvar(string name, string value = null)
+        public static bool WriteSingleHvar(string name, string value, MobiModule module)
         {
             bool result = false;
 
@@ -165,9 +170,9 @@ namespace PilotsDeck.Simulator.MSFS
             try
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    MobiModule.ExecuteCode($"(>{name})");
+                    module.ExecuteCode($"(>{name})");
                 else
-                    MobiModule.ExecuteCode($"{value} (>{name})");
+                    module.ExecuteCode($"{value} (>{name})");
                 result = true;
             }
             catch (Exception ex)
@@ -178,28 +183,40 @@ namespace PilotsDeck.Simulator.MSFS
             return result;
         }
 
-        public async static Task<bool> WriteKvar(SimCommand command)
+        public async static Task<bool> WriteKvar(SimCommand command, SimEventManager manager)
+        {
+            if (TypeMatching.rxKvarSequence.IsMatch(command.Address))
+                return await WriteKvarSequence(command, manager);
+
+            string[] addrParams = command.Address.Parameter.ToString().Split(':');
+            List<object> parameter = [];
+
+            for (int idx = 0; idx < addrParams.Length; idx++)
+            {
+                if (Conversion.IsNumberI(addrParams[idx], out int iValue))
+                    parameter.Add((uint)iValue);
+            }
+
+            return WriteSingleKvar(command.Address.Name, [ ..parameter], manager);
+        }
+
+        public async static Task<bool> WriteKvarSequence(SimCommand command, SimEventManager manager)
         {
             bool result = false;
-            string[] kVars = command.Address.Split(':');
+            string[] sequence = command.Address.Address.Split(':');
 
-            for (int idx = 0; idx < kVars.Length; idx++)
+            for (int idx = 0; idx < sequence.Length; idx++)
             {
-                if (kVars[idx] == "K")
+                if (sequence[idx] == "K")
                     continue;
 
-                if (idx + 1 < kVars.Length && Conversion.IsNumberF(kVars[idx + 1], out _) && idx + 2 < kVars.Length && Conversion.IsNumberF(kVars[idx + 2], out _))
+                if (idx + 1 < sequence.Length && Conversion.IsNumberI(sequence[idx + 1], out int param))
                 {
-                    result = WriteSingleKvar(kVars[idx], kVars[idx + 1], kVars[idx +2]);
-                    idx += 2;
-                }
-                else if (idx + 1 < kVars.Length && Conversion.IsNumberF(kVars[idx + 1], out _))
-                {
-                    result = WriteSingleKvar(kVars[idx], kVars[idx + 1]);
+                    result = WriteSingleKvar(sequence[idx], [(uint)param], manager);
                     idx++;
                 }
                 else
-                    result = WriteSingleKvar(kVars[idx]);
+                    result = false;
 
                 if (!result)
                     break;
@@ -211,23 +228,13 @@ namespace PilotsDeck.Simulator.MSFS
             return result;
         }
 
-        public static bool WriteSingleKvar(string name, string value1 = null, string value2 = null)
+        public static bool WriteSingleKvar(string name, object[] parameter, SimEventManager manager)
         {
             bool result = false;
 
-            if (!name.StartsWith("K:"))
-                name = "K:" + name;
-
             try
             {
-                
-                if (!string.IsNullOrWhiteSpace(value1) && !string.IsNullOrWhiteSpace(value2))
-                    MobiModule.ExecuteCode($"{value2} {value1} (>{name})");
-                if (!string.IsNullOrWhiteSpace(value1))
-                    MobiModule.ExecuteCode($"{value1} (>{name})");
-                else
-                    MobiModule.ExecuteCode($"(>{name})");
-                result = true;
+                result = manager.SendEvent(name, parameter);
             }
             catch (Exception ex)
             {

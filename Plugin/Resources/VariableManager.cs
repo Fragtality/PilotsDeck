@@ -1,6 +1,5 @@
-﻿using PilotsDeck.Resources.Variables;
-using PilotsDeck.Simulator;
-using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Resources.Variables;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,60 +9,14 @@ namespace PilotsDeck.Resources
 {
     public class VariableManager : IDisposable
     {
-        protected static SimController SimController { get { return App.SimController; } }
         protected static ScriptManager ScriptManager { get { return App.PluginController.ScriptManager; } }
-        public ConcurrentDictionary<string, ManagedVariable> ManagedVariables { get; } = [];
+        public ConcurrentDictionary<ManagedAddress, ManagedVariable> ManagedVariables { get; } = [];
         public IEnumerable<ManagedVariable> VariableList { get { return ManagedVariables.Values; } }
-        public static readonly string ADDRESS_EMPTY = "Z:NULL";
 
-        public static string FormatAddress(string address)
-        {
-            if (string.IsNullOrWhiteSpace(address))
-                return ADDRESS_EMPTY;
-
-            if (TypeMatching.rxOffset.IsMatch(address))
-            {
-                string[] parts = address.Split(':');
-                int idx = 0;
-                if (parts[0].StartsWith("0x"))
-                    idx = 2;
-                string sub = parts[0].Substring(idx, 4).ToUpper();
-                parts[0] = "0x" + sub;
-                address = string.Join(":", parts);
-            }
-            else if (TypeMatching.rxAvar.IsMatch(address))
-            {
-                if (!address.StartsWith("(A:"))
-                    address = address.Insert(1, "A:");
-                address = address.Replace(", ", ",");
-            }
-            else if (TypeMatching.rxLuaFunc.IsMatch(address))
-            {
-                string[] parts = address.Split(':');
-                address = $"lua:{parts[1].ToLower().Replace(".lua", "")}:{parts[2]}";
-            }
-            else if (TypeMatching.rxInternal.IsMatch(address))
-                address = address.ToUpperInvariant();
-            else if (TypeMatching.rxCalcRead.IsMatch(address))
-            {
-
-            }
-            else if (TypeMatching.rxLvar.IsMatch(address))
-            {
-                if (!address.StartsWith("L:"))
-                    address = $"(L:{address})";
-                else
-                    address = $"({address})";
-            }
-
-            return address;
-        }
-
-        public ManagedVariable this[string address]
+        public ManagedVariable this[ManagedAddress address]
         {
             get
             {
-                address = FormatAddress(address);
                 if (!ManagedVariables.TryGetValue(address, out ManagedVariable variable))
                 {
                     Logger.Error($"The Address '{address}' is not registered");
@@ -73,53 +26,52 @@ namespace PilotsDeck.Resources
             }
         }
 
-        public bool TryGet(string address, out ManagedVariable variable)
+        public bool TryGet(ManagedAddress address, out ManagedVariable variable)
         {
-            address = FormatAddress(address);
             return ManagedVariables.TryGetValue(address, out variable);
         }
 
-        public bool Contains(string address)
+        public bool Contains(ManagedAddress address)
         {
-            address = FormatAddress(address);
             return ManagedVariables.ContainsKey(address);
         }
 
         public static ManagedVariable CreateEmptyVariable()
         {
-            return new VariableNumeric(ADDRESS_EMPTY, SimValueType.NONE);
+            return new VariableNumeric(ManagedAddress.CreateEmpty());
         }
 
-        public static ManagedVariable CreateVariable(string address)
+        public static ManagedVariable CreateVariable(ManagedAddress address)
         {
             ManagedVariable value;
 
-            if (address == ADDRESS_EMPTY)
+            if (address == null || address?.IsEmpty == true)
                 value = CreateEmptyVariable();
-            else if (TypeMatching.rxOffset.IsMatch(address))
+            else if (address == SimValueType.OFFSET)
                 value = new VariableOffset(address, AppConfiguration.IpcGroupRead);
-            else if (TypeMatching.IsStringDataRef(address))
-                value = new VariableString(address, SimValueType.XPDREF);
-            else if (TypeMatching.rxDref.IsMatch(address))
-                value = new VariableNumeric(address, SimValueType.XPDREF);
-            else if (TypeMatching.rxBvarValue.IsMatch(address))
-                value = new VariableInputEvent(address);
-            else if (TypeMatching.rxLuaFunc.IsMatch(address) && ScriptManager.HasScript(address))
+            else if (address == SimValueType.XPDREF && address.IsStringType)
+                value = new VariableString(address);
+            else if (address == SimValueType.XPDREF)
+                value = new VariableNumeric(address);
+            else if (address == SimValueType.BVAR)
+                value = new VariableNumeric(address);
+            else if (address == SimValueType.LUAFUNC && ScriptManager.HasScript(address))
                 value = new VariableLua(address);
-            else if (TypeMatching.rxInternal.IsMatch(address))
-                value = new VariableString(address, SimValueType.INTERNAL);
-            else if (TypeMatching.rxCalcRead.IsMatch(address))
-                value = new VariableString(address, SimValueType.CALCULATOR);
-            else if (TypeMatching.rxAvar.IsMatch(address))
+            else if (address == SimValueType.INTERNAL)
+                value = new VariableString(address);
+            else if (address == SimValueType.CALCULATOR)
+                value = new VariableNumeric(address);
+            else if (address == SimValueType.AVAR)
             {
-                var matches = TypeMatching.rxAvar.Matches(address);
-                if (matches != null && matches.Count > 0 && matches[0]?.Groups?.Count >= 4 && matches[0]?.Groups[3]?.Value?.ToLowerInvariant() == "string")
-                    value = new VariableString(address, SimValueType.AVAR);
+                if (address.IsStringType)
+                    value = new VariableString(address);
                 else
-                    value = new VariableNumeric(address, SimValueType.AVAR);
+                    value = new VariableNumeric(address);
             }
-            else if (TypeMatching.rxLvar.IsMatch(address) || TypeMatching.rxLvarMobi.IsMatch(address))
-                value = new VariableNumeric(address, SimValueType.LVAR);
+            else if (address == SimValueType.KVAR)
+                value = new VariableNumeric(address);
+            else if (address == SimValueType.LVAR)
+                value = new VariableNumeric(address);
             else
                 value = CreateEmptyVariable();
 
@@ -136,15 +88,12 @@ namespace PilotsDeck.Resources
             ManagedVariables.Values.ToList().ForEach(v => v.CheckChanged());
         }
 
-        public ManagedVariable RegisterVariable(string address)
+        public ManagedVariable RegisterVariable(ManagedAddress address)
         {
             ManagedVariable variable = null;
             try
             {
-                address = FormatAddress(address);
-                SimValueType type = TypeMatching.GetReadType(address);
-
-                if (type == SimValueType.LUAFUNC)
+                if (address == SimValueType.LUAFUNC)
                 {
                     ScriptManager.RegisterScript(address);
                 }
@@ -162,17 +111,13 @@ namespace PilotsDeck.Resources
                 {
                     variable = CreateVariable(address);
 
-                    if (variable.Address != address && variable.Address == ADDRESS_EMPTY)
-                        Logger.Warning($"Could not create Variable for Address '{address}'!");                    
-
-                    if (ManagedVariables.TryGetValue(variable.Address, out ManagedVariable existing))
+                    if (variable.Address != address?.Address && variable.Address.IsEmpty)
                     {
-                        Logger.Warning($"Attempted to create Variable for existing Address: '{address}' -> '{variable.Address}'");
-                        variable = existing;
-                        variable.AddRegistration();
+                        Logger.Warning($"Could not create Variable for Address '{address}'!");
+                        return null;
                     }
-                    else
-                        ManagedVariables.TryAdd(variable.Address, variable);
+                    
+                    ManagedVariables.TryAdd(variable.Address, variable);
 
                     if (variable.IsValueInternal())
                         variable.IsSubscribed = true;
@@ -187,19 +132,16 @@ namespace PilotsDeck.Resources
             return variable;
         }
 
-        public void DeregisterVariable(string address)
+        public void DeregisterVariable(ManagedAddress address)
         {
             try
             {
-                address = FormatAddress(address);
-                SimValueType type = TypeMatching.GetReadType(address);
-
-                if (type == SimValueType.LUAFUNC)
+                if (address == SimValueType.LUAFUNC)
                 {
                     ScriptManager.DeregisterScript(address);
                 }
 
-                if (!string.IsNullOrWhiteSpace(address) && ManagedVariables.TryGetValue(address, out ManagedVariable variable))
+                if (address != null && ManagedVariables.TryGetValue(address, out ManagedVariable variable))
                 {
                     variable.RemoveRegistration();
                     if (variable.Registrations >= 1)

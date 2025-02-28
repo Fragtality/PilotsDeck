@@ -23,19 +23,16 @@ namespace PilotsDeck.Tools
         public static readonly Regex rxScript = new($"^(Lua(Set|Clear|Toggle|Value)?:){{1}}{validName}(:[0-9]{{1,4}})*$", RegexOptions.Compiled);
         public static readonly Regex rxControlSeq = new(@"^[0-9]+(:[0-9]+)*$", RegexOptions.Compiled);
         public static readonly Regex rxControl = new(@"^([0-9]+)$|^(([0-9]+\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\=[0-9]+(:[0-9]+)*){1})*)$", RegexOptions.Compiled);
-        public static readonly Regex rxLvar = new($"^((L:|[^:0-9]){{1}}{validLVarName}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxLvar = new($"^((L:|[^:0-9\x2F]){{1}}({validLVarName})){{1}}$", RegexOptions.Compiled);
         public static readonly string validHvar = $"((?!K:)(?!B:)(H:|[^:0-9]){{1}}{validName}(:[0-9]+){{0,1}}){{1}}";
         public static readonly Regex rxHvar = new($"^({validHvar}){{1}}(:{validHvar})*$", RegexOptions.Compiled);
-        public static readonly Regex rxOffset = new(@"^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifs]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled);
+        public static readonly Regex rxOffset = new(@"^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifsa]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$", RegexOptions.Compiled);
         public static readonly Regex rxVjoy = new(@"^(vjoy:|vJoy:|VJOY:){0,1}(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static readonly Regex rxVjoyDrv = new(@"^(vjoy:|vJoy:|VJOY:){0,1}(1[0-6]|[0-9]){1}:([0-9]|[0-9]{2}|1[0-1][0-9]|12[0-8]){1}(:t)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static readonly Regex rxDref = new($"^({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){{0,1}}){{1}}$", RegexOptions.Compiled);
+        public static readonly Regex rxDref = new($"^(({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*{validNameMultipleXP}){{1}}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){{0,1}}$", RegexOptions.Compiled);
         public static readonly string validPathXP = $"({validNameXP}[\\x2F]){{1}}({validNameMultipleXP}[\\x2F])*({validNameMultipleXP}){{1}}";
         public static readonly Regex rxCmdXP = new($"^({validPathXP}){{1}}(:{validPathXP})*$", RegexOptions.Compiled);
-        public static readonly Regex rxAvar = new(@"^\((A:){0,1}[\w][\w ]+(:\d+){0,1},\s{0,1}([\w][\w/ ]+)\)$", RegexOptions.Compiled);
-        public static readonly Regex rxAvarMobiString = new(@"^\(A:[\w][\w ]+(:\d+){0,1},\s{0,1}string\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static readonly Regex rxLvarMobi = new($"^\\(L:({validLVarName}){{1}}\\)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static readonly Regex rxLvarMobiMatch = new(@"([^:\s][a-zA-Z0-9\x2D\x5F\x2E\x20]{2,}([\x3A][0-9]+){0,1}){1}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex rxAvar = new(@"^\(((A|E|L):){0,1}([\w][\w ]+(:\d+){0,1}),\s{0,1}([\w][\w/ ]+)\)$", RegexOptions.Compiled);
         public static readonly Regex rxBvarValue = new($"^(B:{validName}){{1}}$", RegexOptions.Compiled);
         public static readonly string validBvarCmd = $"((B:){{0,1}}{validName}(:[-+]?[0-9]+([,.]{{1}}[0-9]+)?){{0,1}}){{1}}";
         public static readonly Regex rxBvarCmd = new($"^({validBvarCmd}){{1}}(:{validBvarCmd})*$", RegexOptions.Compiled);
@@ -43,19 +40,10 @@ namespace PilotsDeck.Tools
         public static readonly Regex rxLuaFile = new($"^(Lua|lua|LUA){{1}}:{validName}(\\.lua){{0,1}}", RegexOptions.Compiled);
         public static readonly Regex rxInternal = new($"^X:{validName}$", RegexOptions.Compiled);
         public static readonly Regex rxCalcRead = new(@"^C:[^\s].+$", RegexOptions.Compiled);
-        public static readonly string validKvar = $"((?!H:)(?!B:)(K:|[^:0-9]){{1}}{validNameKvar}(:[0-9.]+(:[0-9.]+){{0,1}}){{0,1}}){{1}}";
-        public static readonly Regex rxKvar = new($"^({validKvar}){{1}}(:{validKvar})*$", RegexOptions.Compiled);
-
-        public static bool IsStringDataRef(string address)
-        {
-            if (rxDref.IsMatch(address))
-            {
-                var parts = address.Split(':');
-                return parts.Length == 2 && parts[1].Length >= 2;
-            }
-            else
-                return false;
-        }
+        public static readonly string validKvar = $"((?!lua:)(?!H:)(?!B:)(K:|[^:0-9]){{1}}{validNameKvar}){{1}}";
+        public static readonly Regex rxKvarVariable = new($"^K:[^0-9]{validNameKvar}$", RegexOptions.Compiled);
+        public static readonly Regex rxKvarCmd = new($"^{validKvar}:[0-9]+(:{validKvar}:[0-9]+)+$|^{validKvar}(:[0-9]+){{0,5}}$", RegexOptions.Compiled);
+        public static readonly Regex rxKvarSequence = new($"^{validKvar}:[0-9]+(:{validKvar}:[0-9]+)+$", RegexOptions.Compiled);
 
         public static SimValueType GetReadType(string address)
         {
@@ -69,6 +57,8 @@ namespace PilotsDeck.Tools
                 return SimValueType.XPDREF;
             if (rxAvar.IsMatch(address))
                 return SimValueType.AVAR;
+            if (rxKvarVariable.IsMatch(address))
+                return SimValueType.KVAR;
             if (rxInternal.IsMatch(address))
                 return SimValueType.INTERNAL;
             if (rxCalcRead.IsMatch(address))
@@ -99,7 +89,7 @@ namespace PilotsDeck.Tools
                 return SimCommandType.BVAR;
             if (rxHvar.IsMatch(address))
                 return SimCommandType.HVAR;
-            if (rxKvar.IsMatch(address))
+            if (rxKvarCmd.IsMatch(address))
                 return SimCommandType.KVAR;
 
             return null;

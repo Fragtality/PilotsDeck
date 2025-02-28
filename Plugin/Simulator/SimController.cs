@@ -1,7 +1,8 @@
-﻿using PilotsDeck.Plugin;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Plugin;
 using PilotsDeck.Resources;
 using PilotsDeck.Resources.Variables;
-using PilotsDeck.Tools;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -191,8 +192,8 @@ namespace PilotsDeck.Simulator
                             foreach (var value in list)
                                 Logger.Debug(value.Address);
                             UnsubscribeVariables(list);
-                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(false);
-                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(false);
+                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(false);
+                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(false);
                         }
                         LastUnusedCheck = DateTime.Now;
                     }
@@ -206,12 +207,12 @@ namespace PilotsDeck.Simulator
             StatisticManager.EndTrack(StatisticID.SIM_PROCESS);
         }
 
-        public void RemoveUnusedVariables(bool force)
+        public void RemoveUnusedResources(bool force)
         {
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(force);
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedVariables(force);
+            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(force);
+            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(force);
         }
-
+        
         public void SubscribeVariable(ManagedVariable managedVariable)
         {
             ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.SubscribeVariable(managedVariable);
@@ -324,7 +325,7 @@ namespace PilotsDeck.Simulator
 
                     if (!handled)
                     {
-                        Logger.Warning($"No active & ready Connector can run the Command '{command?.Type}' Command '{command?.Address}' (Valid-Check: {command?.IsValid})");
+                        Logger.Warning($"No active & ready Connector can run the '{command?.Type}' Command '{command?.Address}' (Valid-Check: {command?.IsValid})");
                         _ = App.DeckController.SendShowAlert(command?.Context);
                     }
 

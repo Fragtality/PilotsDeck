@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Manipulators;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Manipulators;
 using PilotsDeck.Plugin.Render;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +13,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         RECTANGLE,
         RECTANGLE_FILLED,
         CIRCLE,
-        CIRCLE_FILLED
+        CIRCLE_FILLED,
     }
 
     public class ModelDisplayElement(DISPLAY_ELEMENT type)
@@ -75,9 +76,9 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
             return model;
         }
 
-        public virtual int AddManipulator(ELEMENT_MANIPULATOR type)
+        public virtual int AddManipulator(ELEMENT_MANIPULATOR type, ModelManipulator model = null)
         {
-            ElementManipulator instance = ElementManipulator.CreateInstance(type, null, null);
+            ElementManipulator instance = ElementManipulator.CreateInstance(type, model, null);
             if (instance == null)
             {
                 Logger.Warning($"Could not create Instance for Manipulator '{type}'");

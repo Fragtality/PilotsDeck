@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Actions.Advanced.Manipulators;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Actions.Advanced.Manipulators;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Plugin.Render;
 using System.Collections.Concurrent;
@@ -62,6 +63,7 @@ namespace PilotsDeck.Actions.Advanced.Elements
 
         public virtual void SetDefaultState()
         {
+            Color = Settings.GetColor();
             Rotation = Settings.Rotation;
             Position = Settings.GetPosition();
             Size = Settings.GetSize();
@@ -209,19 +211,22 @@ namespace PilotsDeck.Actions.Advanced.Elements
             return id;
         }
 
-        public virtual void RemoveManipulator(int id)
+        public virtual bool RemoveManipulator(int id)
         {
             if (!Settings.Manipulators.ContainsKey(id))
-            {
-                return;
-            }
-            Settings.Manipulators.Remove(id);
+                return false;
+
+            if (!Settings.Manipulators.Remove(id))
+                return false;
+
             var oldDict = Settings.Manipulators;
             Settings.Manipulators = [];
             int n = 0;
             foreach (var manipulator in oldDict.Values)
                 Settings.Manipulators.TryAdd(n++, manipulator);
             Logger.Debug($"Removed ElementManipulator for ID '{id}'");
+
+            return true;
         }
 
         public virtual void RegisterRessources()

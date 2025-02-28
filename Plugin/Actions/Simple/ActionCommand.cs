@@ -1,4 +1,6 @@
-﻿using PilotsDeck.Simulator;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Resources.Variables;
+using PilotsDeck.Simulator;
 using PilotsDeck.Simulator.MSFS;
 using System;
 
@@ -6,17 +8,17 @@ namespace PilotsDeck.Actions.Simple
 {
     public class ActionCommand
     {
-        public string AddressOn { get; set; } = "";
+        public ManagedAddress AddressOn { get; set; } = ManagedAddress.CreateEmptyCommand();
         public SimCommandType CommandType { get; set; } = SimCommandType.MACRO;
-        public bool IsValueType { get { return SimCommand.IsValidValueCommand(AddressOn, DoNotRequestBvar, CommandType); } }
-        public bool IsHoldable { get { return SimCommand.IsVjoyClearSet(AddressOn, CommandType) || HoldSwitch; } }
+        public bool IsValueType { get { return SimCommand.IsValidValueCommand(AddressOn.Address, DoNotRequestBvar, CommandType); } }
+        public bool IsHoldable { get { return SimCommand.IsVjoyClearSet(AddressOn) || HoldSwitch; } }
         public bool DoNotRequestBvar { get; set; } = true;
-        public string AddressOff { get; set; } = "";
+        public ManagedAddress AddressOff { get; set; } = ManagedAddress.CreateEmptyCommand();
         public ValueState State { get; protected set; } = new ValueState(null, "0", "0");
         public bool Compares { get { return State?.Compares() == true; } }
         public bool HoldSwitch { get; set; } = false;
         public bool ToggleSwitch { get; set; } = false;
-        public string AddressMonitor { get; set; } = "";
+        public ManagedAddress AddressMonitor { get; set; } = ManagedAddress.CreateEmpty();
         public bool ResetSwitch { get; set; } = false;
         public int ResetDelay
         {
@@ -42,7 +44,7 @@ namespace PilotsDeck.Actions.Simple
             }
         }
 
-        public string ToggleAddress
+        public ManagedAddress ToggleAddress
         {
             get
             {
@@ -69,21 +71,21 @@ namespace PilotsDeck.Actions.Simple
 
             if (ToggleSwitch)
             {
-                simCommand.Address = ToggleAddress;
+                simCommand.Address = ToggleAddress.Copy();
             }
             else if (HoldSwitch)
             {
                 if (IsValueType)
                 {
-                    simCommand.Address = AddressOn;
+                    simCommand.Address = AddressOn.Copy();
                     simCommand.Value = State.GetSwitchValue(ticks, keyUp);
                 }
                 else
-                    simCommand.Address = keyUp ? AddressOff : AddressOn;
+                    simCommand.Address = (keyUp ? AddressOff : AddressOn).Copy();
             }
             else
             {
-                simCommand.Address = AddressOn;
+                simCommand.Address = AddressOn.Copy();
                 if (IsValueType)
                     simCommand.Value = State.GetSwitchValue(ticks, keyUp);
             }
@@ -96,9 +98,9 @@ namespace PilotsDeck.Actions.Simple
             }
 
             bool isCalcCode = false;
-            if (ToolsMSFS.IsCalculatorTemplate(simCommand.Type, simCommand.Address))
+            if (ToolsMSFS.IsCalculatorTemplate(simCommand.Type, simCommand.Address.Address))
             {
-                simCommand.Address = ToolsMSFS.BuildCalculatorCode(simCommand.Address, ticks);
+                simCommand.Address = new ManagedAddress(ToolsMSFS.BuildCalculatorCode(simCommand.Address.Address, ticks), SimCommandType.CALCULATOR, true);
                 isCalcCode = true;
             }
 
@@ -112,7 +114,7 @@ namespace PilotsDeck.Actions.Simple
             {
                 simCommand.CommandDelay = CommandDelay;
             }
-
+            Logger.Debug($"Created Command from '{AddressOn}' - Ticks: {simCommand.Ticks}");
             Logger.Verbose($"Created Command - Ticks: {simCommand.Ticks}");
             return simCommand;
         }
@@ -139,12 +141,12 @@ namespace PilotsDeck.Actions.Simple
 
             ActionCommand command = new()
             {
-                AddressOn = settingsModel.AddressAction,
+                AddressOn = new ManagedAddress(settingsModel.AddressAction, settingsModel.ActionType, settingsModel.DoNotRequestBvar),
                 CommandType = settingsModel.ActionType,
-                AddressOff = settingsModel.AddressActionOff,
+                AddressOff = new ManagedAddress(settingsModel.AddressActionOff, settingsModel.ActionType, settingsModel.DoNotRequestBvar),
                 HoldSwitch = GetHoldState(settingsModel, settingsModel.ActionType, settingsModel.DoNotRequestBvar),
                 ToggleSwitch = GetToggleState(settingsModel, settingsModel.ActionType, settingsModel.DoNotRequestBvar),
-                AddressMonitor = settingsModel.AddressMonitor,
+                AddressMonitor = new ManagedAddress(settingsModel.AddressMonitor),
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionType, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
@@ -165,9 +167,9 @@ namespace PilotsDeck.Actions.Simple
 
             ActionCommand command = new()
             {
-                AddressOn = settingsModel.AddressActionGuard,
+                AddressOn = new ManagedAddress(settingsModel.AddressActionGuard, settingsModel.ActionTypeGuard, settingsModel.DoNotRequestBvar),
                 CommandType = settingsModel.ActionTypeGuard,
-                AddressOff = settingsModel.AddressActionGuardOff,
+                AddressOff = new ManagedAddress(settingsModel.AddressActionGuardOff, settingsModel.ActionTypeGuard, settingsModel.DoNotRequestBvar),
                 HoldSwitch = GetHoldState(settingsModel, settingsModel.ActionTypeGuard, settingsModel.DoNotRequestBvar),
                 ToggleSwitch = false,
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionTypeGuard, settingsModel.DoNotRequestBvar),
@@ -188,7 +190,7 @@ namespace PilotsDeck.Actions.Simple
 
             ActionCommand command = new()
             {
-                AddressOn = settingsModel.AddressActionLong,
+                AddressOn = new ManagedAddress(settingsModel.AddressActionLong, settingsModel.ActionTypeLong, settingsModel.DoNotRequestBvar),
                 CommandType = settingsModel.ActionTypeLong,
                 HoldSwitch = false,
                 ToggleSwitch = false,
@@ -210,7 +212,7 @@ namespace PilotsDeck.Actions.Simple
 
             ActionCommand command = new()
             {
-                AddressOn = settingsModel.AddressActionTouch,
+                AddressOn = new ManagedAddress(settingsModel.AddressActionTouch, settingsModel.ActionTypeTouch, settingsModel.DoNotRequestBvar),
                 CommandType = settingsModel.ActionTypeTouch,
                 HoldSwitch = false,
                 ToggleSwitch = false,
@@ -232,7 +234,7 @@ namespace PilotsDeck.Actions.Simple
 
             ActionCommand command = new()
             {
-                AddressOn = settingsModel.AddressActionLeft,
+                AddressOn = new ManagedAddress(settingsModel.AddressActionLeft, settingsModel.ActionTypeLeft, settingsModel.DoNotRequestBvar),
                 CommandType = settingsModel.ActionTypeLeft,
                 HoldSwitch = false,
                 ToggleSwitch = false,
@@ -254,7 +256,7 @@ namespace PilotsDeck.Actions.Simple
 
             ActionCommand command = new()
             {
-                AddressOn = settingsModel.AddressActionRight,
+                AddressOn = new ManagedAddress(settingsModel.AddressActionRight, settingsModel.ActionTypeRight, settingsModel.DoNotRequestBvar),
                 CommandType = settingsModel.ActionTypeRight,
                 HoldSwitch = false,
                 ToggleSwitch = false,

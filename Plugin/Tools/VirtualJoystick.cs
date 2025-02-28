@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using System;
 using System.Threading.Tasks;
 using vJoyInterfaceWrap;
 

@@ -1,7 +1,7 @@
-﻿using PilotsDeck.Plugin.Render;
+﻿using CFIT.AppTools;
+using PilotsDeck.Plugin.Render;
 using PilotsDeck.Resources;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System.Drawing;
 
 
@@ -32,6 +32,16 @@ namespace PilotsDeck.Actions.Simple
             if (string.IsNullOrWhiteSpace(Settings.DefaultRect))
             {
                 Settings.DefaultRect = "0; 0";
+                SettingModelUpdated = true;
+            }
+            if (string.IsNullOrWhiteSpace(Settings.CriticalRange) || Settings.CriticalRange.Split(';')?.Length < 2)
+            {
+                Settings.CriticalRange = "0; 10";
+                SettingModelUpdated = true;
+            }
+            if (string.IsNullOrWhiteSpace(Settings.WarnRange) || Settings.WarnRange.Split(';')?.Length < 2)
+            {
+                Settings.WarnRange = "10; 20";
                 SettingModelUpdated = true;
             }
         }
@@ -221,7 +231,7 @@ namespace PilotsDeck.Actions.Simple
         public static bool ValueWithinRange(string value, string range)
         {
             float[] rangeNum = Conversion.ToFloatArray(range, [0, 100]);
-            if (Conversion.IsNumber(value, out double valueNum))
+            if (Conversion.IsNumber(value, out double valueNum) && rangeNum?.Length == 2)
             {
                 if (rangeNum[0] <= valueNum && valueNum <= rangeNum[1])
                     return true;

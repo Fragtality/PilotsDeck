@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Simulator;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using System;
 using System.Collections.Generic;

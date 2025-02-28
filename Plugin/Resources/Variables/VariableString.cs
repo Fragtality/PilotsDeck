@@ -1,9 +1,10 @@
-﻿using PilotsDeck.Tools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using System;
 
 namespace PilotsDeck.Resources.Variables
 {
-    public class VariableString(string address, SimValueType type) : ManagedVariable(address, type)
+    public class VariableString(ManagedAddress address) : ManagedVariable(address)
     {
         public static readonly int MAX_CHARS = 1024;
         protected string StringValue { get; set; } = "0";

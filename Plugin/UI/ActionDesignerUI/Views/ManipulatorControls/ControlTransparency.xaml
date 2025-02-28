@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls.ControlTransparency"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Manipulators"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelTransparency}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Style="{StaticResource DesignerLabelColumn}"/>
+            <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Visibility="{Binding StaticTransparency, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Set Value:
+        </Label>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="InputTransparencySetValue" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"
+             Visibility="{Binding StaticTransparency, Converter={StaticResource BoolVisibilityConverter}}"/>
+
+        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+            Dynamic:
+        </Label>
+        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding DynamicTransparency}" Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+            Change Transparency dynamically by Value
+        </CheckBox>
+
+        <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Name="VariableControl" Margin="0,8,0,0"
+            Visibility="{Binding DynamicTransparency, Converter={StaticResource BoolVisibilityConverter}}"/>
+
+        <Label Grid.Row="3" Grid.Column="0" Visibility="{Binding DynamicTransparency, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Min Value:
+        </Label>
+        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="{Binding DynamicTransparency, Converter={StaticResource BoolVisibilityConverter}}">
+            <TextBox Name="InputTransparencyMinValue" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <Label Style="{StaticResource LabelAnnotation}">
+                (not visible)
+            </Label>
+        </StackPanel>
+
+        <Label Grid.Row="4" Grid.Column="0" Visibility="{Binding DynamicTransparency, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Max Value:
+        </Label>
+        <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="{Binding DynamicTransparency, Converter={StaticResource BoolVisibilityConverter}}">
+            <TextBox Name="InputTransparencyMaxValue" HorizontalAlignment="Left" Style="{StaticResource InputCentered}"/>
+            <Label Style="{StaticResource LabelAnnotation}">
+                (full visible)
+            </Label>
+        </StackPanel>
+    </Grid>
+</UserControl>

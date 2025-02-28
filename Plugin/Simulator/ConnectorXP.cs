@@ -1,6 +1,7 @@
-﻿using PilotsDeck.Resources.Variables;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator.XP;
-using PilotsDeck.Tools;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -391,7 +392,7 @@ namespace PilotsDeck.Simulator
         {
             if (!isString)
             {
-                VariableNumeric managedVariable = new(dataref, SimValueType.XPDREF)
+                VariableNumeric managedVariable = new(new ManagedAddress(dataref))
                 {
                     IsSubscribed = true
                 };
@@ -400,7 +401,7 @@ namespace PilotsDeck.Simulator
             }
             else
             {
-                VariableString managedVariable = new(dataref, SimValueType.XPDREF)
+                VariableString managedVariable = new(new ManagedAddress(dataref))
                 {
                     IsSubscribed = true
                 };
@@ -409,7 +410,7 @@ namespace PilotsDeck.Simulator
             }
         }
 
-        protected bool ContainsAddress(string address, out int index)
+        protected bool ContainsAddress(ManagedAddress address, out int index)
         {
             index = -1;
             var query = IndexMapping.Where(m => m.Value.ValueRef.Address == address);
@@ -464,8 +465,8 @@ namespace PilotsDeck.Simulator
         protected void SubscribeVariableString(VariableString managedVariable, bool isCached, int index, int rate = -1)
         {
             int baseIndex = (isCached ? index : NextIndex);
-            string baseRef = managedVariable.Address.Split(':')[0];
-            if (!int.TryParse(managedVariable.Address.Split(':')[1][1..], out int length))
+            string baseRef = managedVariable.Address.Name;
+            if (!managedVariable.Address.HasParameter || !int.TryParse(managedVariable.Address.Parameter[1..], out int length))
             {
                 Logger.Error($"Could not parse String Length for '{managedVariable.Address}'");
                 return;
@@ -522,7 +523,7 @@ namespace PilotsDeck.Simulator
                     nextIndex = index;
                 }
 
-                dataRefs.Add(managedVariable.Address);
+                dataRefs.Add(managedVariable.Address.Address);
                 indices.Add(nextIndex);
                 mappings.Add(IndexMappingXP.Create(nextIndex, managedVariable));
                 if (!isCached)
@@ -571,7 +572,7 @@ namespace PilotsDeck.Simulator
             mappings.ForEach(m => m.ValueRef.IsSubscribed = true);
         }
 
-        protected bool HasAddress(string address, out IndexMappingXP mapping)
+        protected bool HasAddress(ManagedAddress address, out IndexMappingXP mapping)
         {
             var query = IndexMapping.Where(m => m.Value?.ValueRef?.Address == address && m.Value?.IsRequested == true);
             if (query?.Any() == true)
@@ -651,7 +652,7 @@ namespace PilotsDeck.Simulator
             }
         }
 
-        public void RemoveUnusedVariables(bool force)
+        public void RemoveUnusedResources(bool force)
         {
 
         }
@@ -716,7 +717,7 @@ namespace PilotsDeck.Simulator
 
         protected async Task<bool> SendCommand(SimCommand command)
         {
-            string[] xpcmds = command.Address.Split(':');
+            string[] xpcmds = command.Address.Address.Split(':');
 
             int success = 0;
             int i;
@@ -736,7 +737,7 @@ namespace PilotsDeck.Simulator
                 }
                 else if (xpcmds.Length == 1)
                 {
-                    if(Socket.SendCommand(command.Address))
+                    if(Socket.SendCommand(command.Address.Address))
                         success++;
                 }
                 else
@@ -750,18 +751,18 @@ namespace PilotsDeck.Simulator
 
         protected async Task<bool> WriteRef(SimCommand command)
         {
-            if (command.Address.Contains(":s"))
+            if (command.Address.Parameter.StartsWith('s'))
                 return await WriteStringRef(command);
 
             int success = 0;
             int i;
             for (i = 0; i < command.Ticks; i++)
             {
-                bool result = Socket.SendWriteRef(command.Address, Convert.ToSingle(command.NumValue));
+                bool result = Socket.SendWriteRef(command.Address.Address, Convert.ToSingle(command.NumValue));
                 if (command.IsValueReset && command.ResetDelay > 0)
                 {
                     await Task.Delay(command.ResetDelay, App.CancellationToken);
-                    if (Socket.SendWriteRef(command.Address, Convert.ToSingle(command.ResetValue)) && result)
+                    if (Socket.SendWriteRef(command.Address.Address, Convert.ToSingle(command.ResetValue)) && result)
                         success++;
                 }
                 else if (result)
@@ -779,9 +780,8 @@ namespace PilotsDeck.Simulator
         {
             int success = 0;
             int i;
-            string[] parts = command.Address.Split(':');
-            string baseAddress = parts[0];
-            int size = (int)Conversion.ToDouble(parts[1].Replace("s", ""));
+            string baseAddress = command.Address.Name;
+            int size = (int)Conversion.ToDouble(command.Address.Parameter.Replace("s", ""));
 
             for (i = 0; i < command.Ticks; i++)
             {

@@ -1,8 +1,9 @@
-﻿using PilotsDeck.Actions.Advanced.SettingsModel;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator;
 using PilotsDeck.Simulator.MSFS;
-using PilotsDeck.Tools;
 using System;
 using System.Collections.Concurrent;
 
@@ -15,10 +16,10 @@ namespace PilotsDeck.Actions.Advanced
         public bool IsEncoder { get { return DeckCommandType == StreamDeckCommand.DIAL_LEFT || DeckCommandType == StreamDeckCommand.DIAL_RIGHT || DeckCommandType == StreamDeckCommand.TOUCH_TAP; } }
         public SimCommandType CommandType { get; set; } = model.CommandType;
         public bool DoNotRequestBvar { get; set; } = model.DoNotRequestBvar;
-        public string Address { get; set; } = model.Address;
+        public ManagedAddress Address { get; set; } = new ManagedAddress(model.Address, model.CommandType, model.DoNotRequestBvar);
         public string Name { get; set; } = model.Name;
-        public bool IsValidCommand { get { return SimCommand.IsValidAddressForType(Address, CommandType, DoNotRequestBvar); } }
-        public bool IsValidValueType { get { return SimCommand.IsValidValueCommand(Address, DoNotRequestBvar, CommandType); } }
+        public bool IsValidCommand { get { return SimCommand.IsValidAddressForType(Address.Address, CommandType, DoNotRequestBvar); } }
+        public bool IsValidValueType { get { return SimCommand.IsValidValueCommand(Address.Address, DoNotRequestBvar, CommandType); } }
         public bool IsValueType { get { return SimCommand.IsValueCommand(CommandType, DoNotRequestBvar); } }
         public bool IsCommandType { get { return SimCommand.IsNonvalueCommand(CommandType, DoNotRequestBvar); } }
         public ManagedVariable Variable { get; set; } = null;
@@ -33,7 +34,7 @@ namespace PilotsDeck.Actions.Advanced
         public int ResetDelay { get; set; } = model.ResetDelay;
         public bool UseCommandDelay { get; set; } = model.UseCommandDelay;
         public int CommandDelay { get; set; } = model.CommandDelay;
-        public bool IsCode { get { return (IsValueType && WriteValue?.StartsWith('$') == true) || (CommandType == SimCommandType.CALCULATOR && Address?.StartsWith('$') == true); } }
+        public bool IsCode { get { return (IsValueType && WriteValue?.StartsWith('$') == true) || (CommandType == SimCommandType.CALCULATOR && Address?.Address?.StartsWith('$') == true); } }
         public bool IsCounter { get { return WriteValue?.Length >= 2 && !WriteValue?.Contains(',') == true && Conversion.IsNumber(Code?.Split(':')?[0]); } }
         public bool IsSequence { get { return IsCode && !IsCounter && (WriteValue?.Contains(',') == true && WriteValue?.Length >= 4) || (WriteValue?.StartsWith("$=") == true && WriteValue.Length >= 3); } }
         public string Code { get { return WriteValue?.Trim()?[1..]; } }
@@ -57,7 +58,7 @@ namespace PilotsDeck.Actions.Advanced
                 if (condition.Variable == null)
                 {
                     Logger.Verbose($"Register Variable '{condition.Address}'");
-                    condition.Variable = App.PluginController.VariableManager.RegisterVariable(condition.Address);
+                    condition.Variable = App.PluginController.VariableManager.RegisterVariable(new ManagedAddress(condition.Address));
                 }
             }
         }
@@ -121,7 +122,7 @@ namespace PilotsDeck.Actions.Advanced
             SimCommand command = new()
             {
                 Context = context,
-                Address = Address,
+                Address = Address.Copy(),
                 Type = CommandType,
                 IsUp = keyUp,
                 Ticks = Math.Abs(ticks),
@@ -135,8 +136,8 @@ namespace PilotsDeck.Actions.Advanced
                     command.Value = ToolsValueState.GetCounter(Code, NumericValue, Value, ticks);
                 else if (IsSequence && IsValidValueType)
                     command.Value = ToolsValueState.GetSequence(Code, NumericValue, Value, IsNumericValue);
-                else if (ToolsMSFS.IsCalculatorTemplate(CommandType, Address))
-                    command.Address = ToolsMSFS.BuildCalculatorCode(Address, ticks);
+                else if (ToolsMSFS.IsCalculatorTemplate(CommandType, Address.Address))
+                    command.Address = new ManagedAddress(ToolsMSFS.BuildCalculatorCode(Address.Address, ticks), SimCommandType.CALCULATOR, true);
                 else
                     Logger.Warning($"Could not calculate a Value from Code '{WriteValue}' | '{Address}'");
             }

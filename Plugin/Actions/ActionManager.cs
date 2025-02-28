@@ -1,11 +1,12 @@
-﻿using PilotsDeck.Actions.Advanced;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using PilotsDeck.Actions.Advanced;
 using PilotsDeck.Actions.Simple;
 using PilotsDeck.Plugin;
 using PilotsDeck.Resources;
 using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace PilotsDeck.Actions
 {
     public class ActionManager
     {
-        public static DeckController DeckController { get { return App.DeckController; } }
+        public static DeckController DeckController => App.DeckController;
         public ConcurrentDictionary<string, IAction> Actions { get; } = [];
         public ProfileSwitcherManager ProfileSwitcherManager { get; } = new();
         protected PluginState LastState { get; set; } = PluginState.IDLE;
@@ -183,11 +184,11 @@ namespace PilotsDeck.Actions
                     sdEvent.action = action.GetType().FullName;
                     string json = JsonSerializer.Serialize(sdEvent);
                     Logger.Debug($"Copy to Clipboard: {json}");
-                    Sys.SetClipboard(json.Base64Encode());
+                    ClipboardHelper.SetClipboard(json.Base64Encode());
                 }
                 else if (msg == "SettingsModelPaste")
                 {
-                    string json = Sys.GetClipboard();
+                    string json = ClipboardHelper.GetClipboard();
                     if (string.IsNullOrWhiteSpace(json) || json?.Length < 1)
                     {
                         Logger.Warning($"Clipboard does not contain Text");

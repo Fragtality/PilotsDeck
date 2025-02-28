@@ -1,6 +1,12 @@
-﻿using System;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
+using CFIT.Installer.LibFunc;
+using CFIT.Installer.LibWorker;
+using CFIT.Installer.Tasks;
+using CFIT.Installer.UI.Tasks;
+using System;
 using System.IO;
-using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,10 +16,11 @@ namespace ProfileManager
     public partial class MainWindow : Window
     {
         public static MainWindow Instance { get; private set; }
+        public static string AppTitle { get; protected set; }
+
         protected Brush BrushDefault { get; set; }
         protected Brush BrushHighlight { get; } = SystemColors.HighlightBrush;
-
-        public static string AppTitle { get; protected set; }
+        protected bool StoppedStreamDeck { get; set; } = false;
 
         public MainWindow()
         {
@@ -22,10 +29,9 @@ namespace ProfileManager
                 Instance = this;
                 InitializeComponent();
                 BrushDefault = ButtonProfileInstaller.BorderBrush;
+                FuncStreamDeck.PluginBinary = Config.PluginBinary;
 
-                string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
-                Title += " (" + assemblyVersion + ")";
+                Title = $"{Title} ({VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()})";
                 AppTitle = Title;
 
                 ExecuteCommandLine();
@@ -55,7 +61,7 @@ namespace ProfileManager
         {
             if (ProfileController.AppsRunning)
             {
-                Logger.Log(LogLevel.Error, $"Profile Mapper requested while Apps still running!");
+                Logger.Error($"Profile Mapper requested while Apps still running!");
                 MessageBox.Show("The StreamDeck Software is still running:\r\nCan not clean Profile Flags while StreamDeck Software is active.", "StreamDeck Running", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -64,6 +70,11 @@ namespace ProfileManager
             tempController.CleanProfileManifestFlag();
 
             ButtonProfileMapper_Click(null, null);
+        }
+
+        public static void SetForeground()
+        {
+            Sys.SetForegroundWindow(AppTitle);
         }
 
         private void ShowInstallerView(string filename = null)
@@ -95,7 +106,7 @@ namespace ProfileManager
             button.Opacity = 0.5;
         }
 
-        private void ButtonProfileInstaller_Click(object sender, RoutedEventArgs e)
+        private async void ButtonProfileInstaller_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -104,10 +115,16 @@ namespace ProfileManager
 
                 if (ContentArea.Content is ViewProfileMapper && (ContentArea.Content as ViewProfileMapper).ProfileController.HasChanges && (ContentArea.Content as ViewProfileMapper).IsSaveStateValid())
                 {
-                    Logger.Log(LogLevel.Warning, $"Close requested with unsaved Changes");
+                    Logger.Warning($"Close requested with unsaved Changes");
                     var result = MessageBox.Show("There are unsaved Changes to your Profiles!\r\nSave before closing?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.Yes)
                         (ContentArea.Content as ViewProfileMapper).ProfileController.SaveChanges();
+                }
+
+                if (StoppedStreamDeck)
+                {
+                    Logger.Debug($"Starting StreamDeck after Stop");
+                    await StartStopStreamDeck(DeckProcessOperation.START);
                 }
 
                 ShowInstallerView();
@@ -127,7 +144,7 @@ namespace ProfileManager
 
                 if (ContentArea.Content is ViewProfileInstaller && (ContentArea.Content as ViewProfileInstaller).IsPackageActive)
                 {
-                    Logger.Log(LogLevel.Warning, $"Profile Mapper requested while Profile Installation in Progress!");
+                    Logger.Warning($"Profile Mapper requested while Profile Installation in Progress!");
                     var result = MessageBox.Show("A Profile Package is currently opened for Installation!\r\nCancel Installation?", "Profile Package Loaded", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.No)
                         return;
@@ -137,21 +154,15 @@ namespace ProfileManager
 
                 if (ProfileController.AppsRunning)
                 {
-                    Logger.Log(LogLevel.Warning, $"Profile Mapper requested while Apps still running!");
+                    Logger.Debug($"Profile Mapper requested while Apps still running!");
                     var result = MessageBox.Show("Can not edit Profiles while StreamDeck is running:\r\nKill StreamDeck Software now?", "StreamDeck Running", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.Yes)
                     {
-                        var tempTaskPanel = new InstallerTaskPanel();
-                        ContentArea.Content = tempTaskPanel;
-                        tempTaskPanel.Activate(null, null);
-                        var task = InstallerTask.AddTask("Stop StreamDeck Software", "");
-
-                        await Tools.StopStreamDeckSoftware();
-                        await Tools.WaitOnTask(task, "Stop StreamDeck Software and wait {0}s", 3);
-                        tempTaskPanel.Deactivate();
+                        Logger.Debug($"Stopping StreamDeck ...");
+                        await StartStopStreamDeck(DeckProcessOperation.STOP);
                     }
                     else
-                        Logger.Log(LogLevel.Warning, $"Continued with StreamDeck running");
+                        Logger.Warning($"Continued with StreamDeck running");
                 }
 
                 ButtonEnable(ButtonProfileInstaller);
@@ -166,8 +177,37 @@ namespace ProfileManager
             }
         }
 
+        protected async Task StartStopStreamDeck(DeckProcessOperation operation)
+        {
+            TaskStore.Clear();
+            var tempTaskPanel = new TaskViewPanel();
+            ContentArea.Content = tempTaskPanel;
+            tempTaskPanel.Activate();
+
+            var worker = new WorkerStreamDeckStartStop<Config>(Config.Instance, operation);
+            if (operation == DeckProcessOperation.START)
+            {
+                worker.RefocusWindow = true;
+                worker.RefocusWindowTitle = MainWindow.AppTitle;
+            }
+
+            await worker.Run(System.Threading.CancellationToken.None);
+            if (operation == DeckProcessOperation.STOP)
+                StoppedStreamDeck = true;
+            else
+                StoppedStreamDeck = false;
+
+            tempTaskPanel.Deactivate();
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (StoppedStreamDeck)
+            {
+                Logger.Information($"Starting StreamDeck Software");
+                (new FuncStreamDeck()).StartSoftware();
+            }
+
             if (ContentArea.Content is ViewProfileMapper)
                 (ContentArea.Content as ViewProfileMapper)?.Window_Closing();
             if (ContentArea.Content is ViewProfileInstaller)
