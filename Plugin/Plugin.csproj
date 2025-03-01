@@ -1072,7 +1072,7 @@
     <None Update="Microsoft.FlightSimulator.SimConnect.dll">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\Images\ActionDisplay@2x.png">
+    <None Update="Plugin\Images\ActionDisplay%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Plugin\Images\ActionDisplay.png">
@@ -1126,7 +1126,7 @@
     <None Update="Plugin\Images\ActionSwitchKorry.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\Images\category@2x.png">
+    <None Update="Plugin\Images\category%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Plugin\Images\category.png">
@@ -1152,10 +1152,10 @@
     <None Update="Plugin\Images\StreamDeck_BtnOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\Images\Wait@2x.png">
+    <None Update="Plugin\Images\Wait%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\Images\Wait@3x.png">
+    <None Update="Plugin\Images\Wait%403x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Plugin\Images\Wait.png">

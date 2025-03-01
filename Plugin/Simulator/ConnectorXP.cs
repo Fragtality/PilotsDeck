@@ -33,7 +33,7 @@ namespace PilotsDeck.Simulator
         public bool IsRunning { get { return ISimConnector.GetRunning(Type) || RemoteRunning; } }
         public bool IsLoading { get; protected set; } = true;
         public bool IsReadyProcess { get { return ReceivedAircraftString && IsRunning && !IsLoading && !SocketError; } }
-        public bool IsReadyCommand { get { return IsReadyProcess && !IsPaused && !SocketError; } }
+        public bool IsReadyCommand { get { return IsReadyProcess && /*!IsPaused &&*/ !SocketError; } }
         public bool IsReadySession { get { return !IsLoading && !SocketError; } }
         public bool IsPaused { get; protected set; } = true;
         public string AircraftString { get; protected set; } = "";
@@ -466,7 +466,7 @@ namespace PilotsDeck.Simulator
         {
             int baseIndex = (isCached ? index : NextIndex);
             string baseRef = managedVariable.Address.Name;
-            if (!managedVariable.Address.HasParameter || !int.TryParse(managedVariable.Address.Parameter[1..], out int length))
+            if (!managedVariable.Address.HasParameter || !int.TryParse(managedVariable.Address.Parameter[2..], out int length))
             {
                 Logger.Error($"Could not parse String Length for '{managedVariable.Address}'");
                 return;

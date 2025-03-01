@@ -35,10 +35,10 @@ namespace Installer
 
         //Worker: .NET
         public virtual bool NetRuntimeDesktop { get; set; } = true;
-        public virtual string NetVersion { get; set; } = "8.0.12";
+        public virtual string NetVersion { get; set; } = "8.0.13";
         public virtual bool CheckMajorEqual { get; set; } = true;
-        public virtual string NetUrl { get; set; } = "https://download.visualstudio.microsoft.com/download/pr/f1e7ffc8-c278-4339-b460-517420724524/f36bb75b2e86a52338c4d3a90f8dac9b/windowsdesktop-runtime-8.0.12-win-x64.exe";
-        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.12-win-x64.exe";
+        public virtual string NetUrl { get; set; } = "https://download.visualstudio.microsoft.com/download/pr/fc8c9dea-8180-4dad-bf1b-5f229cf47477/c3f0536639ab40f1470b6bad5e1b95b8/windowsdesktop-runtime-8.0.13-win-x64.exe";
+        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.13-win-x64.exe";
 
         //Worker: MobiFlight
         public virtual bool MobiRequired { get; set; } = true;
@@ -46,15 +46,15 @@ namespace Installer
 
         //Worker: FSUIPC7
         public virtual bool Fsuipc7Required { get; set; } = true;
-        public virtual string Fsuipc7Version { get; set; } = "7.5.1";
+        public virtual string Fsuipc7Version { get; set; } = "7.5.2";
         public virtual string Fsuipc7WasmVersion { get; set; } = "1.0.7";
-        public virtual string Fsuipc7Url { get; set; } = "https://www.fsuipc.com/download/Install_FSUIPC7.5.1.zip";
+        public virtual string Fsuipc7Url { get; set; } = "https://www.fsuipc.com/download/Install_FSUIPC7.5.2.zip";
         public virtual bool Fsuipc7AllowBeta { get; set; } = false;
         public virtual bool Fsuipc7CheckPumps { get; set; } = true;
 
         //Worker: FSUIPC6
         public virtual bool Fsuipc6Required { get; set; } = true;
-        public virtual string Fsuipc6Version { get; set; } = "6.2.0";
+        public virtual string Fsuipc6Version { get; set; } = "6.2.2";
         public virtual string Fsuipc6Url { get; set; } = "https://fsuipc.simflight.com/beta/FSUIPC6.zip";
         public virtual bool Fsuipc6AllowBeta { get; set; } = false;
 

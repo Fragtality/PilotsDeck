@@ -190,6 +190,8 @@ namespace PilotsDeck.Resources.Variables
             }
             else if (TypeMatching.rxDref.IsMatch(address) && TypeMatching.rxDref.GroupsMatching(address, [1], out var drefNameGroup))
             {
+                prefix = "";
+
                 name = drefNameGroup[0];
 
                 if (TypeMatching.rxDref.GroupsMatching(address, [4], out var drefParamGroup))
@@ -243,7 +245,7 @@ namespace PilotsDeck.Resources.Variables
                 string[] parts = address.Split(':');
                 if (parts.Length >= 2)
                 {
-                    prefix = parts[0];
+                    prefix = $"{parts[0]}:";
 
                     name = parts[1];
 
@@ -259,7 +261,7 @@ namespace PilotsDeck.Resources.Variables
                 string[] parts = address.Split(':');
                 if (parts.Length >= 2)
                 {
-                    prefix = parts[0];
+                    prefix = $"{parts[0]}:";
 
                     name = parts[1];
 
