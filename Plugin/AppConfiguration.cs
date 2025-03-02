@@ -39,7 +39,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 8;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 12;
+        public static int BuildConfigVersion { get; } = 13;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -132,7 +132,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public string MobiLvarFile { get { return FILE_LVAR; } }
         [JsonIgnore]
-        public bool MobiSetVarPerFrame { get { return true; } }
+        public bool MobiSetVarPerFrame { get { return MobiVarsPerFrame > 0; } }
         public uint MobiSizeVariables { get; set; } = 10000;
 
 
@@ -223,7 +223,7 @@ namespace PilotsDeck
         public int MsfsStaleTimeout { get; set; } = 15000;
         public int MsfsStateCheckInterval { get; set; } = 500;
         public int MobiRetryDelay { get; set; } = 10000;
-        public int MobiVarsPerFrame { get; set; } = 100;
+        public int MobiVarsPerFrame { get; set; } = 0;
         public int MobiReorderTreshold { get; set; } = 10;
         public int CommandDelay { get; set; } = 25;
         public int InterActionDelay { get; set; } = 15;
@@ -231,6 +231,7 @@ namespace PilotsDeck
         public int VariableResetDelay { get; set; } = 100;
         public int VJoyMinimumPressed { get; set; } = 75;
         public int LongPressTime { get; set; } = 500;
+        public int ApiPortNumber { get; set; } = 42042;
 
 
         public static AppConfiguration LoadConfiguration()
@@ -282,6 +283,12 @@ namespace PilotsDeck
                     config.LogFile = "PilotsDeck.log";
                     Logger.Information($"Setting MsfsStateCheckInterval");
                     config.MsfsStateCheckInterval = 500;
+                }
+
+                if (config.ConfigVersion < 13)
+                {
+                    Logger.Information($"Setting Mobi Variables");
+                    config.MobiVarsPerFrame = 0;
                 }
 
                 config.ConfigVersion = BuildConfigVersion;

@@ -89,13 +89,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2025.57.23.2791" />
-    <PackageReference Include="CFIT.AppLogger" Version="2025.57.23.2755" />
-    <PackageReference Include="CFIT.AppTools" Version="2025.57.23.2762" />
-    <PackageReference Include="CFIT.SimConnectLib" Version="2025.57.23.2781" />
+    <PackageReference Include="CFIT.AppFramework" Version="2025.61.15.556" />
+    <PackageReference Include="CFIT.AppLogger" Version="2025.61.15.512" />
+    <PackageReference Include="CFIT.AppTools" Version="2025.61.15.523" />
+    <PackageReference Include="CFIT.SimConnectLib" Version="2025.61.15.544" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.16" />
-    <PackageReference Include="H.NotifyIcon.Wpf" Version="2.2.0" />
+    <PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.0" />
     <PackageReference Include="NeoLua" Version="1.3.14" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
     <PackageReference Include="System.Text.Encodings.Web" Version="9.0.2" />
@@ -107,6 +107,7 @@
 
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="Plugin\API\" />
   </ItemGroup>
 
   <ItemGroup>

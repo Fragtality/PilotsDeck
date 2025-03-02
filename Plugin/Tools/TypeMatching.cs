@@ -66,7 +66,7 @@ namespace PilotsDeck.Tools
             if (rxLvar.IsMatch(address))
                 return SimValueType.LVAR;
 
-            return 0;
+            return SimValueType.NONE;
         }
 
         public static SimCommandType? GetCommandOnlyType(string address)

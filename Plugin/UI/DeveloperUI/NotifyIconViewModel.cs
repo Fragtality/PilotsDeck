@@ -12,10 +12,21 @@ namespace PilotsDeck.UI.DeveloperUI
         [RelayCommand]
         public static void ToggleWindow()
         {
-            if (App.DeveloperView.IsVisible)
-                App.DeveloperView.Hide(enableEfficiencyMode: false);
-            else if (!App.IsAppShutDown)
-                App.DeveloperView.Show(disableEfficiencyMode: true);
+            try
+            {
+                if (App.CloseReceived)
+                    return;
+
+                if (App.DeveloperView.IsVisible)
+                    App.DeveloperView.Hide(enableEfficiencyMode: false);
+                else
+                    App.DeveloperView.Show(disableEfficiencyMode: true);
+            }
+            catch
+            {
+                App.DeveloperView.Close();
+                Logger.Debug("Exception in ToggleWindow()");
+            }
         }
 
         [RelayCommand]

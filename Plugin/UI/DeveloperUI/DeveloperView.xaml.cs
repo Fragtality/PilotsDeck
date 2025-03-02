@@ -100,8 +100,9 @@ namespace PilotsDeck.UI.DeveloperUI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = true;
             NotifyIconViewModel.ToggleWindow();
+            if (!App.CloseReceived)
+                e.Cancel = true;
         }
 
         private void ButtonMonitor_Click(object sender, RoutedEventArgs e)

@@ -47,6 +47,7 @@ namespace PilotsDeck
         public static TaskbarIcon NotifyIcon { get; private set; }
         public static Window DeveloperView { get; private set; }
         public static int ExitCode { get; set; } = 0;
+        public static bool CloseReceived { get; set; } = false;
         public static ConcurrentQueue<ActionMeta> DesignerQueue { get; private set; } = [];
         public static ConcurrentDictionary<string, bool> ActiveDesigner {  get; private set; } = [];
         public static DispatcherTimer StatisticTimer { get; private set; } = null;
@@ -135,6 +136,7 @@ namespace PilotsDeck
             }
         }
 
+        private const int WM_QUERYENDSESSION = 0x0011;
         private IntPtr WndProcHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             var result = DefWindowProc(hwnd, msg, wParam, lParam).ToInt32();
@@ -165,6 +167,12 @@ namespace PilotsDeck
                     Logger.LogException(ex);
                 }
                 handled = true;
+            }
+            else if (msg == WM_QUERYENDSESSION)
+            {
+                Logger.Debug("Received WM_QUERYENDSESSION Message");
+                CloseReceived = true;
+                DoShutdown(true);
             }
 
             return new IntPtr(result);

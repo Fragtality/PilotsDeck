@@ -5,7 +5,7 @@
   "SizeSimStates": 100,
   "SizeInputEvents": 10000,
   "MobiSizeVariables": 10000,
-  "ConfigVersion": 12,
+  "ConfigVersion": 13,
   "LogDirectory": "log",
   "LogFile": "PilotsDeck.log",
   "LogLevel": 1,
@@ -72,12 +72,13 @@
   "MsfsStaleTimeout": 15000,
   "MsfsStateCheckInterval": 500,
   "MobiRetryDelay": 10000,
-  "MobiVarsPerFrame": 100,
+  "MobiVarsPerFrame": 0,
   "MobiReorderTreshold": 10,
   "CommandDelay": 25,
   "InterActionDelay": 15,
   "TickDelay": 15,
   "VariableResetDelay": 100,
   "VJoyMinimumPressed": 75,
-  "LongPressTime": 500
+  "LongPressTime": 500,
+  "ApiPortNumber": 42042
 }

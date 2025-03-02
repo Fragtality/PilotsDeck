@@ -166,11 +166,11 @@ namespace PilotsDeck.Plugin
                 string[] parts = url.Split('=');
                 if (parts.Length == 2)
                 {
-                    parts[0] = $"X:{parts[0]}";
+                    //parts[0] = $"X:{parts[0]}";
                     var address = new ManagedAddress(parts[0]);
-                    if (TypeMatching.rxInternal.IsMatch(parts[0]) && VariableManager.Contains(address))
+                    if (address.ReadType != SimValueType.NONE && VariableManager.Contains(address))
                     {
-                        Logger.Debug($"Setting internal Variable '{address}' with Value '{parts[1]}'");
+                        Logger.Debug($"Setting Variable '{address}' with Value '{parts[1]}' via DeepLink");
                         VariableManager[address].SetValue(parts[1]);
                     }
                 }
