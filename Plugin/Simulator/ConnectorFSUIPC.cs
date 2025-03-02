@@ -20,7 +20,7 @@ namespace PilotsDeck.Simulator
         public bool IsLoading { get { return SimLoading; } }
         public bool IsReadyProcess { get { return FSUIPCConnection.IsOpen && FsuipcManager.IsInitialized; } }
         protected bool LastProcess { get; set; } = false;
-        public bool IsReadyCommand { get { return IsReadyProcess && !IsPaused && !SimLoading && LastProcess; } }
+        public bool IsReadyCommand { get { return IsReadyProcess && /*!IsPaused &&*/ !SimLoading && LastProcess; } }
         public bool IsReadySession { get { return IsReadyProcess && !IsPaused && !SimLoading && LastProcess; } }
         public bool IsPaused { get { return FsuipcManager?.IsPaused == true || IsInMenu; } }
         private bool SimLoading { get; set; } = false;
