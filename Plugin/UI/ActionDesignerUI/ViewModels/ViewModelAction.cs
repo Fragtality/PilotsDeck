@@ -14,6 +14,7 @@ using PilotsDeck.UI.Converter;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -80,7 +81,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
 
         public virtual bool CheckStateTemplate()
         {
-            return !CurrentItem.IsItem() && !CurrentItem.HasModel() && Elements.Count == 0 && Commands.Count == 0 && !IsTemplateDeclined;
+            return !CurrentItem.IsItem() && !CurrentItem.HasModel() && Elements.Count == 0 && Commands.TreeItems.All(t => t.Children.Count == 0) && !IsTemplateDeclined;
         }
 
         public virtual int GetSelectionIndex()
