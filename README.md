@@ -5,11 +5,11 @@ Directly check & control your FlightSim from the StreamDeck!
 # 1 - Introduction
 PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially reading & **displaying a Control's State** on the StreamDeck as Text, Image, Bar/Arc or a Combination thereof. It is lean & mean, flexible, completely Open-Source and Free-to-Use.<br/><br/>
 
-StreamDeck-wise it behaves like any other StreamDeck Plugin: it **runs alongside other Plugins** and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI (for the "classic" Actions) or it's own "Action Designer" UI (for the new Composite Action). But regardless of the UI: the Configuration is stored in the StreamDeck Profile - You can create, export and share Profiles with the Plugin's Actions. On Top of the StreamDeck builtin Copy & Paste, it has also it's own Mechanic allowing to **share single Actions** via Text with someone else.<br/><br/>
+StreamDeck-wise it behaves like any other StreamDeck Plugin: it **runs alongside other Plugins** and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI (for the "classic" Actions) or its own "Action Designer" UI (for the new Composite Action). But regardless of the UI: the Configuration is stored in the StreamDeck Profile - You can create, export and share Profiles with the Plugin's Actions. On Top of the StreamDeck builtin Copy & Paste, it has also its own Mechanic allowing to **share single Actions** via Text with someone else.<br/><br/>
 Installation is done through its own **Installer** which will check all Requirements and installs them for you if necessary. With the included **Profile Manager App** you can easily install **Profile Packages** (containing the Profiles, Images and Scripts) and can map your existing StreamDeck Profiles for specific Airplanes or Simulators so that the Plugin **automatically switches** the Profile(s) on the StreamDeck(s). You can write Scripts to directly read Values from a Function, or trigger a Function as Command - all in its own **internal Lua Engine** (Credits to: Neolithos for NeoLua!).<br/>
 The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, **XL**, **Mobile** and **Plus**. Other Models might work, but an indented Support for Non-Display Models is not planned. The Plugin runs only on **Windows**. There are no Plans for Linux or macOS Support (the first is not supported by StreamDeck at all, both do not run or support all Sims and some essential .NET Libraries are only available on Windows).<br/><br/>
 
-Simulator-wise it supports all major Platforms on Windows - **MS Flight Simulator**, **X-Plane** and **Prepar3D**. Depending on the Sim, it either uses **SimConnect**, **FSUIPC** or **UDP** Connection (remote capable). Either way it will connect automatically as soon as a Simulator is running. All Variables and Commands these Connections allow are usable with the Plugin. You can can directly switch from one Sim to another without reconfiguring anything.<br/>
+Simulator-wise it supports all major Platforms on Windows - **MS Flight Simulator**, **X-Plane** and **Prepar3D**. Depending on the Sim, it either uses **SimConnect**, **FSUIPC** or **UDP** Connection (remote capable). Either way it will connect automatically as soon as a Simulator is running. All Variables and Commands these Connections allow are usable with the Plugin. You can directly switch from one Sim to another without reconfiguring anything.<br/>
 For Prepar3D (and theoretically FSX) FSUIPC is a Requirement, for MSFS it is Optional and for X-Plane not used at all. Either Way: you do **not need a registered** (bought) Copy of FSUIPC to make the Plugin in Work! (Though some old Profiles may require a registered Copy).<br/><br/>
 It is designed for **advanced Sim-Users** which "know how to do Stuff": it does not give you any Lists to select Stuff from. If you know how to read Control-States for your Plane (e.g. which Variables to use) and how to trigger these Controls (e.g. which Command to use), you can quickly define Actions for that on the StreamDeck. Since it does not limit your Selection by a predefined List, you can do everything the Connection/Simulator currently allows 😉<br/>
 If you don't: be eager to read & learn! 😅 I'll try to give some Background in the Readme, but you have to take it from there!<br/><br/>
@@ -57,17 +57,17 @@ How Commands and Variables are configured and the different Options how they can
 | [**VJOYDRV**](#vjoydrv) | Toggle/Clear/Set a Button of a virtual Joystick from the known *vJoy Device Driver* (if installed) | ✔️ | ✖️ | ALL |
 | [**AVAR**](#avar) | Read from / Write to any Simulation Variable (also known as A-Var) | ✔️ | ✔️ | MSFS |
 | [**KVAR**](#kvar) | Send / Write to any Event-ID (also known as K-Var / SimConnect Event) | ✔️ | ✖️ | MSFS |
-| [**HVAR**](#hvar) | Trigger any HTML Event in the Simulator (also know as H-Var) | ✔️ | ✖️ | MSFS |
+| [**HVAR**](#hvar) | Trigger any HTML Event in the Simulator (also known as H-Var) | ✔️ | ✖️ | MSFS |
 | [**BVAR**](#bvar) | Trigger InputEvents (also known as B-Var) - but only those that MSFS enumerates via SimConnect | ✔️ | (✔️)\* | MSFS |
 | [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✔️\*\* | MSFS |
 | [**XPCMD**](#xpcmd) | Send any Command known to X-Plane (as command_once) | ✔️ | ✖️ | XP |
 | [**XPWREF**](#xpwref) | Read from / Write to any X-Plane DataRef | ✔️ | ✔️ | XP |
 | [**LUAFUNC**](#luafunc) | Run a Lua Function in the Plugin's own Lua Engine | ✔️ | ✔️ | ALL |
-| [**INTERNAL**](#internal) | Read from / Write to an internal Variable (available everwhere within the Plugin) | ✔️ | ✔️ | ALL |
+| [**INTERNAL**](#internal) | Read from / Write to an internal Variable (available everywhere within the Plugin) | ✔️ | ✔️ | ALL |
 
 
 \* = Per Default, B-Vars treated as Command-only Type - only some B-Var have an actual Value to read.<br/>
-\*\* = While you can read the Result from a RPN Expression, you can not write to it (like with other Variable Types).<br/>
+\*\* = While you can read the Result from a RPN Expression, you can't write to it (like with other Variable Types).<br/>
 :grey_exclamation: Please mind that the Command Types Script, Macro, Lvar (on P3D/FSX) and vJoy can only work with a **registered** Version of FSUIPC!<br/>
 :grey_exclamation: Both **vJoy** Command Types are independent of each other and are two different Things! "VJOY" can only be assigned within FSUIPC (and not in the Simulator). The "VJOYDRV" can be assigned by anything which understands a Joystick Button (Simulator, FSUIPC, Addons, ...).
 <br/><br/><br/>
@@ -84,10 +84,10 @@ All Actions work on the **Keypads** (the normal/square StreamDeck Buttons). The 
 | <img src="img/ComRadio1.png" width="188"> | [**COM Radio**](#com-radio) | Keypad / Encoder | Intended for Com Frequencies: the Action shows two different Variables which can be independently scaled/rounded/formatted but share the same Font-Settings. |
 | <img src="img/GaugeBarRudder.png" width="188"> | [**Display Gauge**](#display-gauge) | Keypad / Encoder | This Actions renders the Value dynamically on a Bar or Arc. Size, Color, Position and Font-Settings can be tweaked. It can optionally send Commands. |
 | <img src="img/GaugeArcEng.png" width="188"> | [**Display Gauge (Dual)**](#display-gauge-dual) | Keypad | As before, but it renders two Values dynamically on the same Bar or Arc. |
-| <img src="img/CompositeButton.png" width="188"> | [**Composite Action**](#24---composite-action) | Keypad / Encoder | Not a fixed Template as the other Actions, more a Canvas to draw on: you can add and freely configure different "Elements" (like Text, a Value, an Image) which can be dynamically altered via "Manipulators" on certain "Conditions". Configured in it's own dedicated "Action Designer" UI.  |
+| <img src="img/CompositeButton.png" width="188"> | [**Composite Action**](#24---composite-action) | Keypad / Encoder | Not a fixed Template as the other Actions, more a Canvas to draw on: you can add and freely configure different "Elements" (like Text, a Value, an Image) which can be dynamically altered via "Manipulators" on certain "Conditions". Configured in its own dedicated "Action Designer" UI.  |
 | <img src="img/ProfileSwitcher.png" width="188"> | [**Profile Switcher**](#31---profile-switching) | Keypad | This not a "real" Action like the others, it only serves to enable/disable Profile Switching. |
 
-\* = As an experienced User you might miss the "Display Value with Switch" Action - it was renamed to "Display Value" in Version 0.8.0. The Former "Display Value" Action (without Switch) is still there and will keep working, it is just hidden from the Selection now. You can not create them anymore, but still run them!<br/><br/>
+\* = As an experienced User you might miss the "Display Value with Switch" Action - it was renamed to "Display Value" in Version 0.8.0. The Former "Display Value" Action (without Switch) is still there and will keep working, it is just hidden from the Selection now. You can't create them anymore, but still run them!<br/><br/>
 
 See [2 - Action Configuration](#2---action-configuration) how to configure these Actions.<br/>
 How to add Custom Images is described under [3.3 - Custom Images](#33---custom-images).<br/>
@@ -112,7 +112,7 @@ The Plugin will be installed to:
 
 `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin`
 
-It is automatically started with the StreamDeck Software. It will spawn its own Icon in the System-Tray / Notification Area. Use this Icon to see if an Plugin Update is available, to access the [Developer UI](#32---developer-ui) or open the **Profile Manager** to configure [Profile Switching](#34---profile-switching).<br/>
+It is automatically started with the StreamDeck Software. It will spawn its own Icon in the System-Tray / Notification Area. Use this Icon to see if a Plugin Update is available, to access the [Developer UI](#32---developer-ui) or open the **Profile Manager** to configure [Profile Switching](#34---profile-switching).<br/>
 <img src="img/Plugin-Systray.png" width="267"><br/><br/>
 
 **Note:** Since FSUIPC is only a "secondary" Connector for MSFS, you do not need to have it installed anymore (for MSFS). If you not plan to install/run FSUIPC7, please set the Parameter *UseFsuipcForMSFS* to *false* in the [Plugin Configuration File](#41---plugin-settings) (*PluginConfig.json*) after Installation!<br/>
@@ -125,7 +125,7 @@ But be aware that some older Profiles might still use Commands and Variables fro
 
 
 ## 1.5 - Installing Profile Packages (.ppp Files)
-Starting with Version 0.8.0, the Plugin greatly improves Distribution and Installatin of Profiles:<br/>
+Starting with Version 0.8.0, the Plugin greatly improves Distribution and Installation of Profiles:<br/>
 
 1. Use the **Profile Manager App** found in the Plugin Directory to install Profile Packages: Open it via Plugin Icon in the System-Tray / Notification Area and drop the Package File to be installed on the big Arrow (or navigate to Package File's Location).<br/><img src="img/Plugin-Systray.png" width="267"><br/><br/>
 2. The Package File will be read and the Description (from the Author) will be displayed - **check the Notes** for additional Steps.<br/><br/>
@@ -162,12 +162,12 @@ Some Command/Variable Types have a Reference to look them up - you can quickly o
 <br/>
 
 ## 2.1 - Defining Commands & Variables
-One of PilotsDeck's Core-Concepts is: everthing has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable for reading only by the Address.<br/><br/>
+One of PilotsDeck's Core-Concepts is: everything has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable for reading only by the Address.<br/><br/>
 
 Every Type needs a specific [Address Syntax](#211---address-syntax) to be used in the **Command Address** Field. Some Commands/Variables require extra Parameter and some Commands can also be **sequenced**. That means the Plugin will send multiple Commands with just one Button-Press!<br/><br/>
 
-The Property Inspector UI/Action Designer UI has a Syntax-Check build in for every Type except for Calculator: When the Syntax is correct, you see a little Check-Mark in the Input Field or a red/green Border around the Input Field. Everything you enter will also checked more thourougly by the Plugin before it executes a Command (if possible/trackable).<br/>
-If a Command could not be executed by any Reason (invalid Syntax, Sim not connected) the Keypad will show an yellow Alert Sign briefly on the Display. On an Encoder the Touch-Display will shortly flash in red in that Case. (The standard StreamDeck Mechanic how Actions can show an Error/Warning)
+The Property Inspector UI/Action Designer UI has a Syntax-Check build in for every Type except for Calculator: When the Syntax is correct, you see a little Check-Mark in the Input Field or a red/green Border around the Input Field. Everything you enter will also checked more thoroughly by the Plugin before it executes a Command (if possible/trackable).<br/>
+If a Command could not be executed by any Reason (invalid Syntax, Sim not connected) the Keypad will show a yellow Alert Sign briefly on the Display. On an Encoder the Touch-Display will shortly flash in red in that Case. (The standard StreamDeck Mechanic how Actions can show an Error/Warning)
 <br/><br/>
 Commands available on all Actions *except* the Composite Action:<br/>
 
@@ -226,7 +226,7 @@ If you want to learn more about Macros, look at the "*FSUIPC7 for Advanced Users
 <br/>
 
 *Background*:<br/>
-The ability to run Lua Files is the greates Benefit of the registered (bought) FSUIPC Version - at least for me! Lua-Code is easier to write, understand and are more flexible than Marcos and allow to read or send anything that FSUIPC can read or send from/to the Simulator. They allow to run more advanced Logic on Joystick-Buttons (i.e. let the Button do two different Things depending on being on the Ground or in the Air). The Plugin allows you to run such Scripts via the StreamDeck.<br/><br/>
+The ability to run Lua Files is the greatest Benefit of the registered (bought) FSUIPC Version - at least for me! Lua-Code is easier to write, understand and are more flexible than Marcos and allow to read or send anything that FSUIPC can read or send from/to the Simulator. They allow to run more advanced Logic on Joystick-Buttons (i.e. let the Button do two different Things depending on being on the Ground or in the Air). The Plugin allows you to run such Scripts via the StreamDeck.<br/><br/>
 
 If you want to learn more about Lua-Scripts, look at the "*FSUIPC Lua Plug-Ins*" and "*FSUIPC Lua Library*" Documents in your *My Documents\FSUIPC7* Folder (or \FSUIPC6 for P3D)! Look at the *event.flag* and *event.param* Functions to understand how to use the LuaToggle and LuaValue Lua-Controls.<br/><br/>
 
@@ -260,7 +260,7 @@ You can find a **full List** in the "*Controls List...*" Text-File in your *My D
 #### LVAR
 | Command & Variable | MSFS, P3D, FSX | `(L:)Name` |
 | --- | --- | --- |
-- *Name*: The Name of the L-Var with or without preceding `L:`. Since L-Vars in MSFS can have very "unsual" Characters in their Name, it is recommended get into the habit to always add the L: Prefix!
+- *Name*: The Name of the L-Var with or without preceding `L:`. Since L-Vars in MSFS can have very "unusual" Characters in their Name, it is recommended get into the habit to always add the L: Prefix!
 
 *Examples*:
 - `L:I_OH_FUEL_CENTER_1_U` - Read from the L-Var *I_OH_FUEL_CENTER_1_U*.
@@ -268,7 +268,7 @@ You can find a **full List** in the "*Controls List...*" Text-File in your *My D
 When used as **Command**, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable.<br/>
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
 
-NOTE for MSFS: The L-Vars will be requested without an Unit from the Sim. Depending on how the Developer writes the Variable, this can lead to strange Results (e.g. getting the Value 0.174533... for an Heading of 10). If you come across such Variables, use a [Calculator](#calculator) Variable with an Expression to read the L-Var in a different Unit!<br/><br/>
+NOTE for MSFS: The L-Vars will be requested without a Unit from the Sim. Depending on how the Developer writes the Variable, this can lead to strange Results (e.g. getting the Value 0.174533... for an Heading of 10). If you come across such Variables, use a [Calculator](#calculator) Variable with an Expression to read the L-Var in a different Unit!<br/><br/>
 
 *Background*:<br/>
 Local Variables (sometimes "Local Gauge Variables") are created and updated by the Plane. There are no standard L-Vars which could be used on every Plane. There is also no communality if and which L-Vars a specific Plane has. For some Planes it is the official Way to Read and Trigger Cockpit-Controls (e.g. Fenix, QualityWings). For some it is only for Read (e.g. PMDG). For some they exist, but are not really supported or usable sometimes (e.g. FSLabs).<br/>
@@ -290,7 +290,7 @@ Another great Source for L-Vars and (other Stuff) is [HubHop](https://hubhop.mob
 
 *Examples*:
 - `2118:8:f` - Read a *8* Byte long *float* Number from Address *2118* ("Turbine Engine 2 corrected N1").
-- `3544:4:i:s` - Read a *4* Byte long *signed* *integer* Number from Address *3544* ("standby alitmeter in feet").
+- `3544:4:i:s` - Read a *4* Byte long *signed* *integer* Number from Address *3544* ("standby altimeter in feet").
 - `0x0ec6:2:i` - Read a *2* Byte long *unsigned* *integer* Number from Address *0EC6* ("Pressure QNH").
 - `0x5408:10:s` - Read a *10* Byte long *String* from Address *5408*.
 - `0x0D0C:2:b:1` - Read Bit *1* from the *2* Byte long Bitmask at Address *0D0C* (Nav Lights).
@@ -322,7 +322,7 @@ The additional **Long Press** Command will not be available when you use a non-t
 The VJOY Command can also be used on the **Encoders** and the Touch-Display. On these Interactions a non-toggle vJoy will be shortly pressed. A toggling vJoy will be toggled on every Interaction.<br/><br/>
 
 *Background*:<br/>
-The virtual Joystick Facility of FSUIPC has nothing to do with the System Driver and can be used independently. So the Use-Cases are very narrow, but it can be a useful Feature. When you want to stick of doing your Mappings and Assignement mainly in the FSUIPC UI, you could use these vJoys to map the StreamDeck Keypads/Encoders.
+The virtual Joystick Facility of FSUIPC has nothing to do with the System Driver and can be used independently. So the Use-Cases are very narrow, but it can be a useful Feature. When you want to stick of doing your Mappings and Assignment mainly in the FSUIPC UI, you could use these vJoys to map the StreamDeck Keypads/Encoders.
 <br/><br/><br/>
 
 
@@ -390,7 +390,7 @@ Sequence of multiple K-Vars:
 <br/>
 
 *Background*:<br/>
-Think of K-Vars are the standard SimConnect Events defined by the Simulator. Some Planes might react to every Event, some only to a Part/Fraction, some can't be interfaced with any of those Events. Some might even use an existing Event and use the Parameter for "custom Events" (e.g. PMDG and FSLabs with their "ROTOR_BRAKE" Events).<br/>Although they are called "Variable" and you can set a Value on some, they can not be read - typically the Sim Event (K-Var) updates the according Sim Variable (A-Var)!<br/><br/>
+Think of K-Vars are the standard SimConnect Events defined by the Simulator. Some Planes might react to every Event, some only to a Part/Fraction, some can't be interfaced with any of those Events. Some might even use an existing Event and use the Parameter for "custom Events" (e.g. PMDG and FSLabs with their "ROTOR_BRAKE" Events).<br/>Although they are called "Variable" and you can set a Value on some, they can't be read - typically the Sim Event (K-Var) updates the according Sim Variable (A-Var)!<br/><br/>
 A **full List** can be found in the Flight Simulator SDK under [Event IDs](https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm) - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!<br/>
 Another great Source for K-Vars and (other Stuff) is [HubHop](https://hubhop.mobiflight.com/) by MobiFlight - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!
 <br/><br/><br/>
@@ -410,7 +410,7 @@ Another great Source for K-Vars and (other Stuff) is [HubHop](https://hubhop.mob
 <br/>
 
 *Background*:<br/>
-H-Vars are a new Simulation Variable Type that came with MSFS and work roughly similiar like K-Vars - they trigger an Event but can not be read. Note that you don't need to configure and use the Hvar-Files from FSUIPC for the Plugin. You can use any known and existing H-Var from the Plugin directly.<br/><br/>
+H-Vars are a new Simulation Variable Type that came with MSFS and work roughly similar like K-Vars - they trigger an Event but can't be read. Note that you don't need to configure and use the Hvar-Files from FSUIPC for the Plugin. You can use any known and existing H-Var from the Plugin directly.<br/><br/>
 A great Source for H-Vars and (other Stuff) is [HubHop](https://hubhop.mobiflight.com/) by MobiFlight - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!
 <br/><br/><br/>
 
@@ -435,7 +435,7 @@ Variable:
 <br/>
 
 *Background*:<br/>
-B-Vars (or InputEvents) are an new Addition from MSFS to the "Variable-Zoo", but they come with a Twist: Some of those work like any other Variable Type (e.g. L-Var, A-Var) - you can read and update their Value.<br/>Some (most?) of those work like any other Command Type (e.g. K-Var, H-Var) - you can not read their Value, but you can send/activate them with an optional Parameter.<br/>On top of that, MSFS only makes certain InputEvents (the "_Set" Events) available to outside Applications via SimConnect (although you can see more B-Vars in MSFS' Developer Mode).<br/><br/>
+B-Vars (or InputEvents) are an new Addition from MSFS to the "Variable-Zoo", but they come with a Twist: Some of those work like any other Variable Type (e.g. L-Var, A-Var) - you can read and update their Value.<br/>Some (most?) of those work like any other Command Type (e.g. K-Var, H-Var) - you can't read their Value, but you can send/activate them with an optional Parameter.<br/>On top of that, MSFS only makes certain InputEvents (the "_Set" Events) available to outside Applications via SimConnect (although you can see more B-Vars in MSFS' Developer Mode).<br/><br/>
 
 Because B-Vars / InputEvents have this "Split Personality", the Plugin defaults to run them as Command-only Type: it will not request the Value, but you can use it as Command with the according Options. If a B-Var is actually readable, you can tell the Plugin to treat a specific Address as Variable-Type - and read and update its Value like with other Types.<br/><br/>
 
@@ -460,7 +460,7 @@ For simple Tasks like triggering a **K-Var** (Event) you can use the `$K:Name(:P
 - *Parameter1*: An optional numeric Parameter to send (the first / inner).
 - *Parameter2*: An optional numeric Parameter to send (the second / outer).
 
-If you want to read the **Result** of the RPN-Code as a **Variable**, prefix your Code with `C:` in any of the Variable Address Fields! Note that you can not write to those special Type of Variable.
+If you want to read the **Result** of the RPN-Code as a **Variable**, prefix your Code with `C:` in any of the Variable Address Fields! Note that you can't write to those special Type of Variable.
 
 *Examples*
 - `(A:LIGHT POTENTIOMETER:13, percent over 100) 0.0 > if{ (A:LIGHT POTENTIOMETER:13, percent over 100) 0.1 - 100 * (>K:LIGHT_POTENTIOMETER_13_SET) }` - Example of RPN Code (Decreasing Cabin Lights in the Fenix Airbus).
@@ -477,7 +477,7 @@ Note that there is no Syntax-Checking at all for Calculator Code (except for the
 
 *Background*:<br/>
 Calculator-Code or sometimes Gauge-Code are an internal Mechanic of the Simulator - very roughly spoken it is how the modeled Aircraft Panels work inside for Ages.<br/>
-The Template for increasing/decreasing L-Vars is especially useful on the Right/Left Turn of the **Encoders**: The Plugin will incoporate the number of Ticks received by the StreamDeck Software in the Code it generates (instead of repeating it). That means that it is the "smoothest" Option to manipulate a L-Var with an Encoder!<br/><br/>
+The Template for increasing/decreasing L-Vars is especially useful on the Right/Left Turn of the **Encoders**: The Plugin will incorporate the number of Ticks received by the StreamDeck Software in the Code it generates (instead of repeating it). That means that it is the "smoothest" Option to manipulate a L-Var with an Encoder!<br/><br/>
 Although RPN Syntax is very hard to understand (I still struggle 😵), it can be quite powerful. If you really want to go down the Rabbit Hole of using direct RPN-Code, start in the Flight Simulator SDK under [Reversed Polish Notation](https://docs.flightsimulator.com/html/Additional_Information/Reverse_Polish_Notation.htm).
 <br/><br/><br/>
 
@@ -494,7 +494,7 @@ Although RPN Syntax is very hard to understand (I still struggle 😵), it can b
 <br/>
 
 *Background*:<br/>
-Every Command in X-Plane - whether it is from the Simulator, Plane or other Addons - has an unique Path.<br/><br/>
+Every Command in X-Plane - whether it is from the Simulator, Plane or other Addons - has a unique Path.<br/><br/>
 
 You can lookup these Paths in the UI or on the Internet like on [siminnovations.com](https://www.siminnovations.com/xplane/command/) - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!<br/>
 Or you can use the DataRefTool Plugin to explore all Commands (including Custom) currently known to the Simulator.
@@ -517,7 +517,7 @@ Before you use a DataRef as **Command**, make sure that it is writeable (some ar
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
 
 *Background*:<br/>
-Every Simulator Variable (called DataRef) in X-Plane - whether it is from the Simulator, Plane or other Addons - has an unique Path. DataRefs are Everthing and Everything is defined by DataRefs 😅<br/><br/>
+Every Simulator Variable (called DataRef) in X-Plane - whether it is from the Simulator, Plane or other Addons - has a unique Path. DataRefs are everything and Everything is defined by DataRefs 😅<br/><br/>
 You can lookup the default Sim DataRefs in the X-Plane SDK under [Datarefs](https://developer.x-plane.com/datarefs/) - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!<br/>
 Or you can use the DataRefTool Plugin to explore all DataRefs (including Custom) currently known to the Simulator.
 <br/><br/><br/>
@@ -567,10 +567,10 @@ The Syntax for increasing/decreasing is `$Step(:Limit(:Reset))`
 - `$1:4:2` - Increment by *1* up to a Value of *4*. When *4* is reached, the Variable will be set to *2*.
 
 The Values in a Sequence are defined as `,` separated List. The Plugin will compare the current Value with the List - if the Value is matched, it will write the next Value from the List to the Variable. If there is no match, it will use the last Value in the List. One Value can optionally be defined as Default with a `=` in Front of it. A Sequence must contain at least two Values with an optional Default Value or exactly one Value defined as Default. All Values in the List must be unique with the Exception of the last one.<br/>
-A optional `<` at the End lets the Value "bounce off" - if the current Value is already the last one in the List, the previous Value is written.<br/>
+An optional `<` at the End lets the Value "bounce off" - if the current Value is already the last one in the List, the previous Value is written.<br/>
 *Examples*
 - `$0,1,2<` - When the Control is in Position *0*, it will be moved to Position *1*. Then from *1* to *2*. When at *2*, it will go back to *1*. (e.g. for toggling Taxi Lights OFF>ON<>T.O.)
-- `$=4` - The Control is always moved to Postion *4*, regardless of the current Position. (e.g. for setting ND Mode to PLAN from any Position)
+- `$=4` - The Control is always moved to Position *4*, regardless of the current Position. (e.g. for setting ND Mode to PLAN from any Position)
 - `$2,=3<` - The Control will toggle between Position *2* and *3*. If the Control is in any other Position it will default to *3*. (e.g. for toggling ND Mode between NAV<>ARC and go to ARC from any other Position)
 - `$0,1,2,3,1` - Moves the Control from Position *0* to *3*. When in Position *3* it starts over at Position *1*.
 
@@ -586,16 +586,16 @@ Note that this Option is only available for the Main Command - (short) Pressing 
 
 **Hold Switch**:<br/>
 This Option is available for all Commands and Variables except both vJoys, because the Keypad or Encoder behaves like a (non-toggle) vJoy then! The Difference to a vJoy is: you can directly define which Command or Value is send in the StreamDeck UI. If it makes Sense for a specific Cockpit-Control: the Control needs to stay in Position (does not reset the Position itself) and needs to have two distinct Commands or Values for pressed and unpressed (click<>release, down<>up)!<br/>
-If you use it with a Command(-only) Type, you need to define an **Alternate Command Address**. The normal Command will be send on KeyDown and the alternate Command on KeyUp.<br/>
-If you use it with a Command & Variable Type, you need to define the **On Value** and the **Off Value**. Then On Value will be written on KeyDown and the Off Value on KeyUp. You can not use a Value Manipulation with that Option.<br/>
-Note that when Hold Switch is enabled, the Action can not have another Command for **Long Press**. It is also only available for the main Interaction.<br/>
+If you use it with a Command(-only) Type, you need to define an **Alternate Command Address**. The normal Command will be sent on KeyDown and the alternate Command on KeyUp.<br/>
+If you use it with a Command & Variable Type, you need to define the **On Value** and the **Off Value**. Then On Value will be written on KeyDown and the Off Value on KeyUp. You can't use a Value Manipulation with that Option.<br/>
+Note that when Hold Switch is enabled, the Action can't have another Command for **Long Press**. It is also only available for the main Interaction.<br/>
 Also note that this Option is only available Main Command, but will be applied to the Guard Command if configured!<br/>
 *Examples* when to use: Buttons you need to press & hold like Fire-Test or other Test Buttons are a great Use-Case for that Option.
 <br/><br/><br/>
 
 
 **Reset Switch**:<br/>
-This Option is only available for Variable Types. When activated, the Plugin will write the **On Value** to the Variable and after 100ms it will write the **Off Value** to the Variable. You can not use a Value Manipulation with that Option.<br/>
+This Option is only available for Variable Types. When activated, the Plugin will write the **On Value** to the Variable and after 100ms it will write the **Off Value** to the Variable. You can't use a Value Manipulation with that Option.<br/>
 Note that this Option affects all Commands on that Keypad/Encoder! So for Example if enabled on the Main Command, it will also applied to the Second Command or Touch Command (if these are also a Command & Variable Type).<br/>
 *Examples* when to use: Buttons which do not reset their Position when being pressed (but should not stay pressed). Like the MCDU Keys of the Fenix Airbus for Example! Prefer a Reset Switch over an Hold Switch in such Cases (the Button just has to be pressed and unpressed shortly).
 <br/><br/><br/>
@@ -655,16 +655,16 @@ The Order in which these Options are applied: DecodeBCD -> Scale -> Round -> For
 <br/><br/><br/>
 
 **Font Settings**:<br/>
-Actions which render Text will default to inherit the Font Settings configured in the Title Settings. When the **Inherit Font** Checkbox is disabled, you can specify the **Font**, **Size**, **Color** and **Style** separately! Note that the Plugin can use **all Fonts** installed on your System, so it offers way more Choices then the default Title Settings allow.
+Actions which render Text will default to inherit the Font Settings configured in the Title Settings. When the **Inherit Font** Checkbox is disabled, you can specify the **Font**, **Size**, **Color** and **Style** separately! Note that the Plugin can use **all Fonts** installed on your System, so it offers way more Choices than the default Title Settings allow.
 <br/><br/><br/>
 
 **Background**:<br/>
-All Actions have a **Background Image** they draw their Contents on to. Some Actions have addtional Images that can be selected. See [3.2 - Custom Images](#32---custom-images)) on how to use your own Images.<br/>
+All Actions have a **Background Image** they draw their Contents on to. Some Actions have additional Images that can be selected. See [3.2 - Custom Images](#32---custom-images)) on how to use your own Images.<br/>
 In all Cases, the Images are selecteable from a Dropdown Box which will show little Preview of the currently selected Image in Front of it.
 <br/><br/><br/>
 
 **Image Mapping**:<br/>
-Enable that Option to provide an **Image Map** to determine the active Image. The Mapping is similiar to the Text-Mapping in the Display Value Actions. You write the Number and assign it with `=` to the Image's Filename (without Extention, but with the Folder Name if it is in a Subfolder). Comparisons can also be used (only with Equality). Each Mapping is then separated by a `:` and you can have as many you want.<br/>
+Enable that Option to provide an **Image Map** to determine the active Image. The Mapping is similar to the Text-Mapping in the Display Value Actions. You write the Number and assign it with `=` to the Image's Filename (without Extension, but with the Folder Name if it is in a Subfolder). Comparisons can also be used (only with Equality). Each Mapping is then separated by a `:` and you can have as many you want.<br/>
 The Address/Variable used for the Comparison differs from Action to Action. Note that you can also use Lua Function (from a specialized Image Script) to return the Image to be used.<br/>
 Example:
 - `0=IRS_off:1=IRS_nav:2=IRS_att` - Assigning each different Value/Position of the IRS Switch (0, 1, 2) to its specific Image.
@@ -677,7 +677,7 @@ Some Actions allow you to manipulate the Position & Size of some Objects (Text, 
 <br/><br/><br/>
 
 **Switch Guarded**:<br/>
-This Option enables an additional Command to be run when the Keypad/Dial is pressed. You need to specifiy an **Guard Address** which is checked for the **Guard Value** if the Guard is active. When the Guard is active, the **Guard Command** will be executed (otherwise the normal Main Command).<br/>
+This Option enables an additional Command to be run when the Keypad/Dial is pressed. You need to specify an **Guard Address** which is checked for the **Guard Value** if the Guard is active. When the Guard is active, the **Guard Command** will be executed (otherwise the normal Main Command).<br/>
 You can specify a Comparison for the Guard Value.<br/><br/>
 
 While the Guard is active a dedicated **Guard Image** is drawn *on Top* of the current Content - so if the Image has transparent Parts, the underlying Content can be seen.<br/>
@@ -714,7 +714,7 @@ Even though it is "only" Text-based, it can cover a wide Set of Cockpit-Controls
 
 <br/>
 
-**Draw Frame**: You can disable the Frame drawn arround the Value by default with that. You can customize the *Thickness*, *Color* and its *Size & Position*. If you use a *Different Color* in the Special State, that Color is also applied to the Frame.<br/>
+**Draw Frame**: You can disable the Frame drawn around the Value by default with that. You can customize the *Thickness*, *Color* and its *Size & Position*. If you use a *Different Color* in the Special State, that Color is also applied to the Frame.<br/>
 Note that toggling this Options changes the Values and Behaviour of the *Draw Rectangle*: When the Frame is enabled, the Rectangle is relative to the Center of the Frame.
 <br/><br/><br/><br/>
 
@@ -723,7 +723,7 @@ Note that toggling this Options changes the Values and Behaviour of the *Draw Re
 <img src="Plugin/Plugin/Images/ActionSwitch@2x.png" width="40">
 
 ### Simple Button
-Everything you can configure here is already described: You set a **Command** to be excecuted (with an optional **Guard**) and the **Background** Image to show at all Times. This Action is great for Keyboards found on (M)CDUs, Transponders or some COM Radios. Or Chrono-, Test- and View-Buttons. A straight and honest Button, not much to describe here 😅
+Everything you can configure here is already described: You set a **Command** to be executed (with an optional **Guard**) and the **Background** Image to show at all Times. This Action is great for Keyboards found on (M)CDUs, Transponders or some COM Radios. Or Chrono-, Test- and View-Buttons. A straight and honest Button, not much to describe here 😅
 <br/><br/><br/><br/>
 
 
@@ -772,9 +772,9 @@ This Action is specialized for displaying the active and standby COM Frequencies
 
 **Value Format**: These common Options work as described, but you can have separate Options for Active & Standby Value with the **Different Format** Checkbox. If not checked, the same Options are applied to both Variables!<br/><br/>
 
-**Font Settings**: Both Values will always use the same Font Settings. The **Style** can not be configured here: The Active Value is always drawn in Bold-Style and the Standby Value always in Regular-Style.<br/><br/> 
+**Font Settings**: Both Values will always use the same Font Settings. The **Style** can't be configured here: The Active Value is always drawn in Bold-Style and the Standby Value always in Regular-Style.<br/><br/> 
 
-**Background**: In Addtion to the *Background Image*, this Action has an Additional *Swap Image* which is shown after the Button was pressed. The Duration is configured in ms with *Swap Active*. You could disable that Feature by using the same Image for Default and Swap.<br/><br/> 
+**Background**: In Addition to the *Background Image*, this Action has an Additional *Swap Image* which is shown after the Button was pressed. The Duration is configured in ms with *Swap Active*. You could disable that Feature by using the same Image for Default and Swap.<br/><br/> 
 
 If you want to use it on an Encoder so that you can both alter the Inner and Outer Knob with one Dial: Create an Encoder-Stack! Then configure the COM Radio Action as you want to use it and then copy & paste it in the same Stack. Configure the Commands for either the Outer and Inner Knob on the Left/Right Command and the Swap on the Touch Command. You can use the Format-Option on the Standby for Identification which Action (Knob) is currently selected - for Example with a ">" in Front for the Outer Knob and a "<" behind the Frequency for the Inner.<br/>
 You then can basically turn -> push -> turn -> tap to set and swap your Frequency on one Encoder!
@@ -794,9 +794,9 @@ Generally spoken, this Action can draw a visual Representation of a continuous V
 **Gauge Settings**: By Default this Action will render a Bar on the Display, with **Draw Arc** it can display an Arc instead.<br/>
 - *Size*: For a Bar the it is defined as `Width; Height` and for an Arc it is defined as `Radius; Thickness`
 - *Gauge Color*: The Color used to fill the Bar or Arc.
-- *Color Change*: Use anonther Color when the *Value* matches the Variable defined in *Address Color*. A Comparison is allowed.
+- *Color Change*: Use another Color when the *Value* matches the Variable defined in *Address Color*. A Comparison is allowed.
 - *Orientation* (Bar): Define if the Bar is horizontal or vertical and if the Values are increasing right/left or up/down.
-- *Start Angle* (Arc): The Angle at wich the Arc starts. 0° is on the Right Side in the Center.
+- *Start Angle* (Arc): The Angle at which the Arc starts. 0° is on the Right Side in the Center.
 - *Sweep Angle* (Arc): This Angle defines how "big" or "long" the Arc starting from its *Start Angle*. For positive angles the Indicator moves clock-wise, for negative counterclock-wise.
 - *Offset*: You can adjust the Position with this Field as "x; y" Offset from the top-left Corner (0, 0).
 
@@ -828,7 +828,7 @@ All Options work the same here and are applied to both Values. *Flip* will swap 
 
 This new Action (introduced with 0.8.0) is so powerful and flexible that it needs a dedicated Chapter 😅 <br/>
 To get a rough a Idea of the Capabilities: A Fenix FCU Display can be done without any external Program/Script with individual Labels, Dashes, Dot, different Value Variables and Formatting all reacting correctly (also to the Light-Test) and dimmed by the Knob in the Cockpit - all in one single Action! Or an Action that can show a Knob on one Plane Variant and be a Korry Switch on another Variant.<br/><br/>
-It can use the exact **same Resources** as the "classic" Actions (Commands, Variables, Images, Scripts), but follows a **totally different Approach** on how they are used and arranged. While the other Actions have fixed Layout of the Elements displayed and have a fixed Logic how Commands are triggered, the Composite Action let's you freely design **what Elements the Action consits off** and allows to **freely map** one (or more!) **Commands** to the Events received from the StreamDeck. Hence it's Name: it is a Compound of its individual Elements.<br/><br/>
+It can use the exact **same Resources** as the "classic" Actions (Commands, Variables, Images, Scripts), but follows a **totally different Approach** on how they are used and arranged. While the other Actions have fixed Layout of the Elements displayed and have a fixed Logic how Commands are triggered, the Composite Action let's you freely design **what Elements the Action consits off** and allows to **freely map** one (or more!) **Commands** to the Events received from the StreamDeck. Hence its Name: it is a Compound of its individual Elements.<br/><br/>
 
 [**Display Elements**](#242---display-elements) <br/>
 The Action can be composed of any of the following Elements (in any Amount):
@@ -919,7 +919,7 @@ It is also available for Images, where it is used to fill the Background of the 
 The *absolute* Position on the Canvas. In Contrast to the classic Actions, there is now "default Raster" of 72x72. E.g. a Position of 10, 10 shows up differently on the SD and the XL (or on an Encoder).<br/>
 Use the arrow Buttons to move the Element left/right/up/down 1 Pixel on the Canvas for fine-tuning. The Button on the Center <img src="Plugin/UI/Icons/arrow-repeat.png" width="20"> resets the Position!
 The Plugin tries to scale all Position and Sizes when the complete Action is copied between StreamDecks with different Resolution - but that is only a rough Estimation. You absolutely need to fine-tune the Action.<br/>
-For the Line Primitive, the Fields specifiy the Starting Location.
+For the Line Primitive, the Fields specify the Starting Location.
 <br/><br/>
 
 **Centering**:<br/>
@@ -956,7 +956,7 @@ Conditions always behave and look the same, regardless to what they are attached
 The current Value of the Variable is compared with the specified Comparison to the specified (fixed) Value.<br/><br/>
 
 Comparisons for lesser/greater (with or without Equality) are only applied to numeric Values. Equality and Unequality will act on both numeric and string Values.<br/>
-Additionaly you can do Sub-String Searches with *contains* and *not contains*.<br/>
+Additionally you can do Sub-String Searches with *contains* and *not contains*.<br/>
 You can also use *has changed* so that the Condition is only true one time: when the Variable had changed since the last Refresh Cycle. The Value is ignored on this Comparison.
 
 <br/><br/><br/>
@@ -1015,7 +1015,7 @@ By default the Formatting will "fill up" Zeros to match the Number of Digits spe
 
 **Sub-String**:<br/>
 Cuts out a Part of the Value (as it is currently formatted). An Index of -1 means "do nothing"<br/>
-The Index 0 is the first Character in the String, it is the Postion where the Sub-String starts.<br/>
+The Index 0 is the first Character in the String, it is the Position where the Sub-String starts.<br/>
 The second field denotes the Length read starting from the Index.
 <br/><br/>
 
@@ -1026,7 +1026,7 @@ When a Mapping is selected it is displayed in the Input Fields where you can cha
 <br/><br/>
 
 **String Insertion**:<br/>
-Allows you to insert the Value (as it is formatted/mapped currently) in a static Text. Use `%s` to specifiy where the Value is inserted.<br/>
+Allows you to insert the Value (as it is formatted/mapped currently) in a static Text. Use `%s` to specify where the Value is inserted.<br/>
 <br/><br/><br/>
 
 
@@ -1038,30 +1038,30 @@ For an Arc the Width determines the Size and the Height the Thickness of the Arc
 <br/><br/>
 
 **Min / Max Value**:<br/>
-The Minimum and Maximum Value specifiy the "Range" that is displayed on the Gauge. You scale the Value optionally.<br/>
+The Minimum and Maximum Value specify the "Range" that is displayed on the Gauge. You scale the Value optionally.<br/>
 Note that these Values are applied to every Indicator that is attached, or put differently: Every Indicator attached can only display Values of that Range.
 <br/><br/>
 
 **Angel Start / Sweep** (Arc):<br/>
-Used to specifiy at what Angle the Arc starts and how "long" the Arc is.
+Used to specify at what Angle the Arc starts and how "long" the Arc is.
 <br/><br/>
 
 **Color Ranges**:<br/>
-You can specifiy multiple "Sub Ranges" with their own Min, Max and Color Value on Top of the Gauge to denote "Critical" or "Warning" Ranges.<br/>
+You can specify multiple "Sub Ranges" with their own Min, Max and Color Value on Top of the Gauge to denote "Critical" or "Warning" Ranges.<br/>
 Click on the + Button to add a Range and the - Button to remove the currently selected Range.<br/>
 To change a Range: select it in the List, change the Parameters as needed and click the Pencil to update the Range.
 <br/><br/>
 
 **Gauge Markers**:<br/>
-These Fields allow to define Markers/Ticks/Lines on the Gauge. Each can have it's individual Position (Value), Thickness, Offset, Height and Color.<br/>
+These Fields allow to define Markers/Ticks/Lines on the Gauge. Each can have its individual Position (Value), Thickness, Offset, Height and Color.<br/>
 Click on the + Button to add a Marker and the - Button to remove the currently selected Marker.<br/>
 To change a Marker: select it in the List, change the Parameters as needed and click the Pencil to update the Marker.<br/>
 You can use a Shorthand/Template in Value to add a Range of Markers: `$step:start:end` (replace with the respective Numbers). The other Parameters (Thickness, Offset, Height, Color) will be applied to all Markers as entered. That Range of Markers will be shown and managed as on Entity - i.e. selecting it, allows you edit the whole Range.
 <br/><br/>
 
 **Grow Gauge**:<br/>
-By default a Gauge the gauge is drawn static in the Size specified. When you enable that Checkbox, you can specifiy a Variable used to grow (and shrink) the Gauge - i.e. the Bar/Arc itself will get bigger or smaller.<br/>
-The Variable used is scaled by the specifed Number and must be within the specified Min / Max Value in order to work as intended.<br/>
+By default a Gauge the gauge is drawn static in the Size specified. When you enable that Checkbox, you can specify a Variable used to grow (and shrink) the Gauge - i.e. the Bar/Arc itself will get bigger or smaller.<br/>
+The Variable used is scaled by the specified Number and must be within the specified Min / Max Value in order to work as intended.<br/>
 The Color Ranges can still be statically drawn (regardless of how "big" the Gauge is currently) with the *Always draw colored Ranges* Checkbox. Else they will show up as the Gauge grows.<br/>
 With *Reverse Direction* you can let the Gauge grow in the opposite Direction - i.e. a Bar grows from Right to Left instead.
 <br/><br/><br/>
@@ -1070,7 +1070,7 @@ With *Reverse Direction* you can let the Gauge grow in the opposite Direction - 
 #### PRIMITIVE
 
 **Primitive Type**:<br/>
-Choose between a Line, Rectange or Ellipse (just the outline or filled) to be drawn in the specified Color on the Canvas.<br/>
+Choose between a Line, Rectangle or Ellipse (just the outline or filled) to be drawn in the specified Color on the Canvas.<br/>
 Note that for a Line, the Position and Size Field will be used as Start and End Point of the Line!
 <br/><br/>
 
@@ -1084,7 +1084,7 @@ The Thickness use to draw the Line, Rectangle or Ellipse (outline). Use the arro
 <br/>
 
 A general Word on **Condition Handling**: You can have as many Conditions you need on a Manipulator, each using a different Variable/Comparison/Value.<br/>
-BUT: You can not do any **individual Logic between** the Conditions. Either they must all be true (logical AND) -or- when the Checkbox *Trigger Manipulator when any Condition is true ...* is checked, at least one needs to be true (logical OR).<br/>
+BUT: You can't do any **individual Logic between** the Conditions. Either they must all be true (logical AND) -or- when the Checkbox *Trigger Manipulator when any Condition is true ...* is checked, at least one needs to be true (logical OR).<br/>
 Note that per Default, an empty List of Conditions is considered as "false" - meaning the Manipulator will never be triggered (some Manipulators allow to be Condition-less).
 
 <br/>
@@ -1108,7 +1108,7 @@ When you check *Reset Visible State after*, the Element is hidden again after th
 
 #### SIZE / POSITION
 
-Use this Manipulator to modifiy the Size and/or Position of an Element. You can change single Parameters (e.g. only the Position on the X-Axis or only the Height) or all at once.<br/>
+Use this Manipulator to modify the Size and/or Position of an Element. You can change single Parameters (e.g. only the Position on the X-Axis or only the Height) or all at once.<br/>
 In the default Behavior, the Manipulator will change the selected Parameters with the specified Value on the Element it is attached to - when the Conditions are true. If they are false, the Element continues to use its configured Size/Position.<br/><br/>
 
 Alternatively the selected Parameters can be change dynamically based on the Value of a Variable - to enable that Behavior check *Change Size/Position dynamically by Value* and configure the *Monitor Address*. The minimum/maximum Position or Size that will be set is always within the current Canvas Size.<br/>
@@ -1121,10 +1121,10 @@ Values outside of the Min/Max Range will be ignored and will be considered at Mi
 
 #### ROTATION
 
-Use this Manipulator to modifiy the Rotation of an Element.<br/>
+Use this Manipulator to modify the Rotation of an Element.<br/>
 In the default Behavior, the Manipulator will set the specified Rotation on the Element it is attached to - when the Conditions are true. If they are false, the Element continues to use its configured Rotation.<br/><br/>
 
-Alternatively the Rotation can be continously changed based on the Value of a Variable - to enable that Behavior check *Continously rotate Element by Value* and configure the *Monitor Address*.<br/>
+Alternatively the Rotation can be continuously changed based on the Value of a Variable - to enable that Behavior check *Continuously rotate Element by Value* and configure the *Monitor Address*.<br/>
 Specify the correct *Minimum Value* and *Maximum Value* to map the Variable's Value Range accordingly. When the current Value is at the Minimum Value, the Element will be at *Angle Start*. When the current Value is at the Maximum Value, the Element will be at the Start + *Angle Sweep*.<br/>
 You don't need Conditions with that Behavior, they can be empty. If you have Conditions configured, the Element will only be changed when the Conditions are true.<br/>
 Values outside of the Min/Max Range will be ignored and will be considered at Min/Max.
@@ -1133,7 +1133,7 @@ Values outside of the Min/Max Range will be ignored and will be considered at Mi
 
 #### TRANSPARENCY
 
-Use this Manipulator to modifiy the Transparency of an Element.<br/>
+Use this Manipulator to modify the Transparency of an Element.<br/>
 In the default Behavior, the Manipulator will set the specified Transparency on the Element it is attached to - when the Conditions are true. If they are false, the Element continues to use its configured Transparency.<br/><br/>
 
 Alternatively the Transparency can be dynamically changed based on the Value of a Variable - to enable that Behavior check *Change Transparency dynamically by Value* and configure the *Monitor Address*.<br/>
@@ -1146,7 +1146,7 @@ Values outside of the Min/Max Range will be ignored and will be considered at Mi
 
 #### FORMAT
 
-Use this Manipulator to modifiy the Formatting of a Value Element.<br/>
+Use this Manipulator to modify the Formatting of a Value Element.<br/>
 When the Conditions are true, the specified Formatting Settings are applied to the Value Element it is attached to (all Settings are replaced). If they are false, the Element continues to use its configured Format Settings.<br/>
 Every Setting behaves exactly the same as in the [Value Element](#value).
 
@@ -1172,13 +1172,13 @@ For all Types you can configure the **Size** and **Offset** used to draw the Ind
 ### 2.4.4 - Commands
 
 Commands are **assigned to StreamDeck Events**: KEY_DOWN/_UP, DIAL_DOWN/_UP, DIAL_LEFT/RIGHT, TOUCH_TAP). When you select one of these Events in the List View, you click on the **Command + Button** to add a new Command to the selected Event.<br/>
-Each Composite Action will always have these StreamDeck Events, regardless of the Hardware. Assigning Commands to Events that can not be received (like DIAL_LEFT on a Keypad), does not hurt, but will also don't do anything meaningful 😉<br/><br/>
+Each Composite Action will always have these StreamDeck Events, regardless of the Hardware. Assigning Commands to Events that can't be received (like DIAL_LEFT on a Keypad), does not hurt, but will also don't do anything meaningful 😉<br/><br/>
 
 A Command **can have Conditions** attached to it - if Conditions are attached, the Command is only triggered/send to the Simulator when the Conditions are true. Configuring a Condition works and looks the same as with the Manipulators. Select a Command in the List View and click the **Condition + Button** to add a new Condition.<br/><br/>
 
-You can configure **multiple Commands** per StreamDeck Event to send a Chain of Commands to the Simulator. They will be send in the Order seen in the UI (the top Command is send first). Note that on Encoders, that this Chain of Commands is execute on *every* Tick.<br/>
+You can configure **multiple Commands** per StreamDeck Event to send a Chain of Commands to the Simulator. They will be sent in the Order seen in the UI (the top Command is send first). Note that on Encoders, that this Chain of Commands is execute on *every* Tick.<br/>
 Per default, the Plugin will delay the Execution of the next Command in the Chain by 15ms. You can change that Delay by selecting the StreamDeck Event itself and set the **Inter-Command Delay** Field. A Value of 0 disables this Delay.<br/>
-Be aware that Commands can not depend on each other, for Example when the first Commands updates a Variable, do not expect a following Command to have that changed Value already available (the Execution of Commands is decoupled from refreshing Variables & Actions).<br/><br/>
+Be aware that Commands can't depend on each other, for Example when the first Commands updates a Variable, do not expect a following Command to have that changed Value already available (the Execution of Commands is decoupled from refreshing Variables & Actions).<br/><br/>
 
 Defining Commands share some communality with the classic Actions. The available Command Types and their [Syntax](#211---address-syntax) is exactly the same. For Variable based Commands, you can use the same [Value Manipulations](#212---command-option) in the **On/Write Value** Field.<br/>
 For Variable based Commands, the **Reset Switch** Option is also available and works the same as with the other Actions - but each single Command has its own individual Setting and Delay/Hold Time!<br/>
@@ -1209,7 +1209,7 @@ The Plugin has 3 different **States** that affect how the Actions are displayed:
 <br/>
 
 **Text Coloration** <br/>
-The Plugin will ignore the currently configured Text Color if the String to draw contains a **special start Sequence** with the Color embeded in Html/Hex Format like `"[[#BFBFBF"`<br/>
+The Plugin will ignore the currently configured Text Color if the String to draw contains a **special start Sequence** with the Color embedded in Html/Hex Format like `"[[#BFBFBF"`<br/>
 Can be useful for Applications/Scripts to directly control the Color of their Output. Or in other Words: I wanted it for my GSX Script, so it is there 😂
 
 <br/><br/><br/>
@@ -1239,7 +1239,7 @@ The Plugin **includes a basic Set** of Images with a more "iconograpic" Look for
 <br/>
 You can organize different Image Packs in **Sub-Folders** to help navigating the Images easier ("Sub-Sub-Folders" are ignored) or keep them better separated.<br/><br/>
 
-You don't have to restart the Plugin, every new Image will be selectable/usable when you open the next Property Inspector. When an Image is updated, it needs to be "uncached" (=no Action is using it and Plugin in Idle State) before it is read again. You can also restart the Plugin via it's Tray-Icon to force reloading.<br/>
+You don't have to restart the Plugin, every new Image will be selectable/usable when you open the next Property Inspector. When an Image is updated, it needs to be "uncached" (=no Action is using it and Plugin in Idle State) before it is read again. You can also restart the Plugin via its Tray-Icon to force reloading.<br/>
 The included Images can also be changed or even deleted - but these Changes will be overwritten when the Plugin is updated.<br/><br/>
 To be usable the Image needs to be in **PNG** Format and must be **"square"** - having the same Height and Width. It will be automatically scaled to fit (but not stretched on an Encoder). For **Encoders** the Image should be "rectangular" - having a higher Width than Height.<br/><br/>
 
@@ -1252,7 +1252,7 @@ But for optimal Visual Results it is recommended to provide an Image in specific
 
 It is only really needed if you have multiple StreamDeck Types in use. For Example, if you have only have a XL and all your Icons are already 144px: **just copy over the Images**!
 
-You can also add new Images for the "Sub-Images" selectable in the **Korry Button** Action. These are stored in the `\korry` Sub-Folder of the above mentioned Path. These use the following Sizes (also PNG Format, preferrably with transparent Background):
+You can also add new Images for the "Sub-Images" selectable in the **Korry Button** Action. These are stored in the `\korry` Sub-Folder of the above mentioned Path. These use the following Sizes (also PNG Format, preferably with transparent Background):
 - The "Standard" Size is 54x20 Pixel with no Suffix.
 - The "HQ" Size is 108x40 Pixel with a `@2x` Suffix.
 
@@ -1278,7 +1278,7 @@ To **enable Profiles** for Switching and to **map Profiles** to specific Aircraf
 <br/>
 
 **3.**
-  - If you want configure the Profile as **Default Profile**, select the **Simulator** it is should be used for.<br/>Default Profiles will be loaded if no matching Aircraft Profile was found.
+  - If you want to configure the Profile as **Default Profile**, select the **Simulator** it should be used for.<br/>Default Profiles will be loaded if no matching Aircraft Profile was found.
   - If you configure the Profile for a **specific Aircraft**, enter the **Search-String** to match and click on the Plus-Button.<br/>Aircraft Profiles will be loaded if any of the Search-Strings is contained in the current Aircraft-String received from the Simulator (the matching is case-insensitive).
   - If you want the Plugin to **switch back** to a certain Profile after the **Simulator has closed** (any Sim), select the Checkbox *Use as Switch-Back Profile*
 
@@ -1324,13 +1324,13 @@ The **State** of the Script is **persistent** as long as it is loaded. For Examp
 The Plugin supports 3 different Types of Scripts. Depending of the Script Type the available Lua Globals from the Plugin are different and the Conditions when the Script is loaded/unloaded changes:
 - **Standard** Scripts are only loaded when an Action uses a Function of the Script as Command or Variable. The Script is only active when the Plugin runs a Function as part of a Command or to read the current Value on the Refresh Cycle.
 - **Global** Scripts (placed in the Sub-Folder `\global`) are started when the Sim Session becomes ready (and are stopped when the Session ends). They run constantly on an individual Interval (or on specific Simulator Events). The starting Conditions can be specified to only start a Script for a specific Aircraft and/or Simulator.
-- **Image** Scripts (placed in the Sub-Folder `\image`) are only loaded when an Action uses that Script for Image Mapping (as an Alternative to hand-typed & text-based Maps). The Plugin will run a predefined Function when it need to fetch an Image (on every Refresh Cycle, when the Action has Changes). They can not be used as a Command or Variable (but of course can also read any Variable the Plugin supports)
+- **Image** Scripts (placed in the Sub-Folder `\image`) are only loaded when an Action uses that Script for Image Mapping (as an Alternative to hand-typed & text-based Maps). The Plugin will run a predefined Function when it need to fetch an Image (on every Refresh Cycle, when the Action has Changes). They can't be used as a Command or Variable (but of course can also read any Variable the Plugin supports)
 
 <br/>
 
 Some rough Guidelines:
 - For most Commands and Variables you want to create a Standard Script.
-- When used for Commands: it is no Problem to use Sleep or create a "long running" Task (i.e. Setting up your Plane and modifiying multiple Cockpit Switch in one Function). The execution won't block anything.
+- When used for Commands: it is no Problem to use Sleep or create a "long running" Task (i.e. Setting up your Plane and modifying multiple Cockpit Switch in one Function). The execution won't block anything.
 - When used for Variables: keep it short & fast! The Functions will run on every Process Cycle to get the current Value. 
 - If you need to check any State (and eventually act upon it) in the Background, you might want to create a Global Script instead.
 - Like standard Scripts, global Scripts can also be used as a Command or Variable! But be aware: if a standard and global Script have the same File Name, the Plugin will always prefer the standard Script!
@@ -1471,7 +1471,7 @@ Most FSUIPC Scripts can be easily migrated:
 - ipc.execCalcCode => SimCalculator
 - ipc.log => Log
 - ipc.sleep => Sleep
-- event.flag and event.param can propably just deleted => you can now just directly address a Function and pass Values to it!
+- event.flag and event.param can probably just deleted => you can now just directly address a Function and pass Values to it!
 - Offset => Use SimRead with Offset Syntax from the Plugin or switch to an A-Var
 - Control => Use SimCommand with Control Syntax from the Plugin or switch to a K-Var
 
@@ -1528,7 +1528,7 @@ Global Scripts have **additional Lua Globals** available to them:
 | --- | --- |
 
 The specified *function* is called on the defined Interval (in ms). If no Function Name is specified, the Plugin will default to "OnTick".<br/>
-It is required to have a RunInterval Call in your Script - if you do not need it, the Script propably doesn't need to be global 😉<br/>
+It is required to have a RunInterval Call in your Script - if you do not need it, the Script probably doesn't need to be global 😉<br/>
 There can only be one Call to RunInterval per Script and it need to be placed at the Beginning of the Script (globally) - typically with your SimVar Statements.<br/>
 *Example:*<br/>
 `RunInterval(500, "MAIN_LOOP")`
@@ -1752,12 +1752,12 @@ Profile Packages (.ppp - PilotsDeck Profile Package) allow Profile Authors to sh
 The Package File contains (almost) everything needed by the User to use a Profile or a Set thereof: Images, Scripts and of course the StreamDeck Profiles. A Package File does not need to have all of the three - you can create also Packages to only distribute an Image Pack or a Script or just a Profile. An User only has to take Care to get the correct Fonts now. (Since most Fonts have Limitations on the Distribution, it didn't make much Sense to add them as Feature/Content)<br/><br/>
 
 Requirements / Guidelines for creating Package Files:
-- You have to **stick to the Folder Structure** - it is the same Structure as in the Plugin-Folder (plus the additional Profiles Sub-Folder). So just copy/select the Files as they are layed out in your Plugin Directory.
-- You need to add a **package.json File** with a basic Description of the Package in the **Root Folder of Package**. Use the **"notes" Property** to inform the User about necessary addtional Steps (e.g. Fonts) or other vital Information.
+- You have to **stick to the Folder Structure** - it is the same Structure as in the Plugin-Folder (plus the additional Profiles Sub-Folder). So just copy/select the Files as they are laid out in your Plugin Directory.
+- You need to add a **package.json File** with a basic Description of the Package in the **Root Folder of Package**. Use the **"notes" Property** to inform the User about necessary additional Steps (e.g. Fonts) or other vital Information.
 - **Profiles** added to the Package File need to be in the **.streamDeckProfile Format** you get when Exporting a Profile from the StreamDeck Software.
-- Please **keep the Name** of the StreamDeck Profiles **the same** (as shown in the StreamDeck UI). Else the Profile Manage can not replace old Files and transfer Profile Mappings on Profile Updates.
+- Please **keep the Name** of the StreamDeck Profiles **the same** (as shown in the StreamDeck UI). Else the Profile Manage can't replace old Files and transfer Profile Mappings on Profile Updates.
 - Please **make it clear** in the Profile or File Name for **which StreamDeck Type** a Profile is intended for - so that the User can choose the correct StreamDeck on Installation. There is no automatic Way because for whatever Reason, Elgato does not export that Information.
-- You can include additional Files in the Package (e.g. FSUIPC Scripts, a Readme, Simulator Modules) in the **Extras** Folder. If put there, the Profile Manager will place the Files on the User's Desktop for easier retrival (in a Folder named after the Package File's Name).
+- You can include additional Files in the Package (e.g. FSUIPC Scripts, a Readme, Simulator Modules) in the **Extras** Folder. If put there, the Profile Manager will place the Files on the User's Desktop for easier retrieval (in a Folder named after the Package File's Name).
 
 <br/>
 
@@ -1797,12 +1797,12 @@ Your Name, the Name of the Author 😉 <br/>
 An URL to the Readme and/or to the Download-Page - a Place Users can go to.<br/>
 
 *notes* <br/>
-Use this Property to inform the User about necessary addtional Steps (e.g. Fonts) or other vital Information.<br/>
+Use this Property to inform the User about necessary additional Steps (e.g. Fonts) or other vital Information.<br/>
 Be aware to escape Characters properly for the json Format! Quotation Marks must be escaped like `\"` . To have a Newline in the Output, use `\r\n` .<br/>
 
 *versionplugin* <br/>
 This is the minimum Plugin Version required to use the included Images/Scripts/Profiles.<br/>
-The Version specified will be checked agains the current Plugin Version the User has. If it is below this Minimum, the Package Installation will not be allowed<br/>
+The Version specified will be checked against the current Plugin Version the User has. If it is below this Minimum, the Package Installation will not be allowed<br/>
 
 
 <br/>
@@ -1835,7 +1835,7 @@ The Version specified will be checked agains the current Plugin Version the User
 
 **File Format**<br/>
 A Package File is just a normal Zip-Archive with another Extension (.ppp instead of .zip).<br/>
-So when your finished with you Package Contents, just zip everything into an Archive and change the File Extension.<br/>
+So when you'r finished with you Package Contents, just zip everything into an Archive and change the File Extension.<br/>
 Make sure the Folder Structure is preserved (relative Paths) and that the package.json File is at the Root of the Archive. Do not use any fancy Options - just create a plain Zip File!<br/>
 
 
@@ -1855,7 +1855,7 @@ Some of the Plugin Settings can be tweaked in the File `PluginConfig.json` in th
 * "**LongPressTime**": 500		- The Time in ms a Keypad/Dials had to be down to be considered as Long Press.
 * "**CommandDelay**": 2 		- The Delay in ms between sequenced Commands.
 * "**VariableResetDelay**": 100		- The Time in ms used by the *Reset Switch* Option to wait before the Variable is updated to the Off Value.
-* "**TickDelay**": 15			- The Delay in ms between between Encoder Ticks (before the Command is repeated again).
+* "**TickDelay**": 15			- The Delay in ms between Encoder Ticks (before the Command is repeated again).
 * "**VJoyMinimumPressed**": 75 		- The Time in ms a vJoy Button should be minimally pressed/down.
 * "**FsuipcScriptFlagDelay**": 10	- The Delay in ms between sending the next Flag to FSUIPC Lua Script (when Command Delay was 0).
 * "**InterActionDelay**": 15		- The default Delay in ms between multiple Commands queued by the Composite Action.
@@ -1875,20 +1875,20 @@ A Note on **networked** Installations for **X-Plane**: the Plugin has no Way to 
 ### 4.2.1 - General Guidlines
 **First**, check if you see the Plugin's Actions available in the StreamDeck GUI (on the right Side). If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`.<br/>
 <br/>
-**Second**, if you see the Actions but you can not configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
+**Second**, if you see the Actions but you can't configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
 One Reason could be the Windows Explorer / Zip Folder Mechanic for "Files downloaded from the Internet". Run that in Powershell \(change \<USERNAME\> accordingly\):
 ```powershell
 dir -Path C:\Users\<USERNAME>\AppData\Roaming\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin -Recurse | Unblock-File
 ```
-If that is not the Culprit, check **your AV Scanner** and try if it works if you add an Exception for the Plugin. With Avast this is not necessary (does only a thourough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>
-And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and it's Plugins is done via local Sockets (also the Connection to X-Plane).<br/><br/>
+If that is not the Culprit, check **your AV Scanner** and try if it works if you add an Exception for the Plugin. With Avast this is not necessary (does only a thorough "Cyber Scan" upon first Launch, requiring to restart the StreamDeck Software), but other AV Scanners might behave differently and just silently block it!<br/>
+And it is not only File-Scanning: Security-Tools / Firewalls blocking Network-Traffic could also be the Reason! The Connection between StreamDeck Software and its Plugins is done via local Sockets (also the Connection to X-Plane).<br/><br/>
 If it still doesn't work, contact me on one of the Platforms or Forums! To help you I will need:
 - The **Version** of the Plugin you have downloaded
 - Your latest **StreamDeck Log File** (StreamDeck0.log in %appdata%\Elgato\StreamDeck\logs)
 - The **Startup Log File** (startup.log int the \log Directory of the Plugin. If it does not exist, please tell me that)
 - Your latest **PilotsDeck Log File** (PilotsDeckYYYYMMDD.log int the \log Directory of the Plugin. If it does not exist, please tell me that)
 - Open the Command Line and share me the Output of `dotnet --list-runtimes`
-- Try to run the Exectuable manually via PowerShell / Commandline and copy or make a **Screenshot** of the Output.
+- Try to run the Executable manually via PowerShell / Command Line and copy or make a **Screenshot** of the Output.
 
 <br/><br/>
 
@@ -1896,7 +1896,7 @@ If it still doesn't work, contact me on one of the Platforms or Forums! To help 
 
 #### Does not Connect / "Out of Bound" Exception / MSFS 2024
 
-- Reasons currently unknown, likely due to the Beta State of 2024. Try if removing the Mobiflight Event Module, re-runinng the Installer and then rebooting the PC helps.
+- Reasons currently unknown, likely due to the Beta State of 2024. Try if removing the Mobiflight Event Module, re-running the Installer and then rebooting the PC helps.
 
 <br/>
  
@@ -1910,7 +1910,7 @@ The Thing is: there are so many different Aircrafts out there which each handle 
 So *after Reading* this Document - where do you start? 😉<br/>
 Before you can really start with anything in the Plugin, you must have some kind of SDK/API/whatever Reference from anywhere for the Aircraft you want to create StreamDeck Actions for. You need to know how you can read the Control-States and how you manipulate them! Some Aircraft a purely based on L-Vars, others only for read, other not at all. Some use Custom Events, some use Rotor-Brake-Codes. Some things just can't be read. If you are lucky, it is a Default Plane or a Plane which reacts to Standard-Commands and -Variables. For such "defaulty" Planes, you can use the various References for Standard Commands and Variables I have linked in [Defining Commands and Variables](#21---defining-commands--variables).<br/><br/>
 You can use other Sources like MobiFlight's [HubHop](https://hubhop.mobiflight.com/) to lookup if someone else already found out what Variables / Events can be used on a specific Plane. You can also use the ModelBehaviour Debugger of the MSFS DevMode to search for Events & Variables. The great Sebastian (Mr. MobiFlight himself) did a [Guide on YouTube](https://www.youtube.com/watch?v=PKBjEl9E5A4) how to use that! ❤️<br/><br/>
-Try to follow the KISS Principle. Don't start with Complex Controls or even Displays. Focus on the Cockpit-Controls with the greatest "discomfort" in a normal Simulator Session. Usually the ones where fiddling arround with the Mouse is just annoying. Things like the Aircraft-Lights, because you have to quickly control these when entering/leaving a Runway for Example. Being able to quickly control & check such Controls without loosing Focus on Flying/Taxiing the Aircraft will give you the most Benefit and greatly improves the Simulation Experience.<br/>
+Try to follow the KISS Principle. Don't start with Complex Controls or even Displays. Focus on the Cockpit-Controls with the greatest "discomfort" in a normal Simulator Session. Usually the ones where fiddling around with the Mouse is just annoying. Things like the Aircraft-Lights, because you have to quickly control these when entering/leaving a Runway for Example. Being able to quickly control & check such Controls without loosing Focus on Flying/Taxiing the Aircraft will give you the most Benefit and greatly improves the Simulation Experience.<br/>
 Lights and Signs are a good starting Point (except on the FBW...) because the Variable to read can relatively easily be found. They only have 2 or 3 States and most of the Time you want to toggle them. That calls for a Dynamic Button! Enter the Command, enter the Variable, enter the Values for On/Off (and Special) and select the Light... Images. You have defined your first Light. Just copy and paste that Action for the next similar working Light and change the Command and Variable. Now you have your Light Panel on the StreamDeck!
 <br/><br/>
 
@@ -1936,7 +1936,7 @@ A StreamDeck Page on the Plus for the FCU. The Encoders use the Composite Action
 A complete MCDU Keyboard, with Subpages for Numbers and Letters, on the XL. It is all Simple Buttons!
 <br/><br/><br/>
 
-## 5 - License & Acknowledgements
+## 6 - License & Acknowledgements
 The Plugin is published under the [MIT License](https://github.com/Fragtality/PilotsDeck/blob/master/LICENSE).<br/><br/>
 Using NeoLua Engine from [neolithos](https://github.com/neolithos/neolua)<br/>
 Using Code from "StreamDeckToolkit" from FritzAndFriends, published under [MIT License](https://github.com/FritzAndFriends/StreamDeckToolkit/blob/dev/LICENSE)<br/>

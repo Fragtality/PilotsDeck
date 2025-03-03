@@ -347,6 +347,8 @@ namespace PilotsDeck.Resources.Scripts
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(operation))
                 return false;
             operation = operation.ToLowerInvariant();
+            if (!name.StartsWith("vjoy:"))
+                name = $"vjoy:{name}";
 
             SimCommandType? actionType = TypeMatching.GetCommandOnlyType(name);
             if (actionType == null || (actionType != SimCommandType.VJOY && actionType != SimCommandType.VJOYDRV))

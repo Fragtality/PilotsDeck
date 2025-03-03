@@ -27,7 +27,7 @@ namespace Installer
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV4));
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV5));
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV6));
-            WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP));
+            WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
             WorkerQueues[key].Enqueue(new WorkerInstallUpdate(Config));
             WorkerQueues[key].Enqueue(new WorkerLegacyProfiles(Config));
             if (Config?.GetOption<bool>(Config.OptionVjoyInstallUpdate) == true)
@@ -37,7 +37,7 @@ namespace Installer
                     worker.Model.DisplayInSummary = true;
                 WorkerQueues[key].Enqueue(worker);
             }
-            WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle });
+            WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, StartStopDelay = 1 });
             if (Config?.GetOption<bool>(ConfigBase.OptionDesktopLink) == true)
                 WorkerQueues[key].Enqueue(new WorkerDesktopLink(Config, DesktopLinkOperation.CREATE));
         }
@@ -49,13 +49,13 @@ namespace Installer
 
         protected override void CreateRemovalTasks()
         {
-            WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP));
+            WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
             WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerAppRemove<Config>(Config));
             var workerDesktop = new WorkerDesktopLink(Config, DesktopLinkOperation.REMOVE);
             workerDesktop.Model.DisplayCompleted = true;
             workerDesktop.Model.DisplayInSummary = true;
             WorkerQueues[SetupMode.REMOVE].Enqueue(workerDesktop);
-            WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, IgnorePluginRunning = true });
+            WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, IgnorePluginRunning = true, StartStopDelay = 1 });
         }
 
         protected override void CreateUpdateTasks()

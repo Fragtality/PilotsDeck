@@ -44,17 +44,6 @@ namespace PilotsDeck.Resources
             return file;
         }
 
-        //public static string GetFunctionName(string address)
-        //{
-        //    if (address.StartsWith("lua:", StringComparison.InvariantCultureIgnoreCase))
-        //        address = address.Replace("lua:", "", StringComparison.InvariantCultureIgnoreCase);
-        //    string[] parts = address.Split(':');
-        //    if (parts.Length == 2)
-        //        address = parts[1];
-
-        //    return address;
-        //}
-
         public static bool HasFunctionParams(string address)
         {
             return address.Contains('(');

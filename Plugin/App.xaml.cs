@@ -3,6 +3,7 @@ using CFIT.AppTools;
 using H.NotifyIcon;
 using PilotsDeck.Actions.Advanced;
 using PilotsDeck.Plugin;
+using PilotsDeck.Plugin.API;
 using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.Tools;
@@ -40,6 +41,7 @@ namespace PilotsDeck
         public static DeckController DeckController { get; } = new();
         public static PluginController PluginController { get; } = new();
         public static SimController SimController { get; } = new();
+        public static ApiController ApiController { get; } = new();
         public static CancellationTokenSource CancellationTokenSource { get; private set; } = new();
         public static CancellationToken CancellationToken { get; private set; }
         public static Window HelperWindow { get; private set; }
@@ -119,6 +121,10 @@ namespace PilotsDeck
 
                 Logger.Information($"Starting Sim Controller Thread ...");
                 task = new(SimController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
+                task.Start();
+
+                Logger.Information($"Starting API Controller Thread ...");
+                task = new(ApiController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
                 task.Start();
 
                 StatisticTimer = new DispatcherTimer()

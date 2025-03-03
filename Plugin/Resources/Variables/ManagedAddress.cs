@@ -325,7 +325,7 @@ namespace PilotsDeck.Resources.Variables
             }
             else if (commandType == SimCommandType.VJOY || commandType == SimCommandType.VJOYDRV)
             {
-                string[] parts = address.Split(':');
+                string[] parts = address.ToLowerInvariant().Replace("vjoy:","").Split(':');
 
                 prefix = "vjoy:";
 

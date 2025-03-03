@@ -6,7 +6,6 @@ using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.StreamDeck.Messages;
-using PilotsDeck.Tools;
 using System;
 using System.IO;
 using System.Text.Encodings.Web;
@@ -166,7 +165,6 @@ namespace PilotsDeck.Plugin
                 string[] parts = url.Split('=');
                 if (parts.Length == 2)
                 {
-                    //parts[0] = $"X:{parts[0]}";
                     var address = new ManagedAddress(parts[0]);
                     if (address.ReadType != SimValueType.NONE && VariableManager.Contains(address))
                     {
