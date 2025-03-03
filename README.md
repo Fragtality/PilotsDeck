@@ -884,11 +884,11 @@ In Contrast to the StreamDecks Property Inspector, you can have multiple of thes
 
 <img src="img/ActionDesigner-Overview.png" width="768"><br/>
 
-The Top Buttons (**1**) act on the currently selected Item in the Tree View (**3**). You can either Delete <img src="Plugin/UI/Icons/trash.png" width="20"> the selected Item, Move it up or down, or Copy/Paste <img src="Plugin/UI/Icons/copy.png" width="20"> between Parent Nodes (which also works between different Instances of the UI).<br/>
+The Top Buttons (**1**) act on the currently selected Item in the Tree View (**3**). You can either Delete <img src="Plugin/UI/Icons/trash.png" width="20"> the selected Item, Move it up or down, or Copy/Paste <img src="Plugin/UI/Icons/copy.png" width="20"> between Parent Nodes (which also works between different Instances of the UI). Copy/Paste also allows you to do all Manipulators or Conditions at once - copy the parent/source Item (e.g. an Element to copy its Manipulators) and use the Paste Button directly besides the Child Label (e.g. "Manipulators:" or "Conditions:" on the target Item. Note that all Childs (Manipulators, Conditions) on the targer will be replaced!<br/>
 NOTE that the Order of Elements/Manipulators is important: everything is drawn/executed in the Order seen in the UI - so an Image Element to draw the Background should be the first Thing in the List (on the Top)!<br/>
 When you select an Item in the Tree View (**3**), you can view or change its Parameters in Settings View (**4**).<br/><br/>
 
-The Dropdown/Button (**2**) above the Settings View (**4**) will change dynamically depending on the currently selected Item. On the "Elements" Root it allows to add Elements, on an Element it allows to add Manipulators, on Manipulators it allows to add Conditions.<br/><br/>
+The Dropdown/Button (**2**) above the Settings View (**4**) will change dynamically depending on the currently selected Item. On the "Elements" Header you can trigger the Selection for a new Element, on an Element it allows to add Manipulators, on Manipulators it allows to add Conditions.<br/><br/>
 
 When you open a new/unconfigured Action, the UI allows you to apply one of several Templates resembling the other "classic Actions" to have a rough Layout predefined. That is purely optional, the default is "No Template" which will add nothing.<br/><br/><br/>
 
@@ -900,7 +900,7 @@ On Input-Fields, the Setting is stored when the Field loses Focus or when the En
 <br/><br/>
 
 **Copy/Paste**:<img src="Plugin/UI/Icons/copy.png" width="20"><br/>
-Besides most Setting you'll find a Copy/Paste Button. It allows you to transfer the copied Setting to another Element or Manipulator - also not restricted to the current Window!<br/>
+Besides most Setting you'll find a Copy/Paste Button. It allows copy/paste Settings like Font, Color, Position or even whole Lists. Also not restricted to the current Action Designer Window!<br/>
 When something was copied, only the Setting that can paste it will have the Button active. You need to paste it to copy something new again.
 <br/><br/>
 
