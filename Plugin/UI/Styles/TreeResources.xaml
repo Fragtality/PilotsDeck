@@ -208,12 +208,6 @@
         <Setter Property="Margin" Value="0,0,6,0" />
     </Style>
 
-    <!--<Style x:Key="TreeLabelSubItemName" TargetType="Label" BasedOn="{StaticResource TreeLabelItemName}">
-        <Setter Property="FontSize" Value="11.5" />
-        <Setter Property="FontWeight" Value="DemiBold" />
-        <Setter Property="MinWidth" Value="138" />
-    </Style>-->
-
     <Style x:Key="TreeTextSubItemName" TargetType="TextBlock" BasedOn="{StaticResource TreeTextItemName}">
         <Setter Property="FontSize" Value="11.5" />
         <Setter Property="FontWeight" Value="DemiBold" />
@@ -226,12 +220,6 @@
         <Setter Property="FontSize" Value="11.5" />
         <Setter Property="Margin" Value="0,0,6,0" />
     </Style>
-
-    <!--<Style x:Key="TreeLabelConditionName" TargetType="Label" BasedOn="{StaticResource TreeLabelSubItemName}">
-        <Setter Property="FontSize" Value="11.5" />
-        <Setter Property="MinWidth" Value="114" />
-        <Setter Property="Margin" Value="0,0,0,0" />
-    </Style>-->
 
     <Style x:Key="TreeTextConditionName" TargetType="TextBlock" BasedOn="{StaticResource TreeTextSubItemName}">
         <Setter Property="FontSize" Value="11.5" />

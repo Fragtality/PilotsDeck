@@ -1,7 +1,7 @@
 ﻿using CFIT.AppLogger;
 using CFIT.AppTools;
 using PilotsDeck.Resources.Variables;
-using PilotsDeck.Simulator.XP;
+using PilotsDeck.Simulator.XP.UDP;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

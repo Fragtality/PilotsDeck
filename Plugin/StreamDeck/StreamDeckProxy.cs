@@ -40,22 +40,6 @@ namespace PilotsDeck.StreamDeck
 
         public async Task<string> GetMessageAsString()
         {
-            //var buffer = new byte[65536];
-            //var segment = new ArraySegment<byte>(buffer, 0, buffer.Length);
-            //var result = new WebSocketReceiveResult(0, WebSocketMessageType.Text, false);
-            //var totalCount = 0;
-
-            //while (!result.EndOfMessage)
-            //{
-            //    result = await _Socket.ReceiveAsync(segment, App.CancellationToken);
-            //    totalCount += result.Count;
-            //    segment = new ArraySegment<byte>(buffer, totalCount, buffer.Length - totalCount);
-            //}
-            //segment = new ArraySegment<byte>(buffer, 0, totalCount);
-            //string jsonString = Encoding.UTF8.GetString(segment);
-            //jsonString = jsonString.Trim();
-
-            //return jsonString;
             var buffer = new byte[65536];
             var segment = new ArraySegment<byte>(buffer, 0, buffer.Length);
             var result = await _Socket.ReceiveAsync(segment, App.CancellationToken);

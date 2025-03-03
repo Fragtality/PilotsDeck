@@ -440,7 +440,11 @@ namespace PilotsDeck.Resources.Variables
 
         public virtual string BuildUniformAddress()
         {
-            return $"{Prefix}{Name}{Separator}{Parameter}";
+            string addr = $"{Prefix}{Name}{Separator}{Parameter}";
+            if (ReadType == SimValueType.AVAR)
+                return $"({addr})";
+            else
+                return addr;
         }
 
         public virtual string FormatFsuipcLvar()
