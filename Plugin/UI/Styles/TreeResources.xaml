@@ -8,7 +8,7 @@
     <SolidColorBrush x:Key="MouseOverBrush" Color="{x:Static SystemColors.HighlightColor}" Opacity="0.1"/>
 
     <!-- Item ID Background -->
-    <ImageBrush x:Key="ItemKeyBrush" ImageSource="../Icons/ItemKey.png" Opacity="0.55"/>
+    <ImageBrush x:Key="ItemKeyBrush" ImageSource="../Icons/ItemKey.png" Opacity="0.50"/>
 
     <!-- Icon Converter -->
     <conv:TypeIconConverter x:Key="TypeIconConverter"/>
@@ -123,7 +123,7 @@
         <Setter Property="FontSize" Value="12.5" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="MinHeight" Value="24" />
-        <Setter Property="Margin" Value="0,0,8,0" />
+        <Setter Property="Margin" Value="0,-1,8,0" />
     </Style>
 
     <Style x:Key="TreeImageType" TargetType="Image">

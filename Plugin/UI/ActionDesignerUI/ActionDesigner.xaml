@@ -98,7 +98,7 @@
                             <ToggleButton Name="ExpanderElements" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=VisibilityElements}" Margin="4,0,0,0" Style="{StaticResource ExpanderDownHeaderStyle}"/>
                         <Border Style="{StaticResource ElementRoot_Border}">
                             <StackPanel Orientation="Horizontal" Name="PanelElementRoot" HorizontalAlignment="Stretch" Background="Transparent">
-                                <StackPanel.Resources>
+                                <!--<StackPanel.Resources>
                                     <Style TargetType="Image">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
@@ -106,16 +106,15 @@
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
-                                </StackPanel.Resources>
+                                </StackPanel.Resources>-->
                                 <Image Source="../Icons/Elements.png" Style="{StaticResource TreeHeaderImage}"/>
                                 <Label Style="{StaticResource TreeHeaderLabel}">Elements</Label>
-                                <Image Source="../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}" Margin="2,0,0,0"
+                                <!--<Image Source="../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}" Margin="2,0,0,0"
                                        Name="ImageElementAdd" Visibility="Hidden">
-                                    <!--<Image.Resources>
-
-
-                                    </Image.Resources>-->
-                                </Image>
+                                </Image>-->
+                                <Label Name="LabelAddNewElement" Style="{StaticResource LabelAnnotation}" Visibility="Hidden">
+                                    Click to select Element Type ...
+                                </Label>
                             </StackPanel>
                         </Border>
                     </DockPanel>

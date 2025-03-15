@@ -494,9 +494,17 @@ Although RPN Syntax is very hard to understand (I still struggle 😵), it can b
 <br/>
 
 *Background*:<br/>
-Every Command in X-Plane - whether it is from the Simulator, Plane or other Addons - has a unique Path.<br/><br/>
+Every Command in X-Plane - whether it is from the Simulator, Plane or other Addons - has a unique Path.<br/>
+In Comparison to other Simulators, X-Plane Commands can be requested to be active (e.g. a Button is clicked/pressed) and not active (e.g. a Button is released) in independent Requests - so there is no specific Need for separate Click & Release Commands as in other Sims. Commands can also be send as "command_once" where the "Click & Release" is done instantly in one Request.<br/><br/>
 
-You can lookup these Paths in the UI or on the Internet like on [siminnovations.com](https://www.siminnovations.com/xplane/command/) - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!<br/>
+Per Default the Plugin will trigger X-Plane Commands as "command_once" which is fine for most Buttons, Switches and Knobs. But in Cases of Buttons that need to be hold (kept pressed) for some Time and then released (e.g. CVR Test, TO CONF, Fire Tests) the Configuration depends on your X-Plane Version:
+- For X-Plane Versions *earlier* than 12.1.4: You can only trigger Commands as "command_once". If you need to configure a holdable Switch, you have to use a *vJoy* (Driver) Command (with the corresponding vJoy Button mapped in X-Plane).
+- For X-Plane Versions *at or greater* than 12.1.4: You can enable the *Hold Switch* Option and disable the *Command Once* Option of the Plugin to create an holdable Button/Switch (use the same Command Ref in both Addresses). On the Composite Action you need to add the Command Ref to both the UP and DOWN StreamDeck Events with the *Command Once* Option disabled.
+
+Note on Sequences for Hold Switches: All Commands will be set active - make sure to use the same Sequence for both Addresses!
+<br/><br/>
+
+You can lookup the Command References in the UI or on the Internet like on [siminnovations.com](https://www.siminnovations.com/xplane/command/) - Check the "QRH" Section of the Developer UI for a direct Link (accessible via the Tray-Icon of the Plugin)!<br/>
 Or you can use the DataRefTool Plugin to explore all Commands (including Custom) currently known to the Simulator.
 <br/><br/><br/>
 
@@ -1838,6 +1846,66 @@ A Package File is just a normal Zip-Archive with another Extension (.ppp instead
 So when you'r finished with you Package Contents, just zip everything into an Archive and change the File Extension.<br/>
 Make sure the Folder Structure is preserved (relative Paths) and that the package.json File is at the Root of the Archive. Do not use any fancy Options - just create a plain Zip File!<br/>
 
+<br/><br/><br/><br/>
+
+## 3.7 - REST API
+The Plugin has a very simple and not 100% compliant REST API to interface with the Plugin respectively the connected Simulator. Specifically:
+- Get a List of all active (registered and subscribed) Variable Names the Plugin uses currently
+- Get the Value of a Variable
+- Set the Value of a Variable
+- Send a Sim or vJoy Command
+
+NOTE: It is absolutely not designed to replace other "Middlewares" like FSUIPC or MobiFlight, so do not use the API excessively! It is more a Convenience to test Actions without a Sim or maybe feed some State/Information to the Plugin.<br/><br/>
+
+Per Default the Plugin will listen on Port 42042, but that is customizable in the Plugin Configuration if there would be a Conflict in your Setup.<br/>
+All Requests are done via the GET Method - this Way Clients can just simply call an URL instead of creating a POST Request with a Body.<br/>
+The Result (if there is any) will be send as *plain/text* Content-Type.<br/><br/>
+
+### 3.7.1 - REST Commands
+
+**LIST Variables**
+`http://localhost:42042/v1/list`
+
+Result: List of all active (registered and subscribed) Variable Names - one Name per Line.
+
+<br/><br/>
+
+**GET Variable**
+`http://localhost:42042/v1/get/<Variable Address>`
+
+<Variable Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
+
+Result: The current Value of that Variable.
+
+<br/><br/>
+
+
+**SET Variable**
+`http://localhost:42042/v1/set/<Variable Address>=<Value>`
+
+<Variable Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
+<Value> => The Value to be set.
+
+Result: None (only the HTTP Response Code 200 if successful).
+
+<br/><br/>
+
+**SEND Command**
+`http://localhost:42042/v1/send/<Command Address>`
+
+<Command Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
+
+Result: None (only the HTTP Response Code 200 if successful).
+
+<br/><br/>
+
+**SEND vJoy**
+`http://localhost:42042/v1/vjoy/<vJoy Address>/<Operation>`
+
+<vJoy Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
+<Operation> => Must be either `up`, `down` or `toggle`.
+
+Result: None (only the HTTP Response Code 200 if successful).
 
 <br/><br/><br/><br/>
 

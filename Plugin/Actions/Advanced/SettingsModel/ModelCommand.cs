@@ -13,6 +13,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
                 DeckCommandType = this.DeckCommandType,
                 CommandType = this.CommandType,
                 DoNotRequestBvar = this.DoNotRequestBvar,
+                UseXpCommandOnce = this.UseXpCommandOnce,
                 Address = this.Address,
                 Name = this.Name,
                 TimeAfterLastDown = this.TimeAfterLastDown,
@@ -45,6 +46,7 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         public StreamDeckCommand DeckCommandType { get; set; } = StreamDeckCommand.KEY_UP;
         public SimCommandType CommandType { get; set; } = SimCommandType.LVAR;
         public bool DoNotRequestBvar { get; set; } = true;
+        public bool UseXpCommandOnce { get; set; } = true;
         public string Address { get; set; } = "";
         public string Name { get; set; } = "";
         public int TimeAfterLastDown { get; set; } = 0;

@@ -1,10 +1,7 @@
-﻿using System;
+﻿using CFIT.AppTools;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace PilotsDeck.Simulator.XP.WS.Messages
 {
@@ -33,7 +30,8 @@ namespace PilotsDeck.Simulator.XP.WS.Messages
         };
 
 #pragma warning disable IDE1006
-        public int id { get; set; } = 0;
+        public long id { get; set; } = 0;
+        public bool is_writable { get; set; } = false;
         public string name { get; set; } = "";
         public string value_type { get; set; } = "";
 #pragma warning restore
@@ -56,6 +54,23 @@ namespace PilotsDeck.Simulator.XP.WS.Messages
         public static DataRefList GetDataRefList(string json)
         {
             return JsonSerializer.Deserialize<DataRefList>(json);
+        }
+    }
+
+    public class DataRefValue
+    {
+#pragma warning disable IDE1006
+        public object data { get; set; }
+#pragma warning restore
+
+        public static DataRefValue CreateNumber(double value)
+        {
+            return new() { data = value };
+        }
+
+        public static DataRefValue CreateString(string value)
+        {
+            return new() { data = value.Base64Encode() };
         }
     }
 }

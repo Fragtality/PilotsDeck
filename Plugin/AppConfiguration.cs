@@ -219,6 +219,9 @@ namespace PilotsDeck
         public int XPlaneStateCheckInterval { get; set; } = 1000;
         public int XPlaneTimeoutReceive { get; set; } = 3000;
         public bool XPlaneUseLiveryRefOn12 { get; set; } = false;
+        public bool XPlaneUseWebApi { get; set; } = true;
+        public string XPlaneWebApiHost { get; set; } = "127.0.0.1:8086";
+        public int XPlaneWebApiKeepAlive { get; set; } = 10000;
         public int MsfsRetryDelay { get; set; } = 30000;
         public int MsfsStaleTimeout { get; set; } = 15000;
         public int MsfsStateCheckInterval { get; set; } = 500;

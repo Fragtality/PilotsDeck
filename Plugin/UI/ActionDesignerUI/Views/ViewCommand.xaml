@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.Views"
-             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels.Commands"
-             d:DataContext="{d:DesignInstance Type=model:PilotsDeck.UI.ActionDesignerUI.ViewModels.ViewModelCommand}"
+             xmlns:model="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ViewModels"
+             d:DataContext="{d:DesignInstance Type=model:ViewModelCommand}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="8,0,8,0">
@@ -14,6 +14,7 @@
             <ColumnDefinition Style="{StaticResource DesignerControlColumn}"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -36,16 +37,6 @@
 
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Name="VariableControl" Margin="0,8,0,0"/>
 
-        <!--<Label Grid.Row="1" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
-            Command Address:
-        </Label>
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Center" HorizontalAlignment="Left">
-            <TextBox Name="InputAddress" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" MinWidth="384" MinHeight="24"></TextBox>
-            <Label Name="LabelSyntaxCheck" Margin="8,0,0,0" MinHeight="24" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Left"></Label>
-        </StackPanel>
-
-        <Label Grid.Row="2" Grid.Column="1" Name="LabelVariable" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="-3,-4,0,0" FontSize="10" MinHeight="18"></Label>-->
-
         <Label Grid.Row="3" Grid.Column="0" Visibility="{Binding IsBvar, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
             Run as Command:
         </Label>
@@ -54,10 +45,18 @@
             Treat B-Var as Command Type (without readable Value)
         </CheckBox>
 
-        <Label Grid.Row="4" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding CanLongPress, Converter={StaticResource BoolVisibilityConverter}}">
+        <Label Grid.Row="4" Grid.Column="0" Visibility="{Binding CanXpCommandOnce, Converter={StaticResource BoolVisibilityConverter}}" Style="{StaticResource DesignerLabelM8}">
+            Command Once:
+        </Label>
+        <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding UseXpCommandOnce}" Visibility="{Binding CanXpCommandOnce, Converter={StaticResource BoolVisibilityConverter}}"
+                  Margin="0,8,0,0" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+            Press &amp; Release X-Plane Command in one Request
+        </CheckBox>
+
+        <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding CanLongPress, Converter={StaticResource BoolVisibilityConverter}}">
             Long Press:
         </Label>
-        <Grid Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding CanLongPress, Converter={StaticResource BoolVisibilityConverter}}">
+        <Grid Grid.Row="5" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding CanLongPress, Converter={StaticResource BoolVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -70,10 +69,10 @@
             <Label Grid.Column="2" Style="{StaticResource LabelAnnotation}">ms</Label>
         </Grid>
 
-        <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsRotary, Converter={StaticResource BoolVisibilityConverter}}">
+        <Label Grid.Row="6" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsRotary, Converter={StaticResource BoolVisibilityConverter}}">
             Tick Delay:
         </Label>
-        <Grid Grid.Row="5" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding IsRotary, Converter={StaticResource BoolVisibilityConverter}}">
+        <Grid Grid.Row="6" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding IsRotary, Converter={StaticResource BoolVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -87,10 +86,10 @@
         </Grid>
 
 
-        <Label Grid.Row="6" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsResettable, Converter={StaticResource BoolVisibilityConverter}}">
+        <Label Grid.Row="7" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsResettable, Converter={StaticResource BoolVisibilityConverter}}">
             Reset Switch:
         </Label>
-        <Grid Grid.Row="6" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding IsResettable, Converter={StaticResource BoolVisibilityConverter}}">
+        <Grid Grid.Row="7" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding IsResettable, Converter={StaticResource BoolVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -103,10 +102,10 @@
             <Label Grid.Column="2" Style="{StaticResource LabelAnnotation}">ms</Label>
         </Grid>
 
-        <Label Grid.Row="7" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding HasCommandDelay, Converter={StaticResource BoolVisibilityConverter}}">
+        <Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding HasCommandDelay, Converter={StaticResource BoolVisibilityConverter}}">
             Command Delay:
         </Label>
-        <Grid Grid.Row="7" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding HasCommandDelay, Converter={StaticResource BoolVisibilityConverter}}">
+        <Grid Grid.Row="8" Grid.Column="1" Margin="0,8,0,0" Visibility="{Binding HasCommandDelay, Converter={StaticResource BoolVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -119,28 +118,28 @@
             <Label Grid.Column="2" Style="{StaticResource LabelAnnotation}">ms</Label>
         </Grid>
 
-        <Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}">
+        <Label Grid.Row="9" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}">
             On/Write Value:
         </Label>
-        <TextBox Grid.Row="8" Grid.Column="1" Name="InputWriteValue" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}"
+        <TextBox Grid.Row="9" Grid.Column="1" Name="InputWriteValue" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}"
                  Margin="0,8,0,0" MinWidth="212" HorizontalAlignment="Left" Style="{StaticResource InputLeft}"/>
 
-        <Label Grid.Row="9" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}">
+        <Label Grid.Row="10" Grid.Column="0" Style="{StaticResource DesignerLabelM8}" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}">
             Off/Reset Value:
         </Label>
-        <TextBox Grid.Row="9" Grid.Column="1" Name="InputResetValue" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}"
+        <TextBox Grid.Row="10" Grid.Column="1" Name="InputResetValue" Visibility="{Binding IsValueType, Converter={StaticResource BoolVisibilityConverter}}"
                  Margin="0,8,0,0" MinWidth="212" HorizontalAlignment="Left" Style="{StaticResource InputLeft}"/>
 
-        <Label Grid.Row="10" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+        <Label Grid.Row="11" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
             Any Condition:
         </Label>
-        <CheckBox Grid.Row="10" Grid.Column="1" IsChecked="{Binding AnyCondition}" Margin="0,8,0,0" MinWidth="112" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
+        <CheckBox Grid.Row="11" Grid.Column="1" IsChecked="{Binding AnyCondition}" Margin="0,8,0,0" MinWidth="112" HorizontalAlignment="Left" Style="{StaticResource CheckboxDefault}">
             Trigger Command when any Condition is true (instead of all Conditions)
         </CheckBox>
 
-        <Label Grid.Row="11" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
+        <Label Grid.Row="12" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
             Custom Name:
         </Label>
-        <TextBox Grid.Row="11" Grid.Column="1" Name="InputName" Margin="0,8,0,0" MinWidth="212" HorizontalAlignment="Left" Style="{StaticResource InputLeft}"/>
+        <TextBox Grid.Row="12" Grid.Column="1" Name="InputName" Margin="0,8,0,0" MinWidth="212" HorizontalAlignment="Left" Style="{StaticResource InputLeft}"/>
     </Grid>
 </UserControl>

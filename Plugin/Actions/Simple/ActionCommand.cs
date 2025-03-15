@@ -13,6 +13,7 @@ namespace PilotsDeck.Actions.Simple
         public bool IsValueType { get { return SimCommand.IsValidValueCommand(AddressOn.Address, DoNotRequestBvar, CommandType); } }
         public bool IsHoldable { get { return SimCommand.IsVjoyClearSet(AddressOn) || HoldSwitch; } }
         public bool DoNotRequestBvar { get; set; } = true;
+        public bool UseXpCommandOnce { get; set; } = false;
         public ManagedAddress AddressOff { get; set; } = ManagedAddress.CreateEmptyCommand();
         public ValueState State { get; protected set; } = new ValueState(null, "0", "0");
         public bool Compares { get { return State?.Compares() == true; } }
@@ -109,7 +110,7 @@ namespace PilotsDeck.Actions.Simple
 
             simCommand.Context = context;
             simCommand.Ticks = isCalcCode || State.IsCode ? 1 : Math.Abs(ticks);
-            simCommand.IsUp = keyUp;
+            simCommand.IsUp = (keyUp! && CommandType == SimCommandType.XPCMD && !UseXpCommandOnce) || keyUp;
             if (SimCommand.CommandTypeUsesDelay(CommandType, DoNotRequestBvar) && UseCommandDelay)
             {
                 simCommand.CommandDelay = CommandDelay;
@@ -150,6 +151,7 @@ namespace PilotsDeck.Actions.Simple
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionType, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
+                UseXpCommandOnce = settingsModel.UseXpCommandOnce,
             };
 
             if (command.IsValueType)
@@ -175,6 +177,7 @@ namespace PilotsDeck.Actions.Simple
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionTypeGuard, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
+                UseXpCommandOnce = settingsModel.UseXpCommandOnce,
             };
 
             if (command.IsValueType)
@@ -197,6 +200,7 @@ namespace PilotsDeck.Actions.Simple
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionTypeLong, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
+                UseXpCommandOnce = true,
             };
 
             if (command.IsValueType)
@@ -219,6 +223,7 @@ namespace PilotsDeck.Actions.Simple
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionTypeTouch, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
+                UseXpCommandOnce = true,
             };
 
             if (command.IsValueType)
@@ -241,6 +246,7 @@ namespace PilotsDeck.Actions.Simple
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionTypeLeft, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
+                UseXpCommandOnce = true,
             };
 
             if (command.IsValueType)
@@ -263,6 +269,7 @@ namespace PilotsDeck.Actions.Simple
                 ResetSwitch = GetResetState(settingsModel, settingsModel.ActionTypeRight, settingsModel.DoNotRequestBvar),
                 UseCommandDelay = settingsModel.UseControlDelay,
                 DoNotRequestBvar = settingsModel.DoNotRequestBvar,
+                UseXpCommandOnce = true,
             };
 
             if (command.IsValueType)

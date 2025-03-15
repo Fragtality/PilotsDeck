@@ -32,13 +32,14 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
 
         protected virtual string SelectName()
         {
-            return string.IsNullOrWhiteSpace(Source.Name) ? $"{CommandType}: {Source.Address.Compact()}" : Source.Name;
+            return string.IsNullOrWhiteSpace(Source.Name) ? $"[{CommandType}] {Source.Address.Compact()}" : Source.Name;
         }
 
         protected virtual void NotifyTypeChange()
         {
             NotifyPropertyChanged(nameof(Address));
             NotifyPropertyChanged(nameof(IsBvar));
+            NotifyPropertyChanged(nameof(CanXpCommandOnce));
             NotifyPropertyChanged(nameof(IsResettable));
             NotifyPropertyChanged(nameof(HasCommandDelay));
             NotifyPropertyChanged(nameof(IsValueType));
@@ -48,7 +49,9 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
         public virtual SimCommandType CommandType { get => GetSourceValue<SimCommandType>(); set { SetModelValue(value); NotifyTypeChange(); } }
         public virtual Dictionary<SimCommandType, string> CommandTypes => ViewModelHelper.GetSimTypes();
         public virtual bool IsBvar => CommandType == SimCommandType.BVAR;
+        public virtual bool CanXpCommandOnce => CommandType == SimCommandType.XPCMD && !IsRotary && DeckCommandType != StreamDeckCommand.TOUCH_TAP;
         public virtual bool DoNotRequestBvar { get => GetSourceValue<bool>(); set { SetModelValue(value); NotifyTypeChange(); } }
+        public virtual bool UseXpCommandOnce { get => GetSourceValue<bool>(); set { SetModelValue(value); NotifyTypeChange(); } }
         public virtual bool CanLongPress => Source.DeckCommandType == StreamDeckCommand.KEY_UP || Source.DeckCommandType == StreamDeckCommand.DIAL_UP;
         public virtual int TimeAfterLastDown { get => GetSourceValue<int>(); set => SetModelValue(value); }
         public virtual bool IsRotary => Source.DeckCommandType == StreamDeckCommand.DIAL_LEFT || Source.DeckCommandType == StreamDeckCommand.DIAL_RIGHT;

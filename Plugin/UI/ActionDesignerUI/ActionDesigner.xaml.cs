@@ -80,8 +80,10 @@ namespace PilotsDeck.UI.ActionDesignerUI
             ModelAction.SubscribeProperty(nameof(ModelAction.IsTreeRefreshNeeded), () => { TreeViewElements.ViewModelCollection.RefreshNames(); TreeViewCommands.ViewModelCollection.RefreshNames(); });
 
             PanelElementRoot.MouseLeftButtonUp += (_, _) => ModelAction.SetElementRootSelection();
-            PanelElementRoot.MouseEnter += (_, _) => ImageElementAdd.Visibility = Visibility.Visible;
-            PanelElementRoot.MouseLeave += (_, _) => ImageElementAdd.Visibility = Visibility.Hidden;
+            //PanelElementRoot.MouseEnter += (_, _) => ImageElementAdd.Visibility = Visibility.Visible;
+            //PanelElementRoot.MouseLeave += (_, _) => ImageElementAdd.Visibility = Visibility.Hidden;
+            PanelElementRoot.MouseEnter += (_, _) => LabelAddNewElement.Visibility = Visibility.Visible;
+            PanelElementRoot.MouseLeave += (_, _) => LabelAddNewElement.Visibility = Visibility.Hidden;
         }
 
         protected virtual void InitializeTreeViews()

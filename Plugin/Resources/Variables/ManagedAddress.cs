@@ -463,6 +463,24 @@ namespace PilotsDeck.Resources.Variables
             return $"{Name}.lua";
         }
 
+        public virtual bool TryGetXpStringLength(out int len)
+        {
+            len = 0;
+            if (ReadType != SimValueType.XPDREF || !Parameter.StartsWith(":s") || !int.TryParse(Parameter[2..], out len))
+                return false;
+            else
+                return true;
+        }
+
+        public virtual bool TryGetXpArrayIndex(out int index)
+        {
+            index = 0;
+            if (ReadType != SimValueType.XPDREF || !Parameter.StartsWith('[') || !int.TryParse(Parameter.Replace("[", "").Replace("]", ""), out index))
+                return false;
+            else
+                return true;
+        }
+
         public override string ToString()
         {
             return BuildUniformAddress();

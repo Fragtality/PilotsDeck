@@ -74,7 +74,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.Installer" Version="2025.62.13.2842" />
+    <PackageReference Include="CFIT.Installer" Version="2025.70.23.2194" />
   </ItemGroup>
 
   <ItemGroup>

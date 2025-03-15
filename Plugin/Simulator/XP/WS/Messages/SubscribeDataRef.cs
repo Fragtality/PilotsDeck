@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace PilotsDeck.Simulator.XP.WS.Messages
 {
-    public class SubscribeDataRefMessage
+    public class SubscribeDataRefMessage(int id)
     {
 #pragma warning disable IDE1006
-        public int req_id { get; set; } = 0;
-        public string type { get; set; } = "dataref_subscribe_values";
+        public int req_id { get; set; } = id;
+        public string type { get; set; } = RequestType.SubscribeDataRef;
         public SubscribeParams @params { get; set; } = new();
 
 
@@ -22,30 +19,21 @@ namespace PilotsDeck.Simulator.XP.WS.Messages
 
         }
 
-        public class SubscribeDataRef
+        public class SubscribeDataRef(long id, int? index = null)
         {
-            public int id { get; set; } = 0;
+            public long id { get; set; } = id;
             [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             public string name { get; set; } = null;
             [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-            public int? index { get; set; } = null;
-
-            public SubscribeDataRef(int id, int? index = null)
-            {
-                this.id = id;
-                this.index = index;
-            }
+            public int? index { get; set; } = index;
         }
+
 #pragma warning restore
 
-        public SubscribeDataRefMessage(int id)
+        public void AddDataRef(long id, int? index = null)
         {
-            req_id = id;
-        }
-
-        public void AddDataRef(int id, int? index = null)
-        {
-            @params.datarefs.Add(new(id, index));
+            if (!@params.datarefs.Where(r => r.id == id).Any())
+                @params.datarefs.Add(new(id, index));
         }
 
         public override string ToString()

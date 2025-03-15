@@ -299,6 +299,10 @@ function isBvar(actionType) {
 	return actionType == 13;
 }
 
+function isXpCmd(actionType) {
+	return actionType == 10;
+}
+
 function setChecked(state, name) {
 	var element = document.getElementById(name);
 	if (!element)
@@ -322,6 +326,10 @@ function setHoldField(state) {
 
 function setBvarRequestField(state) {
 	toggleConfigItem(state, 'DoNotRequestBvar');
+}
+
+function setUseXpCommandOnceField(state) {
+	toggleConfigItem(state, 'UseXpCommandOnce');
 }
 
 function setOnOffFields(deckType, state) {
@@ -372,6 +380,7 @@ function setActionFields(deckType, actionType, settingsModel) {
 			toggleConfigItem(isToggle, 'AddressMonitor');
 			setOnOffFields(deckType, isToggle);		
 			setBvarRequestField(false);
+			setUseXpCommandOnceField(false);
 		}
 		else if (settingsModel.HoldSwitch) {
 			setToggleField(false);
@@ -381,6 +390,7 @@ function setActionFields(deckType, actionType, settingsModel) {
 			toggleConfigItem(false, 'AddressMonitor');
 			setOnOffFields(deckType, isHoldableValue(actionType, settingsModel.DoNotRequestBvar));
 			setBvarRequestField(isBvar(actionType));
+			setUseXpCommandOnceField(isXpCmd(actionType));
 		}
 		else if (settingsModel.UseLvarReset) {
 			setToggleField(false);
@@ -389,6 +399,7 @@ function setActionFields(deckType, actionType, settingsModel) {
 			toggleConfigItem(false, 'AddressActionOff');
 			toggleConfigItem(false, 'AddressMonitor');
 			setBvarRequestField(false);
+			setUseXpCommandOnceField(false);
 		}
 		else {
 			setToggleField(isToggleable(actionType, settingsModel.DoNotRequestBvar));
@@ -397,6 +408,7 @@ function setActionFields(deckType, actionType, settingsModel) {
 			toggleConfigItem(false, 'AddressActionOff');
 			toggleConfigItem(false, 'AddressMonitor');
 			setBvarRequestField(isBvar(actionType));
+			setUseXpCommandOnceField(isXpCmd(actionType));
 		}
 
 		toggleConfigItem(hasCommandDelay(actionType, settingsModel.DoNotRequestBvar), 'UseControlDelay');

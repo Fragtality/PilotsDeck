@@ -97,7 +97,7 @@ namespace PilotsDeck.Plugin.API
             context.Response.ContentType = mimeType;
             context.Response.ContentEncoding = Encoding.UTF8;
             context.Response.ContentLength64 = data.LongLength;
-            await context.Response.OutputStream.WriteAsync(data, 0, data.Length, App.CancellationToken);
+            await context.Response.OutputStream.WriteAsync(data, App.CancellationToken);
             context.Response.StatusCode = (int)statusCode;
         }
 

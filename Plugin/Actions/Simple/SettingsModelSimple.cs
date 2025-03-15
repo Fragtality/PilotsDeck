@@ -165,6 +165,7 @@ namespace PilotsDeck.Actions.Simple
 
         public virtual string AddressAction { get; set; } = "";
         public virtual bool DoNotRequestBvar { get; set; } = true;
+        public virtual bool UseXpCommandOnce { get; set; } = true;
         public virtual string AddressMonitor { get; set; } = "";
         public virtual string AddressActionOff { get; set; } = "";
         public virtual SimCommandType ActionType { get; set; } = SimCommandType.LVAR;

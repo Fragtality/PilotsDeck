@@ -16,6 +16,7 @@ namespace PilotsDeck.Actions.Advanced
         public bool IsEncoder { get { return DeckCommandType == StreamDeckCommand.DIAL_LEFT || DeckCommandType == StreamDeckCommand.DIAL_RIGHT || DeckCommandType == StreamDeckCommand.TOUCH_TAP; } }
         public SimCommandType CommandType { get; set; } = model.CommandType;
         public bool DoNotRequestBvar { get; set; } = model.DoNotRequestBvar;
+        public bool UseXpCommandOnce { get; set; } = model.UseXpCommandOnce;
         public ManagedAddress Address { get; set; } = new ManagedAddress(model.Address, model.CommandType, model.DoNotRequestBvar);
         public string Name { get; set; } = model.Name;
         public bool IsValidCommand { get { return SimCommand.IsValidAddressForType(Address.Address, CommandType, DoNotRequestBvar); } }
@@ -124,7 +125,7 @@ namespace PilotsDeck.Actions.Advanced
                 Context = context,
                 Address = Address.Copy(),
                 Type = CommandType,
-                IsUp = keyUp,
+                IsUp = (keyUp! && CommandType == SimCommandType.XPCMD && !UseXpCommandOnce) || keyUp,
                 Ticks = Math.Abs(ticks),
                 TickDelay = TickDelay,
                 EncoderAction = encoderAction

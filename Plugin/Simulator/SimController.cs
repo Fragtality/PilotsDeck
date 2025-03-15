@@ -231,7 +231,7 @@ namespace PilotsDeck.Simulator
             var query = ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary);
             if (query.Any())
             {
-                managedVariables = managedVariables.Where(v => !v.IsSubscribed && v.Registrations >= 1).ToList();
+                managedVariables = [.. managedVariables.Where(v => !v.IsSubscribed && v.Registrations >= 1)];
                 query.First().SubscribeVariables([.. managedVariables]);
             }
         }

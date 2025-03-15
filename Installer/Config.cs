@@ -35,10 +35,10 @@ namespace Installer
 
         //Worker: .NET
         public virtual bool NetRuntimeDesktop { get; set; } = true;
-        public virtual string NetVersion { get; set; } = "8.0.13";
+        public virtual string NetVersion { get; set; } = "8.0.14";
         public virtual bool CheckMajorEqual { get; set; } = true;
-        public virtual string NetUrl { get; set; } = "https://download.visualstudio.microsoft.com/download/pr/fc8c9dea-8180-4dad-bf1b-5f229cf47477/c3f0536639ab40f1470b6bad5e1b95b8/windowsdesktop-runtime-8.0.13-win-x64.exe";
-        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.13-win-x64.exe";
+        public virtual string NetUrl { get; set; } = "https://download.visualstudio.microsoft.com/download/pr/64760cc4-228f-48e4-b57d-55f882dedc69/b181f927cb937ef06fbb6eb41e81fbd0/windowsdesktop-runtime-8.0.14-win-x64.exe";
+        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.14-win-x64.exe";
 
         //Worker: MobiFlight
         public virtual bool MobiRequired { get; set; } = true;
