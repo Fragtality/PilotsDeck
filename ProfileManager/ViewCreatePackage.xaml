@@ -1,0 +1,161 @@
+﻿<UserControl x:Class="ProfileManager.ViewCreatePackage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProfileManager"
+             d:DataContext="{d:DesignInstance Type=local:ViewModelManifest}"
+             mc:Ignorable="d" 
+             d:DesignHeight="960" d:DesignWidth="800">
+    <Grid HorizontalAlignment="Center">
+        <Grid.Resources>
+            <Style x:Key="LabelName" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontWeight" Value="DemiBold" />
+                <Setter Property="Margin" Value="0,0,0,0" />
+            </Style>
+            <Style x:Key="TextInput" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="Width" Value="384" />
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Margin" Value="8,0,0,0" />
+            </Style>
+            <Style x:Key="LabelDescription" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="FontWeight" Value="Light" />
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="Margin" Value="10,2,0,14" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="MaxWidth" Value="384" />
+            </Style>
+            <Style x:Key="LabelNote" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Margin" Value="0,6,0,0" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="MaxWidth" Value="384" />
+            </Style>
+        </Grid.Resources>
+        <!-- Grid Open -->
+        <Grid Name="GridOpenDirectory" VerticalAlignment="Top" HorizontalAlignment="Center" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="DemiBold" Margin="0,0,8,0">Package Directory:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Name="TextPackagePath" FontSize="12" MinHeight="24" MinWidth="256" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,4,0"/>
+            <Button Grid.Row="0" Grid.Column="2" Name="ButtonFindPath" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Center" Height="24" Width="24" Margin="0,0,8,0">...</Button>
+            <Button Grid.Row="0" Grid.Column="3" Name="ButtonLoadPath" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Center" Height="24" Width="72">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Label VerticalContentAlignment="Center" VerticalAlignment="Center" MinHeight="36">Load</Label>
+                    <Image VerticalAlignment="Center" Source="/images/box-arrow-up.png" Height="16" Width="16"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Grid Package -->
+        <Grid Name="GridPackageEditor" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelName}">Path:</TextBlock>
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                <TextBox Name="TextPath" Style="{StaticResource TextInput}"  Width="306" IsReadOnly="True" IsHitTestVisible="False"/>
+                <Button Name="ButtonOpenFolder" Padding="2" Margin="6,0,0,0">
+                    Open Folder
+                </Button>
+            </StackPanel>
+
+            <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="16"/>
+            
+            <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelName}">Title:</TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="1" Name="TextTitle" Text="{Binding Title}" Style="{StaticResource TextInput}"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                A short meaningful Title, so the User knows what she/he is looking at.
+            </TextBlock>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelName}">Version:</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" Name="TextVersion" Text="{Binding VersionPackage}" Style="{StaticResource TextInput}"/>
+            <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                A Version-Number assigned by the Author so that both the Author and the Users can keep track of updated Packages.<LineBreak />
+                It is just displayed, there is no Version-Checking involved.
+            </TextBlock>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelName}">Aircraft:</TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="1" Name="TextAircraft" Text="{Binding Aircraft}" Style="{StaticResource TextInput}"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                A short Description for what Aircraft (and eventually Variants thereof) this Package is intended.<LineBreak />
+                It is just displayed, there are no active Checks involved.
+            </TextBlock>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelName}">Author:</TextBlock>
+            <TextBox Grid.Row="8" Grid.Column="1" Name="TextAuthor" Text="{Binding Author}" Style="{StaticResource TextInput}"/>
+            <TextBlock Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                Your Name, the Name of the Author 😉
+            </TextBlock>
+
+            <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource LabelName}">URL:</TextBlock>
+            <TextBox Grid.Row="10" Grid.Column="1" Name="TextURL" Text="{Binding URL}" Style="{StaticResource TextInput}"/>
+            <TextBlock Grid.Row="11" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                An URL to the Readme and/or to the Download-Page - a Place Users can go to.
+            </TextBlock>
+
+            <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource LabelName}" VerticalAlignment="Top">Notes:</TextBlock>
+            <TextBox Grid.Row="12" Grid.Column="1" Name="TextNotes" Text="{Binding Notes}" Style="{StaticResource TextInput}" VerticalContentAlignment="Top" MinHeight="96" TextWrapping="WrapWithOverflow" AcceptsReturn="True" AcceptsTab="True"/>
+            <TextBlock Grid.Row="13" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                Use this Property to inform the User about necessary additional Steps (e.g. Fonts) or other vital Information.
+            </TextBlock>
+
+            <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource LabelName}">Plugin Version:</TextBlock>
+            <TextBox Grid.Row="14" Grid.Column="1" Name="TextPluginVersion" Text="{Binding VersionPlugin}" Style="{StaticResource TextInput}"/>
+            <TextBlock Grid.Row="15" Grid.Column="1" Style="{StaticResource LabelDescription}">
+                This is the minimum Plugin Version required to use the included Images/Scripts/Profiles.<LineBreak />
+                The Version specified will be checked against the current Plugin Version the User has. If it is below this Minimum, the Package Installation will not be allowed.
+            </TextBlock>
+            
+            <Separator Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="2" Margin="16"/>
+            
+            <TextBlock Grid.Row="17" Grid.Column="0" Style="{StaticResource LabelName}">Manifest:</TextBlock>
+            <Button Name="ButtonSaveManifest" Grid.Row="17" Grid.Column="1" Width="112" Height="24" >
+                Save Manifest
+            </Button>
+            <TextBlock Grid.Row="18" Grid.Column="1" Style="{StaticResource LabelNote}">
+                Save the Package Manifest (package.json) File.<LineBreak />
+                Add/Update your Profiles, Images and Scripts to the respective Sub-Folder in the _Package Folder.<LineBreak />
+                When you have added your Package Contents, use the Create Package Button below to create a Package File. It will be stored in the _Releases Folder.
+            </TextBlock>
+
+            <TextBlock Grid.Row="19" Grid.Column="0" Style="{StaticResource LabelName}" Margin="0,10,0,0">Package:</TextBlock>
+            <Button Grid.Row="19" Grid.Column="1" Name="ButtonCreatePackage" Width="112" MinHeight="24" FontWeight="DemiBold" Margin="0,10,0,0" >
+                Create Package
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

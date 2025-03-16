@@ -3,7 +3,6 @@ using CFIT.AppTools;
 using PilotsDeck.Simulator.XP.WS.Messages;
 using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;

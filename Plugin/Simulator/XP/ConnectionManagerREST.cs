@@ -6,7 +6,6 @@ using PilotsDeck.Simulator.XP.WS.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text.Json;

@@ -3,9 +3,51 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:ProfileManager"
         mc:Ignorable="d"
-        Title="Profile Manager" SizeToContent="WidthAndHeight" MinWidth="760" Width="760" MaxWidth="860" MinHeight="675" Height="675" Activated="Window_Activated" Closing="Window_Closing" ResizeMode="NoResize">
+        Title="Profile Manager" SizeToContent="WidthAndHeight" MinWidth="760" Width="760" MaxWidth="860" MinHeight="675" Height="675"
+        Activated="Window_Activated" Closing="Window_Closing" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ControlTemplate x:Key="ThinScrollBar" TargetType="ScrollBar">
+            <Track x:Name="PART_Track" Width="4" IsDirectionReversed="True" IsEnabled="{TemplateBinding IsMouseOver}">
+                <Track.Thumb>
+                    <Thumb>
+                        <Thumb.Style>
+                            <Style TargetType="{x:Type Thumb}">
+                                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                <Setter Property="IsTabStop" Value="False"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Thumb}">
+                                            <Grid>
+                                                <Border x:Name="thumb" BorderThickness="0" Background="Gray" Height="{TemplateBinding Height}" Width="4"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Thumb.Style>
+                    </Thumb>
+                </Track.Thumb>
+            </Track>
+        </ControlTemplate>
+
+        <!--<system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">4</system:Double>-->
+        <system:Double x:Key="{x:Static SystemParameters.HorizontalScrollBarHeightKey}">4</system:Double>
+        <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+            <Setter Property="Width" Value="4"/>
+            <Setter Property="Template" Value="{StaticResource ThinScrollBar}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="Opacity" Value="0.4" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -20,6 +62,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
             <Button Name="ButtonProfileInstaller" Click="ButtonProfileInstaller_Click" Grid.Column="0" Width="128" Height="84" Margin="0,0,24,0" ToolTip="Install and Update Profiles">
@@ -28,20 +71,28 @@
                     <Image Height="48" Width="48" Margin="0,0,0,4" Source="images/download.png"/>
                 </StackPanel>
             </Button>
-            <Button Name="ButtonProfileMapper" Click="ButtonProfileMapper_Click" Grid.Column="1" Width="128" Height="84" Margin="24,0,0,0" ToolTip="Map Profiles for automatic Switching">
+            <Button Name="ButtonProfileMapper" Click="ButtonProfileMapper_Click" Grid.Column="1" Width="128" Height="84" Margin="24,0,24,0" ToolTip="Map Profiles for automatic Switching">
                 <StackPanel Orientation="Vertical">
                     <TextBlock FontWeight="DemiBold" FontSize="14" Margin="0,0,0,8">Profile Mapping</TextBlock>
                     <Image Height="48" Width="48" Margin="0,0,0,4" Source="images/arrow-left-right.png"/>
                 </StackPanel>
             </Button>
+            <Button Name="ButtonCreatePackage" Click="ButtonCreatePackage_Click" Grid.Column="2" Width="128" Height="84" Margin="24,0,0,0" ToolTip="Create a Package File for Distribution">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontWeight="DemiBold" FontSize="14" Margin="0,0,0,8">Create Package</TextBlock>
+                    <Image Height="48" Width="48" Margin="0,0,0,4" Source="images/box-seam.png"/>
+                </StackPanel>
+            </Button>
         </Grid>
 
         <TextBlock Grid.Row="1" Name="LabelDesc" Visibility="Visible" Margin="24,96,24,0" FontSize="14" FontWeight="DemiBold" MaxWidth="612" TextWrapping="Wrap" HorizontalAlignment="Center">
-            This Tools serves two Purposes:<LineBreak/><LineBreak/>
+            This Tools serves three Purposes:<LineBreak/><LineBreak/>
             1. Install Profiles and their associated Files (Images, Scripts) from 'PilotsDeck Profile Package' (.ppp) Archive-Files.<LineBreak/><LineBreak/>
             
             2. Configuring installed Profiles to switch automatically based on the current Aircraft or Simulator (with some basic Profile Management like changing Names or delete Profiles).<LineBreak/>
-            Use the 'Profile Switcher' Action on your StreamDeck to get the Aircraft String of the current Aircraft.
+            Use the 'Profile Switcher' Action on your StreamDeck to get the Aircraft String of the current Aircraft.<LineBreak/><LineBreak/>
+            
+            3. Create a Profile Package File for Distribution.
         </TextBlock>
 
         <ScrollViewer Grid.Row="2" Grid.Column="0" Name="ContentArea" Margin="12" HorizontalAlignment="Stretch" CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">

@@ -135,6 +135,11 @@ namespace PilotsDeck.Actions.Simple
                     Logger.Debug($"Changed 'FontSize' {oldSize} => {Settings.FontSize}");
                 }
 
+                if (Settings.BUILD_VERSION < 8)
+                {
+                    Settings.UseXpCommandOnce = true;
+                }
+
                 Logger.Information($"Converted Settings for '{ActionID}' from Version {Settings.BUILD_VERSION} to {AppConfiguration.BuildModelVersion}");
                 Settings.BUILD_VERSION = AppConfiguration.BuildModelVersion;
                 SettingModelUpdated = true;

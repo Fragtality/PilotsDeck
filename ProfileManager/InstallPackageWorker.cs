@@ -261,7 +261,7 @@ namespace ProfileManager
                 return;
             }
 
-            await ProfileController.SwapUpdateManifest(query.Select(p => p.ProfileName).ToList());
+            await ProfileController.SwapUpdateManifest([.. query.Select(p => p.ProfileName)]);
         }
 
         public static bool SetStreamDeckWindowForeground()

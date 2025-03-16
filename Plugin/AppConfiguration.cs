@@ -37,7 +37,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static string ColorFile { get; } = "ColorStore.json";
         [JsonIgnore]
-        public static int BuildModelVersion { get; } = 8;
+        public static int BuildModelVersion { get; } = 9;
         [JsonIgnore]
         public static int BuildConfigVersion { get; } = 13;
         [JsonIgnore]

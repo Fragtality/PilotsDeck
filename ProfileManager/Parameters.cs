@@ -28,11 +28,6 @@ namespace ProfileManager
         public static readonly string STREAMDECK_PATH = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Elgato\StreamDeck";
         public static readonly string SD_PROFILE_PATH = $@"{STREAMDECK_PATH}\ProfilesV2";
         public static readonly string SD_PROFILE_MANIFEST = "manifest.json";
-        public static readonly string SD_REG_PATH = @"HKEY_CURRENT_USER\SOFTWARE\Elgato Systems GmbH\StreamDeck";
-        public static readonly string SD_REG_VALUE_FOLDER = "Folder";
-        public static readonly string SD_DEFAULT_FOLDER = @"C:\Program Files\Elgato\";
-        public static readonly string SD_BINARY_NAME = "StreamDeck";
-        public static readonly string SD_BINARY_EXE = $"{SD_BINARY_NAME}.exe";
         public static readonly string SD_WINDOW_NAME = "Stream Deck";
         public static readonly string SD_PROFILE_EXTENSION = ".streamDeckProfile";
 
@@ -54,6 +49,7 @@ namespace ProfileManager
         public static readonly string PLUGIN_MAPPING_DEVICEINFO = "DeviceInfo.json";
         public static readonly string PLUGIN_MAPPING_FILE = "ProfileMappings.json";
 
+        public static readonly int PACKAGE_BUILDVERSION = 1;
         public static readonly string PACKAGE_EXTENSION_NAME = "PilotsDeck Profile Package";
         public static readonly string PACKAGE_EXTENSION = ".ppp";
         public static readonly string PACKAGE_JSON_FILE = "package.json";

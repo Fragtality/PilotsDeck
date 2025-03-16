@@ -80,6 +80,7 @@ namespace ProfileManager
         private void ShowInstallerView(string filename = null)
         {
             ButtonEnable(ButtonProfileMapper);
+            ButtonEnable(ButtonCreatePackage);
             ButtonDisable(ButtonProfileInstaller);
             var view = new ViewProfileInstaller();
             ContentArea.CanContentScroll = true;
@@ -166,6 +167,7 @@ namespace ProfileManager
                 }
 
                 ButtonEnable(ButtonProfileInstaller);
+                ButtonEnable(ButtonCreatePackage);
                 ButtonDisable(ButtonProfileMapper);
                 ContentArea.CanContentScroll = false;
                 ContentArea.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
@@ -175,6 +177,14 @@ namespace ProfileManager
             {
                 Logger.LogException(ex);
             }
+        }
+
+        private void ButtonCreatePackage_Click(object sender, RoutedEventArgs e)
+        {
+            ContentArea.Content = new ViewCreatePackage();
+            ButtonEnable(ButtonProfileInstaller);
+            ButtonEnable(ButtonProfileMapper);
+            ButtonDisable(ButtonCreatePackage);
         }
 
         protected async Task StartStopStreamDeck(DeckProcessOperation operation)

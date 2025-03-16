@@ -63,6 +63,13 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
                     }
                 }
 
+                if (settings.BUILD_VERSION < 8)
+                {
+                    foreach (var type in settings.ActionCommands.Values)
+                        foreach(var command in type)
+                            command.Value.UseXpCommandOnce = true;
+                }
+
                 Logger.Information($"Converted Settings for '{sdEvent.context}' from Version {settings.BUILD_VERSION} to {AppConfiguration.BuildModelVersion}");
                 settings.BUILD_VERSION = AppConfiguration.BuildModelVersion;
                 updated = true;

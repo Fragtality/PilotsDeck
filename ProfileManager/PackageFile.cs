@@ -366,12 +366,12 @@ namespace ProfileManager
 
         protected string GetFileDestinationPath(string sourcePath)
         {
-            return sourcePath.Remove(0, ProfileWorkPath.Length).Insert(0, Parameters.PLUGIN_PATH);
+            return sourcePath[ProfileWorkPath.Length..].Insert(0, Parameters.PLUGIN_PATH);
         }
 
         protected string ChangeFileDestinationPath(string sourcePath, string destinationPath)
         {
-            return sourcePath.Remove(0, ProfileWorkPath.Length + 1 + Parameters.PACKAGE_PATH_EXTRAS.Length).Insert(0, destinationPath);
+            return sourcePath[(ProfileWorkPath.Length + 1 + Parameters.PACKAGE_PATH_EXTRAS.Length)..].Insert(0, destinationPath);
         }
 
         protected static bool IsProfilePath(string filepath)
