@@ -18,7 +18,7 @@ namespace Installer
             Items.Add(new ConfigItemCheckbox("vJoy Driver", "Install/Update vJoy Driver (recommended)", Config.OptionVjoyInstallUpdate, Config));
 
             if (Config.Mode == SetupMode.UPDATE)
-                Items.Add(new ConfigItemCheckbox("Reset Configuration", "Reset Plugin Configuration to default (only for Troubleshooting)", Config.OptionResetConfiguration, Config));
+                Items.Add(new ConfigItemCheckbox("Reset Configuration", "Reset Plugin Configuration to Default (only for Troubleshooting)", Config.OptionResetConfiguration, Config));
         }
 
         protected override void SetFooter()

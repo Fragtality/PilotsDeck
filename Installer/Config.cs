@@ -46,9 +46,9 @@ namespace Installer
 
         //Worker: FSUIPC7
         public virtual bool Fsuipc7Required { get; set; } = true;
-        public virtual string Fsuipc7Version { get; set; } = "7.5.2";
+        public virtual string Fsuipc7Version { get; set; } = "7.5.3";
         public virtual string Fsuipc7WasmVersion { get; set; } = "1.0.7";
-        public virtual string Fsuipc7Url { get; set; } = "https://www.fsuipc.com/download/Install_FSUIPC7.5.2.zip";
+        public virtual string Fsuipc7Url { get; set; } = "https://fsuipc.simflight.com/beta/Install_FSUIPC7.zip";
         public virtual bool Fsuipc7AllowBeta { get; set; } = false;
         public virtual bool Fsuipc7CheckPumps { get; set; } = true;
 

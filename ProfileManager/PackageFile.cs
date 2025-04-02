@@ -23,7 +23,7 @@ namespace ProfileManager
             public string FileName { get; set; } = filename;
             public string ProfileName { get; set; } = profilename;
             public bool HasOldProfile { get; set; } = false;
-            public string InstallPath { get { return @$"{Parameters.PLUGIN_PROFILE_PATH}\{FileName}"; } }
+            public string InstallPath { get { return $"\"{Parameters.PLUGIN_PROFILE_PATH}\\{FileName}\""; } }
             public bool IsInstalled { get; set; } = false;
             public PackageClickResponse ClickResponse { get; set; } = PackageClickResponse.NotClicked;
             public bool IsLinkDisabled { get; set; } = false;
