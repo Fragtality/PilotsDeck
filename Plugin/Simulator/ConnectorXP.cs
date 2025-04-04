@@ -151,7 +151,7 @@ namespace PilotsDeck.Simulator
                 RestTask.Start();
             }
 
-            if (UseWebAPI && SimState >= SimulatorState.LOADING && ConnectionREST.IsConnected)
+            if (UseWebAPI && SimState >= SimulatorState.LOADING && ConnectionREST.IsConnected && !ConnectionUDP.IsLoading)
             {
                 if (!ConnectionREST.HasEnumeratedRefs)
                     _ = ConnectionREST.OnSessionEnter();

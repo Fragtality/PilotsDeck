@@ -49,6 +49,7 @@ namespace PilotsDeck.Simulator.XP.WS
                 SubscribedDataIds.Add(idMapping.RefId, [idMapping]);
 
             SubscribedDataAddresses.TryAdd(idMapping.Address, idMapping);
+            Logger.Verbose($"Subscribed Mapping for '{idMapping.Address}' => '{idMapping.RefId}'");
         }
 
         public virtual bool GetMapping(ManagedVariable variable, out IdMappingXP idMapping)

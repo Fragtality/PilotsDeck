@@ -68,7 +68,7 @@
   "XPlaneStateCheckInterval": 1000,
   "XPlaneTimeoutReceive": 3000,
   "XPlaneUseLiveryRefOn12": false,
-  "XPlaneUseWebApi": true,
+  "XPlaneUseWebApi": false,
   "XPlaneWebApiHost": "127.0.0.1:8086",
   "XPlaneWebApiKeepAlive": 10000,
   "MsfsRetryDelay": 30000,

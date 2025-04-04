@@ -25,6 +25,8 @@ namespace PilotsDeck.Simulator.XP
         public virtual int RequestID { get; protected set; } = 1;
         protected virtual ConcurrentDictionary<int, OutstandingRequest> OutstandingRequests { get; } = [];
         public virtual ConcurrentDictionary<long, bool> ActiveCommands { get; } = [];
+        protected virtual ConcurrentDictionary<long, bool> ActiveSubRequests { get; } = [];
+        protected virtual ConcurrentDictionary<long, bool> ActiveUnsubRequests { get; } = [];
         public virtual bool HasEnumeratedRefs => WebSocket.HasEnumeratedRefs;
         protected virtual bool IsWorking { get; set; } = false;
 
@@ -133,20 +135,28 @@ namespace PilotsDeck.Simulator.XP
                     else if (request.Type == RequestType.SubscribeDataRef && request.RequestData is List<IdMappingXP> subscribeList)
                     {
                         foreach (var sub in subscribeList)
+                        {
                             MappingManager.AddDataRef(sub);
+                            ActiveSubRequests.Remove(sub.RefId);
+                        }
                     }
                     else if (request.Type == RequestType.UnsubscribeDataRef && request.RequestData is UnsubscribeAllRefMessage)
                     {
                         MappingManager.RemoveAllDataRef();
+                        ActiveSubRequests.Clear();
+                        ActiveUnsubRequests.Clear();
                     }
                     else if (request.Type == RequestType.UnsubscribeDataRef && request.RequestData is List<IdMappingXP> unsubscribeList)
                     {
                         foreach (var sub in unsubscribeList)
+                        {
                             MappingManager.RemoveDataRef(sub);
+                            ActiveUnsubRequests.Remove(sub.RefId);
+                        }
                     }
                     else if (request.Type == RequestType.SetCommandActive)
                     {
-                        Logger.Verbose($"Command Request with Request ID '{request.ID}' succeeded");
+                        Logger.Debug($"Command Request with Request ID '{request.ID}' succeeded");
                     }
                     else
                         Logger.Warning($"Unknown Result for Request ID '{result.req_id}' received - Type {result.type}");
@@ -154,7 +164,12 @@ namespace PilotsDeck.Simulator.XP
                     OutstandingRequests.Remove(result.req_id);
                 }
                 else
-                    Logger.Warning($"Request ID '{result.req_id}' not in outstanding Requests - Type: {result.type}");
+                {
+                    if (result.req_id != 0)
+                        Logger.Warning($"Request ID '{result.req_id}' not in outstanding Requests - Type: {result.type} - json: {json}");
+                    else
+                        Logger.Verbose($"Request ID '{result.req_id}' not in outstanding Requests - Type: {result.type} - json: {json}");
+                }
             }
             else if (result.type == ResultType.UpdateDataRef)
             {
@@ -166,12 +181,16 @@ namespace PilotsDeck.Simulator.XP
                         Logger.Warning($"Could not parse or find ID '{update.Key}'");
                         continue;
                     }
-
+                    if (App.Configuration.LogLevel == LogLevel.Verbose)
+                        Logger.Verbose($"Update for id '{id}': {update.Value}");
                     MappingManager.UpdateRef(id, (JsonElement)update.Value);
                 }
             }
             else
+            {
                 Logger.Warning($"Unknown Message with ID '{result.req_id}' received - Type: {result.type}");
+            }
+                
         }
 
         protected virtual bool DoRefSubscribe(ManagedAddress address, out long id)
@@ -202,15 +221,26 @@ namespace PilotsDeck.Simulator.XP
                     Logger.Warning($"DataRef is not in known List: {managedVariable.Address.Name}");
                     continue;
                 }
+                if (ActiveSubRequests.ContainsKey(id))
+                    continue;
+                Logger.Verbose($"Adding '{id}' => '{managedVariable.Address}' to Subscribe List");
                 subscribeList.Add(IdMappingXP.Create(id, managedVariable));
             }
+
+            if (subscribeList.Count == 0)
+                return;
 
             SubscribeDataRefMessage subscribeMessage = new(RequestID++);
             foreach (var sub in subscribeList)
                 subscribeMessage.AddDataRef(sub.RefId);
 
+            Logger.Verbose($"Sending Subscribe DataRef Request '{subscribeMessage.req_id}' - Count {subscribeList.Count}");
             OutstandingRequests.Add(subscribeMessage.req_id, OutstandingRequest.Create(subscribeMessage.req_id, subscribeList, subscribeMessage.type));
             await WebSocket.SendJsonRequest(subscribeMessage);
+            Logger.Verbose($"Request sent.");
+            if (App.Configuration.LogLevel == LogLevel.Verbose)
+                foreach (var sub in subscribeList)
+                    ActiveSubRequests.Add(sub.RefId);
         }
 
         public virtual async Task UnsubscribeVariables(ManagedVariable[] managedVariables)
@@ -224,9 +254,12 @@ namespace PilotsDeck.Simulator.XP
             List<IdMappingXP> unsubscribeList = [];
             foreach (var managedVariable in managedVariables.Where(m => m.IsValueXP()))
             {
-                if (MappingManager.GetMapping(managedVariable, out var idMapping))
+                if (MappingManager.GetMapping(managedVariable, out var idMapping) && !ActiveUnsubRequests.ContainsKey(idMapping.RefId))
                     unsubscribeList.Add(idMapping);
             }
+
+            if (unsubscribeList.Count == 0)
+                return;
 
             UnsubscribeDataRefMessage unsubscribeMessage = new(RequestID++);
             foreach (var sub in unsubscribeList)
@@ -234,6 +267,8 @@ namespace PilotsDeck.Simulator.XP
 
             OutstandingRequests.Add(unsubscribeMessage.req_id, OutstandingRequest.Create(unsubscribeMessage.req_id, unsubscribeList, unsubscribeMessage.type));
             await WebSocket.SendJsonRequest(unsubscribeMessage);
+            foreach (var sub in unsubscribeList)
+                ActiveUnsubRequests.Add(sub.RefId);
         }
 
         public virtual async Task UnsubscribeAllRefs()
@@ -319,9 +354,12 @@ namespace PilotsDeck.Simulator.XP
                     message.AddCommandRef(id, true, 0);
                 ActiveCommands.TryRemove(id, out _);
             }
-
+            
+            var cid = message.@params.commands.First().id;
+            Logger.Debug($"Sending Command Request '{message.req_id}': {cid} -> {WebSocket.KnownCommands[cid].name} | {message.@params.commands.First().duration} | {message.@params.commands.First().is_active}");
             OutstandingRequests.Add(message.req_id, OutstandingRequest.Create(message.req_id, message, RequestType.SetCommandActive));
             await WebSocket.SendJsonRequest(message);
+            Logger.Debug($"Command sent.");
             return true;
         }
 
