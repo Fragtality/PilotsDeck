@@ -36,11 +36,18 @@ namespace ProfileManager
 
                 ExecuteCommandLine();
                 ButtonProfileInstaller_Click(null, null);
+                this.SizeChanged += MainWindow_SizeChanged;
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
             }
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (this.Top + this.Height > (SystemParameters.PrimaryScreenHeight - SystemParameters.FullPrimaryScreenHeight - SystemParameters.WindowCaptionHeight) && this.Top != 24)
+                this.Top = 24;
         }
 
         private void ExecuteCommandLine()
@@ -182,6 +189,8 @@ namespace ProfileManager
         private void ButtonCreatePackage_Click(object sender, RoutedEventArgs e)
         {
             ContentArea.Content = new ViewCreatePackage();
+            ContentArea.CanContentScroll = true;
+            ContentArea.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             ButtonEnable(ButtonProfileInstaller);
             ButtonEnable(ButtonProfileMapper);
             ButtonDisable(ButtonCreatePackage);
