@@ -32,7 +32,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
 
         protected virtual string SelectName()
         {
-            return string.IsNullOrWhiteSpace(Source.Name) ? $"[{CommandType}] {Source.Address.Compact()}" : Source.Name;
+            return string.IsNullOrWhiteSpace(Source.Name) ? $"{CommandType} - {Source.Address.Compact()}" : Source.Name;
         }
 
         protected virtual void NotifyTypeChange()

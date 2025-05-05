@@ -41,7 +41,7 @@ namespace ProfileManager
         protected ObservableCollection<string> GetAircraftCollection()
         {
             if (HasMapping)
-                return new(Mapping.AircraftStrings);
+                return [.. Mapping.AircraftStrings];
             else
                 return [];
         }
@@ -159,7 +159,7 @@ namespace ProfileManager
             if (!HasMapping)
                 return;
 
-            Mapping.AircraftStrings = new(aircraftList);
+            Mapping.AircraftStrings = [.. aircraftList];
             Mapping.IsChanged = true;
             UpdateModel();
         }

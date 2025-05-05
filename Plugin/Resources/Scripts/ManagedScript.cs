@@ -117,7 +117,7 @@ namespace PilotsDeck.Resources.Scripts
                 CreateEnvironment();
 
                 string code = File.ReadAllText(GetScriptFolder(FileName));
-                LuaChunk = LuaEngine.CompileChunk(code, FileName, new LuaCompileOptions() { ClrEnabled = false });
+                LuaChunk = LuaEngine.CompileChunk(code, FileName, new LuaCompileOptions() { ClrEnabled = false, DebugEngine = LuaExceptionDebugger.Default });
                 DoChunk();
 
                 Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script started by ScriptManager"));
@@ -134,24 +134,7 @@ namespace PilotsDeck.Resources.Scripts
             if (IsRunning)
                 DeregisterAllVariables();
 
-            LuaChunk?.Lua?.Clear();
-            LuaChunk = null;
-
-            if (LuaEnv != null)
-            {
-                LuaEnv?.Clear();
-                LuaEnv = null;
-            }
-
-            if (LuaEngine != null)
-            {
-                LuaEngine.Clear();
-                LuaEngine.Dispose();
-                LuaEngine = null;
-            }
-
-            Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script stopped by ScriptManager"));
-            Logger.Debug($"Script stopped: {FileName}");
+ 
         }
 
         public virtual void Reload()
@@ -342,7 +325,7 @@ namespace PilotsDeck.Resources.Scripts
             return true;
         }
 
-        protected virtual bool JoystickCommand(string name, string operation) //TODO test new command for vJoy
+        protected virtual bool JoystickCommand(string name, string operation)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(operation))
                 return false;

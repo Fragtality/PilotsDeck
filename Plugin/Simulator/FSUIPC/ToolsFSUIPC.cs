@@ -180,7 +180,7 @@ namespace PilotsDeck.Simulator.FSUIPC
             }
         }
 
-        public async static Task<bool> RunVjoyClearSet(ManagedAddress address) //TODO acts differently than vjoy Drv?!
+        public async static Task<bool> RunVjoyClearSet(ManagedAddress address)
         {
             bool result = false;
             if (VjoyClearSet(address, false))

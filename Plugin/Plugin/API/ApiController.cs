@@ -61,6 +61,10 @@ namespace PilotsDeck.Plugin.API
             Logger.Debug($"Handling Request: {url}");
             if (url.StartsWith("get/"))
                 await HandleVariableReadRequest(context, url.Replace("get/", ""));
+            else if (url.StartsWith("register/"))
+                HandleVariableRegisterRequest(context, url.Replace("register/", ""));
+            else if (url.StartsWith("unregister/"))
+                HandleVariableUnregisterRequest(context, url.Replace("unregister/", ""));
             else if (url.StartsWith("set/"))
                 HandleVariableWriteRequest(context, url.Replace("set/", ""));
             else if (url.StartsWith("send/"))
@@ -75,6 +79,32 @@ namespace PilotsDeck.Plugin.API
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
             Logger.Debug($"Result: {context.Response.StatusCode}");
+        }
+
+        protected virtual void HandleVariableRegisterRequest(HttpListenerContext context, string variableName)
+        {
+            var address = new ManagedAddress(variableName);
+            if (!VariableManager.TryGet(address, out _))
+            {
+                if (VariableManager.RegisterVariable(address) != null)
+                    context.Response.StatusCode = (int)HttpStatusCode.OK;
+                else
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+            else
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+        }
+
+        protected virtual void HandleVariableUnregisterRequest(HttpListenerContext context, string variableName)
+        {
+            var address = new ManagedAddress(variableName);
+            if (VariableManager.TryGet(address, out _))
+            {
+                VariableManager.DeregisterVariable(address);
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            else
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
         }
 
         protected virtual async Task HandleVariableReadRequest(HttpListenerContext context, string variableName)
@@ -104,14 +134,14 @@ namespace PilotsDeck.Plugin.API
         protected virtual void HandleVariableWriteRequest(HttpListenerContext context, string variableAssignment)
         {
             var idx = variableAssignment.IndexOf('=');
-            if (idx == -1 || string.IsNullOrWhiteSpace(variableAssignment) || idx >= variableAssignment.Length || string.IsNullOrWhiteSpace(variableAssignment[(idx + 1)..]))
+            if (idx == -1 || string.IsNullOrWhiteSpace(variableAssignment) || idx >= variableAssignment.Length)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return;
             }
 
             var address = new ManagedAddress(variableAssignment[0..idx]);
-            var value = variableAssignment[(idx + 1)..];
+            var value = WebUtility.UrlDecode(variableAssignment[(idx + 1)..]);
             if (address.ReadType != SimValueType.NONE && VariableManager.TryGet(address, out var variable))
             {
                 variable.SetValue(value);

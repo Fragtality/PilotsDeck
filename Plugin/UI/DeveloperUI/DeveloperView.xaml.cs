@@ -32,12 +32,23 @@ namespace PilotsDeck.UI.DeveloperUI
                     LabelVersionCheck.FontWeight = FontWeights.DemiBold;
                     LabelVersionCheck.FontSize = 14;
                     LabelVersionCheck.Visibility = Visibility.Visible;
-                    LabelVersionCheck.Inlines.Add("New Version ");
+                    if (App.UpdateIsDev)
+                        LabelVersionCheck.Inlines.Add("New Develop Version ");
+                    else
+                        LabelVersionCheck.Inlines.Add("New Stable Version ");
                     var run = new Run($"{App.UpdateVersion}");
-                    var hyperlink = new Hyperlink(run)
-                    {
-                        NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck/releases/latest")
-                    };
+
+                    Hyperlink hyperlink;
+                    if (App.UpdateIsDev)
+                        hyperlink = new Hyperlink(run)
+                        {
+                            NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck-Installer-latest.exe")
+                        };
+                    else
+                        hyperlink = new Hyperlink(run)
+                        {
+                            NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck/releases/latest")
+                        };
                     LabelVersionCheck.Inlines.Add(hyperlink);
                     LabelVersionCheck.Inlines.Add(" available!");
                     this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Nav.RequestNavigateHandler));

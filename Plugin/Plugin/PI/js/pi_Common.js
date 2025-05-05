@@ -187,14 +187,14 @@ function setPattern(field, type, donotrequest) {
 	var validNameKvar = "[^:\\s][a-zA-Z0-9\\x2D\\x5F\\x2E]+";
 	var regNameMultipleXP = "[a-zA-Z0-9\\x2D\\x5F\\x2B]+";
 	var regLVarName = "[^:\\s][a-zA-Z0-9\\x2D\\x5F\\x2E\\x20]+([\\x3A][0-9]+){0,1}";	
-	var regLvar = `^((L:|[^:0-9]){1}${regLVarName}){1}$`;
-	var strHvar = `((H:||[^:0-9]){1}${regName}(:[0-9]+){0,1}){1}`;
+	var regLvar = `^((L:|[^:0-9\\x2F]){1}(${regLVarName})){1}$`;
+	var strHvar = `((?!K:)(?!B:)(H:|[^:0-9]){1}${regName}(:[0-9]+){0,1}){1}`;
 	var regHvar = `^(${strHvar}){1}(:${strHvar})*$`;
-	var regDref = `^(${regNameXP}[\\x2F]){1}(${regNameMultipleXP}[\\x2F])*(${regNameMultipleXP}(([\\x5B][0-9]+[^\\x2F0-9a-zA-Z])|(:s[0-9]+)){0,1}){1}$`;
+	var regDref = `^((${regNameXP}[\\x2F]){1}(${regNameMultipleXP}[\\x2F])*${regNameMultipleXP}){1}(([\\x5B][0-9]+[\\x5D])|(:s[0-9]+)){0,1}$`;
 	var strPathXP = `(${regNameXP}[\\x2F]){1}(${regNameMultipleXP}[\\x2F])*(${regNameMultipleXP}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
-	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,3}((:[ifsa]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
-	var regAvar = `^\\(((A|E|L):){0,1}[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}[\\w][\\w/ ]+\\)$`;
+	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,4}((:[ifsa]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
+	var regAvar = `^^\\(((A|E|L):){0,1}([\\w][\\w ]+(:\\d+){0,1}),\\s{0,1}([\\w][\\w/ ]+)\\)$`;
 	var regBvarValue = `^(B:${regName}){1}$`;
 	var strBvarCmd = `((B:){0,1}${regName}(:[\\x2D\\x2B]{0,1}[0-9]+([\\x2C\\x2E]{1}[0-9]+){0,1}){0,1}){1}`;
 	var regBvarCmd = `^(${strBvarCmd}){1}(:${strBvarCmd})*$`;
@@ -206,11 +206,11 @@ function setPattern(field, type, donotrequest) {
 	var regCalcRead = `^C:[^\\s].+$`
 	
 	if (type == 0) //macro
-		document.getElementById(field).pattern = `^([^0-9]{1}${regName}(:${regName}){1,}){1}$`;
+		document.getElementById(field).pattern = `^([^:0-9]{1}${regName}:(${regName}){0,1}(:${regName}){0,}){1}$`;
 	else if (type == 1) //script
-		document.getElementById(field).pattern = `^Lua(Set|Clear|Toggle|Value)?:${regName}(:[0-9]{1,4})*$`;
+		document.getElementById(field).pattern = `^(Lua(Set|Clear|Toggle|Value)?:){1}${regName}(:[0-9]{1,4})*$`;
 	else if (type == 2) //control
-		document.getElementById(field).pattern = "^([0-9]+)$|^(([0-9]+\\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\\=[0-9]+(:[0-9]+)*){1})*)$|^[0-9]+(:[0-9]+)*$";
+		document.getElementById(field).pattern = "^^([0-9]+)$|^(([0-9]+\\=[0-9]+(:[0-9]+)*){1}(:([0-9]+\\=[0-9]+(:[0-9]+)*){1})*)$";
 	else if (type == 3)  //lvar
 		document.getElementById(field).pattern = regLvar;
 	else if (type == 4)  //offset

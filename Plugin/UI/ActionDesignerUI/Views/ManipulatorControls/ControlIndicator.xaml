@@ -123,17 +123,5 @@
                 <Image Source="../../../Icons/arrows-expand.png" Style="{StaticResource ImgSquareSmall}"/>
             </Button>
         </StackPanel>
-
-        <!--<Label Grid.Row="8" Grid.Column="0" Style="{StaticResource DesignerLabelM8}">
-            Size / Offset:
-        </Label>
-        <Grid Grid.Row="8" Grid.Column="1" Margin="0,8,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Name="InputSize" Margin="0,0,4,0" Style="{StaticResource InputIndicator}"/>
-            <TextBox Grid.Column="1" Name="InputOffset" Margin="4,0,0,0" Style="{StaticResource InputIndicator}"/>
-        </Grid>-->
     </Grid>
 </UserControl>

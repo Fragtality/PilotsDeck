@@ -33,7 +33,6 @@
             </Track>
         </ControlTemplate>
 
-        <!--<system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">4</system:Double>-->
         <system:Double x:Key="{x:Static SystemParameters.HorizontalScrollBarHeightKey}">4</system:Double>
         <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
             <Setter Property="Width" Value="4"/>

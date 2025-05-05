@@ -56,7 +56,7 @@ How Commands and Variables are configured and the different Options how they can
 | [**VJOY**](#vjoy) | Toggle/Clear/Set a Button of a virtual Joystick from *FSUIPC* | ✔️ | ✖️ | MSFS, P3D, FSX |
 | [**VJOYDRV**](#vjoydrv) | Toggle/Clear/Set a Button of a virtual Joystick from the known *vJoy Device Driver* (if installed) | ✔️ | ✖️ | ALL |
 | [**AVAR**](#avar) | Read from / Write to any Simulation Variable (also known as A-Var) | ✔️ | ✔️ | MSFS |
-| [**KVAR**](#kvar) | Send / Write to any Event-ID (also known as K-Var / SimConnect Event) | ✔️ | ✖️ | MSFS |
+| [**KVAR**](#kvar) | Send / Write to any Event-ID (also known as K-Var / SimConnect Event) | ✔️ | ✔️\*\*\* | MSFS |
 | [**HVAR**](#hvar) | Trigger any HTML Event in the Simulator (also known as H-Var) | ✔️ | ✖️ | MSFS |
 | [**BVAR**](#bvar) | Trigger InputEvents (also known as B-Var) - but only those that MSFS enumerates via SimConnect | ✔️ | (✔️)\* | MSFS |
 | [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✔️\*\* | MSFS |
@@ -68,6 +68,7 @@ How Commands and Variables are configured and the different Options how they can
 
 \* = Per Default, B-Vars treated as Command-only Type - only some B-Var have an actual Value to read.<br/>
 \*\* = While you can read the Result from a RPN Expression, you can't write to it (like with other Variable Types).<br/>
+\*\*\* = Will only be updated when the Event is received.<br/>
 :grey_exclamation: Please mind that the Command Types Script, Macro, Lvar (on P3D/FSX) and vJoy can only work with a **registered** Version of FSUIPC!<br/>
 :grey_exclamation: Both **vJoy** Command Types are independent of each other and are two different Things! "VJOY" can only be assigned within FSUIPC (and not in the Simulator). The "VJOYDRV" can be assigned by anything which understands a Joystick Button (Simulator, FSUIPC, Addons, ...).
 <br/><br/><br/>
@@ -95,7 +96,10 @@ How to add Custom Images is described under [3.3 - Custom Images](#33---custom-i
 <br/><br/><br/>
 
 ## 1.4 - Install, Update, Remove
-Just [Download](https://github.com/Fragtality/PilotsDeck/releases/latest) & Run the **Installer** Binary! It will check and install all Requirements and installs/updates the Plugin (or remove it).<br/><br/>
+Just [Download](https://github.com/Fragtality/PilotsDeck/releases/latest) & Run the **Installer** Binary! It will check and install all Requirements and installs/updates the Plugin (or remove it).<br/>
+On the second Installer Page there are some Options to customize the Process - in most Cases it is recommended to leave them at the preselected Default!<br/>
+You do *not* need to remove the old Version for an Update - using 'Remove' in the Installer will also **remove all custom** Images and Scripts!<br/>
+<br/><br/>
 It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues because either the Binary is blocked from running or is blocked when connecting to the StreamDeck Software.<br/>
 **DO NOT** run the Installer, Plugin or StreamDeck Software "as Admin". It is not recommended to MSFS or FSUIPC7 "as Admin" - it might work, it might fail.<br/>
 If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
@@ -105,7 +109,7 @@ The Requirements for the Plugin:
 - [**.NET 8**](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary. Reboot recommended when the Runtime was installed for the first Time.
 - If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
 - If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest) - will be installed/updated by the Installer, if necessary.
-- Optional: If you want to use **VJOYDRV** Commands you need the [BrunnerInnovations Fork](https://github.com/BrunnerInnovation/vJoy/releases/latest) of the vJoy Driver - the installer will check the State, and offers to optionally install/update it for you.<br/>NOTE: If you install the vJoy Driver for the first Time, don't forget that you need to enable at least one Joystick in the vJoyConf Application to use it!
+- Optional: If you want to use **VJOYDRV** Commands you need the [BrunnerInnovations Fork](https://github.com/BrunnerInnovation/vJoy/releases/latest) of the vJoy Driver - the installer will check the State, and offers to optionally install/update it for you.<br/>**NOTE**: If you install the vJoy Driver for the first Time, don't forget that you need to enable at least one Joystick in the vJoyConf Application to use it!
 
 <br/>
 The Plugin will be installed to:
@@ -115,11 +119,8 @@ The Plugin will be installed to:
 It is automatically started with the StreamDeck Software. It will spawn its own Icon in the System-Tray / Notification Area. Use this Icon to see if a Plugin Update is available, to access the [Developer UI](#32---developer-ui) or open the **Profile Manager** to configure [Profile Switching](#34---profile-switching).<br/>
 <img src="img/Plugin-Systray.png" width="267"><br/><br/>
 
-**Note:** Since FSUIPC is only a "secondary" Connector for MSFS, you do not need to have it installed anymore (for MSFS). If you not plan to install/run FSUIPC7, please set the Parameter *UseFsuipcForMSFS* to *false* in the [Plugin Configuration File](#41---plugin-settings) (*PluginConfig.json*) after Installation!<br/>
+**Note:** Since FSUIPC is only a "secondary" Connector for MSFS, you do not need to have it installed anymore (for MSFS). If you not plan to install/run FSUIPC7, uncheck the respective Option in the Installer!<br/>
 But be aware that some older Profiles might still use Commands and Variables from FSUIPC and might not fully work then.
-
-<br/><br/>
-**Note** for Users of **MobiFlight Connect** Software: The Plugin will alter L-Vars per Frame Setting of the WASM Module to 100 (default is 30).
 
 <br/><br/><br/>
 
@@ -133,7 +134,7 @@ Starting with Version 0.8.0, the Plugin greatly improves Distribution and Instal
 3. If you already have Profiles with the same Name (as shown in the StreamDeck UI), the App will **remove the old** Profiles (and update existing Profile Mappings to the new ones). If want to keep the old Profiles, **uncheck** 'Remove old Profiles'.<br/>
 If you want to keep the extracted Package Contents, check *Keep extracted Files ...*. The Contents will be kept in Profiles Sub-Folder of the Plugin (named after the Package Name).<br/><br/>
 4. Click Install. Note that the StreamDeck Software will be automatically started and stopped as needed.<br/><br/>
-5. The App will extract and copy the Images and Scripts to the Plugin Directory for you.<br/>The Profiles need to be installed through the StreamDeck UI: **Click on the Link** displayed in the Profile Manager App, wait for the StreamDeck UI to come up and the select the correct StreamDeck to install the clicked Profile to. Repeat for each Profile.<br/>
+5. The App will extract and copy the Images and Scripts to the Plugin Directory for you.<br/>The Profiles need to be installed through the StreamDeck UI: **Click on the Link** displayed in the Profile Manager App, wait for the StreamDeck UI to come up and the select the correct StreamDeck to install the clicked Profile to. Repeat for each Profile. **NOTE**: All Profiles in the Package must be either installed or ignored before the Installation continues!<br/>
 You need to click every Link for the Installation to finish successfully. If you do not want or need one of the Profiles, just Cancel the Installation in the StreamDeck UI!<br/>
 <img src="img/ProfileManager-Installing.png" width="512"><br/><br/>
 6. If selected, the App will now remove the old Profiles (if your updating existing Profiles), remove the "Copy" from the Profile Name (of the new ones) and update the Profile Mappings (if there are existing Mappings).<br/>**NOTE**: The Update-Mechanic will only work, if you **keep the Profile Name**.<br/><img src="img/ProfileManager-Completed.png" width="512"><br/><br/>
@@ -268,7 +269,7 @@ You can find a **full List** in the "*Controls List...*" Text-File in your *My D
 When used as **Command**, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable.<br/>
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
 
-NOTE for MSFS: The L-Vars will be requested without a Unit from the Sim. Depending on how the Developer writes the Variable, this can lead to strange Results (e.g. getting the Value 0.174533... for an Heading of 10). If you come across such Variables, use a [Calculator](#calculator) Variable with an Expression to read the L-Var in a different Unit!<br/><br/>
+**NOTE for MSFS**: All L-Vars will be request with 'Number' as their Unit. Depending on how the Developer writes the Variable, this can lead to strange Results (e.g. getting the Value 0.174533... for an Heading of 10). If you come across such Variables, use an [AVAR](#avar) Variable with the required Unit!<br/><br/>
 
 *Background*:<br/>
 Local Variables (sometimes "Local Gauge Variables") are created and updated by the Plane. There are no standard L-Vars which could be used on every Plane. There is also no communality if and which L-Vars a specific Plane has. For some Planes it is the official Way to Read and Trigger Cockpit-Controls (e.g. Fenix, QualityWings). For some it is only for Read (e.g. PMDG). For some they exist, but are not really supported or usable sometimes (e.g. FSLabs).<br/>
@@ -298,6 +299,8 @@ Another great Source for L-Vars and (other Stuff) is [HubHop](https://hubhop.mob
 
 Before you use an Offset as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable. Use only 1 or 0 for Bit-Offsets. For byte array offsets, you can either specify the new value as a hex string prefixed with `0x` (e.g. `0xdeadbeef`) or a JSON-like array of hex strings (prefixed with `0x`) or decimal numbers (e.g. `[26,0x3f]`).<br/>
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
+
+Note on Byte Arrays: Their main Purpose is to be used in Lua Scripts - they are not intended (and not tested!) to be used in Actions as Commands or Variables. Check the [Global Scripts](#352---global-scripts) Section to see an Example on how Byte Arrays can be used in Lua.<br/><br/>
 
 *Background*:<br/>
 These Offsets are the way how FSUIPC makes Simulator Variables (also known as A-Vars) accessible to outside Applications (like my Plugin or some Flight Trackers for Example). FSUIPC sticks with that Concept for historical and compatibility Reasons. But not all Offsets are Simulator Variables: the Benefit of that System is that Applications can exchange Data through FSUIPC Offsets. For Example PMDG or Project Magenta use assigned Offset Ranges to share their Data.<br/>
@@ -347,9 +350,10 @@ Using virtual Joysticks is really a great Feature and Solution for specific Use-
 
 
 #### AVAR
-| Command & Variable | MSFS | `(A:Name(:index), Unit)` |
+| Command & Variable | MSFS | `(Prefix:Name(:index), Unit)` |
 | --- | --- | --- |
-- *Name*: The Name of the A-Var as published. You have to prefix it with `A:` and the whole Expression must be enclosed by Parenthesis `( )`.
+- *Prefix*: The Prefix for the Variable: `A:` for Simulation Variables, `E:` for Enviroment Variables, `L:` for Local Variables (L-Vars)
+- *Name*: The Name of the Variable as published. The whole Expression must be enclosed by Parenthesis `( )`.
 - *:index*: (Optional) The Index to access, if the A-Var is a Map/Enum/Mask.
 - *Unit*: The Unit of the A-Var as published separated by a `,` from the Name.
 
@@ -357,6 +361,8 @@ Using virtual Joysticks is really a great Feature and Solution for specific Use-
 - `(A:FUEL RIGHT QUANTITY, Gallons)` - Reading the A-Var *FUEL RIGHT QUANTITY* using *Gallons* as Unit.
 - `(A:FUELSYSTEM PUMP SWITCH:2, Bool)` - Reading Index *2* of the A-Var *FUELSYSTEM PUMP SWITCH* as *Bool* Value.
 - `(A:LIGHT POTENTIOMETER:13, percent over 100)` - Reading Index *13* of the A-Var *LIGHT POTENTIOMETER* as *Percent over 100* Value (0.0 - 1.0).
+- `(L:FCU_HEADING, Degree)` - Reading the L-Var *FCU_HEADING* using *Degree* as Unit.
+- `(E:ZULU TIME, number)` - Reading the Enviroment Variable *ZULU TIME*.
 
 Before you use an A-Var as **Command**, make sure that it is writeable (some are read-only)! When used as Command, you need to specify the **On Value** and the **Off Value**. The Plugin will toggle between these two Values and writes them to the Variable. Use only 1 or 0 for Booleans.<br/>
 In addition to writing plain Values, the Plugin can also do simple Operations like increasing/decreasing the Value or toggling the Value in a defined Sequence. Look under [Command Options](#212---command-options) for Details.<br/><br/>
@@ -369,17 +375,20 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 
 
 #### KVAR
-| Command | MSFS | `Name:Parameter1(:Parameter2-5)*) | Name:Parameter(:Name:Parameter)*` |
+| Command or Variable | MSFS | `(K:)Name(:Parameter){0,5}) | (K:)Name:Parameter(:(K:)Name:Parameter)*` or `K:Name` |
 | --- | --- | --- |
-
 Single K-Var with multiple Values:
 - *Name*: The Name of the K-Var to be set with or without preceding `K:`.
-- *Parameter1*: The first Index/Parameter (required) to set (positive integer Value)
-- *Parameter2-5*: Additional (optional) Indices/Parameters to set (positive integer Value), if the K-Var accepts multiple Values
+- *Parameter*: Zero to Five Parameters to be set on this K-Var (positive integer Value)
 
 Sequence of multiple K-Vars:
 - *Name*: The Name of the K-Var with or without preceding `K:`. You can send multiple Event in a Sequence if you separate them with a `:` Sign.
-- *Parameter1*: The first Index/Parameter (required) to set (positive integer Value). Each K-Var in the Sequence needs exact one Parameter.
+- *Parameter*: The first Index/Parameter (required) to set (positive integer Value). Each K-Var in the Sequence needs exact one Parameter! (Just take 0 or 1 if you don't have a specific Value)
+
+Using a K-Var as **Variable**:
+- The Name *must* be preceded with the `K:` Prefix!
+- The initial Value will be 0 and will only change if the Event is actually received
+- The Value will only reflect the first Index of a K-Var
 
 *Examples*
 - `K:TOGGLE_ALTERNATOR1` - Send the Event *TOGGLE_ALTERNATOR1*.
@@ -499,7 +508,7 @@ In Comparison to other Simulators, X-Plane Commands can be requested to be activ
 
 Per Default the Plugin will trigger X-Plane Commands as "command_once" which is fine for most Buttons, Switches and Knobs. But in Cases of Buttons that need to be hold (kept pressed) for some Time and then released (e.g. CVR Test, TO CONF, Fire Tests) the Configuration depends on your X-Plane Version:
 - For X-Plane Versions *earlier* than 12.1.4: You can only trigger Commands as "command_once". If you need to configure a holdable Switch, you have to use a *vJoy* (Driver) Command (with the corresponding vJoy Button mapped in X-Plane).
-- For X-Plane Versions *at or greater* than 12.1.4: You can enable the *Hold Switch* Option and disable the *Command Once* Option of the Plugin to create an holdable Button/Switch (use the same Command Ref in both Addresses). On the Composite Action you need to add the Command Ref to both the UP and DOWN StreamDeck Events with the *Command Once* Option disabled.
+- For X-Plane Versions *at or greater* than 12.1.4 (and WebAPI enabled in the Plugin Config): You can enable the *Hold Switch* Option and disable the *Command Once* Option of the Plugin to create an holdable Button/Switch (use the same Command Ref in both Addresses). On the Composite Action you need to add the Command Ref to both the UP and DOWN StreamDeck Events with the *Command Once* Option disabled.
 
 Note on Sequences for Hold Switches: All Commands will be set active - make sure to use the same Sequence for both Addresses!
 <br/><br/>
@@ -892,11 +901,11 @@ In Contrast to the StreamDecks Property Inspector, you can have multiple of thes
 
 <img src="img/ActionDesigner-Overview.png" width="768"><br/>
 
-The Top Buttons (**1**) act on the currently selected Item in the Tree View (**3**). You can either Delete <img src="Plugin/UI/Icons/trash.png" width="20"> the selected Item, Move it up or down, or Copy/Paste <img src="Plugin/UI/Icons/copy.png" width="20"> between Parent Nodes (which also works between different Instances of the UI). Copy/Paste also allows you to do all Manipulators or Conditions at once - copy the parent/source Item (e.g. an Element to copy its Manipulators) and use the Paste Button directly besides the Child Label (e.g. "Manipulators:" or "Conditions:" on the target Item. Note that all Childs (Manipulators, Conditions) on the targer will be replaced!<br/>
-NOTE that the Order of Elements/Manipulators is important: everything is drawn/executed in the Order seen in the UI - so an Image Element to draw the Background should be the first Thing in the List (on the Top)!<br/>
-When you select an Item in the Tree View (**3**), you can view or change its Parameters in Settings View (**4**).<br/><br/>
+The Top Buttons act on the currently selected Item in the respective Tree View (only one Item in both Trees can be selected). When you select an Item in one of the Tree Views, you can view or change its Parameters in central Settings View.<br/>
+You can either Delete <img src="Plugin/UI/Icons/trash.png" width="20"> the selected Item, Move it up or down, or Copy/Paste <img src="Plugin/UI/Icons/copy.png" width="20"> between Parent Nodes (which also works between different Instances of the UI). Copy/Paste also allows you to do all Manipulators or Conditions at once - copy the parent/source Item (e.g. an Element to copy its Manipulators) and use the Paste Button directly besides the Child Label (e.g. "Manipulators:" or "Conditions:" on the target Item. Note that all Childs (Manipulators, Conditions) on the Target will be replaced!<br/>
+NOTE that the Order of Elements/Manipulators is important: everything is drawn/executed in the Order seen in the UI - so an Image Element to draw the Background should be the first Thing in the List (on the Top)!<br/><br/>
 
-The Dropdown/Button (**2**) above the Settings View (**4**) will change dynamically depending on the currently selected Item. On the "Elements" Header you can trigger the Selection for a new Element, on an Element it allows to add Manipulators, on Manipulators it allows to add Conditions.<br/><br/>
+The Dropdown/Button above the Settings View will change dynamically depending on the currently selected Item. On the "Elements" Header you can trigger the Selection for a new Element, on an Element it allows to add Manipulators, on Manipulators it allows to add Conditions.<br/><br/>
 
 When you open a new/unconfigured Action, the UI allows you to apply one of several Templates resembling the other "classic Actions" to have a rough Layout predefined. That is purely optional, the default is "No Template" which will add nothing.<br/><br/><br/>
 
@@ -1064,7 +1073,7 @@ To change a Range: select it in the List, change the Parameters as needed and cl
 These Fields allow to define Markers/Ticks/Lines on the Gauge. Each can have its individual Position (Value), Thickness, Offset, Height and Color.<br/>
 Click on the + Button to add a Marker and the - Button to remove the currently selected Marker.<br/>
 To change a Marker: select it in the List, change the Parameters as needed and click the Pencil to update the Marker.<br/>
-You can use a Shorthand/Template in Value to add a Range of Markers: `$step:start:end` (replace with the respective Numbers). The other Parameters (Thickness, Offset, Height, Color) will be applied to all Markers as entered. That Range of Markers will be shown and managed as on Entity - i.e. selecting it, allows you edit the whole Range.
+To add a whole Range of Markers (with common Settings) you need a specific Syntax in the Value Field: `$start:end:step` denoting the numeric Value where the Range starts/ends and the Stepping between Markers. The other Parameters (Thickness, Offset, Height, Color) will be applied to all Markers as entered. That Range of Markers will be shown and managed as on Entity - i.e. selecting it, allows you edit the whole Range.
 <br/><br/>
 
 **Grow Gauge**:<br/>
@@ -1369,7 +1378,10 @@ Read a Variable from the Sim.<br/>
 The Plugin tries to return Value in it "native" Form - a Number will be returned as Number and a String as String.<br/>
 Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
-`if SimRead("L:AP_VNAV_ARMED") == 1 then --do something end`
+```lua
+if SimRead("L:AP_VNAV_ARMED") == 1 then
+	--do something
+end```
 <br/><br/><br/>
 
 
@@ -1380,7 +1392,10 @@ Force to read a Variable as String - even when it a Number!<br/>
 So a Value of `1` is returned as `"1"`.<br/>
 Use the known Plugin Syntax to define Variable Addresses - it is recommended to add optional Prefixes.<br/>
 *Example:*<br/>
-`if SimReadString("L:AP_VNAV_ARMED") == "1" then --do something end`
+```lua
+if SimReadString("L:AP_VNAV_ARMED") == "1" then
+	--do something
+end```
 <br/><br/><br/>
 
 
@@ -1402,6 +1417,18 @@ Send a Command to the Sim.<br/>
 Use the known Plugin Syntax to pass Parameters for Commands - it is required to add optional Prefixes.<br/>
 *Example:*<br/>
 `SimCommand("K:APU_GENERATOR_SWITCH_TOGGLE:1")`
+<br/><br/><br/>
+
+
+| JoystickCommand | `JoystickCommand("Address", "Operation")` |
+| --- | --- |
+
+Trigger a vJoy Command.<br/>
+Use the known vJoy Syntax for the Address (e.g. '1:1'). It is recommended to prefix the Address with 'vjoy:'.<br/>
+Use either `up`, `down` or `toggle` for Operation to control how the vJoy Buttonn will be set.<br/>
+*Example:*<br/>
+`JoystickCommand("vjoy:1:1", "down")`
+`JoystickCommand("vjoy:1:1", "up")`
 <br/><br/><br/>
 
 
@@ -1650,6 +1677,57 @@ function SyncLS()
 	end
 end
 ```
+<br/><br/>
+**Example Script for FSUIPC Byte Array**
+Provided by the great ngreatorex - The Developer contributing Byte Arrays to PilotsDeck! :tada:
+```lua
+RunSim("MSFS")
+RunAircraft("PMDG 777")
+RunInterval(200, "UpdateVariables")
+
+local CDU_COLUMNS = 24
+local CDU_ROWS = 14
+local AutoCruise = 0
+
+SimVar("0x5800:1024:a")
+function UpdateVariables()
+    local bytes = SimRead("0x5800:1024:a")
+    local rows = {}
+    local byteIndex = 0
+
+    for col=1,CDU_COLUMNS do
+        for row=1,CDU_ROWS do
+            if col == 1 then
+                rows[row] = {}
+            end
+        
+            rows[row][col] = { Symbol=string.char(bytes[byteIndex]), Color=bytes[byteIndex+1], Flags=bytes[byteIndex+2] }
+            byteIndex = byteIndex + 3
+        end
+    end
+
+    local title = ""
+    for idx, cell in ipairs(rows[1]) do
+        if cell.Symbol ~= string.char(0) and cell.Symbol ~= " " then
+            title = title .. cell.Symbol
+        end
+    end
+
+    if title == "AUTOCRUISE" then
+        if bit32.extract(rows[9][2].Flags, 0) == 0 then
+            AutoCruise = 2
+        else
+            AutoCruise = 1
+        end
+    else
+        AutoCruise = 0
+    end
+end
+
+function GetAutoCruise()
+    return AutoCruise
+end
+```
 <br/><br/><br/>
 
 ## 3.5.3 - Image Scripts
@@ -1767,6 +1845,7 @@ Requirements / Guidelines for creating Package Files:
 - Please **make it clear** in the Profile or File Name for **which StreamDeck Type** a Profile is intended for - so that the User can choose the correct StreamDeck on Installation. There is no automatic Way because for whatever Reason, Elgato does not export that Information.
 - You can include additional Files in the Package (e.g. FSUIPC Scripts, a Readme, Simulator Modules) in the **Extras** Folder. If put there, the Profile Manager will place the Files on the User's Desktop for easier retrieval (in a Folder named after the Package File's Name).
 
+NOTE: The Profile Manager has a 'Create Package' View to assist with the Creation and Update of Package Files.
 <br/>
 
 **Package Description**<br/>
@@ -1844,21 +1923,34 @@ The Version specified will be checked against the current Plugin Version the Use
 **File Format**<br/>
 A Package File is just a normal Zip-Archive with another Extension (.ppp instead of .zip).<br/>
 So when you'r finished with you Package Contents, just zip everything into an Archive and change the File Extension.<br/>
-Make sure the Folder Structure is preserved (relative Paths) and that the package.json File is at the Root of the Archive. Do not use any fancy Options - just create a plain Zip File!<br/>
+Make sure the Folder Structure is preserved (relative Paths) and that the package.json File is at the Root of the Archive. Do not use any fancy Options - just create a plain Zip File!<br/><br/>
+
+### 3.6.1 - Create Package View
+
+<img src="img/CreatePackage.png" width="768"><br/>
+
+1 - To load or create a Package, enter or browse (with the '...' Button) the Work-Folder for the Package and click 'Load'. When you create a new Package, use a new empty Folder - the Manager will create the required Folder-Structure when click the Button! Note that the Folder's Name will be used later as the Filename for the Package File.<br/><br/>
+
+2 - Then fill out or update the Text-Fields, following the Recommendations above, for the Package Description File. Click 'Save Manifest' to create/update the package.json File for your Package.<br/><br/>
+
+3 - Now you can add/update the actual Files that should go with your Package to the `_Package` Sub-Folder of the Work-Folder. The Manager automatically creates the expected Folder Structure (see above) in this Sub-Folder.<br/><br/>
+
+4 - When having everything put together, click on the 'Create Package' Button to create the actual Package File. The Manager will put it into the `_Releases` Sub-Folder of the Work-Folder and use the Folder Name and Version as Filename. It creates both a .zip and .ppp File - the only Difference is the Extension (to allow Uploads on Platforms only allowing certain Extensions, like flightsim.to). The Manager will warn/ask you, if there is already a Package File with the same Name/Version.
 
 <br/><br/><br/><br/>
 
 ## 3.7 - REST API
-The Plugin has a very simple and not 100% compliant REST API to interface with the Plugin respectively the connected Simulator. Specifically:
+The Plugin has a very simple and not compliant REST API (so more REST-like API) to interface with the Plugin respectively the connected Simulator. Specifically:
 - Get a List of all active (registered and subscribed) Variable Names the Plugin uses currently
 - Get the Value of a Variable
 - Set the Value of a Variable
 - Send a Sim or vJoy Command
+- Register/Deregister a Variable
 
-NOTE: It is absolutely not designed to replace other "Middlewares" like FSUIPC or MobiFlight, so do not use the API excessively! It is more a Convenience to test Actions without a Sim or maybe feed some State/Information to the Plugin.<br/><br/>
+NOTE: It is absolutely not designed to replace other "Middlewares" like FSUIPC or SPAD, so do not use the API excessively! It is more a Convenience to test Actions without a Sim or maybe feed some State/Information to the Plugin.<br/><br/>
 
 Per Default the Plugin will listen on Port 42042, but that is customizable in the Plugin Configuration if there would be a Conflict in your Setup.<br/>
-All Requests are done via the GET Method - this Way Clients can just simply call an URL instead of creating a POST Request with a Body.<br/>
+All Requests are done via the GET Method - this Way Clients can just simply call an URL instead of creating a POST Request with a Body (i.e. directly with the Browser).<br/>
 The Result (if there is any) will be send as *plain/text* Content-Type.<br/><br/>
 
 ### 3.7.1 - REST Commands
@@ -1907,6 +1999,22 @@ Result: None (only the HTTP Response Code 200 if successful).
 
 Result: None (only the HTTP Response Code 200 if successful).
 
+**REGISTER Variable**
+`http://localhost:42042/v1/register/<Variable Address>`
+
+<Variable Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
+
+Result: None (only the HTTP Response Code 200 if successful).
+
+<br/><br/>
+
+**UNREGISTER Variable**
+`http://localhost:42042/v1/unregister/<Variable Address>`
+
+<Variable Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
+
+Result: None (only the HTTP Response Code 200 if successful, 404 if Variable is not known/registered).
+
 <br/><br/><br/><br/>
 
 ---
@@ -1927,11 +2035,14 @@ Some of the Plugin Settings can be tweaked in the File `PluginConfig.json` in th
 * "**VJoyMinimumPressed**": 75 		- The Time in ms a vJoy Button should be minimally pressed/down.
 * "**FsuipcScriptFlagDelay**": 10	- The Delay in ms between sending the next Flag to FSUIPC Lua Script (when Command Delay was 0).
 * "**InterActionDelay**": 15		- The default Delay in ms between multiple Commands queued by the Composite Action.
-* "**MobiVarsPerFrame**": 50		- The amount of (changed) Variables the MF WASM Module will send per visual Sim Frame.
+* "**MobiVarsPerFrame**": 0		- The amount of (changed) Variables the MF WASM Module will send per visual Sim Frame. A Value of Zero does not set that Module Parameter (so the Module uses the Default of 30).
 * "**IntervalSimMonitor**": 5000	- The Interval in ms used to check for running Simulators (does include the Check for remote X-Plane Installations).
 * "**XPlaneIP**": "127.0.0.1" 		- The IP (not Hostname) where X-Plane is running, anything other than "127.0.0.1" will be considered remote.
 * "**XPlanePort**": 49000 		- The Port Number used to connect to X-Plane.
 * "**XPlaneRemoteCheckTimeout**": 1500	- The Timeout in ms for the Check if a remote X-Plane Installation is ready. Must be below SimMonitor.
+* "**XPlaneUseWebApi**": false	- Use the X-Plane WebAPI (available with 12.1.4 and above) to read/write DataRefs and send Commands. You must allow Access in the X-Plane Settings for the Plugin being able to connect!
+* "**XPlaneWebApiHost**": 127.0.0.1:8086	- The Address used to connect to the WebAPI.
+* "**ApiPortNumber**": 42042	- The Port Number used by the Plugin's REST API.
 
 <br/>
 

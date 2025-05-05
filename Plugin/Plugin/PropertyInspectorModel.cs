@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
-using System.Linq;
 
 namespace PilotsDeck.Plugin
 {
@@ -96,10 +95,10 @@ namespace PilotsDeck.Plugin
         {
             var enumOptions = GetEnumerationOptions();
             var baseDirInfo = new DirectoryInfo(AppConfiguration.DirImages);
-            AddImageDirectory("/", baseDirInfo.EnumerateFiles(AppConfiguration.ImageExtensionFilter, enumOptions).ToList());
+            AddImageDirectory("/", [.. baseDirInfo.EnumerateFiles(AppConfiguration.ImageExtensionFilter, enumOptions)]);
 
             foreach (var dir in baseDirInfo.GetDirectories())
-                AddImageDirectory("/" + dir.Name, new DirectoryInfo(dir.FullName).EnumerateFiles(AppConfiguration.ImageExtensionFilter, enumOptions).ToList());
+                AddImageDirectory("/" + dir.Name, [.. new DirectoryInfo(dir.FullName).EnumerateFiles(AppConfiguration.ImageExtensionFilter, enumOptions)]);
         }
 
         protected void AddImageDirectory(string key, List<FileInfo> fileList)

@@ -121,24 +121,24 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements
             set => SetModelArray<float>(value, 1, null, null, nameof(ModelDisplayElement.Position));
         }
 
-        public virtual CenterType Center { get =>  GetSourceValue<CenterType>(); set => SetModelValue<CenterType>(value); }
+        public virtual CenterType Center { get => GetSourceValue<CenterType>(); set => SetModelValue<CenterType>(value); }
         public virtual Dictionary<CenterType, string> CenterTypes { get; } = ViewModelHelper.CenterTypes;
-        public virtual float[] Size { get =>  GetSourceValue<float[]>(); set => SetModelValue<float[]>(value); }
+        public virtual float[] Size { get => GetSourceValue<float[]>(); set => SetModelValue<float[]>(value); }
         public virtual float Width
         {
-            get =>  Source.GetSize().X;
+            get => Source.GetSize().X;
             set => SetModelArray<float>(value, 0, null, null, nameof(ModelDisplayElement.Size));
         }
         public virtual float Height
         {
-            get =>  Source.GetSize().Y;
+            get => Source.GetSize().Y;
             set => SetModelArray<float>(value, 1, null, null, nameof(ModelDisplayElement.Size));
         }
-        public virtual string CanvasString { get =>  $"Canvas Size: {ModelAction.Action.CanvasSize.X} x {ModelAction.Action.CanvasSize.Y}"; }
-        public virtual ScaleType Scale { get =>  GetSourceValue<ScaleType>(); set => SetModelValue<ScaleType>(value); }
+        public virtual string CanvasString { get => $"Canvas Size: {ModelAction.Action.CanvasSize.X} x {ModelAction.Action.CanvasSize.Y}"; }
+        public virtual ScaleType Scale { get => GetSourceValue<ScaleType>(); set => SetModelValue<ScaleType>(value); }
         public virtual Dictionary<ScaleType, string> ScaleTypes { get; } = ViewModelHelper.ScaleTypes;
-        public virtual float Rotation { get =>  GetSourceValue<float>(); set => SetModelValue<float>(value); }
-        public virtual float Transparency { get =>  GetSourceValue<float>(); set => SetModelValue<float>(value); }
+        public virtual float Rotation { get => GetSourceValue<float>(); set => SetModelValue<float>(value); }
+        public virtual float Transparency { get => GetSourceValue<float>(); set => SetModelValue<float>(value); }
 
         public virtual string SelectName()
         {
@@ -165,7 +165,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements
         }
 
         public override string DisplayName { get => SelectName(); } 
-        public override string Name { get =>  GetSourceValue<string>(); set { SetModelValue<string>(value); ModelAction.NotifyTreeRefresh(); } }
+        public override string Name { get => GetSourceValue<string>(); set { SetModelValue<string>(value); ModelAction.NotifyTreeRefresh(); } }
         public virtual string Address { get => Source.ValueAddress; set => SetModelValue<string>(value, null, null, nameof(Source.ValueAddress)); }
     }
 }

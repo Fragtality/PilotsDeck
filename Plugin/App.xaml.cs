@@ -54,6 +54,7 @@ namespace PilotsDeck
         public static ConcurrentDictionary<string, bool> ActiveDesigner {  get; private set; } = [];
         public static DispatcherTimer StatisticTimer { get; private set; } = null;
         public static bool UpdateDetected { get; private set; } = false;
+        public static bool UpdateIsDev { get; private set; } = false; 
         public static string UpdateVersion { get; private set; } = "";
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -355,11 +356,31 @@ namespace PilotsDeck
                 if (tag_name.StartsWith('v'))
                     tag_name = tag_name[1..];
 
-                if (Version.TryParse(tag_name, out Version repoVersion) && repoVersion > appVersion)
+                if (Version.TryParse(tag_name, out Version repoVersion))
                 {
-                    UpdateDetected = true;
-                    UpdateVersion = repoVersion.ToString(3);
-                    Logger.Information($"New Version detected: {UpdateVersion}");
+                    if (repoVersion > appVersion)
+                    {
+                        UpdateDetected = true;
+                        UpdateVersion = repoVersion.ToString(3);
+                        Logger.Information($"New Stable Version detected: {UpdateVersion}");
+                    }
+                    else if (repoVersion == appVersion)
+                    {
+                        json = await client.GetStringAsync("https://raw.githubusercontent.com/Fragtality/PilotsDeck/refs/heads/master/Installer/Payload/version.json");
+                        Logger.Debug($"json received: len {json?.Length}");
+                        node = JsonSerializer.Deserialize<JsonNode>(json);
+                        if (string.Compare(node["Timestamp"]!.ToString(), VersionTools.GetEntryAssemblyTimestamp(), StringComparison.InvariantCultureIgnoreCase) > 0)
+                        {
+                            UpdateDetected = true;
+                            UpdateVersion = node["Timestamp"]!.ToString();
+                            UpdateIsDev = true;
+                            Logger.Information($"New Dev Version detected: {UpdateVersion}");
+                        }
+                        else
+                            Logger.Information($"Application up-to-date!");
+                    }
+                    else
+                        Logger.Debug($"Mismatch of Repo to App Version ({repoVersion} vs. {appVersion})");
                 }
             }
             catch (Exception ex)

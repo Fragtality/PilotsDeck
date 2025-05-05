@@ -5,7 +5,7 @@ using System.Windows;
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("PilotsDeck Installer v0.8.7.0 (2025.04.04.2029)")]
+[assembly: AssemblyTitle("PilotsDeck Installer v0.8.8.0 (2025.05.05.1417)")]
 [assembly: AssemblyDescription("Installer Application for PilotsDeck")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fragtality")]
@@ -46,5 +46,5 @@ using System.Windows;
 //      Buildnummer
 //      Revision
 //
-[assembly: AssemblyVersion("0.8.7.0")]
-[assembly: AssemblyFileVersion("0.8.7.0")]
+[assembly: AssemblyVersion("0.8.8.0")]
+[assembly: AssemblyFileVersion("0.8.8.0")]

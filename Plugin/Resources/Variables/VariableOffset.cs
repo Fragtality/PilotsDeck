@@ -138,7 +138,7 @@ namespace PilotsDeck.Resources.Variables
             catch (Exception ex)
             {
                 Logger.LogException(ex);
-                return Array.Empty<byte>();
+                return [];
             }
         }
 

@@ -57,7 +57,7 @@ namespace Installer.Worker
                 FuncIO.DeleteFile(installer);
 
                 Model.SetSuccess($"vJoy Driver was installed/updated successfully!");
-                Model.AddMessage(new TaskMessage("Please consider a Reboot.", true, FontWeights.DemiBold), false, false);
+                Model.AddMessage(new TaskMessage("Please consider a Reboot!\nNOTE: If you installed vJoy for the first Time, you need to enable a virtual Joystick with the 'vJoyConf' Tool!", true, FontWeights.DemiBold), false, false);
                 return true;
             }
         }

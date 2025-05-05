@@ -39,13 +39,17 @@
         </Grid.Resources>
         <!-- Grid Open -->
         <Grid Name="GridOpenDirectory" VerticalAlignment="Top" HorizontalAlignment="Center" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="DemiBold" Margin="0,0,8,0">Package Directory:</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="DemiBold" Margin="0,0,8,0">Work Folder:</TextBlock>
             <TextBox Grid.Row="0" Grid.Column="1" Name="TextPackagePath" FontSize="12" MinHeight="24" MinWidth="256" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,4,0"/>
             <Button Grid.Row="0" Grid.Column="2" Name="ButtonFindPath" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Center" Height="24" Width="24" Margin="0,0,8,0">...</Button>
             <Button Grid.Row="0" Grid.Column="3" Name="ButtonLoadPath" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Center" Height="24" Width="72">
@@ -54,6 +58,10 @@
                     <Image VerticalAlignment="Center" Source="/images/box-arrow-up.png" Height="16" Width="16"/>
                 </StackPanel>
             </Button>
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Style="{StaticResource LabelNote}">
+                Enter or Select (with '...') the Work Folder of your Package and click on 'Load'.<LineBreak />
+                To create a new Package, select a new Empty Folder! The Manager will automatically create the expected File-Structure on the selected Folder.
+            </TextBlock>
         </Grid>
 
         <!-- Grid Package -->
@@ -85,7 +93,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelName}">Path:</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelName}">Work Folder:</TextBlock>
             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                 <TextBox Name="TextPath" Style="{StaticResource TextInput}"  Width="306" IsReadOnly="True" IsHitTestVisible="False"/>
                 <Button Name="ButtonOpenFolder" Padding="2" Margin="6,0,0,0">

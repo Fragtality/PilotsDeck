@@ -40,7 +40,7 @@ namespace PilotsDeck.Plugin
         {
             var model = new ModelProfileSwitcherInspector(GlobalSettings)
             {
-                LoadedMappings = ProfileMappings.Select(m => m.ProfileName).ToList(),
+                LoadedMappings = [.. ProfileMappings.Select(m => m.ProfileName)],
                 AircraftPathString = ToolsMSFS.GetAircraftStringShort(SimController?.AircraftString) ?? ""
             };
 
