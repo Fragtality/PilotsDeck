@@ -27,10 +27,11 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             try
             {
-                if (App.UpdateDetected && LabelVersionCheck.Visibility != Visibility.Visible)
+                if (App.UpdateDetected)
                 {
                     LabelVersionCheck.FontWeight = FontWeights.DemiBold;
                     LabelVersionCheck.FontSize = 14;
+                    LabelVersionCheck.Text = "";
                     LabelVersionCheck.Inlines.Clear();
                     
                     if (App.UpdateIsDev)
