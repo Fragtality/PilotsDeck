@@ -339,7 +339,7 @@ namespace PilotsDeck
         {
             try
             {
-                var appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                var appVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
 
                 HttpClient client = new()
                 {
