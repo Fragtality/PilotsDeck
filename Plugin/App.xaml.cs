@@ -369,7 +369,9 @@ namespace PilotsDeck
                         json = await client.GetStringAsync("https://raw.githubusercontent.com/Fragtality/PilotsDeck/refs/heads/master/Installer/Payload/version.json");
                         Logger.Debug($"json received: len {json?.Length}");
                         node = JsonSerializer.Deserialize<JsonNode>(json);
-                        if (string.Compare(node["Timestamp"]!.ToString(), VersionTools.GetEntryAssemblyTimestamp(), StringComparison.InvariantCultureIgnoreCase) > 0)
+                        string timestamp = VersionTools.GetEntryAssemblyTimestamp();
+                        Logger.Debug($"Comparing {node["Timestamp"]!} to {timestamp}");
+                        if (string.Compare(node["Timestamp"]!.ToString(), timestamp, StringComparison.InvariantCultureIgnoreCase) > 0)
                         {
                             UpdateDetected = true;
                             UpdateVersion = node["Timestamp"]!.ToString();
