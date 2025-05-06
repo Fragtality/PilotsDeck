@@ -27,11 +27,12 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             try
             {
-                if (App.UpdateDetected)
+                if (App.UpdateDetected && LabelVersionCheck.Visibility != Visibility.Visible)
                 {
                     LabelVersionCheck.FontWeight = FontWeights.DemiBold;
                     LabelVersionCheck.FontSize = 14;
-                    LabelVersionCheck.Visibility = Visibility.Visible;
+                    LabelVersionCheck.Inlines.Clear();
+                    
                     if (App.UpdateIsDev)
                         LabelVersionCheck.Inlines.Add("New Develop Version ");
                     else
@@ -52,7 +53,6 @@ namespace PilotsDeck.UI.DeveloperUI
                     LabelVersionCheck.Inlines.Add(hyperlink);
                     LabelVersionCheck.Inlines.Add(" available!");
                     this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Nav.RequestNavigateHandler));
-
                     LabelVersionCheck.Visibility = Visibility.Visible;
                 }
             }
