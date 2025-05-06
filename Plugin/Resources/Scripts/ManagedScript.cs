@@ -134,7 +134,24 @@ namespace PilotsDeck.Resources.Scripts
             if (IsRunning)
                 DeregisterAllVariables();
 
- 
+            LuaChunk?.Lua?.Clear();
+            LuaChunk = null;
+
+            if (LuaEnv != null)
+            {
+                LuaEnv?.Clear();
+                LuaEnv = null;
+            }
+
+            if (LuaEngine != null)
+            {
+                LuaEngine.Clear();
+                LuaEngine.Dispose();
+                LuaEngine = null;
+            }
+
+            Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script stopped by ScriptManager"));
+            Logger.Debug($"Script stopped: {FileName}");
         }
 
         public virtual void Reload()
