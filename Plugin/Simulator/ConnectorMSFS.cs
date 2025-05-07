@@ -2,6 +2,7 @@
 using CFIT.AppTools;
 using CFIT.SimConnectLib;
 using CFIT.SimConnectLib.Definitions;
+using CFIT.SimConnectLib.InputEvents;
 using CFIT.SimConnectLib.Modules.MobiFlight;
 using CFIT.SimConnectLib.SimResources;
 using CFIT.SimConnectLib.SimVars;
@@ -11,7 +12,9 @@ using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.Tools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PilotsDeck.Simulator
@@ -43,6 +46,7 @@ namespace PilotsDeck.Simulator
             SimConnect = new(App.Configuration, typeof(IdAllocator), App.CancellationToken);
             MobiModule = (MobiModule)SimConnect.AddModule(typeof(MobiModule), App.Configuration);
             SubManager = new SubManager(SimConnect, MobiModule);
+            SimConnect.InputManager.CallbackEventsEnumerated += InputEventsEnumerated;
         }
 
         public async void Run()
@@ -147,6 +151,29 @@ namespace PilotsDeck.Simulator
                     Logger.LogException(ex);
             }
             Logger.Information($"ConnectorMSFS Task ended (simRunning: {IsRunning} | quitReceived: {SimConnect?.QuitReceived} | cancelled: {App.CancellationToken.IsCancellationRequested})");
+        }
+
+
+        protected virtual void InputEventsEnumerated(InputEventManager manager, bool enumerated)
+        {
+            try
+            {
+                if (enumerated)
+                {
+                    StringBuilder text = new();
+                    var inputEvents = manager.InputEvents.Values.Select(i => i.Name).ToList();
+                    inputEvents.Sort();
+                    foreach (var inputEvent in inputEvents)
+                        text.AppendLine($"B:{inputEvent}");
+                    File.WriteAllText(AppConfiguration.FILE_BVAR, text.ToString());
+                }
+                else
+                    File.Delete(AppConfiguration.FILE_BVAR);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public void Stop()
@@ -567,6 +594,7 @@ namespace PilotsDeck.Simulator
             {
                 if (disposing)
                 {
+                    SimConnect.InputManager.CallbackEventsEnumerated -= InputEventsEnumerated;
                     SimConnect.Dispose();
                 }
                 _disposed = true;

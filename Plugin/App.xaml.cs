@@ -358,13 +358,14 @@ namespace PilotsDeck
 
                 if (Version.TryParse(tag_name, out Version repoVersion))
                 {
+                    Logger.Debug($"Comparing {repoVersion} to {appVersion}");
                     if (repoVersion > appVersion)
                     {
                         UpdateDetected = true;
                         UpdateVersion = repoVersion.ToString(3);
                         Logger.Information($"New Stable Version detected: {UpdateVersion}");
                     }
-                    else if (repoVersion == appVersion)
+                    else if (repoVersion <= appVersion)
                     {
                         json = await client.GetStringAsync("https://raw.githubusercontent.com/Fragtality/PilotsDeck/refs/heads/master/Installer/Payload/version.json");
                         Logger.Debug($"json received: len {json?.Length}");
