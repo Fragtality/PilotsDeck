@@ -52,7 +52,7 @@ namespace Installer.Worker
                 }
 
                 Model.Message = $"Installing vJoy Driver ...";
-                Sys.RunCommand(installer, out _);
+                Sys.RunCommand($"\"{installer}\"", out _);
                 await Task.Delay(500);
                 FuncIO.DeleteFile(installer);
 

@@ -61,7 +61,7 @@ namespace Installer.Worker
             }
 
             Model.Message = $"Starting interactive Installer ...";
-            Sys.RunCommand(installerPath, out _);
+            Sys.RunCommand($"\"{installerPath}\"", out _);
             await Task.Delay(1000);
             FuncIO.DeleteFile(installerPath);
 
