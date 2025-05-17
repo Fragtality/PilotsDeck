@@ -249,6 +249,7 @@ namespace PilotsDeck
             Logger.Debug($"Window Handle is: {WindowHandle}");
             HwndSource mainWindowSrc = HwndSource.FromHwnd(WindowHandle);
             mainWindowSrc.AddHook(WndProcHook);
+            AppContext.SetSwitch("Switch.System.Windows.Controls.Grid.StarDefinitionsCanExceedAvailableSpace", true);
         }
 
         protected void InitSystray()

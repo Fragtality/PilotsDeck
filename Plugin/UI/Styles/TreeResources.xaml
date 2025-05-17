@@ -261,7 +261,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ElementID}" Style="{StaticResource TreeLabelItemKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Style="{StaticResource TreeImageType}"/>
-            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextItemName}"/>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
             <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
@@ -313,7 +313,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ManipulatorID}" Style="{StaticResource TreeLabelSubItemKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Style="{StaticResource TreeImageType}"/>
-            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelSubItemName}"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextSubItemName}"/>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
             <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
@@ -364,7 +364,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ConditionID}" Style="{StaticResource TreeLabelConditionKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Source="../Icons/Condition.png" Style="{StaticResource TreeImageType}"/>
-            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelConditionName}"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextConditionName}"/>
         </Grid>
     </HierarchicalDataTemplate>
 
@@ -385,7 +385,7 @@
 
             <ToggleButton Grid.Row="0" Grid.Column="0" Name="Expander" Style="{StaticResource ExpanderDownHeaderStyle}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Width="20" Height="20" Style="{StaticResource TreeImageType}"/>
-            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" FontSize="13.5" MinHeight="28" Margin="6,0,0,-10"  Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" FontSize="13.5" MinHeight="28" Margin="6,0,0,-10"  Text="{Binding DisplayName}" Style="{StaticResource TreeTextItemName}"/>
         </Grid>
 
         <HierarchicalDataTemplate.Triggers>
@@ -409,7 +409,7 @@
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding CommandID}" Style="{StaticResource TreeLabelItemKey}"/>
-            <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextItemName}"/>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
             <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
@@ -458,7 +458,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ConditionID}" Style="{StaticResource TreeLabelConditionKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Source="../Icons/Condition.png" Style="{StaticResource TreeImageType}"/>
-            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" MinWidth="122" Style="{StaticResource TreeLabelConditionName}"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" MinWidth="122" Style="{StaticResource TreeTextConditionName}"/>
         </Grid>
     </HierarchicalDataTemplate>
 </ResourceDictionary>

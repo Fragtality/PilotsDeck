@@ -8,6 +8,11 @@
     <conv:MediaColorConverter x:Key="MediaColorConverter"/>
     <conv:StringColorConverter x:Key="StringColorConverter"/>
 
+    <Style TargetType="{x:Type ContentPresenter}">
+        <Setter Property="RecognizesAccessKey" Value="False" />
+    </Style>
+
+
     <Style x:Key="TreeHeaderLabel" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
