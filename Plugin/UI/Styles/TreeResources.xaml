@@ -16,6 +16,10 @@
     <!-- Data Template Selector -->
     <tree:TreeTemplateSelector x:Key="TreeTemplateSelector"/>
 
+    <Style TargetType="{x:Type ContentPresenter}">
+        <Setter Property="RecognizesAccessKey" Value="False" />
+    </Style>
+
     <!-- TreeView -->
     <Style x:Key="TreeViewControl" TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -208,6 +212,12 @@
         <Setter Property="Margin" Value="0,0,6,0" />
     </Style>
 
+    <Style x:Key="TreeLabelSubItemName" TargetType="Label" BasedOn="{StaticResource TreeLabelItemName}">
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontWeight" Value="DemiBold" />
+        <Setter Property="MinWidth" Value="138" />
+    </Style>
+
     <Style x:Key="TreeTextSubItemName" TargetType="TextBlock" BasedOn="{StaticResource TreeTextItemName}">
         <Setter Property="FontSize" Value="11.5" />
         <Setter Property="FontWeight" Value="DemiBold" />
@@ -219,6 +229,12 @@
         <Setter Property="Width" Value="24" />
         <Setter Property="FontSize" Value="11.5" />
         <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+
+    <Style x:Key="TreeLabelConditionName" TargetType="Label" BasedOn="{StaticResource TreeLabelSubItemName}">
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="MinWidth" Value="114" />
+        <Setter Property="Margin" Value="0,0,0,0" />
     </Style>
 
     <Style x:Key="TreeTextConditionName" TargetType="TextBlock" BasedOn="{StaticResource TreeTextSubItemName}">
@@ -245,7 +261,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ElementID}" Style="{StaticResource TreeLabelItemKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Style="{StaticResource TreeImageType}"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextItemName}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
             <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
@@ -297,7 +313,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ManipulatorID}" Style="{StaticResource TreeLabelSubItemKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Style="{StaticResource TreeImageType}"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextSubItemName}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelSubItemName}"/>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
             <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
@@ -348,7 +364,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ConditionID}" Style="{StaticResource TreeLabelConditionKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Source="../Icons/Condition.png" Style="{StaticResource TreeImageType}"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextConditionName}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelConditionName}"/>
         </Grid>
     </HierarchicalDataTemplate>
 
@@ -369,7 +385,7 @@
 
             <ToggleButton Grid.Row="0" Grid.Column="0" Name="Expander" Style="{StaticResource ExpanderDownHeaderStyle}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Width="20" Height="20" Style="{StaticResource TreeImageType}"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" FontSize="13.5" MinHeight="28" Margin="6,0,0,-10"  Text="{Binding DisplayName}" Style="{StaticResource TreeTextItemName}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" FontSize="13.5" MinHeight="28" Margin="6,0,0,-10"  Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
         </Grid>
 
         <HierarchicalDataTemplate.Triggers>
@@ -393,7 +409,7 @@
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding CommandID}" Style="{StaticResource TreeLabelItemKey}"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="LabelName" Text="{Binding DisplayName}" Style="{StaticResource TreeTextItemName}"/>
+            <Label Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="LabelName" Content="{Binding DisplayName}" Style="{StaticResource TreeLabelItemName}"/>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Name="Expander" Style="{StaticResource ExpanderDownChildStyle}"/>
             <StackPanel Grid.Row="1" Grid.Column="2" Name="PanelChilds" Style="{StaticResource TreePanelChilds}">
@@ -442,7 +458,7 @@
 
             <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Content="{Binding ConditionID}" Style="{StaticResource TreeLabelConditionKey}"/>
             <Image Grid.Row="0" Grid.Column="1" Name="ImageType" Source="../Icons/Condition.png" Style="{StaticResource TreeImageType}"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="LabelName" Text="{Binding DisplayName}" MinWidth="122" Style="{StaticResource TreeTextConditionName}"/>
+            <Label Grid.Row="0" Grid.Column="2" Name="LabelName" Content="{Binding DisplayName}" MinWidth="122" Style="{StaticResource TreeLabelConditionName}"/>
         </Grid>
     </HierarchicalDataTemplate>
 </ResourceDictionary>
