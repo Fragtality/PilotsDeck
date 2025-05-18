@@ -42,6 +42,7 @@ namespace PilotsDeck.Plugin
         public PluginState State { get; protected set; } = PluginState.IDLE;
         protected bool FirstRun { get; set; } = true;
         protected bool ForcedRefresh { get; set; } = false;
+        protected bool ResetInProgress { get; set; } = false;
 
         public PluginController()
         {
@@ -266,13 +267,16 @@ namespace PilotsDeck.Plugin
                             Logger.Information("--- Plugin changed to READY ---");
                         State = PluginState.READY;
 
-                        ActionManager.ProfileSwitcherManager.SwitchProfiles();
+                        ResetInProgress = true;
+                        ActionManager.ProfileSwitcherManager.SwitchProfiles();                        
                         Task.Run(async () =>
                         {
                             await Task.Delay(500);
                             RemoveUnusedResources(true);
                             await Task.Delay(500);
                             ScriptManager.StartGlobalScripts();
+                            await Task.Delay(500);
+                            ResetInProgress = false;
                         });
                         ForcedRefresh = true;
                     }
@@ -305,7 +309,7 @@ namespace PilotsDeck.Plugin
 
 
                 //MAIN - Run, Refresh, Update
-                if (SimController.SimState == SimulatorState.SESSION && State == PluginState.READY)
+                if (SimController.SimState == SimulatorState.SESSION && State == PluginState.READY && !ResetInProgress)
                     ScriptManager.RunGlobalScripts();
 
                 if (ForcedRefresh)
