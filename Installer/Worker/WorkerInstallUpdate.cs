@@ -1,4 +1,5 @@
 ﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using CFIT.Installer.LibFunc;
 using CFIT.Installer.LibWorker;
 using Installer.Tools;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Installer
 {
@@ -24,6 +26,20 @@ namespace Installer
             Model.Title = "PilotsDeck Plugin";
             SetPropertyFromOption<bool>(Config.OptionResetConfiguration);
             SetPropertyFromOption<bool>(Config.OptionFsuipc7UseSecondary);
+        }
+
+        protected override async Task<bool> DoRun()
+        {
+            Model.Message = "Waiting for Plugin to close ...";
+            await Task.Delay(500);
+            if (Sys.GetProcessRunning(Config.PluginBinary))
+            {
+                Logger.Debug($"Plugin still running - kill Process");
+                Sys.KillProcess(Config.PluginBinary);
+                await Task.Delay(750);
+            }
+            
+            return await base.DoRun();
         }
 
         protected override void CreateFileExclusions()

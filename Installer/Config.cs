@@ -60,9 +60,9 @@ namespace Installer
 
         //Worker: StreamDeck
         public virtual string DeckVersionMinimum { get { return "6.5.0"; } }
-        public virtual string DeckVersionTarget { get { return "6.8.1"; } }
-        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.8.1.21263.msi"; } }
-        public virtual string DeckInstaller { get { return "Stream_Deck_6.8.1.21263.msi"; } }
+        public virtual string DeckVersionTarget { get { return "6.9.0"; } }
+        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.9.0.21694.msi"; } }
+        public virtual string DeckInstaller { get { return "Stream_Deck_6.9.0.21694.msi"; } }
 
         //Prepar3D
         public virtual string P3dRegPath { get { return @"HKEY_CURRENT_USER\SOFTWARE\Lockheed Martin"; } }
