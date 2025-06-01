@@ -375,7 +375,7 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 
 
 #### KVAR
-| Command or Variable | MSFS | `(K:)Name(:Parameter){0,5}) | (K:)Name:Parameter(:(K:)Name:Parameter)*` or `K:Name` |
+| Command or Variable | MSFS | `(K:)Name(:Parameter){0,5}) \| (K:)Name:Parameter(:(K:)Name:Parameter)*` or `K:Name` |
 | --- | --- | --- |
 Single K-Var with multiple Values:
 - *Name*: The Name of the K-Var to be set with or without preceding `K:`.
