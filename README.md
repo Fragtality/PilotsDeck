@@ -2085,15 +2085,19 @@ Some of the Plugin Settings can be tweaked in the File `PluginConfig.json` in th
 * "**XPlaneUseWebApi**": false	- Use the X-Plane WebAPI (available with 12.1.4 and above) to read/write DataRefs and send Commands. You must allow Access in the X-Plane Settings for the Plugin being able to connect!
 * "**XPlaneWebApiHost**": 127.0.0.1:8086	- The Address used to connect to the WebAPI.
 * "**ApiPortNumber**": 42042	- The Port Number used by the Plugin's REST API.
+* "**MsfsRemoteConnection**": false	- Set to true to enable a SimConnect Connection over the Network.
+* "**MsfsRemoteHost**": 127.0.0.1:6969	- The Remote Address and Port for SimConnect to connect to. The localhost (127.0.0.1) is only the default Value, a networked Connection to localhost is not supported by the Plugin.
 
 <br/>
 
 A Note on **networked** Installations for **X-Plane**: the Plugin has no Way to determine if the Simulator is in the loading State - the Plugin will directly jump to Idle to Session Ready when X-Plane has finished loading the Flight. Changing Aircrafts/Loading another Flight will cause the Plugin to consider the Simulator as stopped until it has finished loading.
+
 <br/><br/><br/>
 
 ## 4.2 - Troubleshooting
 
 ### 4.2.1 - General Guidlines
+
 **First**, check if you see the Plugin's Actions available in the StreamDeck GUI (on the right Side). If you don't see them, verify that the Plugin was installed in the correct Path. The Path to the Executable should be: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\PilotsDeck.exe`.<br/>
 <br/>
 **Second**, if you see the Actions but you can't configure any Action because the Dropdown Boxes for Command Types and Images are not filled: it is very likely that the Executable and/or its DLLs are blocked by some Security Mechanic. The Dropdowns not working is only the "first Symptom" - the Actions/Buttons on the StreamDeck will generally not work in any Sim!<br/>
@@ -2113,7 +2117,25 @@ If it still doesn't work, contact me on one of the Platforms or Forums! To help 
 
 <br/><br/>
 
-### 4.2.2 - Known Errors
+### 4.2.2 - Create a Verbose Log
+
+In some Situations it might be neccessary to create a Verbose Log.<br/>
+ONLY create such a Log when directed to do so! They get really big really fast, so they should only be done when needed and only as long as needed to cover the Issue in Question.<br/>
+When directed to do so, please follow these Steps closely:
+
+1) Prepare your Setup for the Situation in Question so that you can directly replicate your Issue - e.g. when there is an Issue with an Action on a certain Aircraft, load the Sim and Aircraft.
+2) Close the StreamDeck Software (so that the Plugin is not running)
+3) Delete all PilotsDeck Log File in `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin\log`
+4) Modify the PluginConfig.json (`%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin`): Change the Value for `LogLevel` to `0`
+5) Start the StreamDeck Software again. When the Plugin is finished loading, directly replicate your Issue without any Delays
+6) Once the Issue in Question is captured, close the StreamDeck Software again
+7) Copy the PilotsDeck Log File elsewhere to preserve its State and to share it later
+8) Revert the Change in the PluginConfig.json - set `LogLevel` back to `1`
+9) Continue to use the StreamDeck Software/Plugin as normal and share the Log
+
+<br/><br/>
+
+### 4.2.3 - Known Errors
 
 #### Does not Connect / "Out of Bound" Exception / MSFS 2024
 
