@@ -352,6 +352,7 @@ Using virtual Joysticks is really a great Feature and Solution for specific Use-
 #### AVAR
 | Command & Variable | MSFS | `(Prefix:Name(:index), Unit)` |
 | --- | --- | --- |
+
 - *Prefix*: The Prefix for the Variable: `A:` for Simulation Variables, `E:` for Enviroment Variables, `L:` for Local Variables (L-Vars)
 - *Name*: The Name of the Variable as published. The whole Expression must be enclosed by Parenthesis `( )`.
 - *:index*: (Optional) The Index to access, if the A-Var is a Map/Enum/Mask.
@@ -377,6 +378,7 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 #### KVAR
 | Command or Variable | MSFS | `(K:)Name(:Parameter){0,5}) \| (K:)Name:Parameter(:(K:)Name:Parameter)*` or `K:Name` |
 | --- | --- | --- |
+
 Single K-Var with multiple Values:
 - *Name*: The Name of the K-Var to be set with or without preceding `K:`.
 - *Parameter*: Zero to Five Parameters to be set on this K-Var (positive integer Value)
