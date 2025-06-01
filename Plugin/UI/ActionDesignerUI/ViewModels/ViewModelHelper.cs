@@ -50,6 +50,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
             target.Add(new(ELEMENT_MANIPULATOR.SIZEPOS, "Size / Position"));
             target.Add(new(ELEMENT_MANIPULATOR.ROTATE, "Rotate"));
             target.Add(new(ELEMENT_MANIPULATOR.TRANSPARENCY, "Transparency"));
+            target.Add(new(ELEMENT_MANIPULATOR.FLASH, "Flash"));
         }
 
         public static Dictionary<ELEMENT_MANIPULATOR, string> GetManipulatorTypes(TreeItemData item)
@@ -65,6 +66,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
             dict.Add(ELEMENT_MANIPULATOR.SIZEPOS, "Size / Position");
             dict.Add(ELEMENT_MANIPULATOR.ROTATE, "Rotate");
             dict.Add(ELEMENT_MANIPULATOR.TRANSPARENCY, "Transparency");
+            dict.Add(ELEMENT_MANIPULATOR.FLASH, "Flash");
 
             return dict;
         }
@@ -78,6 +80,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
             { ELEMENT_MANIPULATOR.SIZEPOS, "Size / Position" },
             { ELEMENT_MANIPULATOR.ROTATE, "Rotate" },
             { ELEMENT_MANIPULATOR.TRANSPARENCY, "Transparency" },
+            { ELEMENT_MANIPULATOR.FLASH, "Flash" },
         };
 
         public static Dictionary<PrimitiveType, string> PrimitiveTypes { get; } = new()

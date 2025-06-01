@@ -37,9 +37,9 @@ namespace PilotsDeck
         [JsonIgnore]
         public static string ColorFile { get; } = "ColorStore.json";
         [JsonIgnore]
-        public static int BuildModelVersion { get; } = 9;
+        public static int BuildModelVersion { get; } = 10;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 13;
+        public static int BuildConfigVersion { get; } = 14;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -225,6 +225,8 @@ namespace PilotsDeck
         public int MsfsRetryDelay { get; set; } = 30000;
         public int MsfsStaleTimeout { get; set; } = 15000;
         public int MsfsStateCheckInterval { get; set; } = 500;
+        public bool MsfsRemoteConnection { get; set; } = false;
+        public string MsfsRemoteHost { get; set; } = "127.0.0.1:6969";
         public int MobiRetryDelay { get; set; } = 10000;
         public int MobiVarsPerFrame { get; set; } = 0;
         public int MobiReorderTreshold { get; set; } = 10;

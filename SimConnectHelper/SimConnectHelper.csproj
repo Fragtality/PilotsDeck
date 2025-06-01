@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <ApplicationIcon>PluginIcon.ico</ApplicationIcon>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <PlatformTarget>x64</PlatformTarget>
+    <Title>PilotsDeck - SimConnectHelper</Title>
+    <Authors>Fragtality</Authors>
+    <Copyright>Copyright © 2025</Copyright>
+    <PackageProjectUrl>https://github.com/Fragtality/PilotsDeck</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Fragtality/PilotsDeck</RepositoryUrl>
+    <PackageIcon>PluginIcon.png</PackageIcon>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy.MM.dd.HHmm"))</SourceRevisionId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="PluginIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="PluginIcon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

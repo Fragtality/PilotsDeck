@@ -122,6 +122,10 @@ namespace PilotsDeck.Actions.Advanced.Manipulators
             {
                 element = new ManipulatorSizePos(model ?? new ModelManipulator(type), parent);
             }
+            else if (type == ELEMENT_MANIPULATOR.FLASH)
+            {
+                element = new ManipulatorFlash(model ?? new ModelManipulator(), parent);
+            }
 
             if (element?.Settings?.IsNewModel == true)
             {

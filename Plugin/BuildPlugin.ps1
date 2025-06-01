@@ -27,6 +27,7 @@ $msBuildDir = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\C
 
 try {
 	$pathProfileManager = Join-Path $pathBase "ProfileManager"
+	$pathSimConnectHelper = Join-Path $pathBase "SimConnectHelper"
 
 	cd $pathProject
 	$pluginManifest = Get-Content -Raw (Join-Path $pathProject manifest.json) | ConvertFrom-Json
@@ -68,6 +69,17 @@ try {
 		cd $pathProfileManager
 		dotnet publish -p:PublishProfile=FolderProfile -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
 	}
+
+	## SimConnectHelper Build
+	if (($buildConfiguration -eq "Debug" -and -not $cfgSkipManagerDebug) -or $buildConfiguration -eq "Release") {
+		Write-Host "msbuild for SimConnectHelper ..."
+		cd $msBuildDir
+		.\msbuild.exe (Join-Path $pathBase "\PilotsDeck.sln") /t:SimConnectHelper:rebuild /p:Configuration="Release" /p:Platform=x64 /p:BuildProjectReferences=false -verbosity:quiet
+		Write-Host "dotnet publish for SimConnectHelper ..."
+		cd $pathSimConnectHelper
+		dotnet publish -p:PublishProfile=PubProfile"$buildConfiguration" -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
+	}
+
 	Remove-Item -Recurse -Force -Path ($pathPublish + "\*.pdb")
 
 

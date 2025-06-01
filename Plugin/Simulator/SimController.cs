@@ -68,7 +68,7 @@ namespace PilotsDeck.Simulator
 
             foreach (var sim in App.Configuration.SimBinaries)
             {
-                if (!ActiveConnectors.ContainsKey(sim.Key) && (sim.Value.Where(b => Sys.GetProcessRunning(b)).Any() || await ConnectorXP.CheckRemoteXP(sim.Key)))
+                if (!ActiveConnectors.ContainsKey(sim.Key) && (sim.Value.Where(b => Sys.GetProcessRunning(b)).Any() || await ConnectorXP.CheckRemoteXP(sim.Key) || await ConnectorMSFS.CheckRemoteMsfs(sim.Key)))
                 {
                     Logger.Information($"Simulator Binary '{string.Join(" | ", sim.Value)}' detected - finding Connector for Type '{sim.Key}'");
                     ISimConnector simConnector = null;
@@ -84,7 +84,7 @@ namespace PilotsDeck.Simulator
                             break;
                         case SimulatorType.MSFS:
                             simConnector = new ConnectorMSFS();
-                            if (App.Configuration.UseFsuipcForMSFS)
+                            if (App.Configuration.UseFsuipcForMSFS && !App.Configuration.MsfsRemoteConnection)
                             {
                                 secondaryConnector = new ConnectorFSUIPC(SimulatorType.FSUIPC7)
                                 {

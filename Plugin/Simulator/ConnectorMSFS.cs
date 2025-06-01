@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +27,8 @@ namespace PilotsDeck.Simulator
         public SimulatorType Type { get; } = SimulatorType.MSFS;
         public SimulatorState SimState { get; protected set; } = SimulatorState.RUNNING;
         public bool IsPrimary { get; set; } = true;
-        public bool IsRunning { get { return ISimConnector.GetRunning(Type); } }
+        public bool IsRunning { get { return ISimConnector.GetRunning(Type) || RemoteRunning; } }
+        public bool RemoteRunning { get; set; } = false;
         public bool IsLoading { get { return !IsReadySession && SimConnect.IsReceiveRunning; } }
         public bool IsReadyProcess { get { return SimConnect.IsReceiveRunning && SimConnect.IsSimConnected; } }
         public bool IsReadyCommand { get { return IsReadyProcess && SimConnect.IsSimRunning; } }
@@ -40,13 +43,79 @@ namespace PilotsDeck.Simulator
         protected bool FirstRun { get; set; } = true;
         protected bool FirstConnect { get; set; } = true;
         protected DateTime LastConnectionAttempt { get; set; } = DateTime.MinValue;
+        public const string SimConnectTemplate =
+"""
+[SimConnect]
+Protocol=IPv4
+Address={0}
+Port={1}
+MaxReceiveSize=41088
+DisableNagle=1
+""";
 
         public ConnectorMSFS()
         {
+            CheckSimConnectFile();
             SimConnect = new(App.Configuration, typeof(IdAllocator), App.CancellationToken);
             MobiModule = (MobiModule)SimConnect.AddModule(typeof(MobiModule), App.Configuration);
             SubManager = new SubManager(SimConnect, MobiModule);
             SimConnect.InputManager.CallbackEventsEnumerated += InputEventsEnumerated;
+        }
+
+        protected virtual void CheckSimConnectFile()
+        {
+            try
+            {
+                string filePath = Path.Join(App.PLUGIN_PATH, "SimConnect.cfg");
+                bool fileExists = File.Exists(filePath);
+
+                if (fileExists && !App.Configuration.MsfsRemoteConnection)
+                {
+                    Logger.Information($"SimConnect.cfg File exits but not using remote Connection - deleting File");
+                    File.Delete(filePath);
+                    RemoteRunning = false;
+                }
+                else if (App.Configuration.MsfsRemoteConnection && !App.Configuration.MsfsRemoteHost.StartsWith("127.0.0") && App.Configuration.MsfsRemoteHost.Split(':').Length == 2)
+                {
+                    Logger.Information($"Setting SimConnect.cfg File for Remote Connection to {App.Configuration.MsfsRemoteHost}");
+                    var address = App.Configuration.MsfsRemoteHost.Split(':');
+                    string content = string.Format(SimConnectTemplate, address[0], address[1]);
+                    File.WriteAllText(filePath, content);
+                    RemoteRunning = true;
+                }
+                else
+                    RemoteRunning = false;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+
+        public static async Task<bool> CheckRemoteMsfs(SimulatorType type)
+        {
+            bool success = false;
+
+            if (type != SimulatorType.MSFS || !App.Configuration.MsfsRemoteConnection || App.Configuration.MsfsRemoteHost.StartsWith("127.0.0") || App.Configuration.MsfsRemoteHost.Split(':').Length != 2)
+                return success;
+
+            try
+            {
+                using var client = new TcpClient();
+                var address = IPAddress.Parse(App.Configuration.MsfsRemoteHost.Split(':')[0]);
+                var port = int.Parse(App.Configuration.MsfsRemoteHost.Split(':')[1]);
+                await client.ConnectAsync(address, port);
+                success = client.Connected;
+                client.Close();
+                if (!success)
+                    Logger.Debug($"Connection to remote MSFS not successful");
+            }
+            catch
+            {
+                Logger.Verbose($"Error while connecting to remote MSFS");
+            }
+
+            return success;
         }
 
         public async void Run()
@@ -104,11 +173,21 @@ namespace PilotsDeck.Simulator
 
                     if (!SimConnect.IsReceiveRunning && SimConnect.IsSimConnected)
                     {
-                        Logger.Warning($"Receive not running while Connection established! Reconnecting in {(App.Configuration.RetryDelay / 2) / 1000}s");
-                        SimConnect.Disconnect();
-                        FirstRun = true;
-                        await Task.Delay(App.Configuration.RetryDelay / 2, App.CancellationToken);
-                        continue;
+                        if (!RemoteRunning)
+                        {
+                            Logger.Warning($"Receive not running while Connection established! Reconnecting in {(App.Configuration.RetryDelay / 2) / 1000}s");
+                            SimConnect.Disconnect();
+                            FirstRun = true;
+                            await Task.Delay(App.Configuration.RetryDelay / 2, App.CancellationToken);
+                            continue;
+                        }
+                        else
+                        {
+                            Logger.Warning($"Receive not running while Connection established! Assuming Remote MSFS has closed.");
+                            SimConnect.Disconnect();
+                            RemoteRunning = false;
+                            continue;
+                        }
                     }
 
                     SimConnect.CheckState();
@@ -138,6 +217,12 @@ namespace PilotsDeck.Simulator
                     }
 
                     await Task.Delay(App.Configuration.MsfsStateCheckInterval, App.CancellationToken);
+                }
+
+                if (RemoteRunning && SimConnect.QuitReceived)
+                {
+                    if (!App.CancellationToken.IsCancellationRequested)
+                        _ = Task.Delay(App.Configuration.IntervalSimMonitor * 3, App.CancellationToken).ContinueWith((_) => RemoteRunning = false);
                 }
 
                 if (IsRunning && !SimConnect.QuitReceived)

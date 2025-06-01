@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SimConnectHelper": {
+      "commandName": "Project",
+      "commandLineArgs": "--debug"
+    }
+  }
+}

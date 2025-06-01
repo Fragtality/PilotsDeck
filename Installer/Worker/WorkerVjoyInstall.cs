@@ -39,8 +39,13 @@ namespace Installer.Worker
             {
                 Model.DisplayInSummary = true;
                 Model.DisplayCompleted = true;
+                bool newInstall = !IsInstalled();
 
-                Model.AddMessage(new TaskMessage($"The installed Version does not match the target Version {Config.VjoyVersion}!", false, FontWeights.DemiBold), true, false);
+                if (newInstall)
+                    Model.AddMessage(new TaskMessage($"vJoy Driver is not installed!", false, FontWeights.DemiBold), true, false);
+                else
+                    Model.AddMessage(new TaskMessage($"The installed Version does not match the target Version {Config.VjoyVersion}!", false, FontWeights.DemiBold), true, false);
+
                 Model.State = TaskState.WAITING;
 
                 Model.Message = "Downloading vJoy Installer ...";
@@ -57,7 +62,10 @@ namespace Installer.Worker
                 FuncIO.DeleteFile(installer);
 
                 Model.SetSuccess($"vJoy Driver was installed/updated successfully!");
-                Model.AddMessage(new TaskMessage("Please consider a Reboot!\nNOTE: If you installed vJoy for the first Time, you need to enable a virtual Joystick with the 'vJoyConf' Tool!", true, FontWeights.DemiBold), false, false);
+                if (newInstall)
+                    Model.AddMessage(new TaskMessage("Please consider a Reboot!\nNOTE: You need to enable a virtual Joystick and set it to 128 Buttons with the 'vJoyConf' Tool!", true, FontWeights.DemiBold), false, false);
+                else
+                    Model.AddMessage(new TaskMessage("Please consider a Reboot!", true, FontWeights.DemiBold), false, false);
                 return true;
             }
         }

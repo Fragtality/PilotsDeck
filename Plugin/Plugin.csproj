@@ -51,6 +51,7 @@
     <None Remove="UI\Icons\Expanded.png" />
     <None Remove="UI\Icons\ItemKey.png" />
     <None Remove="UI\Icons\ManipulatorColor.png" />
+    <None Remove="UI\Icons\ManipulatorFlash.png" />
     <None Remove="UI\Icons\ManipulatorFormat.png" />
     <None Remove="UI\Icons\ManipulatorIndicator.png" />
     <None Remove="UI\Icons\ManipulatorRotate.png" />
@@ -89,7 +90,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2025.144.12.1478" />
+    <PackageReference Include="CFIT.AppFramework" Version="2025.152.14.878" />
     <PackageReference Include="CFIT.AppLogger" Version="2025.143.19.705" />
     <PackageReference Include="CFIT.AppTools" Version="2025.144.12.1448" />
     <PackageReference Include="CFIT.SimConnectLib" Version="2025.144.12.1469" />
@@ -164,6 +165,7 @@
     <Resource Include="UI\Icons\Expanded.png" />
     <Resource Include="UI\Icons\ItemKey.png" />
     <Resource Include="UI\Icons\ManipulatorColor.png" />
+    <Resource Include="UI\Icons\ManipulatorFlash.png" />
     <Resource Include="UI\Icons\ManipulatorFormat.png" />
     <Resource Include="UI\Icons\ManipulatorIndicator.png" />
     <Resource Include="UI\Icons\ManipulatorRotate.png" />

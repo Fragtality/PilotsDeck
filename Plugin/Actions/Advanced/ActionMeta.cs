@@ -34,6 +34,7 @@ namespace PilotsDeck.Actions.Advanced
         TRANSPARENCY,
         VISIBLE,
         SIZEPOS,
+        FLASH,
     }
 
     public class ActionMeta : IAction
@@ -56,6 +57,7 @@ namespace PilotsDeck.Actions.Advanced
         public virtual bool FirstLoad { get; set; } = true;
 
         protected virtual DateTime LastKeyDown { get; set; }
+        public virtual bool HasStreamDeckInteraction { get; protected set; } = false;
 
         public virtual ConcurrentDictionary<int, DisplayElement> DisplayElements { get; protected set; } = [];
         public virtual ConcurrentDictionary<StreamDeckCommand, ConcurrentDictionary<int, ActionCommand>> ActionCommands { get; protected set; } = [];
@@ -479,6 +481,7 @@ namespace PilotsDeck.Actions.Advanced
                 NeedRedraw = false;
                 NeedRefresh = false;
             }
+            HasStreamDeckInteraction = false;
         }
 
         public virtual void ResetDrawState()
@@ -554,12 +557,14 @@ namespace PilotsDeck.Actions.Advanced
         {
             var diff = DateTime.Now - LastKeyDown;
             LastKeyDown = DateTime.Now;
+            HasStreamDeckInteraction = true;
 
             return GetTimedCommands(diff, StreamDeckCommand.DIAL_UP, 1);
         }
 
         public virtual SimCommand[] OnDialRotate(StreamDeckEvent sdEvent)
         {
+            HasStreamDeckInteraction = true;
             StreamDeckCommand sdCommand = sdEvent.payload.ticks > 0 ? StreamDeckCommand.DIAL_RIGHT : StreamDeckCommand.DIAL_LEFT;
 
             return GetUntimedCommands(sdCommand, sdEvent.payload.ticks);
@@ -576,12 +581,14 @@ namespace PilotsDeck.Actions.Advanced
         {
             var diff = DateTime.Now - LastKeyDown;
             LastKeyDown = DateTime.Now;
+            HasStreamDeckInteraction = true;
 
             return GetTimedCommands(diff, StreamDeckCommand.KEY_UP, 1);
         }
 
         public virtual SimCommand[] OnTouchTap(StreamDeckEvent sdEvent)
         {
+            HasStreamDeckInteraction = true;
             return GetUntimedCommands(StreamDeckCommand.TOUCH_TAP, 1);
         }
     }

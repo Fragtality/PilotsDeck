@@ -43,6 +43,7 @@ namespace PilotsDeck.UI.Converter
             { ELEMENT_MANIPULATOR.TRANSPARENCY, Img.GetAssemblyImage("ManipulatorTransparency")  },
             { ELEMENT_MANIPULATOR.VISIBLE, Img.GetAssemblyImage("ManipulatorVisible")  },
             { ELEMENT_MANIPULATOR.SIZEPOS, Img.GetAssemblyImage("ManipulatorSizePos")  },
+            { ELEMENT_MANIPULATOR.FLASH, Img.GetAssemblyImage("ManipulatorFlash")  },
         };
 
         public static Dictionary<StreamDeckCommand, BitmapImage> CommandIcons { get; } = new()

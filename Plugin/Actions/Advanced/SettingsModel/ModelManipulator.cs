@@ -57,6 +57,9 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
                 SizePosAddress = this.SizePosAddress,
                 SizePosMinValue = this.SizePosMinValue,
                 SizePosMaxValue = this.SizePosMaxValue,
+                FlashInterval = this.FlashInterval,
+                FlashResetOnInteraction = this.FlashResetOnInteraction,
+                FlashDoNotHideOnStop = this.FlashDoNotHideOnStop,
             };
 
             foreach (var condition in Conditions)
@@ -142,5 +145,10 @@ namespace PilotsDeck.Actions.Advanced.SettingsModel
         public virtual string SizePosAddress { get; set; } = "";
         public virtual float SizePosMinValue { get; set; } = 0;
         public virtual float SizePosMaxValue { get; set; } = 100;
+
+        //ManipulatorFlash
+        public virtual int FlashInterval { get; set; } = 300;
+        public virtual bool FlashResetOnInteraction { get; set; } = false;
+        public virtual bool FlashDoNotHideOnStop { get; set; } = false;
     }
 }

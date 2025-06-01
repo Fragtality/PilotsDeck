@@ -39,6 +39,8 @@ namespace PilotsDeck.UI.ActionDesignerUI.Views
                 ManipulatorView.Content = new ControlIndicator(ModelManipulator);
             else if (ModelManipulator.ManipulatorType == ELEMENT_MANIPULATOR.FORMAT)
                 ManipulatorView.Content = new ControlFormat(ModelManipulator);
+            else if (ModelManipulator.ManipulatorType == ELEMENT_MANIPULATOR.FLASH)
+                ManipulatorView.Content = new ControlFlash(ModelManipulator);
         }
     }
 }
