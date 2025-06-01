@@ -109,7 +109,7 @@ The Requirements for the Plugin:
 - [**.NET 8**](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary. Reboot recommended when the Runtime was installed for the first Time.
 - If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
 - If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest) - will be installed/updated by the Installer, if necessary.
-- Optional: If you want to use **VJOYDRV** Commands you need the [BrunnerInnovations Fork](https://github.com/BrunnerInnovation/vJoy/releases/latest) of the vJoy Driver - the installer will check the State, and offers to optionally install/update it for you.<br/>**NOTE**: If you install the vJoy Driver for the first Time, don't forget that you need to enable at least one Joystick in the vJoyConf Application to use it!
+- Optional: If you want to use **VJOYDRV** Commands you need the [BrunnerInnovations Fork](https://github.com/BrunnerInnovation/vJoy/releases/latest) of the vJoy Driver - the Installer will check the State, and offers to optionally install/update it for you.<br/>**NOTE**: If you install the vJoy Driver for the first Time, don't forget that you need to enable at least one Joystick (configured to have 128 Buttons) in the vJoyConf Application to use it!
 
 <br/>
 The Plugin will be installed to:
