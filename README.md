@@ -1858,7 +1858,7 @@ Requirements / Guidelines for creating Package Files:
 - Please **make it clear** in the Profile or File Name for **which StreamDeck Type** a Profile is intended for - so that the User can choose the correct StreamDeck on Installation. There is no automatic Way because for whatever Reason, Elgato does not export that Information.
 - You can include additional Files in the Package (e.g. FSUIPC Scripts, a Readme, Simulator Modules) in the **Extras** Folder. If put there, the Profile Manager will place the Files on the User's Desktop for easier retrieval (in a Folder named after the Package File's Name).
 
-NOTE: The Profile Manager has a 'Create Package' View to assist with the Creation and Update of Package Files.
+**NOTE**: The Profile Manager has a **'Create Package' View** to assist with the Creation and Update of Package Files.
 <br/>
 
 **Package Description**<br/>
@@ -2012,6 +2012,8 @@ Result: None (only the HTTP Response Code 200 if successful).
 
 Result: None (only the HTTP Response Code 200 if successful).
 
+<br/><br/>
+
 **REGISTER Variable**
 `http://localhost:42042/v1/register/<Variable Address>`
 
@@ -2027,6 +2029,33 @@ Result: None (only the HTTP Response Code 200 if successful).
 <Variable Address> => Use the (exact) same Syntax as elsewhere in the Plugin.
 
 Result: None (only the HTTP Response Code 200 if successful, 404 if Variable is not known/registered).
+
+<br/><br/><br/><br/>
+
+## 3.8 - MSFS Remote Connection
+
+You can run the Plugin and StreamDeck Software on a different PC and connect to you Simulator PC via the Network. Note that regardless of Configuration, FSUIPC7 will not be available as Secondary Connector for MSFS when using a remote Connection!<br/>
+To assist with Configuration, use the `SimConnectHelper` App located in the Plugin-Directory (`%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin`).<br/><br/>
+
+First, setup the "**Server**" - the Machine running the Simulator:
+
+1) Copy the SimConnectHelper App to that Machine.
+2) Run the App and select the Simulator Version/Variant you want to configure
+3) Select Add/Update to configure for Remote-Connection
+4) Select one of the available IP-Address to use (the correct one is something you have to know) and enter a Port to use (in doubt use 6969)
+5) The Simulator/Server is now prepared - Exit the App with 'q' or modify another Version/Variant.
+
+You can keep the App on your Simulator Machine to modifiy or remove the Configuration later.<br/><br/>
+
+Next, setup the "**Client**" - the Machine running the StreamDeck Software and Plugin:
+1) Stop the StreamDeck Software (so the Plugin is not running)
+2) Open the SimConnectHelper App in the Plugin-Directory (!)
+3) The App should display Options to setup the Plugin for Remote or Local Connection - choose "Setup Plugin for Remote Connection"
+4) Enter the IP-Address to use (the one you selected on the Server) and the Port to use (the Port you have entered there)
+5) The Plugin Config is now modified. You can choose "Display current Plugin Configuration" to view the Configuration.
+
+You can run the App later to configure the Plugin back to a local Connection.<br/>
+Note: If you're familiar with remote SimConnect and modifying the SimConnect.xml File of the Simulator, you can directly start with configuring the Plugin. Use the Display Option to get the XML-Code that needs to be added to SimConnect.xml File.
 
 <br/><br/><br/><br/>
 
