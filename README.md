@@ -875,6 +875,7 @@ You can add one or more different Manipulators to each of the Elements of the Ac
 | :---: | :---: | :--- |
 | *Color* | ALL | Change the Color used to draw the Element when the Conditions are true. |
 | *Visible* | ALL | Show or Hide the Element when the Conditions are true. |
+| *Flash* | ALL | Let the the Element flash (alternate Visibility on defined Interval) when the Conditions are true. |
 | *Size / Position* | ALL | Change the Size/Position continuously by a Variable or to fixed Size/Position when the Conditions are true. |
 | *Rotation* | ALL | Change the Rotation continuously by a Variable or to fixed Rotation when the Conditions are true. |
 | *Transparency* | ALL | Change the Transparency continuously by a Variable or to fixed Transparency when the Conditions are true. |
@@ -1124,6 +1125,14 @@ When you check *Reset Visible State after*, the Element is hidden again after th
 
 <br/><br/><br/>
 
+#### FLASH
+
+Use this Manipulator to let an Element flash.<br/>
+When the Conditions are true, the Element will alternate the Visibility (hidden, shown) on the Configured *Flash Interval* (in ms).<br/>
+The flashing will stop when the Conditions are false. If the used Conditions can only indicate the Start-Condition, you can alternatively stop the flashing when the Action received a StreamDeck Command/Interaction (Key/Dial Up, Rotate, Tap) by checking *Stop on Interaction*.<br/>
+Per default, the Element will be hidden when the Conditions are not met and will return to the hidden State when flashing has stopped (either by Condition or Interaction). If the Element should be visible per default, check *Default State Visible*.
+
+<br/><br/><br/>
 
 #### SIZE / POSITION
 
@@ -1383,7 +1392,8 @@ Use the known Plugin Syntax to define Variable Addresses - it is recommended to 
 ```lua
 if SimRead("L:AP_VNAV_ARMED") == 1 then
 	--do something
-end```
+end
+```
 <br/><br/><br/>
 
 
@@ -1397,7 +1407,8 @@ Use the known Plugin Syntax to define Variable Addresses - it is recommended to 
 ```lua
 if SimReadString("L:AP_VNAV_ARMED") == "1" then
 	--do something
-end```
+end
+```
 <br/><br/><br/>
 
 
