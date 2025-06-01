@@ -48,11 +48,11 @@
     <Reference Include="CFIT.AppLogger, Version=2025.143.19.705, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\packages\CFIT.AppLogger.2025.143.19.705\lib\net48\CFIT.AppLogger.dll</HintPath>
     </Reference>
-    <Reference Include="CFIT.AppTools, Version=2025.144.12.1448, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.AppTools.2025.144.12.1448\lib\net48\CFIT.AppTools.dll</HintPath>
+    <Reference Include="CFIT.AppTools, Version=2025.152.21.3398, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\CFIT.AppTools.2025.152.21.3398\lib\net48\CFIT.AppTools.dll</HintPath>
     </Reference>
-    <Reference Include="CFIT.Installer, Version=2025.144.20.2740, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.Installer.2025.144.20.2740\lib\net48\CFIT.Installer.dll</HintPath>
+    <Reference Include="CFIT.Installer, Version=2025.152.21.3415, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\CFIT.Installer.2025.152.21.3415\lib\net48\CFIT.Installer.dll</HintPath>
     </Reference>
     <Reference Include="Costura, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.6.0.0\lib\netstandard2.0\Costura.dll</HintPath>
