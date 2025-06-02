@@ -2046,7 +2046,8 @@ First, setup the "**Server**" - the PC running the Simulator:
 4) Select one of the available IP-Addresses to use (the correct one is something you have to know) and enter a Port to use (in Doubt use 6969)
 5) The Simulator/Server is now prepared - Exit the App with 'q' or modify another Version/Variant
 
-You can keep the App on your Simulator PC to modify or remove the Configuration later.<br/><br/>
+You can keep the App on your Simulator PC to modify or remove the Configuration later.<br/>
+NOTE: The SimConnectHelper App also needs the [.NET8 Desktop Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed in order to run!<br/><br/>
 
 Next, setup the "**Client**" - the PC running the StreamDeck Software and Plugin:
 1) Stop the StreamDeck Software (so the Plugin is not running)
