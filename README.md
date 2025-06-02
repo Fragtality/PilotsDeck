@@ -2040,11 +2040,12 @@ To assist with Configuration, use the `SimConnectHelper` App located in the Plug
 
 First, setup the "**Server**" - the PC running the Simulator:
 
-1) Copy the SimConnectHelper App to that PC.
+1) Copy the SimConnectHelper App to that PC
 2) Run the App and select the Simulator Version/Variant you want to configure
 3) Select Add/Update to configure for Remote-Connection
 4) Select one of the available IP-Addresses to use (the correct one is something you have to know) and enter a Port to use (in Doubt use 6969)
 5) The Simulator/Server is now prepared - Exit the App with 'q' or modify another Version/Variant
+6) Remember that the Windows or other Firewalls on the Simulator PC might block incoming Connections - so you might need to configure an Exclusion
 
 You can keep the App on your Simulator PC to modify or remove the Configuration later.<br/>
 NOTE: The SimConnectHelper App also needs the [.NET8 Desktop Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed in order to run!<br/><br/>
