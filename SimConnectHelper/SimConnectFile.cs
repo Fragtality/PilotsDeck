@@ -334,22 +334,28 @@ namespace SimConnectHelper
 
         public static void MenuInputHost(out string address, out string port)
         {
-            var addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            var query = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            List<string> addressList = ["0.0.0.0 (Listen on All)"];
+            foreach (var entry in query)
+                if (entry.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    addressList.Add(entry.ToString());
 
             do
             {
                 Console.Clear();
                 Console.WriteLine($"Select IP Address to use:");
-                for (int i = 0; i < addressList.Length; i++)
-                    if (addressList[i].AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                for (int i = 0; i < addressList.Count; i++)
                         Console.WriteLine($"[{i}]\t{addressList[i]}");
                 Console.Write(">> ");
 
                 char input = Console.ReadKey().KeyChar;
-                if (int.TryParse(input.ToString(), out int num) && num >= 0 && num < addressList.Length)
+                if (int.TryParse(input.ToString(), out int num) && num >= 0 && num < addressList.Count)
                 {
                     Logger.Write($"\nUsing Address {addressList[num]}");
-                    address = addressList[num].ToString();
+                    if (num != 0)
+                        address = addressList[num];
+                    else
+                        address = "0.0.0.0";
                     break;
                 }
             }
