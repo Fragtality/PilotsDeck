@@ -68,12 +68,12 @@ namespace Installer.Worker
         protected bool CheckMsfs(Simulator sim)
         {
             Model.Message = $"Searching Package Path for {sim} ...";
-            if (FuncMsfs.CheckInstalledMsfs(sim, out string[] paths))
+            if (FuncMsfs.CheckInstalledMsfs(sim, SimulatorStore.All, out Dictionary<SimulatorStore, string> paths))
             {
                 CountSimulators++;
                 SearchSimulators.Add(sim);
-                PackagePaths.Add(sim, paths);
-                Logger.Debug($"Added {paths?.Count()} Paths for Simulator {sim}");
+                PackagePaths.Add(sim, paths.Values.ToArray());
+                Logger.Debug($"Added {paths?.Values?.Count} Paths for Simulator {sim}");
                 return true;
             }
 
