@@ -19,7 +19,8 @@ namespace PilotsDeck.Resources.Variables
 
         public override void CheckChanged()
         {
-            IsChanged = DoubleValue != ValueLast;
+            if (!IsChanged)
+                IsChanged = DoubleValue != ValueLast;
             ValueLast = DoubleValue;
         }
 

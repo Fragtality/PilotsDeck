@@ -225,7 +225,7 @@ namespace PilotsDeck.Plugin.Render
             else
                 drawBrush = new(Color.FromArgb(GetAlpha(), drawColor));
 
-            Render.DrawString(text, Scale(drawFont, drawRect, scale ?? DefaultScale), drawBrush, Scale(CheckSize(drawRect, DeviceCanvas), scale ?? DefaultScale).Center(DeviceCanvas.Center(), center ?? DefaultCenter), ToolsRender.GetStringFlags(horizontal, vertical));
+            Render.DrawString(text.Replace("[[n","\n"), Scale(drawFont, drawRect, scale ?? DefaultScale), drawBrush, Scale(CheckSize(drawRect, DeviceCanvas), scale ?? DefaultScale).Center(DeviceCanvas.Center(), center ?? DefaultCenter), ToolsRender.GetStringFlags(horizontal, vertical));
             drawBrush.Dispose();
         }
 

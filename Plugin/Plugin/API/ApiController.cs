@@ -117,6 +117,11 @@ namespace PilotsDeck.Plugin.API
                     value = value[9..];
                 await WriteResponse(context, value);
             }
+            else if (address.ReadType == SimValueType.INTERNAL)
+            {
+                variable = VariableManager.RegisterVariable(address);
+                await WriteResponse(context, variable.Value);
+            }
             else
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
         }
@@ -144,6 +149,12 @@ namespace PilotsDeck.Plugin.API
             var value = WebUtility.UrlDecode(variableAssignment[(idx + 1)..]);
             if (address.ReadType != SimValueType.NONE && VariableManager.TryGet(address, out var variable))
             {
+                variable.SetValue(value);
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            else if (address.ReadType == SimValueType.INTERNAL)
+            {
+                variable = VariableManager.RegisterVariable(address);
                 variable.SetValue(value);
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
             }

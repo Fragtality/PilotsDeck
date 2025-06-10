@@ -22,7 +22,8 @@ namespace PilotsDeck.Resources.Variables
 
         public override void CheckChanged()
         {
-            IsChanged = StringValue != ValueLast;
+            if (!IsChanged)
+                IsChanged = StringValue != ValueLast;
             ValueLast = StringValue;
         }
 
