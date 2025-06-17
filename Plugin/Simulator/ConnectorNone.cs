@@ -21,6 +21,10 @@ namespace PilotsDeck.Simulator
                 var scriptValues = App.PluginController.VariableManager.VariableList.Where(v => v.Type == SimValueType.LUAFUNC && v.Registrations > 0);
                 foreach (var variable in scriptValues)
                     Task.Run(() => { variable.SetValue(App.PluginController.ScriptManager.RunFunction(variable.Address, out _, false)); });
+
+                var internalVars = App.PluginController.VariableManager.VariableList.Where(v => v.Type == SimValueType.INTERNAL && !v.IsSubscribed && v.Registrations > 0);
+                foreach (var variable in internalVars)
+                    variable.IsSubscribed = true;
             }
             catch (Exception ex)
             {

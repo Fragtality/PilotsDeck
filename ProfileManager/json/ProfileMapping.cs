@@ -71,7 +71,7 @@ namespace ProfileManager.json
 
         public void SetCheckPath()
         {
-            string path = $"/{Parameters.PLUGIN_PROFILE_FOLDER}/{DeckId}/{ProfileManifest.ProfileDirectoryCleaned}";
+            string path = $"{Parameters.PLUGIN_PROFILE_FOLDER}/{ProfileManifest.ProfileName}";
             if (ProfileManifest.PreconfiguredName != path)
             {
                 ProfileManifest.PreconfiguredName = path;

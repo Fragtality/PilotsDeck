@@ -13,6 +13,7 @@ namespace PilotsDeck.StreamDeck.Messages
 
         public class Payload
         {
+            public int page { get; set; } = 0;
             public string profile { get; set; }
         }
     }

@@ -177,7 +177,7 @@ namespace PilotsDeck.Plugin
 
                 ActiveDecks = [];
                 foreach (var device in DeckController.DeckInfo.devices)
-                    ActiveDecks.Add(device.id, null);
+                    ActiveDecks.Add(device.id.ToUpperInvariant(), null);
 
 
 
@@ -185,7 +185,8 @@ namespace PilotsDeck.Plugin
                 Logger.Information($"Searching {queryAircraft.Count()} valid Profiles for Aircraft '{currentAircraft}' ...");
                 foreach (var deviceMapping in queryAircraft)
                 {
-                    if (!ActiveDecks.TryGetValue(deviceMapping.DeckId, out string varDeck))
+                    var deckId = deviceMapping.DeckId.ToUpperInvariant();
+                    if (!ActiveDecks.TryGetValue(deckId, out string varDeck))
                     {
                         Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - not connected / not in list!");
                         continue;
@@ -199,7 +200,7 @@ namespace PilotsDeck.Plugin
                     if (MatchAircraftStrings(currentAircraft, deviceMapping.AircraftStrings))
                     {
                         Logger.Information($"Found Match for '{deviceMapping.ProfileName}' against: {string.Join(" | ", deviceMapping.AircraftStrings)}");
-                        ActiveDecks[deviceMapping.DeckId] = deviceMapping.ProfilePath;
+                        ActiveDecks[deckId] = deviceMapping.ProfileName;
                     }
                 }
 
@@ -208,7 +209,8 @@ namespace PilotsDeck.Plugin
                 Logger.Information($"Searching {queryDefault.Count()} valid Profiles for Simulator '{SimController.SimMainType}' ...");
                 foreach (var deviceMapping in queryDefault)
                 {
-                    if (!ActiveDecks.TryGetValue(deviceMapping.DeckId, out string varDeck))
+                    var deckId = deviceMapping.DeckId.ToUpperInvariant();
+                    if (!ActiveDecks.TryGetValue(deckId, out string varDeck))
                     {
                         Logger.Debug($"Skipping StreamDeck '{deviceMapping.DeckName}' - not connected / not in list!");
                         continue;
@@ -220,7 +222,7 @@ namespace PilotsDeck.Plugin
                     }
 
                     Logger.Information($"Using first Match on '{deviceMapping.ProfileName}' for Default Simulator Profile");
-                    ActiveDecks[deviceMapping.DeckId] = deviceMapping.ProfilePath;
+                    ActiveDecks[deckId] = deviceMapping.ProfileName;
                 }
 
 
@@ -229,7 +231,7 @@ namespace PilotsDeck.Plugin
                     if (deck.Value != null)
                     {
                         Logger.Information($"Switching Deck '{deck.Key}' to Profile '{deck.Value}'");
-                        _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.Key, deck.Value);
+                        _ = DeckController.SendSwitchToProfile(DeckController.PluginContext.ToLowerInvariant(), deck.Key.ToLowerInvariant(), $"Profiles/{deck.Value}");
                     }
                 }
             }
@@ -253,7 +255,7 @@ namespace PilotsDeck.Plugin
                             if (profile != null)
                             {
                                 Logger.Information($"Switching Deck '{deck.id}' to Profile '{profile.ProfileUUID}'");
-                                _ = DeckController.SendSwitchToProfile(DeckController.PluginContext, deck.id, profile.ProfilePath);
+                                _ = DeckController.SendSwitchToProfile(DeckController.PluginContext.ToLowerInvariant(), deck.id.ToLowerInvariant(), "");
                             }
                         }
                     }

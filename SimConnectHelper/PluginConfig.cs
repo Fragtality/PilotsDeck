@@ -66,7 +66,6 @@ namespace SimConnectHelper
 
         public static int MenuSelectPluginOperation()
         {
-            int num = -1;
             do
             {
                 Console.Clear();
@@ -81,7 +80,7 @@ namespace SimConnectHelper
                 Console.WriteLine("");
                 if (input == 'q' || input == 'Q')
                     return -1;
-                if (int.TryParse(input.ToString(), out num) && num >= 0 && num <= 2)
+                if (int.TryParse(input.ToString(), out int num) && num >= 0 && num <= 2)
                 {
                     if (num == 0)
                         SetupRemoteConnection();

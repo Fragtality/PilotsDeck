@@ -212,7 +212,7 @@
   "Version": "0.8.9.0",
   "SDKVersion": 2,
   "Software": {
-    "MinimumVersion": "6.5"
+    "MinimumVersion": "6.9"
   },
   "OS": [
     {
@@ -220,5 +220,6 @@
       "MinimumVersion": "10"
     }
   ],
+  "Profiles": [],
   "UUID": "com.extension.pilotsdeck"
 }

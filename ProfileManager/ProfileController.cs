@@ -142,7 +142,7 @@ namespace ProfileManager
         protected void MapAndCheckData()
         {
             foreach (var deviceInfo in DeviceInfos)
-                foreach (var manifest in ProfileManifests.Where(m => m.Device.Hash == deviceInfo.ID))
+                foreach (var manifest in ProfileManifests.Where(m => m.Device.Hash.Equals(deviceInfo.ID, StringComparison.InvariantCultureIgnoreCase)))
                     manifest.SetDeviceInfo(deviceInfo);
 
             foreach (var mapping in ProfileMappings)

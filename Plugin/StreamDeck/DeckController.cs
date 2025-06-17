@@ -137,7 +137,7 @@ namespace PilotsDeck.StreamDeck
 
         protected void AddUpdateDevice(StreamDeckEvent sdEvent)
         {
-            var query = DeckInfo.devices.Where(d => d.id == sdEvent.device);
+            var query = DeckInfo.devices.Where(d => d.id.Equals(sdEvent.device, StringComparison.InvariantCultureIgnoreCase));
             if (query.Any())
             {
                 var device = query.First(); 
@@ -151,7 +151,7 @@ namespace PilotsDeck.StreamDeck
             {
                 var device = new StreamDeckInfoMessage.Device()
                 {
-                    id = sdEvent.device,
+                    id = sdEvent.device.ToUpperInvariant(),
                     type = sdEvent.deviceInfo.type,
                     name = sdEvent.deviceInfo.name,
                     size = sdEvent.deviceInfo.size
@@ -163,18 +163,18 @@ namespace PilotsDeck.StreamDeck
 
         protected void RemoveDevice(StreamDeckEvent sdEvent)
         {
-            var query = DeckInfo.devices.Where(d => d.id == sdEvent.device);
+            var query = DeckInfo.devices.Where(d => d.id.Equals(sdEvent.device, StringComparison.InvariantCultureIgnoreCase));
             if (query.Any())
             {
 
                 Logger.Information($"Removed Device Info for '{query.First().name}' ({query.First().id})");
-                DeckInfo.devices.RemoveAll(d => d.id == sdEvent.device);
+                DeckInfo.devices.RemoveAll(d => d.id.Equals(sdEvent.device, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
         public StreamDeckType GetDeckType(string deviceUuid)
         {
-            var item = DeckInfo.devices.Where(d => d.id == deviceUuid)?.FirstOrDefault();
+            var item = DeckInfo.devices.Where(d => d.id.Equals(deviceUuid, StringComparison.InvariantCultureIgnoreCase))?.FirstOrDefault();
             if (item == null || item?.type == null)
                 return (StreamDeckType)0;
             else
@@ -351,7 +351,9 @@ namespace PilotsDeck.StreamDeck
                     profile = profileName
                 }
             };
-            await QueueMessageAsync(JsonSerializer.Serialize(args));
+            var json = JsonSerializer.Serialize(args);
+            Logger.Debug($"Sending Profile Switch Command: {json}");
+            await QueueMessageAsync(json);
         }
 
         public async Task SendToPropertyInspector(string context, dynamic settings)

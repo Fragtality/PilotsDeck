@@ -33,7 +33,7 @@ namespace PilotsDeck.Simulator.MSFS
         {
             string code;
             if (template.StartsWith('$'))
-                template = template.Remove(0, 1);
+                template = template[1..];
             string[] parts = template.Split(':');
 
             if (parts[0].Length == 1 && parts[0] == "K")
@@ -197,7 +197,7 @@ namespace PilotsDeck.Simulator.MSFS
                     parameter.Add((uint)iValue);
             }
 
-            return WriteSingleKvar(command.Address.Name, [ ..parameter], manager);
+            return await WriteSingleKvar(command.Address.Name, [ ..parameter], manager);
         }
 
         public async static Task<bool> WriteKvarSequence(SimCommand command, SimEventManager manager)
@@ -212,7 +212,7 @@ namespace PilotsDeck.Simulator.MSFS
 
                 if (idx + 1 < sequence.Length && Conversion.IsNumberI(sequence[idx + 1], out int param))
                 {
-                    result = WriteSingleKvar(sequence[idx], [(uint)param], manager);
+                    result = await WriteSingleKvar(sequence[idx], [(uint)param], manager);
                     idx++;
                 }
                 else
@@ -228,13 +228,13 @@ namespace PilotsDeck.Simulator.MSFS
             return result;
         }
 
-        public static bool WriteSingleKvar(string name, object[] parameter, SimEventManager manager)
+        public static async Task<bool> WriteSingleKvar(string name, object[] parameter, SimEventManager manager)
         {
             bool result = false;
 
             try
             {
-                result = manager.SendEvent(name, parameter);
+                result = await manager.SendEvent(name, parameter);
             }
             catch (Exception ex)
             {

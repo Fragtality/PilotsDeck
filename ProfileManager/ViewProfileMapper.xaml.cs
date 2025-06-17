@@ -139,7 +139,7 @@ namespace ProfileManager
                 FilteredItems = ProfileListItems.Where(m => m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
 
             if (SelectDeckFilter.SelectedIndex != 0 && !string.IsNullOrEmpty(SelectDeckFilter.SelectedValue?.ToString()))
-                FilteredItems = FilteredItems.Where(i => i.ViewModel.DeckName == SelectDeckFilter.SelectedValue.ToString());
+                FilteredItems = FilteredItems.Where(i => i.ViewModel.DeckName.Equals(SelectDeckFilter.SelectedValue.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
             ProfileListView.Children.Clear();
             foreach (var item in FilteredItems)

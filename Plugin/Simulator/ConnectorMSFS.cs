@@ -190,7 +190,7 @@ DisableNagle=1
                         }
                     }
 
-                    SimConnect.CheckState();
+                    await SimConnect.CheckState();
 
                     if (SimState == SimulatorState.RUNNING && SimConnect.IsReceiveRunning)
                     {
@@ -501,18 +501,18 @@ DisableNagle=1
             if (!varSub.Resource.IsRegistered)
             {
                 Logger.Debug($"Need to Register SimVar for Command");
-                varSub.Resource.Register();
+                await varSub.Resource.Register();
             }
 
             int success = 0;
             int i;
             for (i = 0; i < command.Ticks; i++)
             {
-                bool result = varSub.Resource.WriteValue(command.NumValue);
+                bool result = await varSub.Resource.WriteValue(command.NumValue);
                 if (command.IsValueReset && command.ResetDelay > 0)
                 {
                     await Task.Delay(command.ResetDelay, App.CancellationToken);
-                    if (varSub.Resource.WriteValue(command.ResetNumValue) && result)
+                    if (await varSub.Resource.WriteValue(command.ResetNumValue) && result)
                         success++;
                 }
                 else if (result)
@@ -566,11 +566,11 @@ DisableNagle=1
             int i;
             for (i = 0; i < command.Ticks; i++)
             {
-                bool result = SimConnect.InputManager.SendEvent(command.Address.Name, command.NumValue);
+                bool result = await SimConnect.InputManager.SendEvent(command.Address.Name, command.NumValue);
                 if (command.IsValueReset && command.ResetDelay > 0)
                 {
                     await Task.Delay(command.ResetDelay, App.CancellationToken);
-                    if (SimConnect.InputManager.SendEvent(command.Address.Name, command.ResetNumValue) && result)
+                    if (await SimConnect.InputManager.SendEvent(command.Address.Name, command.ResetNumValue) && result)
                         success++;
                 }
                 else if (result)
@@ -616,11 +616,11 @@ DisableNagle=1
 
                 if (idx + 1 < bVars.Length && Conversion.IsNumber(bVars[idx + 1], out double numValue))
                 {
-                    result = SimConnect.InputManager.SendEvent(bVars[idx], numValue);
+                    result = await SimConnect.InputManager.SendEvent(bVars[idx], numValue);
                     idx++;
                 }
                 else
-                    result = SimConnect.InputManager.SendEvent(bVars[idx], 1);
+                    result = await SimConnect.InputManager.SendEvent(bVars[idx], 1);
 
                 if (!result)
                     break;
@@ -660,7 +660,7 @@ DisableNagle=1
             int success = 0;
             for (int n = 0; n < command.Ticks; n++)
             {
-                if (MobiModule.ExecuteCode(command.Address.Name))
+                if (await MobiModule.ExecuteCode(command.Address.Name))
                 {
                     success++;
                     if (command.Ticks > 1)

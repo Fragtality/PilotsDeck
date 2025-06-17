@@ -169,7 +169,7 @@ namespace SimConnectHelper
                 return -1;
             }
 
-            string sim = MenuSelectSimulator();
+            MenuSelectSimulator();
             return 0;
         }
 
@@ -298,7 +298,7 @@ namespace SimConnectHelper
 
         public static void MenuUpdateEntry(SimConnectFile simConnectFile)
         {
-            int index = -1;
+            int index;
             do
             {
                 Console.Clear();
