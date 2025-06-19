@@ -380,8 +380,8 @@ A **full List** of all A-Vars with their according Unit (and if writable) can be
 | --- | --- | --- |
 
 Single K-Var with multiple Values:
-- *Name*: The Name of the K-Var to be set with or without preceding `K:`.
-- *Parameter*: Zero to Five Parameters to be set on this K-Var (positive integer Value)
+- *Name*: The Name of the K-Var to be set with or without preceding `K:`. Numeric Names (PMDG et. al.) must be prefixed with an Hashtag (e.g. #12345).
+- *Parameter*: Zero to Five Parameters to be set on this K-Var (positive integer Value, can be given as Hexnumber prefixed with 0x)
 
 Sequence of multiple K-Vars:
 - *Name*: The Name of the K-Var with or without preceding `K:`. You can send multiple Event in a Sequence if you separate them with a `:` Sign.
@@ -397,6 +397,7 @@ Using a K-Var as **Variable**:
 - `AP_SPD_VAR_INC:1:AP_SPD_VAR_INC:1` - Send the Event *AP_SPD_VAR_INC* two Times.
 - `K:FUELSYSTEM_PUMP_TOGGLE:3` - Send the Event *FUELSYSTEM_PUMP_TOGGLE* with Value *3*.
 - `K:LIGHT_POTENTIOMETER_SET:84:50` - Send the Event *LIGHT_POTENTIOMETER_SET* with Values 0 => *84* 1 => *50*.
+- `K:#69650:0x20000000` - Send the PMDG Event *69650* (aka EVT_OH_ELEC_CAB_UTIL) with Hex Value *0x20000000*.
 
 <br/>
 

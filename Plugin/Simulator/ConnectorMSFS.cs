@@ -42,6 +42,7 @@ namespace PilotsDeck.Simulator
         protected SubManager SubManager { get; }
         protected bool FirstRun { get; set; } = true;
         protected bool FirstConnect { get; set; } = true;
+        protected bool IsWritingFile { get; set; } = false;
         protected DateTime LastConnectionAttempt { get; set; } = DateTime.MinValue;
         public const string SimConnectTemplate =
 """
@@ -243,6 +244,15 @@ DisableNagle=1
         {
             try
             {
+                if (IsWritingFile)
+                {
+                    Logger.Debug($"Waiting to write File ...");
+                    while (IsWritingFile)
+                        Task.Delay(App.Configuration.CheckInterval, App.CancellationToken);
+                    Logger.Debug($"Wait ended");
+                }
+                IsWritingFile = true;
+
                 if (enumerated)
                 {
                     StringBuilder text = new();
@@ -258,6 +268,10 @@ DisableNagle=1
             catch (Exception ex)
             {
                 Logger.LogException(ex);
+            }
+            finally
+            {
+                IsWritingFile = false;
             }
         }
 

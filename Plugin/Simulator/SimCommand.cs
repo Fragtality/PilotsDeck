@@ -116,11 +116,6 @@ namespace PilotsDeck.Simulator
             return (address.CommandType == SimCommandType.VJOYDRV || address.CommandType == SimCommandType.VJOY) && !address.HasParameter;
         }
 
-        //public static bool IsVjoyToggle(string address, SimCommandType? type)
-        //{
-        //    return (type == SimCommandType.VJOYDRV || type == SimCommandType.VJOY) && address?.Contains(":t", StringComparison.InvariantCultureIgnoreCase) == true;
-        //}
-
         public static bool IsValidBvarAddress(string address, bool donotrequest)
         {
             return (!donotrequest && TypeMatching.rxBvarValue.IsMatch(address)) || (donotrequest && TypeMatching.rxBvarCmd.IsMatch(address));

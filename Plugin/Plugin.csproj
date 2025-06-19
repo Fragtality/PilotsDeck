@@ -90,10 +90,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2025.167.0.1843" />
-    <PackageReference Include="CFIT.AppLogger" Version="2025.167.0.1788" />
-    <PackageReference Include="CFIT.AppTools" Version="2025.167.0.1796" />
-    <PackageReference Include="CFIT.SimConnectLib" Version="2025.167.0.1817" />
+    <PackageReference Include="CFIT.AppFramework" Version="2025.170.22.2711" />
+    <PackageReference Include="CFIT.AppLogger" Version="2025.170.22.2653" />
+    <PackageReference Include="CFIT.AppTools" Version="2025.170.22.2664" />
+    <PackageReference Include="CFIT.SimConnectLib" Version="2025.170.22.2696" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.16" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.0" />

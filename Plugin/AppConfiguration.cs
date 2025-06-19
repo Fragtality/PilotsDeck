@@ -39,7 +39,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 10;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 14;
+        public static int BuildConfigVersion { get; } = 15;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -118,6 +118,8 @@ namespace PilotsDeck
         public uint SizeEvents { get; set; } = 10000;
         public uint SizeSimStates { get; set; } = 100;
         public uint SizeInputEvents { get; set; } = 10000;
+        public int InputEventsMaxAttempts { get; set; } = 3;
+        public int InputEventScanDelay { get; set; } = 2500;
 
         [JsonIgnore]
         public bool VerboseLogging { get { return LogLevel == LogLevel.Verbose; } }

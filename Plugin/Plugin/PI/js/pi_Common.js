@@ -184,7 +184,7 @@ function setPattern(field, type, donotrequest) {
 
 	var regName = "[^:\\s][a-zA-Z0-9\\x2D\\x5F]+";
 	var regNameXP = "[^:\\s][a-zA-Z0-9\\x2D\\x5F\\x2B]+";
-	var validNameKvar = "[^:\\s][a-zA-Z0-9\\x2D\\x5F\\x2E]+";
+	var validNameKvar = "[^:\\s][a-zA-Z0-9\\x2D\\x5F\\x2E]+|#[0-9]+";
 	var regNameMultipleXP = "[a-zA-Z0-9\\x2D\\x5F\\x2B]+";
 	var regLVarName = "[^:\\s][a-zA-Z0-9\\x2D\\x5F\\x2E\\x20]+([\\x3A][0-9]+){0,1}";	
 	var regLvar = `^((L:|[^:0-9\\x2F]){1}(${regLVarName})){1}$`;
@@ -200,7 +200,7 @@ function setPattern(field, type, donotrequest) {
 	var regBvarCmd = `^(${strBvarCmd}){1}(:${strBvarCmd})*$`;
 	var validKvar = `((?!lua:)(?!H:)(?!B:)(K:|[^:0-9]){1}${validNameKvar}){1}`;
 	var rxKvarVariable = `^K:[^0-9]${validNameKvar}$`;
-	var rxKvarCmd = `^${validKvar}:[0-9]+(:${validKvar}:[0-9]+)+$|^${validKvar}(:[0-9]+){0,5}$`;
+	var rxKvarCmd = `^${validKvar}:(0x){0,1}[0-9]+(:${validKvar}:(0x){0,1}[0-9]+)+$|^${validKvar}(:(0x){0,1}[0-9]+){0,5}$`;
 	var regLuaFunc = `^(Lua|lua|LUA){1}:${regName}(\\.lua){0,1}(:${regName}){1}(\\({1}[^\\)]+\\){1}){0,1}$`;
 	var regInternal = `^(X:){1}${regName}$`;
 	var regCalcRead = `^C:[^\\s].+$`

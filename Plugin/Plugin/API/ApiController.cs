@@ -58,7 +58,7 @@ namespace PilotsDeck.Plugin.API
         protected virtual async Task HandleGetRequestV1(HttpListenerContext context)
         {
             string url = context.Request.RawUrl.Replace("/v1/", "");
-            Logger.Debug($"Handling Request: {url}");
+            Logger.Verbose($"Handling Request: {url}");
             if (url.StartsWith("get/"))
                 await HandleVariableReadRequest(context, url.Replace("get/", ""));
             else if (url.StartsWith("register/"))
@@ -78,7 +78,7 @@ namespace PilotsDeck.Plugin.API
                 Logger.Warning($"Received unknown GET Request: {context.Request.RawUrl}");
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
-            Logger.Debug($"Result: {context.Response.StatusCode}");
+            Logger.Verbose($"Result: {context.Response.StatusCode}");
         }
 
         protected virtual void HandleVariableRegisterRequest(HttpListenerContext context, string variableName)

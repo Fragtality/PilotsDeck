@@ -15,7 +15,7 @@ namespace PilotsDeck.Tools
         //3A => :
         public static readonly string validName = @"[^:\s][a-zA-Z0-9\x2D\x5F]+";
         public static readonly string validNameXP = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2B]+";
-        public static readonly string validNameKvar = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2E]+";
+        public static readonly string validNameKvar = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2E]+|#[0-9]+";
         public static readonly string validNameMultiple = @"[a-zA-Z0-9\x2D\x5F]+";
         public static readonly string validNameMultipleXP = @"[a-zA-Z0-9\x2D\x5F\x2B]+";
         public static readonly string validLVarName = @"[^:\s][a-zA-Z0-9\x2D\x5F\x2E\x20]+([\x3A][0-9]+){0,1}";
@@ -42,8 +42,8 @@ namespace PilotsDeck.Tools
         public static readonly Regex rxCalcRead = new(@"^C:[^\s].+$", RegexOptions.Compiled);
         public static readonly string validKvar = $"((?!lua:)(?!H:)(?!B:)(K:|[^:0-9]){{1}}{validNameKvar}){{1}}";
         public static readonly Regex rxKvarVariable = new($"^K:[^0-9]{validNameKvar}$", RegexOptions.Compiled);
-        public static readonly Regex rxKvarCmd = new($"^{validKvar}:[0-9]+(:{validKvar}:[0-9]+)+$|^{validKvar}(:[0-9]+){{0,5}}$", RegexOptions.Compiled);
-        public static readonly Regex rxKvarSequence = new($"^{validKvar}:[0-9]+(:{validKvar}:[0-9]+)+$", RegexOptions.Compiled);
+        public static readonly Regex rxKvarCmd = new($"^{validKvar}:(0x){{0,1}}[0-9]+(:{validKvar}:(0x){{0,1}}[0-9]+)+$|^{validKvar}(:(0x){{0,1}}[0-9]+){{0,5}}$", RegexOptions.Compiled);
+        public static readonly Regex rxKvarSequence = new($"^{validKvar}:(0x){{0,1}}[0-9]+(:{validKvar}:(0x){{0,1}}[0-9]+)+$", RegexOptions.Compiled);
 
         public static SimValueType GetReadType(string address)
         {

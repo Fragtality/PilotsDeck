@@ -14,7 +14,7 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             try
             {
-                if (App.CloseReceived)
+                if (App.CloseReceived || DeveloperView.IsClosing)
                     return;
 
                 if (App.DeveloperView.IsVisible)

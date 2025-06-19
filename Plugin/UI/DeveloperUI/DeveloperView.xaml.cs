@@ -14,6 +14,7 @@ namespace PilotsDeck.UI.DeveloperUI
         protected IView CurrentView { get; set; } = null;
         protected static Thickness ThicknessSelected { get; set; } = new Thickness(1.5);
         protected static Thickness ThicknessDefault { get; set; } = new Thickness(1);
+        public static bool IsClosing { get; protected set; } = false;
 
         public DeveloperView(NotifyIconViewModel notifyModel)
         {
@@ -21,6 +22,7 @@ namespace PilotsDeck.UI.DeveloperUI
             InitializeComponent();
 
             Title = $"{Title} ({VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()})";
+            this.Closing += (_, _) => IsClosing = true;
         }
 
         protected void CheckVersion()
