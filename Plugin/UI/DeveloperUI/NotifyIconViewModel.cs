@@ -14,7 +14,7 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             try
             {
-                if (App.CloseReceived || DeveloperView.IsClosing)
+                if (App.CloseReceived || App.DeveloperView == null)
                     return;
 
                 if (App.DeveloperView.IsVisible)
@@ -22,10 +22,10 @@ namespace PilotsDeck.UI.DeveloperUI
                 else
                     App.DeveloperView.Show(disableEfficiencyMode: true);
             }
-            catch
+            catch (Exception ex)
             {
                 App.DeveloperView.Close();
-                Logger.Debug("Exception in ToggleWindow()");
+                Logger.LogException(ex);
             }
         }
 
