@@ -1,0 +1,120 @@
+﻿<!doctype html>
+<html>
+
+<head lang="en">
+    %INCLUDE[Header]%
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        %INCLUDE[CopyPaste]%
+
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab selected" data-target="#tabVariable" title="Read Value from Sim">Value</div>
+                <div class="tab" data-target="#tabGauge" title="Configure Gauge Appearance">Gauge</div>
+                <div class="tab" data-target="#tabText" title="Change Text and Font Appearance">Text</div>
+            </div>
+        </div>
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab" data-target="#tabCommands" title="Send Commands to Sim">Commands</div>
+                <div class="tab" data-target="#tabGuard" title="Add a Guard Image and Command">Guard</div>
+                <div class="tab" data-target="#tabBackground" title="Change Background Image">Background</div>
+            </div>
+        </div>
+        <hr class="tab-separator" />
+
+        <div id="tabCommands" class="tab-container">
+            <div type="checkbox" class="sdpi-item" id="Config_HasAction">
+                <div class="sdpi-item-label" id="lblHasAction">Has Command</div>
+                <input class="sdpi-item-value" id="HasAction" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="HasAction"><span></span>Make this Button clickable</label>
+            </div>
+
+            <div id="DefaultActions" class="inline">
+                %INCLUDE[DefaultActions]%
+            </div>
+
+            <div id="EncoderActions" class="hidden">
+                %INCLUDE[EncoderActions]%
+            </div>
+        </div>
+
+        <div id="tabVariable" class="tab-container">
+            %INCLUDE[VariableAddress]%
+
+            <div class="sdpi-heading">Value Format</div>
+            <div class="sdpi-item" id="Config_Scalar">
+                <div class="sdpi-item-label" id="lblScalar">Scalar</div>
+                <input id="Scalar" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            </div>
+            <div class="sdpi-item" id="Config_MinimumValue">
+                <div class="sdpi-item-label" id="lblMinimumValue">Minimum</div>
+                <input id="MinimumValue" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            </div>
+            <div class="sdpi-item" id="Config_MaximumValue">
+                <div class="sdpi-item-label" id="lblMaximumValue">Maximum</div>
+                <input id="MaximumValue" class="sdpi-item-value" type="text" required pattern="[+-]?[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Scale Value by this Number" />
+            </div>
+        </div>
+
+        <div id="tabGauge" class="tab-container">
+            <div class="sdpi-heading">Gauge Settings</div>
+            %INCLUDE[Gauge]%
+        </div>
+
+        <div id="tabText" class="tab-container">
+            <div class="sdpi-heading">Text Settings</div>
+            <div type="checkbox" class="sdpi-item" id="Config_ShowText">
+                <div class="sdpi-item-label" id="lblShowText">Show Text</div>
+                <input class="sdpi-item-value" id="ShowText" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="ShowText"><span></span></label>
+            </div>
+            <div class="sdpi-item" id="Config_Format">
+                <div class="sdpi-item-label" id="lblFormat">Format</div>
+                <input id="Format" class="sdpi-item-value" type="text" pattern="((([0-9]{1,}\.){0,1}[0-9]{1,})|(([0-9]{1,}\.){0,1}[0-9]{1,}){0,1}:.*%s.*|[^:]*.*%s.*){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Round and/or Format Value (zeros.fraction:..%s..)" />
+            </div>
+            <div class="sdpi-item" id="Config_ValueMappings">
+                <div class="sdpi-item-label" id="lblValueMappings">Mappings</div>
+                <input id="ValueMappings" class="sdpi-item-value" type="text" pattern="^[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+)*$" onchange="setSettings(event.target.value, event.target.id)" placeholder="Map Number Value to Text" />
+            </div>
+            <div type="checkbox" class="sdpi-item" id="Config_UseWarnColors">
+                <div class="sdpi-item-label" id="lblUseWarnColors">Range Colors</div>
+                <input class="sdpi-item-value" id="UseWarnColors" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="UseWarnColors"><span></span></label>
+            </div>
+            %INCLUDE[Font]%
+
+            <div class="sdpi-item" id="Config_RectCoord">
+                <div class="sdpi-item-label" id="lblRectCoord">Draw Rectangle</div>
+                <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            </div>
+        </div>
+
+        <div id="tabGuard" class="tab-container">
+            %INCLUDE[GuardActions]%
+        </div>
+
+        <div id="tabBackground" class="tab-container">
+            <div class="sdpi-heading">Background</div>
+            <div type="checkbox" class="sdpi-item" id="Config_UseImageMapping">
+                <div class="sdpi-item-label" id="lblUseImageMapping">Image Mapping</div>
+                <input class="sdpi-item-value" id="UseImageMapping" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="UseImageMapping"><span></span>Map Images directly per Value</label>
+            </div>
+            <div class="sdpi-item" id="Config_ImageMap">
+                <div class="sdpi-item-label" id="lblImageMap">Image Map</div>
+                <input id="ImageMap" class="sdpi-item-value" type="text" pattern="^([0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+)*)|((Lua|lua|LUA){1}:[^:\s][a-zA-Z0-9\x2D\x5F]+(\.lua){0,1}(:[^:\s]+){0,1})$" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to Image Mappings" />
+            </div>
+
+            %INCLUDE[Background]%
+        </div>
+    </div>
+
+    <script src="js/pi-Common.js"></script>
+    <script src="js/pi-DisplayGauge.js"></script>
+</body>
+</html>

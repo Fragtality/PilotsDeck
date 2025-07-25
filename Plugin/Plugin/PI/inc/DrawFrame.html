@@ -1,0 +1,18 @@
+
+        <div type="checkbox" class="sdpi-item" id="Config_DrawBox">
+            <div class="sdpi-item-label" id="lblDrawBox">Draw Frame</div>
+            <input class="sdpi-item-value" id="DrawBox" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+            <label for="DrawBox"><span></span></label>
+        </div>
+        <div class="sdpi-item" id="Config_BoxSize">
+            <div class="sdpi-item-label" id="lblBoxSize">Thickness</div>
+            <input id="BoxSize" class="sdpi-item-value" type="text" required pattern="[0-9]{1,}(['\x2C'\x2E]{1}[0-9]{1,}){0,1}" onchange="setSettings(event.target.value, event.target.id)" placeholder="Thickness in px" />
+        </div>
+        <div class="sdpi-item" id="Config_BoxColor">
+            <div class="sdpi-item-label" id="lblBoxColor">Color</div>
+            <input id="BoxColor" class="sdpi-item-value" type="color" onchange="setSettings(event.target.value, event.target.id)" placeholder="Color" />
+        </div>
+        <div class="sdpi-item" id="Config_BoxRect">
+            <div class="sdpi-item-label" id="lblBoxRect">Size &amp; Position</div>
+            <input id="BoxRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+        </div>

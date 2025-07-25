@@ -1,0 +1,13 @@
+
+        <div class="sdpi-item" id="Config_DirDefaultImage">
+            <div class="sdpi-item-label">Image Directory</div>
+            <select id="DirDefaultImage" class="sdpi-item-value select" onchange="updateImageSelectBox('DefaultImage', event.target.value)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_DefaultImage">
+            <div class="sdpi-item-label">Background Image</div>
+            <img id="Prev_DefaultImage" src="../Images/Wait.png" alt="Wait" height="32" /><select id="DefaultImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+        </div>
+        <div class="sdpi-item" id="Config_DefaultRect">
+            <div class="sdpi-item-label" id="lblDefaultRect">Draw Rectangle</div>
+            <input id="DefaultRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="w; h" />
+        </div>

@@ -1,0 +1,139 @@
+﻿<!doctype html>
+<html>
+
+<head lang="en">
+    %INCLUDE[Header]%
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        %INCLUDE[CopyPaste]%
+
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab selected" data-target="#tabTop" title="Value and Image for Top Half">Top</div>
+                <div class="tab" data-target="#tabBot" title="Value and Image for Bottom Half">Bottom</div>
+                <div class="tab" data-target="#tabImages" title="Background Image and Image Settings">Images</div>
+            </div>
+        </div>
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab" data-target="#tabCommands" title="Send Commands to Sim">Commands</div>
+                <div class="tab" data-target="#tabGuard" title="Add a Guard Image and Command">Guard</div>
+            </div>
+        </div>
+        <hr class="tab-separator" />
+
+        <div id="tabCommands" class="tab-container">
+            <div id="DefaultActions" class="inline">
+                %INCLUDE[DefaultActions]%
+            </div>
+
+            <div id="EncoderActions" class="hidden">
+                %INCLUDE[EncoderActions]%
+            </div>
+        </div>
+
+        <div id="tabTop" class="tab-container">
+            <div class="sdpi-heading">Top Half</div>
+            <div class="sdpi-item" id="Config_AddressTop">
+                <div class="sdpi-item-label" id="lblAddressTop">Top Address</div>
+                <input id="AddressTop" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
+            </div>
+            <div type="checkbox" class="sdpi-item" id="Config_ShowTopNonZero">
+                <div class="sdpi-item-label" id="lblShowTopNonZero">Show while non-zero</div>
+                <input class="sdpi-item-value" id="ShowTopNonZero" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="ShowTopNonZero"><span></span></label>
+            </div>
+            <div class="sdpi-item" id="Config_TopState">
+                <div class="sdpi-item-label" id="lblTopState">Show Value</div>
+                <input id="TopState" class="sdpi-item-value" type="text" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Value to display this Image" />
+            </div>
+            <div class="sdpi-item" id="Config_DirTopImage">
+                <div class="sdpi-item-label">Image Directory</div>
+                <select id="DirTopImage" class="sdpi-item-value select" onchange="updateImageSelectBox('TopImage', event.target.value)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_TopImage">
+                <div class="sdpi-item-label" id="lblTopImage">Image</div>
+                <img id="Prev_TopImage" src="../Images/Wait.png" alt="Wait" height="16" /><select id="TopImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_ImageMap">
+                <div class="sdpi-item-label" id="lblImageMap">Image Map</div>
+                <input id="ImageMap" class="sdpi-item-value" type="text" pattern="^([0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+)*)|((Lua|lua|LUA){1}:[^:\s][a-zA-Z0-9\x2D\x5F]+(\.lua){0,1}(:[^:\s]+){0,1})$" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to Image Mappings" />
+            </div>
+            <div class="sdpi-heading">Tweak Position</div>
+            <div class="sdpi-item" id="Config_TopRect">
+                <div class="sdpi-item-label" id="lblTopRect">Top Rectangle</div>
+                <input id="TopRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            </div>
+        </div>
+
+        <div id="tabBot" class="tab-container">
+            <div class="sdpi-heading">Bottom Half</div>
+            <div class="sdpi-item" id="Config_AddressBot">
+                <div class="sdpi-item-label" id="lblAddressBot">Bottom Address</div>
+                <input id="AddressBot" class="sdpi-item-value" type="text" required pattern="" onchange="setSettings(event.target.value, event.target.id)" placeholder="Offset, LVar, AVar, Dref" />
+            </div>
+            <div type="checkbox" class="sdpi-item" id="Config_ShowBotNonZero">
+                <div class="sdpi-item-label" id="lblShowBotNonZero">Show while non-zero</div>
+                <input class="sdpi-item-value" id="ShowBotNonZero" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="ShowBotNonZero"><span></span></label>
+            </div>
+            <div class="sdpi-item" id="Config_BotState">
+                <div class="sdpi-item-label" id="lblBotState">Show Value</div>
+                <input id="BotState" class="sdpi-item-value" type="text" required onchange="setSettings(event.target.value, event.target.id)" placeholder="Value to display this Image" />
+            </div>
+            <div class="sdpi-item" id="Config_DirBotImage">
+                <div class="sdpi-item-label">Image Directory</div>
+                <select id="DirBotImage" class="sdpi-item-value select" onchange="updateImageSelectBox('BotImage', event.target.value)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_BotImage">
+                <div class="sdpi-item-label" id="lblBotImage">Image</div>
+                <img id="Prev_BotImage" src="../Images/Wait.png" alt="Wait" height="16" /><select id="BotImage" class="sdpi-item-value select" onchange="setSettings(event.target.value, event.target.id)"></select>
+            </div>
+            <div class="sdpi-item" id="Config_ImageMapBot">
+                <div class="sdpi-item-label" id="lblImageMapBot">Image Map</div>
+                <input id="ImageMapBot" class="sdpi-item-value" type="text" pattern="^([0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+(:[0-9]+((,|\.)[0-9]+)?(<|>)?=[^:^=]+)*)|((Lua|lua|LUA){1}:[^:\s][a-zA-Z0-9\x2D\x5F]+(\.lua){0,1}(:[^:\s]+){0,1})$" onchange="setSettings(event.target.value, event.target.id)" required placeholder="Value to Image Mappings" />
+            </div>
+            <div class="sdpi-heading">Tweak Position</div>
+            <div class="sdpi-item" id="Config_BotRect">
+                <div class="sdpi-item-label" id="lblBotRect">Bottom Rectangle</div>
+                <input id="BotRect" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            </div>
+        </div>
+
+        <div id="tabGuard" class="tab-container">
+            <div id="GuardActions" class="hidden">
+                %INCLUDE[GuardActions]%
+            </div>
+        </div>
+
+        <div id="tabImages" class="tab-container">
+            <div class="sdpi-heading">Image Handling</div>
+            <div type="checkbox" class="sdpi-item" id="Config_ShowTopImage">
+                <div class="sdpi-item-label" id="lblShowTopImage">Top Image</div>
+                <input class="sdpi-item-value" id="ShowTopImage" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="ShowTopImage"><span></span></label>
+            </div>
+            <div type="checkbox" class="sdpi-item" id="Config_ShowBotImage">
+                <div class="sdpi-item-label" id="lblShowBotImage">Bottom Image</div>
+                <input class="sdpi-item-value" id="ShowBotImage" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="ShowBotImage"><span></span></label>
+            </div>
+            <div type="checkbox" class="sdpi-item" id="Config_UseImageMapping">
+                <div class="sdpi-item-label" id="lblUseImageMapping">Image Mapping</div>
+                <input class="sdpi-item-value" id="UseImageMapping" type="checkbox" onchange="setSettings(event.target.checked, event.target.id)">
+                <label for="UseImageMapping"><span></span>Map Images directly per Value</label>
+            </div>
+
+            <div class="sdpi-heading">Background</div>
+            %INCLUDE[Background]%
+        </div>
+    </div>
+
+    <script src="js/pi-Common.js"></script>
+    <script src="js/pi-SwitchKorry.js"></script>
+</body>
+</html>

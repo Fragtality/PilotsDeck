@@ -9,6 +9,7 @@ vJoy/
 Artwork/
 Releases/
 node_modules/
+Plugin/Plugin/PI/*.html
 *.sdPlugin/bin
 *.sdPlugin/logs
 Marketplace/com.extension.pilotsdeck.sdPlugin/installer

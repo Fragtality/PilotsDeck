@@ -90,10 +90,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2025.200.22.943" />
+    <PackageReference Include="CFIT.AppFramework" Version="2025.201.17.1752" />
     <PackageReference Include="CFIT.AppLogger" Version="2025.193.15.2238" />
     <PackageReference Include="CFIT.AppTools" Version="2025.193.15.2250" />
-    <PackageReference Include="CFIT.SimConnectLib" Version="2025.200.22.927" />
+    <PackageReference Include="CFIT.SimConnectLib" Version="2025.201.17.1737" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.16" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.0" />
@@ -1190,37 +1190,70 @@
     <None Update="Plugin\PI\inc_GuardActions.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Plugin\PI\js\pi-Common.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Plugin\PI\js\pi_Common.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_Display.js">
+    <None Update="Plugin\PI\js\pi-Display.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_DisplayGauge.js">
+    <None Update="Plugin\PI\js\pi-DisplayGauge.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_DisplayGaugeDual.js">
+    <None Update="Plugin\PI\js\pi-DisplayGaugeDual.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_DisplayRadio.js">
+    <None Update="Plugin\PI\js\pi-DisplayRadio.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_DisplaySwitch.js">
+    <None Update="Plugin\PI\js\pi-DisplaySwitch.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_Meta.js">
+    <None Update="Plugin\PI\js\pi-Meta.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_ProfileSwitcher.js">
+    <None Update="Plugin\PI\js\pi-ProfileSwitcher.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_Switch.js">
+    <None Update="Plugin\PI\js\pi-Switch.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_SwitchDisplay.js">
+    <None Update="Plugin\PI\js\pi-SwitchDisplay.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Plugin\PI\js\pi_SwitchKorry.js">
+    <None Update="Plugin\PI\js\pi-SwitchKorry.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-Display.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-DisplayGauge.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-DisplayGaugeDual.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-DisplayRadio.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-DisplaySwitch.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-Meta.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-ProfileSwitcher.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-Switch.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-SwitchDisplay.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugin\PI\pi-SwitchKorry.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Plugin\PI\pi_Display.html">
@@ -1253,6 +1286,9 @@
     <None Update="Plugin\PI\pi_SwitchKorry.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Plugin\PI\src\pi-SwitchKorry.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="previews\Example01XL.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -1272,7 +1308,7 @@
   </Target>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="pwsh -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)..\NuPreBuild.ps1&quot; $(SolutionDir) $(ProjectDir) &quot;Plugin&quot; &quot;CFIT.AppLogger&quot; &quot;CFIT.AppTools&quot; &quot;CFIT.SimConnectLib&quot; &quot;CFIT.AppFramework&quot;" />
+    <Exec Command="pwsh -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)..\NuPreBuild.ps1&quot; $(SolutionDir) $(ProjectDir) &quot;Plugin&quot; &quot;CFIT.AppLogger&quot; &quot;CFIT.AppTools&quot; &quot;CFIT.SimConnectLib&quot; &quot;CFIT.AppFramework&quot;&#xD;&#xA;pwsh -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)BuildPI.ps1&quot; $(Configuration) $(SolutionDir) $(ProjectDir)" />
   </Target>
 
 </Project>

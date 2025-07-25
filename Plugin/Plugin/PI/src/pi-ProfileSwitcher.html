@@ -1,0 +1,41 @@
+﻿<!doctype html>
+<html>
+
+<head lang="en">
+    %INCLUDE[Header]%
+</head>
+
+<body>
+    <div class="sdpi-wrapper" id="divWrapper">
+        <div class="sdpi-heading">Profile Switching</div>
+        <div type="checkbox" class="sdpi-item" id="Config_EnableSwitching">
+            <div class="sdpi-item-label" id="lblEnableSwitching">Switch Profiles</div>
+            <input class="sdpi-item-value" id="EnableSwitching" type="checkbox" onchange="sendToPlugin('toggleEnableSwitching')">
+            <label for="EnableSwitching"><span></span></label>
+        </div>
+        <div type="checkbox" class="sdpi-item" id="Config_SwitchBack">
+            <div class="sdpi-item-label" id="lblSwitchBack">Switch Back</div>
+            <input class="sdpi-item-value" id="SwitchBack" type="checkbox" onchange="sendToPlugin('toggleSwitchBack')">
+            <label for="SwitchBack"><span></span></label>
+        </div>
+
+        <div class="sdpi-heading">Current Aircraft</div>
+        <div class="sdpi-item" id="Config_AircraftPathString">
+            <div class="sdpi-item-label" id="lblAircraftPathString">Path String</div>
+            <span class="sdpi-item-value textarea">
+                <textarea class="sdpi-item-value" style="min-height: 75px" id="AircraftPathString"></textarea>
+            </span>
+        </div>
+
+        <div class="sdpi-heading">Loaded Profiles</div>
+        <div type="list" class="sdpi-item list" id="Config_LoadedMappings">
+            <div class="sdpi-item-label" id="lblLoadedMappings">Profile Names</div>
+            <ul class="sdpi-item-value no-select" id="LoadedMappings">
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/pi-Common.js"></script>
+    <script src="js/pi-ProfileSwitcher.js"></script>
+</body>
+</html>

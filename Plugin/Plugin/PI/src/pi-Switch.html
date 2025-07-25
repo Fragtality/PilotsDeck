@@ -1,0 +1,47 @@
+﻿<!doctype html>
+<html>
+
+<head lang="en">
+    %INCLUDE[Header]%
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        %INCLUDE[CopyPaste]%
+
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab selected" data-target="#tabCommands" title="Send Commands to Sim">Commands</div>
+                <div class="tab" data-target="#tabGuard" title="Add a Guard Image and Command">Guard</div>
+                <div class="tab" data-target="#tabBackground" title="Change Background Image">Background</div>
+            </div>
+        </div>
+        <hr class="tab-separator" />
+
+        <div id="tabCommands" class="tab-container">
+            <div id="DefaultActions" class="inline">
+                %INCLUDE[DefaultActions]%
+            </div>
+
+            <div id="EncoderActions" class="hidden">
+                %INCLUDE[EncoderActions]%
+            </div>
+        </div>
+
+        <div id="tabGuard" class="tab-container">
+            <div id="GuardActions" class="hidden">
+                %INCLUDE[GuardActions]%
+            </div>
+        </div>
+
+        <div id="tabBackground" class="tab-container">
+            <div class="sdpi-heading">Background</div>
+            %INCLUDE[Background]%
+        </div>
+    </div>
+
+    <script src="js/pi-Common.js"></script>
+    <script src="js/pi-Switch.js"></script>
+</body>
+</html>

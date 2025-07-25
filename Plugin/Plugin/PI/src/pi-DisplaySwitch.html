@@ -1,0 +1,88 @@
+﻿<!doctype html>
+<html>
+
+<head lang="en">
+    %INCLUDE[Header]%
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        %INCLUDE[CopyPaste]%
+
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab selected" data-target="#tabVariable" title="Read Value from Sim">Value</div>
+                <div class="tab" data-target="#tabIndication" title="Change Appearance for a special State">Special State</div>
+                <div class="tab" data-target="#tabCommands" title="Send Commands to Sim">Commands</div>
+            </div>
+        </div>
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab" data-target="#tabFont" title="Change the Font">Font</div>
+                <div class="tab" data-target="#tabFrame" title="Change the Frame around the Value">Frame</div>
+                <div class="tab" data-target="#tabBackground" title="Change Background Image">Background</div>
+            </div>
+        </div>
+        <div type="tabs" class="sdpi-item">
+            <div class="sdpi-item-label empty"></div>
+            <div class="tabs">
+                <div class="tab" data-target="#tabGuard" title="Add a Guard Image and Command">Guard</div>
+            </div>
+        </div>
+        <hr class="tab-separator" />
+
+        <div id="tabCommands" class="tab-container">
+            <div id="DefaultActions" class="inline">
+                %INCLUDE[DefaultActions]%
+            </div>
+
+            <div id="EncoderActions" class="hidden">
+                %INCLUDE[EncoderActions]%
+            </div>
+        </div>
+
+        <div id="tabVariable" class="tab-container">
+            %INCLUDE[VariableAddress]%
+
+            %INCLUDE[FormatValue]%
+
+            <div class="sdpi-heading">Text Position</div>
+            <div class="sdpi-item" id="Config_RectCoord">
+                <div class="sdpi-item-label" id="lblRectCoord">Draw Rectangle</div>
+                <input id="RectCoord" class="sdpi-item-value" type="text" pattern="[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*;[ ]*[+-]?[0-9]+([,.][0-9]+)?[ ]*" onchange="setSettings(event.target.value, event.target.id)" required placeholder="x; y; w; h" />
+            </div>
+        </div>
+
+        <div id="tabIndication" class="tab-container">
+            <div class="sdpi-heading">Special State</div>
+            %INCLUDE[Indication]%
+        </div>
+
+        <div id="tabFont" class="tab-container">
+            <div class="sdpi-heading">Font Settings</div>
+            %INCLUDE[Font]%
+        </div>
+
+        <div id="tabFrame" class="tab-container">
+            <div class="sdpi-heading">Draw Frame</div>
+            %INCLUDE[DrawFrame]%
+        </div>
+
+        <div id="tabGuard" class="tab-container">
+            <div id="GuardActions" class="hidden">
+                %INCLUDE[GuardActions]%
+            </div>            
+        </div>
+
+        <div id="tabBackground" class="tab-container">
+            <div class="sdpi-heading">Background</div>
+            %INCLUDE[Background]%
+        </div>
+    </div>
+
+    <script src="js/pi-Common.js"></script>
+    <script src="js/pi-DisplaySwitch.js"></script>
+</body>
+</html>

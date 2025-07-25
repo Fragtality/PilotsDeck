@@ -95,7 +95,18 @@ namespace PilotsDeck.StreamDeck
 
                     if (!string.IsNullOrEmpty(json))
                     {
-                        var sdEvent = JsonSerializer.Deserialize<StreamDeckEvent>(json, JsonOptions.JsonSerializerOptions);
+                        StreamDeckEvent sdEvent = null;
+                        try
+                        {
+                            sdEvent = JsonSerializer.Deserialize<StreamDeckEvent>(json, JsonOptions.JsonSerializerOptions);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogException(ex);
+                            Logger.Debug(json);
+                            continue;
+                        }
+
                         if (sdEvent == null)
                         {
                             Logger.Error($"Unknown Message received: '{json}'");
