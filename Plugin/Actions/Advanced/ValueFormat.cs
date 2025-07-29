@@ -149,9 +149,9 @@ namespace PilotsDeck.Actions.Advanced
             if (SubIndex >= 0 && SubIndex < result.Length)
             {
                 if (SubLength >= 0 && SubIndex + SubLength <= result.Length)
-                    result = result[SubIndex..SubLength];
+                    result = result.Substring(SubIndex, SubLength);
                 else
-                    result = result[SubIndex..];
+                    result = result.Substring(SubIndex);
             }
 
             if (Mappings.Count > 0 && Mappings.TryGetValue(result, out string mappedValue))

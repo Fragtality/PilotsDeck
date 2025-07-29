@@ -10,3 +10,4 @@
 [assembly: SuppressMessage("Design", "CA1069:Enumerationswerte dürfen nicht dupliziert werden", Justification = "<Ausstehend>", Scope = "type", Target = "~T:PilotsDeck.Actions.StreamDeckCommand")]
 [assembly: SuppressMessage("Style", "IDE0290:Primären Konstruktor verwenden", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Actions.Advanced.ConditionHandler.#ctor(PilotsDeck.Actions.Advanced.ConditionHandler)")]
 [assembly: SuppressMessage("Usage", "CsWinRT1028:Class is not marked partial", Justification = "<Ausstehend>")]
+[assembly: SuppressMessage("Style", "IDE0057:Bereichsoperator verwenden", Justification = "<Ausstehend>", Scope = "member", Target = "~M:PilotsDeck.Actions.Advanced.ValueFormat.FormatValue(PilotsDeck.Resources.Variables.ManagedVariable)~System.String")]
