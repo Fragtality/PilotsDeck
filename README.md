@@ -575,7 +575,7 @@ They are useful in specific Use-Cases when you need to share a Value only within
 <br/><br/><br/><br/>
 
 
-### 2.1.2 - Command Option
+### 2.1.2 - Command Options
 <br/>
 
 **On Value** / **Off Value**:<br/>
@@ -1209,7 +1209,7 @@ You can configure **multiple Commands** per StreamDeck Event to send a Chain of 
 Per default, the Plugin will delay the Execution of the next Command in the Chain by 15ms. You can change that Delay by selecting the StreamDeck Event itself and set the **Inter-Command Delay** Field. A Value of 0 disables this Delay.<br/>
 Be aware that Commands can't depend on each other, for Example when the first Commands updates a Variable, do not expect a following Command to have that changed Value already available (the Execution of Commands is decoupled from refreshing Variables & Actions).<br/><br/>
 
-Defining Commands share some communality with the classic Actions. The available Command Types and their [Syntax](#211---address-syntax) is exactly the same. For Variable based Commands, you can use the same [Value Manipulations](#212---command-option) in the **On/Write Value** Field.<br/>
+Defining Commands share some communality with the classic Actions. The available Command Types and their [Syntax](#211---address-syntax) is exactly the same. For Variable based Commands, you can use the same [Value Manipulations](#212---command-options) in the **On/Write Value** Field.<br/>
 For Variable based Commands, the **Reset Switch** Option is also available and works the same as with the other Actions - but each single Command has its own individual Setting and Delay/Hold Time!<br/>
 For Command-only Types that allow to be sequenced, the **Command Delay** Option is also available to delay Execution of the Commands contained in the Sequence. Each single Command has its own individual Setting and Delay Time!<br/><br/>
 
