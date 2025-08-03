@@ -4,7 +4,6 @@ Directly check & control your FlightSim from the StreamDeck!
 
 # 1 - Introduction
 PilotsDeck is a Plugin for Elegato's StreamDeck with the Ability to **trigger Cockpit-Controls** in different Ways and especially reading & **displaying a Control's State** on the StreamDeck as Text, Image, Bar/Arc or a Combination thereof. It is lean & mean, flexible, completely Open-Source and Free-to-Use.<br/><br/>
-
 StreamDeck-wise it behaves like any other StreamDeck Plugin: it **runs alongside other Plugins** and you can Drag, Drop, Copy, Paste the Actions like any other Action in the StreamDeck Software between your Folders, Pages or even different StreamDecks. The Action Configuration is done through the standard "Property Inspector" of the StreamDeck UI (for the "classic" Actions) or its own "Action Designer" UI (for the new Composite Action). But regardless of the UI: the Configuration is stored in the StreamDeck Profile - You can create, export and share Profiles with the Plugin's Actions. On Top of the StreamDeck builtin Copy & Paste, it has also its own Mechanic allowing to **share single Actions** via Text with someone else.<br/><br/>
 Installation is done through its own **Installer** which will check all Requirements and installs them for you if necessary. With the included **Profile Manager App** you can easily install **Profile Packages** (containing the Profiles, Images and Scripts) and can map your existing StreamDeck Profiles for specific Airplanes or Simulators so that the Plugin **automatically switches** the Profile(s) on the StreamDeck(s). You can write Scripts to directly read Values from a Function, or trigger a Function as Command - all in its own **internal Lua Engine** (Credits to: Neolithos for NeoLua!).<br/>
 The Plugin supports different StreamDeck Models: **Mini**, **Standard**/15-Key, **XL**, **Mobile** and **Plus**. Other Models might work, but an indented Support for Non-Display Models is not planned. The Plugin runs only on **Windows**. There are no Plans for Linux or macOS Support (the first is not supported by StreamDeck at all, both do not run or support all Sims and some essential .NET Libraries are only available on Windows).<br/><br/>
@@ -575,7 +574,7 @@ They are useful in specific Use-Cases when you need to share a Value only within
 <br/><br/><br/><br/>
 
 
-### 2.1.2 - Command Option
+### 2.1.2 - Command Options
 <br/>
 
 **On Value** / **Off Value**:<br/>
