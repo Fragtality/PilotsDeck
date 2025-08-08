@@ -105,7 +105,7 @@ It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin 
 If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
 The Requirements for the Plugin:
 - Windows **10** or **11** (updated)
-- [**StreamDeck Software v6.5**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
+- [**StreamDeck Software v6.9**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
 - [**.NET 8**](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary. Reboot recommended when the Runtime was installed for the first Time.
 - If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
 - If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest) - will be installed/updated by the Installer, if necessary.
