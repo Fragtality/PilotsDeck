@@ -105,7 +105,7 @@ It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin 
 If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
 The Requirements for the Plugin:
 - Windows **10** or **11** (updated)
-- [**StreamDeck Software v6.5**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
+- [**StreamDeck Software v6.9**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
 - [**.NET 8**](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary. Reboot recommended when the Runtime was installed for the first Time.
 - If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
 - If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest) - will be installed/updated by the Installer, if necessary.
@@ -512,6 +512,7 @@ In Comparison to other Simulators, X-Plane Commands can be requested to be activ
 Per Default the Plugin will trigger X-Plane Commands as "command_once" which is fine for most Buttons, Switches and Knobs. But in Cases of Buttons that need to be hold (kept pressed) for some Time and then released (e.g. CVR Test, TO CONF, Fire Tests) the Configuration depends on your X-Plane Version:
 - For X-Plane Versions *earlier* than 12.1.4: You can only trigger Commands as "command_once". If you need to configure a holdable Switch, you have to use a *vJoy* (Driver) Command (with the corresponding vJoy Button mapped in X-Plane).
 - For X-Plane Versions *at or greater* than 12.1.4 (and WebAPI enabled in the Plugin Config): You can enable the *Hold Switch* Option and disable the *Command Once* Option of the Plugin to create an holdable Button/Switch (use the same Command Ref in both Addresses). On the Composite Action you need to add the Command Ref to both the UP and DOWN StreamDeck Events with the *Command Once* Option disabled.
+- **NOTE**: The WebAPI is disabled per default since there is an open X-Plane Bug (XPD-16752) leading to the API not delivering DataRef Updates as requested.
 
 Note on Sequences for Hold Switches: All Commands will be set active - make sure to use the same Sequence for both Addresses!
 <br/><br/>
@@ -575,7 +576,7 @@ They are useful in specific Use-Cases when you need to share a Value only within
 <br/><br/><br/><br/>
 
 
-### 2.1.2 - Command Option
+### 2.1.2 - Command Options
 <br/>
 
 **On Value** / **Off Value**:<br/>
@@ -1209,7 +1210,7 @@ You can configure **multiple Commands** per StreamDeck Event to send a Chain of 
 Per default, the Plugin will delay the Execution of the next Command in the Chain by 15ms. You can change that Delay by selecting the StreamDeck Event itself and set the **Inter-Command Delay** Field. A Value of 0 disables this Delay.<br/>
 Be aware that Commands can't depend on each other, for Example when the first Commands updates a Variable, do not expect a following Command to have that changed Value already available (the Execution of Commands is decoupled from refreshing Variables & Actions).<br/><br/>
 
-Defining Commands share some communality with the classic Actions. The available Command Types and their [Syntax](#211---address-syntax) is exactly the same. For Variable based Commands, you can use the same [Value Manipulations](#212---command-option) in the **On/Write Value** Field.<br/>
+Defining Commands share some communality with the classic Actions. The available Command Types and their [Syntax](#211---address-syntax) is exactly the same. For Variable based Commands, you can use the same [Value Manipulations](#212---command-options) in the **On/Write Value** Field.<br/>
 For Variable based Commands, the **Reset Switch** Option is also available and works the same as with the other Actions - but each single Command has its own individual Setting and Delay/Hold Time!<br/>
 For Command-only Types that allow to be sequenced, the **Command Delay** Option is also available to delay Execution of the Commands contained in the Sequence. Each single Command has its own individual Setting and Delay Time!<br/><br/>
 
@@ -2089,7 +2090,7 @@ Some of the Plugin Settings can be tweaked in the File `PluginConfig.json` in th
 * "**XPlaneIP**": "127.0.0.1" 		- The IP (not Hostname) where X-Plane is running, anything other than "127.0.0.1" will be considered remote.
 * "**XPlanePort**": 49000 		- The Port Number used to connect to X-Plane.
 * "**XPlaneRemoteCheckTimeout**": 1500	- The Timeout in ms for the Check if a remote X-Plane Installation is ready. Must be below SimMonitor.
-* "**XPlaneUseWebApi**": false	- Use the X-Plane WebAPI (available with 12.1.4 and above) to read/write DataRefs and send Commands. You must allow Access in the X-Plane Settings for the Plugin being able to connect!
+* "**XPlaneUseWebApi**": false	- Use the X-Plane WebAPI (available with 12.1.4 and above) to read/write DataRefs and send Commands. You must allow Access in the X-Plane Settings for the Plugin being able to connect! Disabled per default due to an open X-Plane Bug (XPD-16752).
 * "**XPlaneWebApiHost**": 127.0.0.1:8086	- The Address used to connect to the WebAPI.
 * "**ApiPortNumber**": 42042	- The Port Number used by the Plugin's REST API.
 * "**MsfsRemoteConnection**": false	- Set to true to enable a SimConnect Connection over the Network.
