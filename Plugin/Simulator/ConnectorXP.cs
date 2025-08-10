@@ -33,6 +33,7 @@ namespace PilotsDeck.Simulator
         public DispatcherTimer TimerCheckLoading { get; } = new();
         public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; private set; } = [];
         public bool UseWebAPI => App.Configuration.XPlaneUseWebApi && SimVersion >= ConnectionManagerREST.VERSIONWEBAPI;
+        public bool WebApiCmdOnly => UseWebAPI && App.Configuration.XPlaneUseWebApi;
         protected virtual DateTime LastKeepAlive { get; set; } = DateTime.Now;
 
         public ConnectorXP()
@@ -166,7 +167,7 @@ namespace PilotsDeck.Simulator
 
         public void UnsubscribeAllRefs()
         {
-            if (!UseWebAPI)
+            if (!UseWebAPI || WebApiCmdOnly)
             {
                 foreach (var variable in App.PluginController.VariableManager.VariableList.Where(v => v.IsValueXP()))
                     variable.IsSubscribed = false;
@@ -191,7 +192,7 @@ namespace PilotsDeck.Simulator
 
         public void SubscribeVariable(ManagedVariable managedVariable)
         {
-            if (!UseWebAPI)
+            if (!UseWebAPI || WebApiCmdOnly)
                 ConnectionUDP.SubscribeVariable(managedVariable);
             else
                 _ = ConnectionREST.SubscribeVariables([managedVariable]);
@@ -199,7 +200,7 @@ namespace PilotsDeck.Simulator
 
         public void SubscribeVariables(ManagedVariable[] managedVariables)
         {
-            if (!UseWebAPI)
+            if (!UseWebAPI || WebApiCmdOnly)
                 ConnectionUDP.SubscribeVariables(managedVariables);
             else
                 _ = ConnectionREST.SubscribeVariables(managedVariables);
@@ -207,7 +208,7 @@ namespace PilotsDeck.Simulator
 
         public void UnsubscribeVariable(ManagedVariable managedVariable)
         {
-            if (!UseWebAPI)
+            if (!UseWebAPI || WebApiCmdOnly)
                 ConnectionUDP.UnsubscribeVariable(managedVariable);
             else
                 _ = ConnectionREST.UnsubscribeVariables([managedVariable]);
@@ -215,7 +216,7 @@ namespace PilotsDeck.Simulator
 
         public void UnsubscribeVariables(ManagedVariable[] managedVariables)
         {
-            if (!UseWebAPI)
+            if (!UseWebAPI || WebApiCmdOnly)
                 ConnectionUDP.UnsubscribeVariables(managedVariables);
             else
                 _ = ConnectionREST.UnsubscribeVariables(managedVariables);
@@ -263,7 +264,7 @@ namespace PilotsDeck.Simulator
             }
             else if (command.Type == SimCommandType.XPWREF)
             {
-                if (!UseWebAPI)
+                if (!UseWebAPI || WebApiCmdOnly)
                     result = await ConnectionUDP.WriteRef(command);
                 else
                     result = await ConnectionREST.WriteRef(command);
