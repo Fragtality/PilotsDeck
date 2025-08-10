@@ -512,6 +512,7 @@ In Comparison to other Simulators, X-Plane Commands can be requested to be activ
 Per Default the Plugin will trigger X-Plane Commands as "command_once" which is fine for most Buttons, Switches and Knobs. But in Cases of Buttons that need to be hold (kept pressed) for some Time and then released (e.g. CVR Test, TO CONF, Fire Tests) the Configuration depends on your X-Plane Version:
 - For X-Plane Versions *earlier* than 12.1.4: You can only trigger Commands as "command_once". If you need to configure a holdable Switch, you have to use a *vJoy* (Driver) Command (with the corresponding vJoy Button mapped in X-Plane).
 - For X-Plane Versions *at or greater* than 12.1.4 (and WebAPI enabled in the Plugin Config): You can enable the *Hold Switch* Option and disable the *Command Once* Option of the Plugin to create an holdable Button/Switch (use the same Command Ref in both Addresses). On the Composite Action you need to add the Command Ref to both the UP and DOWN StreamDeck Events with the *Command Once* Option disabled.
+- **NOTE**: The WebAPI is disabled per default since there is an open X-Plane Bug (XPD-16752) leading to the API not delivering DataRef Updates as requested.
 
 Note on Sequences for Hold Switches: All Commands will be set active - make sure to use the same Sequence for both Addresses!
 <br/><br/>
@@ -2089,7 +2090,7 @@ Some of the Plugin Settings can be tweaked in the File `PluginConfig.json` in th
 * "**XPlaneIP**": "127.0.0.1" 		- The IP (not Hostname) where X-Plane is running, anything other than "127.0.0.1" will be considered remote.
 * "**XPlanePort**": 49000 		- The Port Number used to connect to X-Plane.
 * "**XPlaneRemoteCheckTimeout**": 1500	- The Timeout in ms for the Check if a remote X-Plane Installation is ready. Must be below SimMonitor.
-* "**XPlaneUseWebApi**": false	- Use the X-Plane WebAPI (available with 12.1.4 and above) to read/write DataRefs and send Commands. You must allow Access in the X-Plane Settings for the Plugin being able to connect!
+* "**XPlaneUseWebApi**": false	- Use the X-Plane WebAPI (available with 12.1.4 and above) to read/write DataRefs and send Commands. You must allow Access in the X-Plane Settings for the Plugin being able to connect! Disabled per default due to an open X-Plane Bug (XPD-16752).
 * "**XPlaneWebApiHost**": 127.0.0.1:8086	- The Address used to connect to the WebAPI.
 * "**ApiPortNumber**": 42042	- The Port Number used by the Plugin's REST API.
 * "**MsfsRemoteConnection**": false	- Set to true to enable a SimConnect Connection over the Network.
