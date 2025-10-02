@@ -7,7 +7,7 @@
   "InputEventsMaxAttempts": 3,
   "InputEventScanDelay": 2500,
   "MobiSizeVariables": 10000,
-  "ConfigVersion": 16,
+  "ConfigVersion": 17,
   "LogDirectory": "log",
   "LogFile": "PilotsDeck.log",
   "LogLevel": 1,
@@ -28,6 +28,7 @@
     "de": "Kursiv",
     "en": "Italic"
   },
+  "WsReceiveBuffer": 131072,
   "RenderDpi": 96,
   "StringReplace": "%s",
   "CleanInactiveCommands": false,

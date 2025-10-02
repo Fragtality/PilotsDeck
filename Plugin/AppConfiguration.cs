@@ -39,7 +39,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 10;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 16;
+        public static int BuildConfigVersion { get; } = 17;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -186,6 +186,7 @@ namespace PilotsDeck
             else
                 return FontItalicName["en"];
         }
+        public int WsReceiveBuffer { get; set; } = 131072;
         public float RenderDpi { get; set; } = 96.0f;
         public string StringReplace { get; set; } = "%s";
         public bool CleanInactiveCommands { get; set; } = false;

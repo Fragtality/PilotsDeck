@@ -40,7 +40,7 @@ namespace PilotsDeck.StreamDeck
 
         public async Task<string> GetMessageAsString()
         {
-            var buffer = new byte[65536];
+            var buffer = new byte[App.Configuration.WsReceiveBuffer];
             var segment = new ArraySegment<byte>(buffer, 0, buffer.Length);
             var result = await _Socket.ReceiveAsync(segment, App.CancellationToken);
 

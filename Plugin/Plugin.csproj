@@ -90,16 +90,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2025.232.20.2716" />
+    <PackageReference Include="CFIT.AppFramework" Version="2025.253.21.1927" />
     <PackageReference Include="CFIT.AppLogger" Version="2025.218.23.703" />
-    <PackageReference Include="CFIT.AppTools" Version="2025.218.23.720" />
-    <PackageReference Include="CFIT.SimConnectLib" Version="2025.232.20.2679" />
+    <PackageReference Include="CFIT.AppTools" Version="2025.253.21.1891" />
+    <PackageReference Include="CFIT.SimConnectLib" Version="2025.253.21.1914" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.16" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.0" />
-    <PackageReference Include="NeoLua" Version="1.3.14" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.8" />
+    <PackageReference Include="NeoLua" Version="1.3.15" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.9" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>

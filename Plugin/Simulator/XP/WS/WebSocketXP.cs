@@ -46,7 +46,7 @@ namespace PilotsDeck.Simulator.XP.WS
 
         public virtual async Task<string> GetMessageAsString()
         {
-            var buffer = new byte[65536];
+            var buffer = new byte[App.Configuration.WsReceiveBuffer];
             var segment = new ArraySegment<byte>(buffer, 0, buffer.Length);
             var result = await WebSocket.ReceiveAsync(segment, App.CancellationToken);
 
