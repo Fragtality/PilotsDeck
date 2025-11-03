@@ -35,10 +35,10 @@ namespace Installer
 
         //Worker: .NET
         public virtual bool NetRuntimeDesktop { get; set; } = true;
-        public virtual string NetVersion { get; set; } = "8.0.20";
+        public virtual string NetVersion { get; set; } = "8.0.21";
         public virtual bool CheckMajorEqual { get; set; } = true;
-        public virtual string NetUrl { get; set; } = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.20/windowsdesktop-runtime-8.0.20-win-x64.exe";
-        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.20-win-x64.exe";
+        public virtual string NetUrl { get; set; } = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.21/windowsdesktop-runtime-8.0.21-win-x64.exe";
+        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.21-win-x64.exe";
 
         //Worker: MobiFlight
         public virtual bool MobiRequired { get; set; } = true;
@@ -60,9 +60,9 @@ namespace Installer
 
         //Worker: StreamDeck
         public virtual string DeckVersionMinimum { get { return "6.9.0"; } }
-        public virtual string DeckVersionTarget { get { return "6.9.1"; } }
-        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_6.9.1.21711.msi"; } }
-        public virtual string DeckInstaller { get { return "Stream_Deck_6.9.1.21711.msi"; } }
+        public virtual string DeckVersionTarget { get { return "7.0.3"; } }
+        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_7.0.3.22071.msi"; } }
+        public virtual string DeckInstaller { get { return "Stream_Deck_7.0.3.22071.msi"; } }
 
         //Prepar3D
         public virtual string P3dRegPath { get { return @"HKEY_CURRENT_USER\SOFTWARE\Lockheed Martin"; } }
