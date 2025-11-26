@@ -4,7 +4,6 @@ using CFIT.SimConnectLib;
 using CFIT.SimConnectLib.Definitions;
 using CFIT.SimConnectLib.InputEvents;
 using CFIT.SimConnectLib.Modules.MobiFlight;
-using CFIT.SimConnectLib.SimResources;
 using CFIT.SimConnectLib.SimVars;
 using PilotsDeck.Resources;
 using PilotsDeck.Resources.Variables;
@@ -36,7 +35,7 @@ namespace PilotsDeck.Simulator
         public bool IsPaused { get { return SimConnect.IsPaused; } }
         public string AircraftString { get { return SimConnect.AircraftString; } }
         public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; } = [];
-        protected Dictionary<string, ISimResourceSubscription> EventSubscriptions { get; } = [];
+        //protected Dictionary<string, ISimResourceSubscription> EventSubscriptions { get; } = [];
         protected SimConnectManager SimConnect { get; }
         protected MobiModule MobiModule { get; }
         protected SubManager SubManager { get; }
@@ -349,7 +348,7 @@ DisableNagle=1
                 if (RegisteredEvents.TryGetValue(evtName, out var events))
                 {
                     foreach (var evt in events)
-                        evt.Callback(evtName, evtData);
+                        evt.Callback(evt.Name, evtData);
                 }
                 else
                     Logger.Warning($"The Event '{evtName}' is not subscribed!");
@@ -370,11 +369,19 @@ DisableNagle=1
 
             try
             {
+                var evtAddress = new ManagedAddress(evtName);
+                if (evtAddress.IsEmpty || !evtAddress.IsRead || (evtAddress.ReadType != SimValueType.LVAR && evtAddress.ReadType != SimValueType.AVAR && evtAddress.ReadType != SimValueType.KVAR && evtAddress.ReadType != SimValueType.BVAR))
+                {
+                    Logger.Warning($"The Event '{evtName}' is not valid for Subscription!");
+                    return false;
+                }
+                var evtVariable = VariableManager.RegisterVariable(evtAddress);
+
                 bool doSub = false;
-                if (RegisteredEvents.TryGetValue(evtName, out var regList))
+                if (RegisteredEvents.TryGetValue(evtVariable.Address, out var regList))
                 {
                     if (regList.Any(e => e.Name == evtName && e.ReceiverID == receiverID))
-                        Logger.Warning($"The Event '{evtName}' is already subscribed for '{receiverID}'!");
+                        Logger.Warning($"The Event '{evtVariable.Address}' is already subscribed for '{receiverID}'!");
                     else
                     {
                         regList.Add(new ISimConnector.EventRegistration(evtName, receiverID, callbackFunction));
@@ -383,21 +390,23 @@ DisableNagle=1
                 }
                 else
                 {
-                    RegisteredEvents.Add(evtName, []);
-                    RegisteredEvents[evtName].Add(new ISimConnector.EventRegistration(evtName, receiverID, callbackFunction));
+                    RegisteredEvents.Add(evtVariable.Address, []);
+                    RegisteredEvents[evtVariable.Address].Add(new ISimConnector.EventRegistration(evtName, receiverID, callbackFunction));
                     Logger.Debug($"Subscribed Event '{evtName}' for '{receiverID}'");
                     doSub = true;
                 }
 
                 if (doSub)
                 {
-                    var sub = SimConnect.EventManager.Subscribe(evtName);
-                    if (sub == null)
+                    SubscribeVariable(evtVariable);
+                    SubManager.TryGet(evtVariable, out SubMapping subMapping);
+
+                    if (subMapping == null)
                         return false;
 
-                    sub.OnReceived += (sub, value) =>
+                    subMapping.Subscription.OnReceived += (sub, value) =>
                     {
-                        OnReceiveEvent(sub.Name, value);
+                        OnReceiveEvent(evtAddress.Address, value);
                     };
                 }
 
@@ -420,34 +429,41 @@ DisableNagle=1
 
             try
             {
-                bool doSub = false;
-                if (RegisteredEvents.TryGetValue(evtName, out var regList))
+                var evtAddress = new ManagedAddress(evtName);
+                if (evtAddress.IsEmpty || !evtAddress.IsRead || (evtAddress.ReadType != SimValueType.LVAR && evtAddress.ReadType != SimValueType.AVAR && evtAddress.ReadType != SimValueType.KVAR && evtAddress.ReadType != SimValueType.BVAR))
+                {
+                    Logger.Warning($"The Event '{evtName}' is not valid for Subscription!");
+                    return false;
+                }
+
+                if (VariableManager.TryGet(evtAddress, out ManagedVariable evtVariable) || SubManager.TryGet(evtVariable, out SubMapping subMapping))
+                {
+                    Logger.Warning($"The Event '{evtName}' has no registered Variable or SubMapping!");
+                    return false;
+                }
+
+                if (RegisteredEvents.TryGetValue(evtAddress.Address, out var regList))
                 {
                     ISimConnector.EventRegistration reg = regList.FirstOrDefault(e => e.Name == evtName && e.ReceiverID == receiverID, null);
                     if (reg == null)
-                        Logger.Warning($"The Event '{evtName}' is not subscribed for '{receiverID}'!");
+                        Logger.Warning($"The Event '{evtAddress.Address}' is not subscribed for '{receiverID}'!");
                     else
                     {
                         regList.Remove(reg);
                         Logger.Debug($"Unsubscribed Event '{evtName}' for '{receiverID}'");
                         if (regList.Count == 0)
                         {
-                            doSub = true;
                             RegisteredEvents.Remove(evtName);
+                            subMapping.Subscription.OnReceived -= (sub, value) =>
+                            {
+                                OnReceiveEvent(evtAddress.Address, value);
+                            };
+                            UnsubscribeVariable(evtVariable);
                         }
                     }
                 }
                 else
                     Logger.Warning($"The Event '{evtName}' is not subscribed!");
-
-                if (doSub && EventSubscriptions.TryGetValue(evtName, out var sub))
-                {
-                    if (sub == null)
-                        return false;
-
-                    sub.Unsubscribe();
-                    EventSubscriptions.Remove(evtName);
-                }
 
                 return true;
             }

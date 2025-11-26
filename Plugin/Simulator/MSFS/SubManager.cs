@@ -26,6 +26,11 @@ namespace PilotsDeck.Simulator.MSFS
             return SubscriptionMappings.Where(m => m.Key.Variable.Address == variable.Address).Any();
         }
 
+        public bool Contains(string name)
+        {
+            return SubscriptionMappings.Where(m => m.Key.Subscription.Name == name).Any();
+        }
+
         public bool TryGet(ManagedVariable variable, out SubMapping mapping)
         {
             var query = SubscriptionMappings.Where(m => m.Key.Variable.Address == variable.Address);

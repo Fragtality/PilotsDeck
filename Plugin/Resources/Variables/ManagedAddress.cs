@@ -1,4 +1,5 @@
-﻿using CFIT.AppTools;
+﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using CFIT.SimConnectLib.SimVars;
 using PilotsDeck.Simulator;
 using PilotsDeck.Tools;
@@ -124,86 +125,97 @@ namespace PilotsDeck.Resources.Variables
 
             if (string.IsNullOrWhiteSpace(address))
                 return false;
-
-            if (TypeMatching.rxOffset.IsMatch(address))
+            try
             {
-                prefix = "0x";
-
-                string[] parts = address.Split(':');
-                int idx = 0;
-                if (parts[0].StartsWith("0x"))
-                    idx = 2;
-                name = parts[0].Substring(idx, 4).ToUpper();
-
-                if (parts.Length > 1)
+                if (TypeMatching.rxOffset.IsMatch(address))
                 {
+                    prefix = "0x";
+
+                    string[] parts = address.Split(':');
+                    int idx = 0;
+                    if (parts[0].StartsWith("0x"))
+                        idx = 2;
+                    name = parts[0].Substring(idx, 4).ToUpper();
+
+                    if (parts.Length > 1)
+                    {
+                        separator = ":";
+                        param = string.Join(':', parts[1..]).ToLowerInvariant();
+                    }
+                }
+                else if (TypeMatching.rxAvar.IsMatch(address) && TypeMatching.rxAvar.GroupsMatching(address, [3, 5], out var rpnGroups))
+                {
+                    if (TypeMatching.rxAvar.GroupsMatching(address, [1], out var prefixGroup))
+                        prefix = prefixGroup[0];
+                    else
+                        prefix = "A:";
+
+                    name = rpnGroups[0];
+
+                    separator = ",";
+                    param = rpnGroups[1].ToLowerInvariant();
+                }
+                else if (TypeMatching.rxKvarVariable.IsMatch(address))
+                {
+                    prefix = "K:";
+
+                    name = address.Split(':')[1];
+                }
+                else if (TypeMatching.rxBvarValue.IsMatch(address))
+                {
+                    prefix = "B:";
+
+                    name = address[2..];
+                }
+                else if (TypeMatching.rxLuaFunc.IsMatch(address))
+                {
+                    prefix = "lua:";
+
+                    string[] parts = address.Split(':');
+                    name = parts[1].ToLowerInvariant().Replace(".lua", "");
+
                     separator = ":";
-                    param = string.Join(':', parts[1..]).ToLowerInvariant();
+
+                    param = parts[2];
+                }
+                else if (TypeMatching.rxInternal.IsMatch(address))
+                {
+                    prefix = "X:";
+
+                    name = address[2..];
+                }
+                else if (TypeMatching.rxCalcRead.IsMatch(address))
+                {
+                    prefix = "C:";
+
+                    name = address[2..];
+                }
+                else if (TypeMatching.rxDref.IsMatch(address) && TypeMatching.rxDref.GroupsMatching(address, [1], out var drefNameGroup))
+                {
+                    prefix = "";
+
+                    name = drefNameGroup[0];
+
+                    if (TypeMatching.rxDref.GroupsMatching(address, [4], out var drefParamGroup))
+                        param = drefParamGroup[0].ToLowerInvariant();
+                }
+                else if (TypeMatching.rxLvar.IsMatch(address) && TypeMatching.rxLvar.GroupsMatching(address, [1], out var lvarGroups))
+                {
+                    prefix = "L:";
+
+                    name = lvarGroups[0];
+                    if (name.StartsWith("L:"))
+                        name = name[2..];
                 }
             }
-            else if (TypeMatching.rxAvar.IsMatch(address) && TypeMatching.rxAvar.GroupsMatching(address, [3,5], out var rpnGroups))
+            catch (Exception ex)
             {
-                if (TypeMatching.rxAvar.GroupsMatching(address, [1], out var prefixGroup))
-                    prefix = prefixGroup[0];
-                else
-                    prefix = "A:";
-
-                name = rpnGroups[0];
-
-                separator = ",";
-                param = rpnGroups[1].ToLowerInvariant();
-            }
-            else if (TypeMatching.rxKvarVariable.IsMatch(address))
-            {
-                prefix = "K:";
-
-                name = address.Split(':')[1];                
-            }
-            else if (TypeMatching.rxBvarValue.IsMatch(address))
-            {
-                prefix = "B:";
-
-                name = address[2..];
-            }
-            else if (TypeMatching.rxLuaFunc.IsMatch(address))
-            {
-                prefix = "lua:";
-
-                string[] parts = address.Split(':');
-                name = parts[1].ToLowerInvariant().Replace(".lua", "");
-
-                separator = ":";
-
-                param = parts[2];
-            }
-            else if (TypeMatching.rxInternal.IsMatch(address))
-            {
-                prefix = "X:";
-
-                name = address[2..];
-            }
-            else if (TypeMatching.rxCalcRead.IsMatch(address))
-            {
-                prefix = "C:";
-
-                name = address[2..];
-            }
-            else if (TypeMatching.rxDref.IsMatch(address) && TypeMatching.rxDref.GroupsMatching(address, [1], out var drefNameGroup))
-            {
-                prefix = "";
-
-                name = drefNameGroup[0];
-
-                if (TypeMatching.rxDref.GroupsMatching(address, [4], out var drefParamGroup))
-                    param = drefParamGroup[0].ToLowerInvariant();
-            }
-            else if (TypeMatching.rxLvar.IsMatch(address) && TypeMatching.rxLvar.GroupsMatching(address, [1], out var lvarGroups))
-            {
-                prefix = "L:";
-
-                name = lvarGroups[0];
-                if (name.StartsWith("L:"))
-                    name = name[2..];
+                Logger.LogException(ex);
+                prefix = EMPTY_PREFIX;
+                name = EMPTY_NAME;
+                separator = "";
+                param = "";
+                return false;
             }
 
             return $"{prefix}{name}" != ADDRESS_EMPTY;

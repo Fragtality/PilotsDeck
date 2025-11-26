@@ -1513,6 +1513,37 @@ Use the string.Format Function of C# as an Alternative to Lua builtin string.for
 `SharpFormatLocale("{0:0.}", SimRead("INI_Altitude_Dial"))`
 <br/><br/><br/>
 
+
+| HttpGet | `HttpGet("url")` |
+| --- | --- |
+
+Execute a HTTP GET Request to the passed URL and return the Response (Body) as String.<br/>
+*Example:*<br/>
+`local ofp = HttpGet("https://www.simbrief.com/api/xml.fetcher.php?json=1&username=OttoThePilot")`
+<br/><br/><br/>
+
+
+| Deserialize | `Deserialize("json")` |
+| --- | --- |
+
+Deserialize the passed JSON String to a Lua-Table.<br/>
+*Example:*<br/>
+```lua
+local json = Deserialize('{"fetch":{"userid":123456}}')
+local userid = ["fetch"]["userid"]
+```
+<br/><br/><br/>
+
+
+| Serialize | `Serialize(table)` |
+| --- | --- |
+
+Serialize the passed Lua-Table to a JSON-String.<br/>
+*Example:*<br/>
+`local json = Serialize(mytable)`
+<br/><br/><br/>
+
+
 **Migration from FSUIPC** <br/>
 Most FSUIPC Scripts can be easily migrated:
 - ipc.readLvar => SimRead (Place a SimVar Statement for the Variable)
@@ -1610,11 +1641,13 @@ There can only be one Call to RunSim per Script and it need to be placed at the 
 | RunEvent | `RunEvent("event", "callback")` |
 | --- | --- |
 
-The specified *callback* Function is called as soon as the Plugin receives a Notification for the specified *event*.<br/>
-This is currently only supported for MSFS (as the other Connectors do not offer an Event-based API). Check the Flight Simulator SDK for [Event IDs](https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm)<br/>
+The specified *callback* Function in the Script is called as soon as the Plugin receives a Notification for the specified *event*. The Value of the Event/Variable will be passed as a Parameter to the *callback* Function.<br/>
+This is currently only supported for MSFS (as the other Connectors do not offer an Event-based API). You can subscribe to K-Var ([SimEvents](https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm)), L-Vars, A-Vars ([SimVars](https://docs.flightsimulator.com/html/Programming_Tools/SimVars/Simulation_Variables.htm)) and B-Vars (InputEvents). Use the Plugin-Syntax as documented and always set the correct Prefix!<br/>
 There can multiple Calls to RunEvent per Script to track different Events (in different Functions). These need to be placed at the Beginning of the Script (globally) - typically with your RunInterval Statement.<br/>
-*Example:*<br/>
-`RunEvent("EXTERNAL_SYSTEM_TOGGLE", "SYSTEM_EVENT")`
+*Examples:*<br/>
+`RunEvent("K:EXTERNAL_SYSTEM_TOGGLE", "SYSTEM_EVENT")`<br/>
+`RunEvent("L:CABaroKnob", "LVAR_UPDATE")`<br/>
+`RunEvent("(A:SIM ON GROUND, Bool)", "AVAR_UPDATE")`
 <br/><br/><br/>
 
 **Migration from FSUIPC** <br/>

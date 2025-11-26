@@ -164,6 +164,11 @@ namespace PilotsDeck.Resources.Scripts
             if (!IsActiveGlobal)
                 return;
 
+            if (!string.IsNullOrWhiteSpace(evtName) && evtName.Length > 2 && !evtName.StartsWith('(') && evtName[1] != ':')
+            {
+                evtName = evtName.Insert(0, "K:");
+            }
+
             if (!string.IsNullOrWhiteSpace(callback) && !string.IsNullOrWhiteSpace(evtName) && !EventCallbacks.ContainsKey(evtName))
             {
                 EventCallbacks.Add(evtName, callback);

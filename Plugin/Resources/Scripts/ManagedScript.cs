@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 
 namespace PilotsDeck.Resources.Scripts
@@ -95,6 +98,9 @@ namespace PilotsDeck.Resources.Scripts
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
             _env.GetRegistryValue = new Func<string, string, string>(GetRegistryValue);
+            _env.HttpGet = new Func<string, string>(DoHttpGet);
+            _env.Serialize = new Func<object, string>(JsonSerialize);
+            _env.Deserialize = new Func<string, JsonNode>(JsonDeserialize);
             _env.Sleep = new Action<int>(ScriptSleep);
             _env.UseLog = new Action<string>(UseLog);
             _env.Log = new Action<string>(WriteLog);
@@ -451,6 +457,58 @@ namespace PilotsDeck.Resources.Scripts
         protected virtual string GetRegistryValue(string path, string value)
         {
             return Sys.GetRegistryValue<string>(path, value) ?? "";
+        }
+
+        protected virtual string DoHttpGet(string url)
+        {
+            string result = "";
+
+            try
+            {
+                using var httpClient = new HttpClient();
+                result = httpClient.GetStringAsync(url).Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            return result;
+        }
+
+        protected virtual string JsonSerialize(object obj)
+        {
+            string result = "";
+
+            try
+            {
+                result = JsonSerializer.Serialize(obj);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            return result;
+        }
+
+        protected virtual JsonNode JsonDeserialize(string json)
+        {
+            JsonNode result = null;
+
+            try
+            {
+                result = JsonNode.Parse(json);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            return result;
         }
 
         public override string ToString()

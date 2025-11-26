@@ -35,10 +35,10 @@ namespace Installer
 
         //Worker: .NET
         public virtual bool NetRuntimeDesktop { get; set; } = true;
-        public virtual string NetVersion { get; set; } = "8.0.21";
+        public virtual string NetVersion { get; set; } = "8.0.22";
         public virtual bool CheckMajorEqual { get; set; } = true;
-        public virtual string NetUrl { get; set; } = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.21/windowsdesktop-runtime-8.0.21-win-x64.exe";
-        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.21-win-x64.exe";
+        public virtual string NetUrl { get; set; } = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.22/windowsdesktop-runtime-8.0.22-win-x64.exe";
+        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-8.0.22-win-x64.exe";
 
         //Worker: MobiFlight
         public virtual bool MobiRequired { get; set; } = true;
@@ -46,9 +46,9 @@ namespace Installer
 
         //Worker: FSUIPC7
         public virtual bool Fsuipc7Required { get; set; } = true;
-        public virtual string Fsuipc7Version { get; set; } = "7.5.4";
+        public virtual string Fsuipc7Version { get; set; } = "7.5.5";
         public virtual string Fsuipc7WasmVersion { get; set; } = "1.0.7";
-        public virtual string Fsuipc7Url { get; set; } = "https://fsuipc.com/download/Install_FSUIPC7.5.4.zip";
+        public virtual string Fsuipc7Url { get; set; } = "https://fsuipc.com/download/Install_FSUIPC7.zip";
         public virtual bool Fsuipc7AllowBeta { get; set; } = false;
         public virtual bool Fsuipc7CheckPumps { get; set; } = true;
 
