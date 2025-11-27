@@ -115,7 +115,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
 
         protected override void InitializeMemberBindings()
         {
-            CreateMemberBinding<string, string>("Key", new TextNumberConverter(), new ValidationRuleTextNumber());
+            CreateMemberBinding<string, string>("Key", new NoneConverter(), new ValidationRuleNull());
             CreateMemberBinding<string, string>("Value", new NoneConverter(), new ValidationRuleNull());
         }
 
