@@ -436,7 +436,7 @@ DisableNagle=1
                     return false;
                 }
 
-                if (VariableManager.TryGet(evtAddress, out ManagedVariable evtVariable) || SubManager.TryGet(evtVariable, out SubMapping subMapping))
+                if (!VariableManager.TryGet(evtAddress, out ManagedVariable evtVariable) || !SubManager.TryGet(evtVariable, out SubMapping subMapping))
                 {
                     Logger.Warning($"The Event '{evtName}' has no registered Variable or SubMapping!");
                     return false;
