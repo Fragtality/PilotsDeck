@@ -26,7 +26,7 @@ namespace ProfileManager
     public class Parameters
     {
         public static readonly string STREAMDECK_PATH = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Elgato\StreamDeck";
-        public static readonly string SD_PROFILE_PATH = $@"{STREAMDECK_PATH}\ProfilesV2";
+        public static readonly string SD_PROFILE_PATH = $@"{STREAMDECK_PATH}\ProfilesV3";
         public static readonly string SD_PROFILE_MANIFEST = "manifest.json";
         public static readonly string SD_WINDOW_NAME = "Stream Deck";
         public static readonly string SD_PROFILE_EXTENSION = ".streamDeckProfile";

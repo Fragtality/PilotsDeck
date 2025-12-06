@@ -210,6 +210,13 @@ namespace PilotsDeck.Actions.Simple
         public virtual void SetTitleParameters(string title, StreamDeckEvent.TitleParameters titleParameters)
         {
             Title = title;
+            if (Settings.FontInherit && App.Configuration.FontSizeInheritOverride)
+            {
+                Logger.Verbose($"FontSize: {titleParameters.fontSize} => {App.Configuration.FontSizeInherit}");
+                titleParameters.fontSize = App.Configuration.FontSizeInherit;
+            }
+            else
+                Logger.Verbose($"FontSize: {titleParameters.fontSize}");
             TitleSettings = new SettingsTitle(titleParameters);
             RefreshTitle();
             NeedRefresh = true;

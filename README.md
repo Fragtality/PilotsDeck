@@ -2108,6 +2108,8 @@ In case you wonder if you need to create a **SimConnect.cfg** File on the Client
 
 ## 4.1 - Plugin Settings
 Some of the Plugin Settings can be tweaked in the File `PluginConfig.json` in the Plugin Folder (where the Binary is). The File will be persisted through Updates - changed Settings will survive Updates.<br/>Normally you don't need to do anything here, it is best to keep the Settings and their Defaults unless instructed otherwise:<br/>
+* "**FontSizeInheritOverride**": false	        - When set to true, the Font Size for Actions using the "Inherit Font" Setting will be overriden. Useful for StreamDeck 7.1.0 and above.
+* "**FontSizeInherit**": 10		- The Font Size that will be set when *FontSizeInheritOverride* is set.
 * "**IntervalDeckRefresh**": 50	        - The Interval in ms used to refresh all active (currently displayed) Actions registered to the Plugin. All Actions will be refreshed, but only redrawn if they had Changes since the last Cycle.
 * "**IntervalSimProcess**": 50		- The Interval in ms used to poll Variable from the Sim (if a Variable Type needs to be polled) - this also included Lua Functions used as Variable.
 * "**UseFsuipcForMSFS**": true         	- Determines if FSUIPC7 is used for MSFS as secondary Connector. If changed to false, the Plugin won't try to attempt to connect ot FSUIPC7.

@@ -7,14 +7,24 @@ using System.IO;
 
 namespace PilotsDeck.Resources.Scripts
 {
+    public class TimerCallback
+    {
+        public TimerCallback() { }
+        public int Interval { get; set; } = 1000;
+        public string CallbackFunction { get; set; } = "OnTick";
+        public DateTime NextRun { get; set; } = DateTime.Now;
+        
+        public void SetNextRun(DateTime now)
+        {
+            NextRun = now.AddMilliseconds(Interval);
+        }
+    }
+
     public class ManagedGlobalScript(string file, Serilog.Core.Logger log) : ManagedScript(file, log)
     {
         public virtual bool IsActiveGlobal { get; set; } = false;
-        public virtual int Interval { get; set; } = 1000;
         public virtual Dictionary<string, string> EventCallbacks { get; private set; } = [];
-        public virtual string CallbackFunction { get; set; } = "OnTick";
-        public virtual bool CallbacksIntialized { get; protected set; } = false;
-        public virtual DateTime NextRun { get; set; } = DateTime.Now;
+        public virtual Dictionary<string, TimerCallback> TimerCallbacks { get; private set; } = [];
         public virtual string Aircraft { get; set; } = "";
         public virtual SimulatorType SimulatorType { get; set; } = SimulatorType.NONE;
 
@@ -47,8 +57,6 @@ namespace PilotsDeck.Resources.Scripts
                 return;
 
             base.Start(fileInfo, log);
-            
-            SetNextRun();
         }
 
         public override void Stop()
@@ -63,23 +71,20 @@ namespace PilotsDeck.Resources.Scripts
             base.Stop();
         }
 
-        private void SetNextRun()
-        {
-            if (IsRunning)
-                NextRun = DateTime.Now.AddMilliseconds(Interval);
-        }
-
         public virtual void RunGlobal(DateTime now)
         {
-            if (!IsRunning || !CallbacksIntialized)
+            if (!IsRunning || TimerCallbacks.Count == 0)
                 return;
 
             try
             {
-                if (now >= NextRun)
+                foreach (var callback in TimerCallbacks)
                 {
-                    DoChunk($"{CallbackFunction}()");
-                    SetNextRun();
+                    if (now >= callback.Value.NextRun)
+                    {
+                        DoChunk($"{callback.Value.CallbackFunction}()");
+                        callback.Value.SetNextRun(now);
+                    }
                 }
             }
             catch (LuaRuntimeException ex)
@@ -126,12 +131,21 @@ namespace PilotsDeck.Resources.Scripts
 
         protected virtual void RunInterval(int interval, string function = "OnTick")
         {
-            Interval = interval;
             function ??= "OnTick";
-            CallbackFunction = function;
-            NextRun = DateTime.Now.AddMilliseconds(Interval);
-            Logger.Debug($"Interval set to '{Interval}' for Function '{CallbackFunction}' in Script '{FileName}'");
-            CallbacksIntialized = true;
+            if (TimerCallbacks.ContainsKey(function))
+            {
+                Logger.Warning($"The Script '{FileName}' already registered a Callback for '{function}'");
+                return;
+            }
+
+            var callback = new TimerCallback()
+            {
+                CallbackFunction = function,
+                Interval = interval
+            };
+
+            TimerCallbacks.Add(function, callback);
+            Logger.Debug($"Interval set to '{interval}' for Function '{function}' in Script '{FileName}'");
         }
 
         protected virtual void RunAircraft(string aircraft = "")
@@ -178,7 +192,7 @@ namespace PilotsDeck.Resources.Scripts
             else
                 Logger.Warning($"Could not add Event '{evtName}' for Script '{FileName}'");
 
-            CallbacksIntialized = true;
+            //CallbacksIntialized = true;
         }
 
         protected override void UseLog(string name)
