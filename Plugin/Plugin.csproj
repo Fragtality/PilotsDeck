@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Nullable>annotations</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -90,16 +91,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2025.339.17.107" />
-    <PackageReference Include="CFIT.AppLogger" Version="2025.319.13.1841" />
-    <PackageReference Include="CFIT.AppTools" Version="2025.319.13.1949" />
-    <PackageReference Include="CFIT.SimConnectLib" Version="2025.319.13.1973" />
+    <PackageReference Include="CFIT.AppFramework" Version="2025.341.14.926" />
+    <PackageReference Include="CFIT.AppLogger" Version="2025.341.14.881" />
+    <PackageReference Include="CFIT.AppTools" Version="2025.341.14.889" />
+    <PackageReference Include="CFIT.SimConnectLib" Version="2025.341.14.914" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.16" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.4.1" />
-    <PackageReference Include="NeoLua" Version="1.3.19" />
-    <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -114,6 +112,9 @@
     <Reference Include="Microsoft.FlightSimulator.SimConnect">
       <HintPath>Microsoft.FlightSimulator.SimConnect.dll</HintPath>
 	  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Reference>
+    <Reference Include="Neo.Lua">
+      <HintPath>Neo.Lua.dll</HintPath>
     </Reference>
     <Reference Include="vJoyInterfaceWrap">
       <HintPath>vJoyInterfaceWrap.dll</HintPath>

@@ -45,14 +45,17 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CFIT.AppLogger, Version=2025.319.13.1841, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.AppLogger.2025.319.13.1841\lib\net48\CFIT.AppLogger.dll</HintPath>
+    <Reference Include="CFIT.AppLogger, Version=2025.341.14.881, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\CFIT.AppLogger.2025.341.14.881\lib\net48\CFIT.AppLogger.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="CFIT.AppTools, Version=2025.319.13.1949, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.AppTools.2025.319.13.1949\lib\net48\CFIT.AppTools.dll</HintPath>
+    <Reference Include="CFIT.AppTools, Version=2025.341.14.889, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\CFIT.AppTools.2025.341.14.889\lib\net48\CFIT.AppTools.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="CFIT.Installer, Version=2025.319.13.1964, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.Installer.2025.319.13.1964\lib\net48\CFIT.Installer.dll</HintPath>
+    <Reference Include="CFIT.Installer, Version=2025.341.14.904, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\CFIT.Installer.2025.341.14.904\lib\net48\CFIT.Installer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Costura, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.6.0.0\lib\netstandard2.0\Costura.dll</HintPath>
@@ -164,9 +167,6 @@
     <Compile Include="ConfigPage.cs" />
     <Compile Include="Definition.cs" />
     <Compile Include="PageWelcomePilotsDeck.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

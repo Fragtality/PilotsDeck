@@ -23,7 +23,7 @@ $buildConfiguration = $args[0]
 $pathBase = $args[1]
 $pathProject = $args[2]
 $streamDeckExePath = "C:\Program Files\Elgato\StreamDeck\StreamDeck.exe"
-$msBuildDir = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64"
+$msBuildDir = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64"
 
 try {
 	$pathProfileManager = Join-Path $pathBase "ProfileManager"
@@ -62,9 +62,6 @@ try {
 
 	## ProfileManager Build
 	if (($buildConfiguration -eq "Debug" -and -not $cfgSkipManagerDebug) -or $buildConfiguration -eq "Release") {
-		Write-Host "msbuild for ProfileManager ..."
-		cd $msBuildDir
-		.\msbuild.exe (Join-Path $pathBase "\PilotsDeck.sln") /t:ProfileManager:rebuild /p:Configuration="Release" /p:Platform=x64 /p:BuildProjectReferences=false -verbosity:quiet
 		Write-Host "dotnet publish for ProfileManager ..."
 		cd $pathProfileManager
 		dotnet publish -p:PublishProfile=FolderProfile -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
@@ -72,9 +69,6 @@ try {
 
 	## SimConnectHelper Build
 	if (($buildConfiguration -eq "Debug" -and -not $cfgSkipManagerDebug) -or $buildConfiguration -eq "Release") {
-		Write-Host "msbuild for SimConnectHelper ..."
-		cd $msBuildDir
-		.\msbuild.exe (Join-Path $pathBase "\PilotsDeck.sln") /t:SimConnectHelper:rebuild /p:Configuration="Release" /p:Platform=x64 /p:BuildProjectReferences=false -verbosity:quiet
 		Write-Host "dotnet publish for SimConnectHelper ..."
 		cd $pathSimConnectHelper
 		dotnet publish -p:PublishProfile=PubProfile"$buildConfiguration" -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
