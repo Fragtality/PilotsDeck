@@ -1,4 +1,5 @@
 ﻿using PilotsDeck.UI.ActionDesignerUI.Clipboard;
+using PilotsDeck.UI.ActionDesignerUI.ColorStore;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Address;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Manipulators;
 using PilotsDeck.UI.ActionDesignerUI.Views.Controls;
@@ -25,7 +26,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls
             ButtonManager.BindButton(ButtonIndicatorColorClipboard, nameof(ViewModel.IndicatorColor), SettingType.COLOR);
             ButtonManager.BindParent(this);
 
-            ColorStore.BindColorLabel(LabelColorSelect, (c) => ViewModel.IndicatorColor = c);
+            ColorStoreManager.BindColorLabel(LabelColorSelect, ViewModel.ModelAction.WindowInstance, (c) => ViewModel.IndicatorColor = c);
             ViewModel.SetImageCommand.Bind(InputImage);
 
             ViewModel[nameof(ViewModel.IndicatorScale)].BindElement(InputScale);

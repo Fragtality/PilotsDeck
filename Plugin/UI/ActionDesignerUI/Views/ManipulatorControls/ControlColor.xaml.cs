@@ -1,4 +1,5 @@
 ﻿using PilotsDeck.UI.ActionDesignerUI.Clipboard;
+using PilotsDeck.UI.ActionDesignerUI.ColorStore;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Manipulators;
 using System.Windows.Controls;
 
@@ -21,7 +22,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Views.ManipulatorControls
             ButtonManager.BindButton(ButtonColorClipboard, nameof(ViewModel.Color), SettingType.COLOR);
             ButtonManager.BindParent(this);
 
-            ColorStore.BindColorLabel(LabelColor, (c) => ViewModel.Color = c);
+            ColorStoreManager.BindColorLabel(LabelColor, ViewModel.ModelAction.WindowInstance, (c) => ViewModel.Color = c);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CFIT.AppFramework.UI.ViewModels;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.UI.ActionDesignerUI.Clipboard;
+using PilotsDeck.UI.ActionDesignerUI.ColorStore;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Address;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements;
 using PilotsDeck.UI.ActionDesignerUI.Views.Controls;
@@ -46,7 +47,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Views.ElementControls
             ViewModelRanges.BindMemberIndex(InputRangeStart, nameof(ColorRange.Range), 0);
             ViewModelRanges.BindMemberIndex(InputRangeEnd, nameof(ColorRange.Range), 1);
             ViewModelRanges.BindMember(LabelRangeColor, nameof(ColorRange.Color), Label.BackgroundProperty, Brushes.White);
-            ColorStore.BindColorLabel(LabelRangeColor, (c) => ViewModel.ColorRanges[nameof(ColorRange.Color)].SetValueIn(System.Drawing.ColorTranslator.ToHtml(c)));
+            ColorStoreManager.BindColorLabel(LabelRangeColor, ViewModel.ModelAction.WindowInstance, (c) => ViewModel.ColorRanges[nameof(ColorRange.Color)].SetValueIn(System.Drawing.ColorTranslator.ToHtml(c)));
             ViewModelRanges.BindTextElement(LabelRangeColor, nameof(ColorRange.Color), "Color");
             ButtonManager.BindButton(ButtonCopyPasteRanges, nameof(ViewModel.ColorRangesCopy), SettingType.GAUGEMAP);
 
@@ -57,7 +58,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Views.ElementControls
             ViewModelMarkers.BindMember(InputMarkerHeight, nameof(IMarkerDefinition.Height));
             ViewModelMarkers.BindMember(InputMarkerOffset, nameof(IMarkerDefinition.Offset));
             ViewModelMarkers.BindMember(LabelMarkerColor, nameof(IMarkerDefinition.Color), Label.BackgroundProperty, Brushes.White);
-            ColorStore.BindColorLabel(LabelMarkerColor, (c) => ViewModel.GaugeMarkers[nameof(IMarkerDefinition.Color)].SetValueIn(System.Drawing.ColorTranslator.ToHtml(c)));
+            ColorStoreManager.BindColorLabel(LabelMarkerColor, ViewModel.ModelAction.WindowInstance, (c) => ViewModel.GaugeMarkers[nameof(IMarkerDefinition.Color)].SetValueIn(System.Drawing.ColorTranslator.ToHtml(c)));
             ViewModelMarkers.BindTextElement(LabelMarkerColor, nameof(IMarkerDefinition.Color), "Color");
             ButtonManager.BindButton(ButtonCopyPasteMarker, nameof(ViewModel.GaugeMarkersCopy), SettingType.GAUGEMARKER);
         }

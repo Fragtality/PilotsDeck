@@ -38,8 +38,8 @@
         </StackPanel>
 
         <StackPanel Grid.Column="1" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Height="32" VerticalAlignment="Bottom">
-            <Button Name="ButtonOK" Click="ButtonOK_Click" MinHeight="32" MinWidth="48">OK</Button>
-            <Button Name="ButtonCancel" Click="ButtonCancel_Click" MinHeight="32" MinWidth="48" Margin="16,0,0,0">Cancel</Button>
+            <Button Name="ButtonOK" Click="ButtonOK_Click" MinHeight="32" MinWidth="48" IsDefault="True">OK</Button>
+            <Button Name="ButtonCancel" Click="ButtonCancel_Click" MinHeight="32" MinWidth="48" Margin="16,0,0,0" IsCancel="True">Cancel</Button>
         </StackPanel>
     </Grid>
 </Window>

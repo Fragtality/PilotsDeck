@@ -59,7 +59,6 @@ namespace PilotsDeck.UI.ActionDesignerUI
                 LastSelectedImage = selectedImage;
                 FillImageVariants();
             }
-            ButtonOK.IsDefault = true;
             Refreshing = false;
 
             if (ParentWindow != null)
@@ -183,8 +182,7 @@ namespace PilotsDeck.UI.ActionDesignerUI
                 LabelFileName.Content = image.ImageFile;
                 image.Border.BorderBrush = SystemColors.HighlightBrush;
 
-                if (LastSelectedImage != null)
-                    LastSelectedImage.Border.BorderBrush = InactiveBrush;
+                LastSelectedImage?.Border.BorderBrush = InactiveBrush;
                 LastSelectedImage = image;
                 FillImageVariants();
             }

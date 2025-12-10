@@ -8,6 +8,7 @@ using PilotsDeck.Simulator;
 using PilotsDeck.StreamDeck;
 using PilotsDeck.Tools;
 using PilotsDeck.UI.ActionDesignerUI;
+using PilotsDeck.UI.ActionDesignerUI.ColorStore;
 using PilotsDeck.UI.DeveloperUI;
 using System;
 using System.Collections.Concurrent;
@@ -93,7 +94,7 @@ namespace PilotsDeck
                 Logger.Information($"Version checked. Loading Configuration ...");
                 LoadConfiguration();
                 CheckFolders();
-                ColorStore.Load();
+                ColorStoreManager.Load();
 
                 Logger.Information($"Configuration loaded. Loading Tray Icon ...");
                 InitSystray();
@@ -201,7 +202,7 @@ namespace PilotsDeck
             IsAppShutDown = true;
 
             Logger.Information("Signal Shutdown ...");
-            ColorStore.Save();
+            ColorStoreManager.Save();
             StatisticTimer?.Stop();
             CancellationTokenSource.Cancel();
             if (shutdownApp)

@@ -1,4 +1,5 @@
 ﻿using PilotsDeck.UI.ActionDesignerUI.Clipboard;
+using PilotsDeck.UI.ActionDesignerUI.ColorStore;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements;
 using PilotsDeck.UI.ActionDesignerUI.Views.ElementControls;
 using System.Windows;
@@ -33,7 +34,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Views
 
         protected virtual void InitializeBindings()
         {
-            ColorStore.BindColorLabel(LabelColorSelect, (c) => ModelElement.Color = c);
+            ColorStoreManager.BindColorLabel(LabelColorSelect, ParentWindow, (c) => ModelElement.Color = c);
             ModelElement[nameof(ModelElement.PosX)].BindElement(InputPosX);
             ModelElement[nameof(ModelElement.PosY)].BindElement(InputPosY);
             ModelElement[nameof(ModelElement.Width)].BindElement(InputWidth);

@@ -1,0 +1,96 @@
+﻿<Window x:Class="PilotsDeck.UI.ActionDesignerUI.ColorStore.DialogColor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PilotsDeck.UI.ActionDesignerUI.ColorStore"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
+        mc:Ignorable="d"
+        Title="Select Color" Height="450" Width="800" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ColorPicker;component/Styles/DefaultColorPickerStyle.xaml" />
+                <ResourceDictionary Source="../../Styles/StyleResources.xaml" />
+                <ResourceDictionary>
+                    <Style TargetType="UniformGrid" x:Key="UniformGridDefault">
+                        <Setter Property="Columns" Value="10" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="VerticalAlignment" Value="Top" />
+                        <Setter Property="Margin" Value="0" />
+                    </Style>
+                    <Style TargetType="Label" x:Key="LabelGrid" BasedOn="{StaticResource {x:Type Label}}">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="MinHeight" Value="24" />
+                        <Setter Property="FontWeight" Value="DemiBold" />
+                        <Setter Property="Margin" Value="0,0,0,4" />
+                        <Setter Property="Padding" Value="0" />
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
+            <StackPanel Orientation="Vertical">
+                <Label Style="{StaticResource LabelGrid}">Standard Colors</Label>
+                <UniformGrid Name="GridStandardColors" Style="{StaticResource UniformGridDefault}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="16,0,0,0">
+            <StackPanel Orientation="Vertical">
+                <Label Style="{StaticResource LabelGrid}">Custom Colors</Label>
+                <UniformGrid Name="GridUserColors" Style="{StaticResource UniformGridDefault}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" Margin="0,16,0,0">
+                <Label Style="{StaticResource LabelGrid}">Recently used</Label>
+                <UniformGrid Name="GridRecentColors" Style="{StaticResource UniformGridDefault}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2" Margin="16,0,0,0">
+            <colorpicker:SquarePicker Width="256" Height="256" Name="ColorPicker"/>
+            <Grid Margin="0,16,0,0" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Grid.Column="0" Name="ButtonAdd" Style="{StaticResource BtnSquareSmall}" Margin="0,0,8,0">
+                    <Image Source="../../Icons/plus-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+                <Button Grid.Row="1" Grid.Column="0" Name="ButtonRemove" Style="{StaticResource BtnSquareSmall}" Margin="0,8,8,0">
+                    <Image Source="../../Icons/dash-circle.png" Style="{StaticResource ImgSquareSmall}"/>
+                </Button>
+
+                <Label Grid.Row="0" Grid.Column="1" Name="LabelPreview" Width="72" Height="24" BorderBrush="LightGray" BorderThickness="1"/>
+                <colorpicker:HexColorTextBox Grid.Row="1" Grid.Column="1"  Margin="0,8,0,0" Name="TextBoxHex"
+                                     ColorState="{Binding ElementName=ColorPicker, Path=ColorState, Mode=TwoWay, Delay=10}"
+                                     ShowAlpha="False" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" Height="32" VerticalAlignment="Bottom" Margin="0,16,0,0">
+            <Button Name="ButtonOK" Click="ButtonOkOnClick" MinHeight="32" MinWidth="48" FontWeight="DemiBold">OK</Button>
+            <Button Name="ButtonCancel" Click="ButtonCancelOnClick" MinHeight="32" MinWidth="48" Margin="16,0,0,0">Cancel</Button>
+        </StackPanel>
+    </Grid>
+</Window>
