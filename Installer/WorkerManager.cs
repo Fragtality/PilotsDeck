@@ -18,7 +18,8 @@ namespace Installer
         protected void CreateInstallUpdateTasks(SetupMode key)
         {
             WorkerQueues[key].Enqueue(new WorkerDotNet<Config>(Config));
-            WorkerQueues[key].Enqueue(new WorkerStreamDeckSoftware(Config));
+            if (!Config.IgnoreStreamDeck)
+                WorkerQueues[key].Enqueue(new WorkerStreamDeckSoftware(Config));
             WorkerQueues[key].Enqueue(new WorkerCheckSimulators(Config));
             WorkerQueues[key].Enqueue(new WorkerFsuipc7(Config, Simulator.MSFS2020));
             WorkerQueues[key].Enqueue(new WorkerFsuipc7(Config, Simulator.MSFS2024));
@@ -27,7 +28,8 @@ namespace Installer
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV4));
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV5));
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV6));
-            WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
+            if (!Config.IgnoreStreamDeck)
+                WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
             WorkerQueues[key].Enqueue(new WorkerInstallUpdate(Config));
             WorkerQueues[key].Enqueue(new WorkerLegacyProfiles(Config));
             if (Config?.GetOption<bool>(Config.OptionVjoyInstallUpdate) == true)
@@ -37,7 +39,8 @@ namespace Installer
                     worker.Model.DisplayInSummary = true;
                 WorkerQueues[key].Enqueue(worker);
             }
-            WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, StartStopDelay = 1 });
+            if (!Config.IgnoreStreamDeck)
+                WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, StartStopDelay = 1 });
             if (Config?.GetOption<bool>(ConfigBase.OptionDesktopLink) == true)
                 WorkerQueues[key].Enqueue(new WorkerDesktopLink(Config, DesktopLinkOperation.CREATE));
         }

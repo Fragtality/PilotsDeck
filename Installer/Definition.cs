@@ -36,6 +36,11 @@ namespace Installer
                 Config.IgnoreMsfs2024 = true;
                 Logger.Information("Installer was started with IgnoreMSFS (2024)");
             }
+            if (Sys.HasArgument(args, "--ignorestreamdeck"))
+            {
+                Config.IgnoreStreamDeck = true;
+                Logger.Information("Installer was started with IgnoreStreamDeck");
+            }
         }
 
         protected override void CreateWindowBehavior()

@@ -102,6 +102,7 @@ You do *not* need to remove the old Version for an Update - using 'Remove' in th
 <br/><br/>
 It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues because either the Binary is blocked from running or is blocked when connecting to the StreamDeck Software.<br/>
 **DO NOT** run the Installer, Plugin or StreamDeck Software "as Admin". It is not recommended to MSFS or FSUIPC7 "as Admin" - it might work, it might fail.<br/>
+If your StreamDeck Installation isn't detected (e.g. it isn't StreamDeck), you can try to start the Installer with the Commandline Parameter `--ignorestreamdeck`. Note: you need to manually stop the Software before running the Installer (and start it manually afterwards) when using that Parameter!<br/>
 If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
 The Requirements for the Plugin:
 - Windows **10** or **11** (updated)

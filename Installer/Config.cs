@@ -13,6 +13,7 @@ namespace Installer
         //InstallerOptions
         public virtual bool IgnoreMsfs2020 { get; set; } = false;
         public virtual bool IgnoreMsfs2024 { get; set; } = false;
+        public virtual bool IgnoreStreamDeck { get; set; } = false;
         public virtual string ProfileManagerName { get { return "Profile Manager"; } }
         public virtual string ProfileManagerExePath { get { return Path.Combine(ProductPath, $"{ProfileManagerName.Replace(" ", "")}.exe"); } }
         public virtual bool Fsuipc7UseSecondaryConfig { get; set; } = true;
