@@ -12,6 +12,10 @@ $buildConfiguration = $args[0]
 $pathBase = $args[1]
 $pathProject = $args[2]
 
+if ((Test-Path -Path (Join-Path $basePath "build.lck"))) {
+	exit 0
+}
+
 $pathOut = Join-Path $pathProject "Plugin/PI"
 $pathPIsource = Join-Path $pathOut "src"
 $pathPIinc = Join-Path $pathOut "inc"

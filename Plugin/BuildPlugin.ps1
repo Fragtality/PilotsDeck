@@ -30,12 +30,13 @@ try {
 	$pathSimConnectHelper = Join-Path $pathBase "SimConnectHelper"
 
 	cd $pathProject
+	$pathInstallerPayload = Join-Path $pathBase "Installer\Payload"
 	$pluginManifest = Get-Content -Raw (Join-Path $pathProject manifest.json) | ConvertFrom-Json
+	$timestamp = "build" + (Get-Content -Raw (Join-Path $pathInstallerPayload version.json) | ConvertFrom-Json).Timestamp
 	$pluginVersion = $pluginManifest.Version
 	$pluginUUID = $pluginManifest.UUID
 	$pathPublish = Join-Path $pathBase "Releases\$pluginUUID.sdPlugin"
 	$pathPlugin = Join-Path ($env:APPDATA) "Elgato\StreamDeck\Plugins\$pluginUUID.sdPlugin"
-	$pathInstallerPayload = Join-Path $pathBase "Installer\Payload"
 
 	######### BUILD
 	## Create Lock
@@ -55,23 +56,23 @@ try {
 	Write-Host ("Build Configuration: '$buildConfiguration'")
 
 	## Plugin Build
-	Write-Host "dotnet publish for Plugin (v$pluginVersion) ..."
+	Write-Host "dotnet publish for Plugin (v$pluginVersion+$timestamp) ..."
 	Remove-Item -Recurse -Force -Path ($pathPublish + "\*")
 	cd $pathProject
-	dotnet publish -p:PublishProfile=PubProfile$buildConfiguration -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
-
+	dotnet publish -p:PublishProfile=PubProfile$buildConfiguration -p:Version="$pluginVersion" -p:SourceRevisionId="$timestamp" -c $buildConfiguration --verbosity quiet
+	
 	## ProfileManager Build
 	if (($buildConfiguration -eq "Debug" -and -not $cfgSkipManagerDebug) -or $buildConfiguration -eq "Release") {
 		Write-Host "dotnet publish for ProfileManager ..."
 		cd $pathProfileManager
-		dotnet publish -p:PublishProfile=FolderProfile -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
+		dotnet publish -p:PublishProfile=FolderProfile -p:Version="$pluginVersion" -p:SourceRevisionId="$timestamp" -c $buildConfiguration --verbosity quiet
 	}
 
 	## SimConnectHelper Build
 	if (($buildConfiguration -eq "Debug" -and -not $cfgSkipManagerDebug) -or $buildConfiguration -eq "Release") {
 		Write-Host "dotnet publish for SimConnectHelper ..."
 		cd $pathSimConnectHelper
-		dotnet publish -p:PublishProfile=PubProfile"$buildConfiguration" -p:Version="$pluginVersion" -c $buildConfiguration --verbosity quiet
+		dotnet publish -p:PublishProfile=PubProfile"$buildConfiguration" -p:Version="$pluginVersion" -p:SourceRevisionId="$timestamp" -c $buildConfiguration --verbosity quiet
 	}
 
 	Remove-Item -Recurse -Force -Path ($pathPublish + "\*.pdb")

@@ -17,10 +17,6 @@
     <PackageIcon>PluginIcon.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy.MM.dd.HHmm"))</SourceRevisionId>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>embedded</DebugType>
   </PropertyGroup>

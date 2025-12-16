@@ -45,14 +45,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CFIT.AppLogger, Version=2025.344.18.3079, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.AppLogger.2025.344.18.3079\lib\net48\CFIT.AppLogger.dll</HintPath>
+    <Reference Include="CFIT.AppLogger, Version=2025.350.17.2666, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\CFIT.AppLogger.2025.350.17.2666\lib\net48\CFIT.AppLogger.dll</HintPath>
     </Reference>
-    <Reference Include="CFIT.AppTools, Version=2025.344.18.3088, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.AppTools.2025.344.18.3088\lib\net48\CFIT.AppTools.dll</HintPath>
+    <Reference Include="CFIT.AppTools, Version=2025.350.17.2675, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\CFIT.AppTools.2025.350.17.2675\lib\net48\CFIT.AppTools.dll</HintPath>
     </Reference>
-    <Reference Include="CFIT.Installer, Version=2025.344.18.3099, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\CFIT.Installer.2025.344.18.3099\lib\net48\CFIT.Installer.dll</HintPath>
+    <Reference Include="CFIT.Installer, Version=2025.350.17.2685, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\CFIT.Installer.2025.350.17.2685\lib\net48\CFIT.Installer.dll</HintPath>
     </Reference>
     <Reference Include="Costura, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.6.0.0\lib\netstandard2.0\Costura.dll</HintPath>
@@ -164,6 +164,7 @@
     <Compile Include="ConfigPage.cs" />
     <Compile Include="Definition.cs" />
     <Compile Include="PageWelcomePilotsDeck.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

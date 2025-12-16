@@ -9,6 +9,10 @@ if ($args[0] -eq "*Undefined*" -or -not $args[0]) {
 	$basePath = (pwd).Path
 }
 
+if ((Test-Path -Path (Join-Path $basePath "build.lck"))) {
+	exit 0
+}
+
 $packageName = $args[2]
 $pathRepo = "..\CFIT\PackageRepo"
 $nugetCli = Join-Path $basePath "nuget.exe"

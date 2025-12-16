@@ -32,21 +32,12 @@ $pathProjectApp = Join-Path $basePath $projectName
 #Get App Version
 Write-Host "Read $appName Binary ..."
 $version = (Get-Item $binPath).VersionInfo.FileVersion
-$timestamp = (Get-Item $binPath).LastWriteTimeUtc | Get-Date -Format "yyyy.MM.dd.HHmm"
+$timestamp = (Get-Content -Raw (Join-Path $pathPayload version.json) | ConvertFrom-Json).Timestamp
 $company = (Get-Item $binPath).VersionInfo.CompanyName
 $year = Get-Date -Format "yyyy"
 
-#Version JSON
-Write-Host "Create version.json ..."
-@"
-{
-	"Version": "$version",
-	"Timestamp": "$timestamp"
-}
-"@ | Out-File (Join-Path $pathPayload "version.json") -Encoding utf8NoBOM
-
 #AssemblyInfo File
-Write-Host "Update Installer AssemblyInfo ..."
+Write-Host "Update Installer AssemblyInfo ($version+build$timestamp) ..."
 UpdateAssemblyInfo $pathProjectInstaller "AssemblyTitle" "$appName Installer v$version ($timestamp)"
 UpdateAssemblyInfo $pathProjectInstaller "AssemblyDescription" "Installer Application for $appName"
 UpdateAssemblyInfo $pathProjectInstaller "AssemblyCompany" "$company"
