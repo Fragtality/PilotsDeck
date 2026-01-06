@@ -163,6 +163,10 @@ Some Command/Variable Types have a Reference to look them up - you can quickly o
 
 <br/>
 
+**Youtube Guide**: The Creator aimoii uploaded a [Step-by-Step Series](https://www.youtube.com/watch?v=DQOa7yLfDi8&list=PL_j2bl-uw9xFdxFwlzT4QosIALjObRVEk) on his Youtube Channel on how to configure the Plugin Actions! Check it out and leave a Like ❤️
+
+<br/>
+
 ## 2.1 - Defining Commands & Variables
 One of PilotsDeck's Core-Concepts is: everything has/is an Address. So whether it is a Variable to read (e.g. L-Var/DataRef/Offset) or a Command to send (e.g. Control, Script, Calculator-Code): it is identified by the Address. A Command is defined by its Type and Address in the UI. A Variable for reading only by the Address.<br/><br/>
 
@@ -1531,7 +1535,7 @@ Deserialize the passed JSON String to a Lua-Table.<br/>
 *Example:*<br/>
 ```lua
 local json = Deserialize('{"fetch":{"userid":123456}}')
-local userid = ["fetch"]["userid"]
+local userid = json["fetch"]["userid"]
 ```
 <br/><br/><br/>
 
