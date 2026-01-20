@@ -2,6 +2,7 @@
 using CFIT.Installer.LibFunc;
 using CFIT.Installer.Product;
 using Serilog;
+using System;
 using System.IO;
 
 namespace ProfileManager
@@ -24,8 +25,21 @@ namespace ProfileManager
         public override string ProductConfigFile { get { return $"PluginConfig.json"; } }
         public override string ProductConfigPath { get { return Path.Combine(ProductPath, ProductConfigFile); } }
         public override string ProductExePath { get { return Path.Combine(ProductPath, ProductExe); } }
-        public override string ProductPath { get { return $@"{FuncStreamDeck.DeckPluginPath}\com.extension.pilotsdeck.sdPlugin"; } }
+        public override string ProductPath { get { return GetPluginPath(); } }
         public virtual string ProductPathProfiles { get { return Path.Combine(ProductPath, "Profiles"); } }
         public virtual string ProductPathScripts { get { return Path.Combine(ProductPath, "Scripts"); } }
+
+        private static string GetPluginPath()
+        {
+            // Try HotSpot path first
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string hotSpotPath = Path.Combine(appDataPath, "HotSpot", "StreamDock", "plugins", "com.extension.pilotsdeck.sdPlugin");
+
+            if (Directory.Exists(hotSpotPath))
+                return hotSpotPath;
+
+            // Fallback to StreamDeck path
+            return Path.Combine(FuncStreamDeck.DeckPluginPath, "com.extension.pilotsdeck.sdPlugin");
+        }
     }
 }
