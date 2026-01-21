@@ -31,15 +31,25 @@ namespace ProfileManager
 
         private static string GetPluginPath()
         {
-            // Try HotSpot path first
             string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string hotSpotPath = Path.Combine(appDataPath, "HotSpot", "StreamDock", "plugins", "com.extension.pilotsdeck.sdPlugin");
 
-            if (Directory.Exists(hotSpotPath))
-                return hotSpotPath;
+            if (Parameters.IsStreamDockMode)
+            {
+                // HotSpot StreamDock mode
+                string hotSpotPath = Path.Combine(appDataPath, "HotSpot", "StreamDock", "plugins", "com.extension.pilotsdeck.sdPlugin");
+                if (Directory.Exists(hotSpotPath))
+                    return hotSpotPath;
 
-            // Fallback to StreamDeck path
-            return Path.Combine(FuncStreamDeck.DeckPluginPath, "com.extension.pilotsdeck.sdPlugin");
+                Logger.Warning($"HotSpot path not found: {hotSpotPath}");
+            }
+
+            // Default StreamDeck path (or fallback)
+            string streamDeckPath = Path.Combine(FuncStreamDeck.DeckPluginPath, "com.extension.pilotsdeck.sdPlugin");
+            if (Directory.Exists(streamDeckPath))
+                return streamDeckPath;
+
+            Logger.Warning($"StreamDeck path not found: {streamDeckPath}");
+            return Parameters.PLUGIN_PATH; // Return from Parameters as last resort
         }
     }
 }

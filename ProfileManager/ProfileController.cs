@@ -111,7 +111,7 @@ namespace ProfileManager
             }
             else
             {
-                MessageBox.Show($"The File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_DEVICEINFO}' does not exist or is empty!\r\nStart/Stop the StreamDeck Software and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"The File '{Parameters.PLUGIN_PROFILE_FOLDER}\\{Parameters.PLUGIN_MAPPING_DEVICEINFO}' does not exist or is empty!\r\nStart/Stop the {Parameters.PlatformSoftwareName} and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Logger.Error($"The File '{Parameters.PLUGIN_MAPPING_DEVICEINFO}' does not exist or is empty! ({path})");
                 HasError = true;
             }
@@ -296,6 +296,7 @@ namespace ProfileManager
             {
                 if (updatedNames.Count > 0 && FuncStreamDeck.IsDeckOrPluginRunning())
                 {
+                    Logger.Information($"Stopping {Parameters.PlatformSoftwareName} for profile swap...");
                     var stopWorker = new WorkerStreamDeckStartStop<Config>(Config.Instance, DeckProcessOperation.KILL);
                     await stopWorker.Run(System.Threading.CancellationToken.None);
                 }
@@ -381,6 +382,7 @@ namespace ProfileManager
                 else
                     task.SetState($"\r\n=> Completed! ({countChangedManifest} replaced)", TaskState.COMPLETED);
 
+                Logger.Information($"Starting {Parameters.PlatformSoftwareName} after profile swap...");
                 var startWorker = new WorkerStreamDeckStartStop<Config>(Config.Instance, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = MainWindow.AppTitle };
                 await startWorker.Run(System.Threading.CancellationToken.None);
             }
