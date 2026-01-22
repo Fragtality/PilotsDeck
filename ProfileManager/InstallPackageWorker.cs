@@ -5,12 +5,14 @@ using CFIT.Installer.LibWorker;
 using CFIT.Installer.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Threading;
-
+using MessageBox = System.Windows.Forms.MessageBox;
 namespace ProfileManager
 {
     public class InstallPackageWorker
@@ -24,7 +26,7 @@ namespace ProfileManager
         protected bool IsCanceled { get; set; } = false;
         public PackageFile PackageFile { get; protected set; } = new(null);
 
-        public bool OptionRemoveOldProfiles {  get; set; } = false;
+        public bool OptionRemoveOldProfiles { get; set; } = false;
 
         public bool IsValid { get { return IsChecked && IsLoaded && IsCompatible; } }
         public bool IsChecked { get; protected set; } = false;
@@ -89,6 +91,36 @@ namespace ProfileManager
 
                 if (PackageFile.CountProfiles > 0)
                 {
+                    if (Parameters.IsStreamDockMode)
+                    {
+                        string _temp = PackageFile.PackagedProfiles[0].InstallPath.Trim('"');
+                        string argument = $"/select,\"{_temp}\"";
+                        Process.Start("explorer.exe", argument);
+                        MainWindow.SetForeground();
+                        await SwapProfilesAsync();
+                        string message = "You can use the Deck Scene Conversion plugin in SPACE to perform the conversion.\n\n" +
+                   "Would you like to open the plugin page to learn more?";
+                        string caption = "Plugin Suggestion";
+
+                        DialogResult result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            try
+                            {
+                                Process.Start(new ProcessStartInfo("https://space.key123.vip/product?id=20251206002211")
+                                {
+                                    UseShellExecute = true
+                                });
+                            }
+                            catch (System.ComponentModel.Win32Exception)
+                            {
+                                MessageBox.Show("Could not open the browser. Please visit: https://space.key123.vip/product?id=20251206002211");
+                            }
+                        }
+                        MainWindow.SetForeground();
+                        return;
+                    }
                     if (await AddStreamDeckProfilesAsync() && await CheckProfilesInstalled() && OptionRemoveOldProfiles)
                     {
                         MainWindow.SetForeground();
@@ -181,7 +213,7 @@ namespace ProfileManager
         }
 
         protected async Task<bool> CheckProfilesInstalled()
-        {   
+        {
             var task = TaskStore.Add($"Install {PackageFile.PackagedProfiles.Count} Profiles to {Parameters.PlatformName}", "Wait for all Profiles to be clicked ...");
             task.DisplayCompleted = false;
             task.State = TaskState.WAITING;

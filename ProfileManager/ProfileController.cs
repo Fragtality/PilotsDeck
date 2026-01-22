@@ -6,6 +6,7 @@ using Microsoft.VisualBasic.FileIO;
 using ProfileManager.json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -32,7 +33,19 @@ namespace ProfileManager
         public int CountMappingsRemoved { get { return ProfileMappings.Where(m => m.DeleteFlag).Count() - CountMappingsUnmatched; } }
         public int CountManifestsRemoved { get { return ProfileManifests.Where(m => m.DeleteFlag).Count(); } }
 
-        public static bool AppsRunning { get { return FuncStreamDeck.IsDeckOrPluginRunning(); } }
+        public static bool AppsRunning
+        {
+            get
+            {
+                if (Parameters.IsStreamDockMode)
+                {
+
+                    Process[] processes = Process.GetProcessesByName("VSD Craft");
+                    return processes.Length > 0;
+                }
+                return FuncStreamDeck.IsDeckOrPluginRunning();
+            }
+        }
 
         public void Load()
         {
@@ -142,7 +155,7 @@ namespace ProfileManager
         protected void MapAndCheckData()
         {
             foreach (var deviceInfo in DeviceInfos)
-                foreach (var manifest in ProfileManifests.Where(m => m.Device.Hash.Equals(deviceInfo.ID, StringComparison.InvariantCultureIgnoreCase)))
+                foreach (var manifest in ProfileManifests.Where(m => m.Device != null && m.Device.Hash.Equals(deviceInfo.ID, StringComparison.InvariantCultureIgnoreCase)))
                     manifest.SetDeviceInfo(deviceInfo);
 
             foreach (var mapping in ProfileMappings)

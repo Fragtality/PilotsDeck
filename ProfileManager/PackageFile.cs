@@ -31,7 +31,7 @@ namespace ProfileManager
 
         public string FullPath { get; protected set; } = filePath;
         public string FileName { get { return Path.GetFileNameWithoutExtension(FullPath); } }
-        public PackageManifest Manifest{ get; protected set; }
+        public PackageManifest Manifest { get; protected set; }
         public FileStream ArchiveStream { get; protected set; }
         public ZipArchive Archive { get; protected set; }
         public string Title { get { return string.IsNullOrWhiteSpace(Manifest?.Title) ? FileName : Manifest.Title; } }
@@ -280,7 +280,7 @@ namespace ProfileManager
             {
                 Logger.Debug($"Install Package Files ...");
 
-                var task = TaskStore.Add("Install Package Files", $"Extract Archive to Work-Directory: ({ProfileWorkPath})");              
+                var task = TaskStore.Add("Install Package Files", $"Extract Archive to Work-Directory: ({ProfileWorkPath})");
                 task.DisplayCompleted = false;
 
                 if (Directory.Exists(ProfileWorkPath))
@@ -288,12 +288,19 @@ namespace ProfileManager
                     Logger.Debug($"Clean up work Folder (pre)");
                     Directory.Delete(ProfileWorkPath, true);
                 }
-                
+
                 Logger.Debug($"Extract Archive to work dir");
                 Archive.ExtractToDirectory(ProfileWorkPath, true);
 
                 if (CountProfiles > 0)
+                {
                     CopyValidFolderFiles(Parameters.PLUGIN_PROFILE_FOLDER, $"*{Parameters.SD_PROFILE_EXTENSION}", 0);
+                    if (Parameters.IsStreamDockMode)
+                    {
+                        CopyValidFolderFiles(Parameters.PLUGIN_PROFILE_FOLDER, $"*.streamDeckProfile", 0);
+                    }
+                }
+
                 if (CountImages > 0)
                     CopyValidFolderFiles(Parameters.PLUGIN_IMAGE_FOLDER, $"*{Parameters.PLUGIN_IMAGE_EXT}", 1);
                 if (CountScripts > 0)
@@ -338,7 +345,7 @@ namespace ProfileManager
                 {
                     Logger.Warning($"Destination Path for '{dest}' does not exist!");
                     Directory.CreateDirectory(Path.GetDirectoryName(dest));
-                }    
+                }
                 File.Copy(entry, dest, true);
             }
         }
@@ -376,7 +383,14 @@ namespace ProfileManager
 
         protected static bool IsProfilePath(string filepath)
         {
-            return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_PROFILE_FOLDER}/", Parameters.SD_PROFILE_EXTENSION);
+            if (Parameters.IsStreamDockMode)
+            {
+                return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_PROFILE_FOLDER}/", Parameters.SD_PROFILE_EXTENSION) || CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_PROFILE_FOLDER}/", ".streamDeckProfile");
+            }
+            else
+            {
+                return CheckPathBeginEnd(filepath, $"{Parameters.PLUGIN_PROFILE_FOLDER}/", Parameters.SD_PROFILE_EXTENSION);
+            }
         }
 
         protected static bool IsImagePath(string filepath)

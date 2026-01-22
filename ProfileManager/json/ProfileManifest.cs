@@ -33,7 +33,27 @@ namespace ProfileManager.json
             public string Hash { get; set; }
         }
 
+        // StreamDeck format: nested Device object
         public ManifestDevice Device { get; set; }
+
+        // StreamDock format: flat properties
+        [JsonPropertyName("DeviceModel")]
+        public string DeviceModel { get; set; }
+
+        [JsonPropertyName("DeviceUUID")]
+        public string DeviceUUID { get; set; }
+
+        // Helper property to get the actual device model (supports both formats)
+        [JsonIgnore]
+        public string ActualDeviceModel { get { return Device?.Model ?? DeviceModel; } }
+
+        // Helper property to get the actual device UUID (supports both formats)
+        [JsonIgnore]
+        public string ActualDeviceUUID { get { return Device?.UUID ?? DeviceUUID; } }
+
+        // Helper property to check if this is a StreamDock manifest
+        [JsonIgnore]
+        public bool IsStreamDockFormat { get { return !string.IsNullOrEmpty(DeviceModel) && Device == null; } }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string InstalledByPluginUUID { get; set; } = null;
@@ -65,7 +85,9 @@ namespace ProfileManager.json
 
         public override string ToString()
         {
-            return $"Manifest: Name {ProfileName} | IsPrepared {IsPreparedForSwitching} | Directory {ProfileDirectory} | DeckID {Device.Hash}";
+            return Device != null
+                ? $"Manifest: Name {ProfileName} | IsPrepared {IsPreparedForSwitching} | Directory {ProfileDirectory} | DeckID {Device.Hash}"
+                : $"Manifest: Name {ProfileName} | IsPrepared {IsPreparedForSwitching} | Directory {ProfileDirectory} | DeckID N/A";
         }
 
         public void SetDeviceInfo(DeviceInfo deviceInfo)
@@ -78,8 +100,43 @@ namespace ProfileManager.json
         public static ProfileManifest LoadManifest(string json)
         {
             var manifest = JsonSerializer.Deserialize<ProfileManifest>(json);
-            if (manifest?.Device != null)
-                manifest.Device.Hash = Tools.CreateMD5(manifest.Device.UUID);
+            if (manifest != null)
+            {
+                // For StreamDeck format (nested Device object)
+                if (manifest.Device != null)
+                {
+                    manifest.Device.Hash = Tools.CreateMD5(manifest.Device.UUID);
+                }
+                // For StreamDock format (flat properties) - create Device for compatibility
+                else
+                {
+                    string deviceUUID = manifest.DeviceUUID;
+                    string deviceModel = manifest.DeviceModel;
+
+                    if (!string.IsNullOrEmpty(deviceUUID))
+                    {
+                        // StreamDock format: map flat properties to Device object
+                        manifest.Device = new ManifestDevice
+                        {
+                            Model = deviceModel,
+                            UUID = deviceUUID,
+                            Hash = Tools.CreateMD5(deviceUUID)
+                        };
+                        Logger.Verbose($"StreamDock format detected - Device object created from flat properties");
+                    }
+                    else
+                    {
+                        // Incomplete manifest data - create placeholder Device to prevent null reference
+                        manifest.Device = new ManifestDevice
+                        {
+                            Model = "Unknown",
+                            UUID = Guid.NewGuid().ToString(),
+                            Hash = "UNKNOWN"
+                        };
+                        Logger.Warning($"Incomplete manifest '{manifest.ProfileName}' - missing Device info, using placeholder");
+                    }
+                }
+            }
             return manifest;
         }
 
@@ -88,9 +145,8 @@ namespace ProfileManager.json
             var manifest = LoadManifest(File.ReadAllText(path));
 
             manifest.ProfileDirectory = folder;
-            manifest.Device.Hash = Tools.CreateMD5(manifest.Device.UUID);
             manifest.ProfileController = controller;
-            Logger.Verbose($"Manifest was loaded: {manifest}");
+            Logger.Verbose($"Manifest was loaded: {manifest.ProfileName}");
 
             return manifest;
         }
