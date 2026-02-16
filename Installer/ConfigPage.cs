@@ -17,6 +17,8 @@ namespace Installer
 
             Items.Add(new ConfigItemCheckbox("vJoy Driver", "Install/Update vJoy Driver (recommended)", Config.OptionVjoyInstallUpdate, Config));
 
+            Items.Add(new ConfigItemCheckbox("HotSpot StreamDock Install", "Install for HotSpot StreamDock (skip StreamDeck detection)", Config.OptionHotSpotStreamDockInstall, Config));
+
             if (Config.Mode == SetupMode.UPDATE)
                 Items.Add(new ConfigItemCheckbox("Reset Configuration", "Reset Plugin Configuration to Default (only for Troubleshooting)", Config.OptionResetConfiguration, Config));
         }

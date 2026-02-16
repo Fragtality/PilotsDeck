@@ -5,6 +5,7 @@ using CFIT.Installer.LibWorker;
 using CFIT.Installer.Tasks;
 using CFIT.Installer.UI.Tasks;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -93,7 +94,7 @@ namespace ProfileManager
             ContentArea.CanContentScroll = true;
             ContentArea.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             ContentArea.Content = view;
-            
+
             if (filename != null)
                 view.OpenPackageFile(filename);
         }
@@ -163,14 +164,36 @@ namespace ProfileManager
                 if (ProfileController.AppsRunning)
                 {
                     Logger.Debug($"Profile Mapper requested while Apps still running!");
-                    var result = MessageBox.Show("Can not edit Profiles while StreamDeck is running:\r\nKill StreamDeck Software now?", "StreamDeck Running", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                    if (result == MessageBoxResult.Yes)
+                    if (!Parameters.IsStreamDockMode)
                     {
-                        Logger.Debug($"Stopping StreamDeck ...");
-                        await StartStopStreamDeck(DeckProcessOperation.STOP);
+                        var result = MessageBox.Show("Can not edit Profiles while StreamDeck is running:\r\nKill StreamDeck Software now?", "StreamDeck Running", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Logger.Debug($"Stopping StreamDeck ...");
+                            await StartStopStreamDeck(DeckProcessOperation.STOP);
+                        }
+                        else
+                            Logger.Warning($"Continued with StreamDeck running");
                     }
                     else
-                        Logger.Warning($"Continued with StreamDeck running");
+                    {
+                        var result = MessageBox.Show("Can not edit Profiles while StreamDock is running:\r\nKill StreamDeck Software now?", "StreamDock Running", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Logger.Debug($"Stopping StreamDock ...");
+                            Process[] processes = Process.GetProcessesByName("VSD Craft");
+                            foreach (Process p in processes)
+                            {
+                                if (!p.CloseMainWindow())
+                                {
+                                    p.Kill();
+                                }
+                            }
+                        }
+                        else
+                            Logger.Warning($"Continued with StreamDock running");
+                    }
+
                 }
 
                 ButtonEnable(ButtonProfileInstaller);

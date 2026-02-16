@@ -2,6 +2,7 @@
 using CFIT.Installer.LibFunc;
 using CFIT.Installer.Product;
 using Serilog;
+using System;
 using System.IO;
 
 namespace ProfileManager
@@ -24,8 +25,31 @@ namespace ProfileManager
         public override string ProductConfigFile { get { return $"PluginConfig.json"; } }
         public override string ProductConfigPath { get { return Path.Combine(ProductPath, ProductConfigFile); } }
         public override string ProductExePath { get { return Path.Combine(ProductPath, ProductExe); } }
-        public override string ProductPath { get { return $@"{FuncStreamDeck.DeckPluginPath}\com.extension.pilotsdeck.sdPlugin"; } }
+        public override string ProductPath { get { return GetPluginPath(); } }
         public virtual string ProductPathProfiles { get { return Path.Combine(ProductPath, "Profiles"); } }
         public virtual string ProductPathScripts { get { return Path.Combine(ProductPath, "Scripts"); } }
+
+        private static string GetPluginPath()
+        {
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            if (Parameters.IsStreamDockMode)
+            {
+                // HotSpot StreamDock mode
+                string hotSpotPath = Path.Combine(appDataPath, "HotSpot", "StreamDock", "plugins", "com.extension.pilotsdeck.sdPlugin");
+                if (Directory.Exists(hotSpotPath))
+                    return hotSpotPath;
+
+                Logger.Warning($"HotSpot path not found: {hotSpotPath}");
+            }
+
+            // Default StreamDeck path (or fallback)
+            string streamDeckPath = Path.Combine(FuncStreamDeck.DeckPluginPath, "com.extension.pilotsdeck.sdPlugin");
+            if (Directory.Exists(streamDeckPath))
+                return streamDeckPath;
+
+            Logger.Warning($"StreamDeck path not found: {streamDeckPath}");
+            return Parameters.PLUGIN_PATH; // Return from Parameters as last resort
+        }
     }
 }

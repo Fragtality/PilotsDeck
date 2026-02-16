@@ -5,12 +5,14 @@ using CFIT.Installer.LibWorker;
 using CFIT.Installer.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Threading;
-
+using MessageBox = System.Windows.Forms.MessageBox;
 namespace ProfileManager
 {
     public class InstallPackageWorker
@@ -24,7 +26,7 @@ namespace ProfileManager
         protected bool IsCanceled { get; set; } = false;
         public PackageFile PackageFile { get; protected set; } = new(null);
 
-        public bool OptionRemoveOldProfiles {  get; set; } = false;
+        public bool OptionRemoveOldProfiles { get; set; } = false;
 
         public bool IsValid { get { return IsChecked && IsLoaded && IsCompatible; } }
         public bool IsChecked { get; protected set; } = false;
@@ -89,6 +91,36 @@ namespace ProfileManager
 
                 if (PackageFile.CountProfiles > 0)
                 {
+                    if (Parameters.IsStreamDockMode)
+                    {
+                        string _temp = PackageFile.PackagedProfiles[0].InstallPath.Trim('"');
+                        string argument = $"/select,\"{_temp}\"";
+                        Process.Start("explorer.exe", argument);
+                        MainWindow.SetForeground();
+                        await SwapProfilesAsync();
+                        string message = "You can use the Deck Scene Conversion plugin in SPACE to perform the conversion.\n\n" +
+                   "Would you like to open the plugin page to learn more?";
+                        string caption = "Plugin Suggestion";
+
+                        DialogResult result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            try
+                            {
+                                Process.Start(new ProcessStartInfo("https://space.key123.vip/product?id=20251206002211")
+                                {
+                                    UseShellExecute = true
+                                });
+                            }
+                            catch (System.ComponentModel.Win32Exception)
+                            {
+                                MessageBox.Show("Could not open the browser. Please visit: https://space.key123.vip/product?id=20251206002211");
+                            }
+                        }
+                        MainWindow.SetForeground();
+                        return;
+                    }
                     if (await AddStreamDeckProfilesAsync() && await CheckProfilesInstalled() && OptionRemoveOldProfiles)
                     {
                         MainWindow.SetForeground();
@@ -108,12 +140,13 @@ namespace ProfileManager
 
         protected async Task<bool> AddStreamDeckProfilesAsync()
         {
-            Logger.Debug($"Installing Profiles in StreamDeck Software ...");
+            Logger.Debug($"Installing Profiles in {Parameters.PlatformSoftwareName} ...");
             bool result = false;
             try
             {
                 if (!FuncStreamDeck.IsDeckAndPluginRunning())
                 {
+                    Logger.Information($"Starting {Parameters.PlatformSoftwareName} for profile installation...");
                     var worker = new WorkerStreamDeckStartStop<Config>(Config.Instance, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = MainWindow.AppTitle };
                     await worker.Run(System.Threading.CancellationToken.None);
                 }
@@ -125,8 +158,8 @@ namespace ProfileManager
                 {
                     file = Path.GetFileNameWithoutExtension(profile.FileName);
                     Logger.Debug($"Adding Task for '{profile.FileName}'");
-                    var task = TaskStore.Add($"Add Profile '{profile.ProfileName}' to StreamDeck");
-                    task.AddMessage("Click the Link and select the StreamDeck in the UI (or click Ignore):", true, false, false, FontWeights.DemiBold);
+                    var task = TaskStore.Add($"Add Profile '{profile.ProfileName}' to {Parameters.PlatformName}");
+                    task.AddMessage($"Click the Link and select the {Parameters.PlatformName} in the UI (or click Ignore):", true, false, false, FontWeights.DemiBold);
                     task.State = TaskState.WAITING;
                     task.DisplayCompleted = true;
                     var link = task.AddLink(profile.FileName, sdBinary, profile.InstallPath);
@@ -158,7 +191,7 @@ namespace ProfileManager
 
         private static void MessageWaitForProfilesInstalled(IEnumerable<PackageFile.PackagedProfile> query, TaskModel task)
         {
-            string msg = "Wait for Profiles to be added to StreamDeck:";
+            string msg = $"Wait for Profiles to be added to {Parameters.PlatformName}:";
             foreach (var profile in query)
                 msg += $"\r\n{profile.FileName}";
             task.ReplaceLastMessage(msg);
@@ -180,8 +213,8 @@ namespace ProfileManager
         }
 
         protected async Task<bool> CheckProfilesInstalled()
-        {   
-            var task = TaskStore.Add($"Install {PackageFile.PackagedProfiles.Count} Profiles to StreamDeck", "Wait for all Profiles to be clicked ...");
+        {
+            var task = TaskStore.Add($"Install {PackageFile.PackagedProfiles.Count} Profiles to {Parameters.PlatformName}", "Wait for all Profiles to be clicked ...");
             task.DisplayCompleted = false;
             task.State = TaskState.WAITING;
 
@@ -245,7 +278,7 @@ namespace ProfileManager
             }
             else
             {
-                task.SetError("Unable to read Profile Data from StreamDeck!");
+                task.SetError($"Unable to read Profile Data from {Parameters.PlatformSoftwareName}!");
                 return false;
             }
 

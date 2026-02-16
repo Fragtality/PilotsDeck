@@ -130,20 +130,34 @@ namespace ProfileManager
             string name = TextboxNameFilter?.Text?.ToLowerInvariant() ?? "";
 
             if (SelectProfileFilter.SelectedIndex == (int)Filter.MAPPED)
-                FilteredItems = ProfileListItems.Where(m => m.ViewModel.IsMappedProfile && m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
+                FilteredItems = ProfileListItems.Where(m => IsValidItem(m, name) && m.ViewModel.IsMappedProfile);
             else if (SelectProfileFilter.SelectedIndex == (int)Filter.UNMAPPED)
-                FilteredItems = ProfileListItems.Where(m => !m.ViewModel.IsMappedProfile && m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
+                FilteredItems = ProfileListItems.Where(m => IsValidItem(m, name) && !m.ViewModel.IsMappedProfile);
             else if (SelectProfileFilter.SelectedIndex == (int)Filter.CHANGED)
-                FilteredItems = ProfileListItems.Where(m => m.ViewModel.IsChanged && m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
+                FilteredItems = ProfileListItems.Where(m => IsValidItem(m, name) && m.ViewModel.IsChanged);
             else
-                FilteredItems = ProfileListItems.Where(m => m.ViewModel.ProfileName.ToLowerInvariant().Contains(name));
+                FilteredItems = ProfileListItems.Where(m => IsValidItem(m, name));
 
             if (SelectDeckFilter.SelectedIndex != 0 && !string.IsNullOrEmpty(SelectDeckFilter.SelectedValue?.ToString()))
-                FilteredItems = FilteredItems.Where(i => i.ViewModel.DeckName.Equals(SelectDeckFilter.SelectedValue.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                FilteredItems = FilteredItems.Where(i => i?.ViewModel != null && i.ViewModel.DeckName.Equals(SelectDeckFilter.SelectedValue.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
             ProfileListView.Children.Clear();
             foreach (var item in FilteredItems)
                 ProfileListView.Children.Add(item);
+        }
+
+        protected bool IsValidItem(ProfileListItem item, string nameFilter)
+        {
+            if (item == null)
+                return false;
+            if (item.ViewModel == null)
+                return false;
+            if (item.ViewModel.Manifest == null)
+                return false;
+            if (item.ViewModel.ProfileName == null)
+                return false;
+
+            return item.ViewModel.ProfileName.ToLowerInvariant().Contains(nameFilter);
         }
 
         protected void CallOnAllItems(Action<ProfileListItem> method)

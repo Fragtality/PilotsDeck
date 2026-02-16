@@ -21,7 +21,33 @@ namespace ProfileManager
                 Application.Current.Shutdown();
                 return;
             }
-
+            if (!Directory.Exists(Parameters.PLUGIN_PATH))
+            {
+                var result = MessageBox.Show($"Could not find the plugin in the {Parameters.PlatformName} plugin directory.\n\nPath: {Parameters.PLUGIN_PATH}\n\nSwitch to {(Parameters.IsStreamDockMode ? "StreamDeck" : "HotSpot StreamDock")} mode?",
+                    "Plugin Not Found", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    Parameters.ChangeHotSpotMode();
+                    Logger.Information($"Switched to {Parameters.PlatformName} mode");
+                    Logger.Information($"Plugin path: {Parameters.PLUGIN_PATH}");
+                    if (!Directory.Exists(Parameters.PLUGIN_PATH))
+                    {
+                        MessageBox.Show($"Plugin path not found:\n{Parameters.PLUGIN_PATH}", "Plugin Not Found", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Application.Current.Shutdown();
+                        return;
+                    }
+                }
+                else
+                {
+                    Application.Current.Shutdown();
+                    return;
+                }
+            }
+            else
+            {
+                Logger.Information($"Running in {Parameters.PlatformName} mode");
+                Logger.Information($"Plugin path: {Parameters.PLUGIN_PATH}");
+            }
             Directory.SetCurrentDirectory(Parameters.PLUGIN_PATH);
 
             Logger.CreateAppLoggerRotated(Config.Instance);

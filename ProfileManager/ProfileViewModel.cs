@@ -14,8 +14,8 @@ namespace ProfileManager
         public bool IsChanged { get { return Manifest.IsChanged || Manifest.DeleteFlag || (HasMapping && (Mapping.IsChanged || Mapping.DeleteFlag)); } }
         public bool IsMappedProfile { get { return HasMapping && IsPreparedForSwitching && !ProfileNever; } }
         public string ProfileName { get { return Manifest.ProfileName; } }
-        public string DeviceInfo { get { return $"@ {Manifest.Device.DeckName} ({Manifest.Device.Hash})"; } }
-        public string DeckName { get { return Manifest.Device.DeckName; } }
+        public string DeviceInfo { get { return Manifest.Device != null ? $"@ {Manifest.Device.DeckName} ({Manifest.Device.Hash})" : "@ Unknown Device"; } }
+        public string DeckName { get { return Manifest.Device?.DeckName ?? "Unknown"; } }
         public string ProfileDirectory { get { return Manifest.ProfileDirectory; } }
         public bool IsPreparedForSwitching { get { return Manifest.IsPreparedForSwitching; } }
         public bool ProfileNever { get {  return !HasMapping || (HasMapping && Mapping.IsProfileNever); } }
@@ -35,7 +35,9 @@ namespace ProfileManager
 
         public override string ToString()
         {
-            return $"Name {Manifest.Device.DeckName} | DeckID {Manifest.Device.Hash} | ProfileName {ProfileName} | PreconfiguredName {Manifest.PreconfiguredName} | HasMapping {HasMapping} ";
+            return Manifest.Device != null
+                ? $"Name {Manifest.Device.DeckName} | DeckID {Manifest.Device.Hash} | ProfileName {ProfileName} | PreconfiguredName {Manifest.PreconfiguredName} | HasMapping {HasMapping} "
+                : $"Name Unknown | DeckID N/A | ProfileName {ProfileName} | PreconfiguredName {Manifest.PreconfiguredName} | HasMapping {HasMapping} ";
         }
 
         protected ObservableCollection<string> GetAircraftCollection()
