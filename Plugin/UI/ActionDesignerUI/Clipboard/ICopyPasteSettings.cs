@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PilotsDeck.Actions.Advanced.SettingsModel;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels;
 using PilotsDeck.UI.ActionDesignerUI.ViewModels.Elements;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
@@ -73,7 +74,16 @@ namespace PilotsDeck.UI.ActionDesignerUI.Clipboard
         protected T CopyTask<T>(string propertyName)
         {
             if (this is ViewModelElement viewModel && viewModel.Source.IsPropertyType<T>(propertyName))
-                return viewModel.GetSourceValue<T>(propertyName);
+            {
+                if (typeof(T).IsArray)
+                {
+                    var value = viewModel.GetSourceValue<T>(propertyName);
+                    return (T)((ICloneable)value).Clone();
+                }
+                else
+                    return viewModel.GetSourceValue<T>(propertyName);
+
+            }
             else
                 return this.GetPropertyValue<T>(propertyName);
         }

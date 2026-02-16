@@ -36,10 +36,10 @@ namespace Installer
 
         //Worker: .NET
         public virtual bool NetRuntimeDesktop { get; set; } = true;
-        public virtual string NetVersion { get; set; } = "10.0.1";
+        public virtual string NetVersion { get; set; } = "10.0.3";
         public virtual bool CheckMajorEqual { get; set; } = true;
-        public virtual string NetUrl { get; set; } = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.1/windowsdesktop-runtime-10.0.1-win-x64.exe";
-        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-10.0.1-win-x64.exe";
+        public virtual string NetUrl { get; set; } = "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.3/windowsdesktop-runtime-10.0.3-win-x64.exe";
+        public virtual string NetInstaller { get; set; } = "windowsdesktop-runtime-10.0.3-win-x64.exe";
 
         //Worker: MobiFlight
         public virtual bool MobiRequired { get; set; } = true;
@@ -47,8 +47,8 @@ namespace Installer
 
         //Worker: FSUIPC7
         public virtual bool Fsuipc7Required { get; set; } = true;
-        public virtual string Fsuipc7Version { get; set; } = "7.5.5";
-        public virtual string Fsuipc7WasmVersion { get; set; } = "1.0.7";
+        public virtual string Fsuipc7Version { get; set; } = "7.5.6";
+        public virtual string Fsuipc7WasmVersion { get; set; } = "1.1.0";
         public virtual string Fsuipc7Url { get; set; } = "https://fsuipc.com/download/Install_FSUIPC7.zip";
         public virtual bool Fsuipc7AllowBeta { get; set; } = false;
         public virtual bool Fsuipc7CheckPumps { get; set; } = true;
@@ -61,9 +61,9 @@ namespace Installer
 
         //Worker: StreamDeck
         public virtual string DeckVersionMinimum { get { return "7.1.0"; } }
-        public virtual string DeckVersionTarget { get { return "7.2.0"; } }
-        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_7.2.0.22454.msi"; } }
-        public virtual string DeckInstaller { get { return "Stream_Deck_7.2.0.22454.msi"; } }
+        public virtual string DeckVersionTarget { get { return "7.2.1"; } }
+        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_7.2.1.22472.msi"; } }
+        public virtual string DeckInstaller { get { return "Stream_Deck_7.2.1.22472.msi"; } }
 
         //Prepar3D
         public virtual string P3dRegPath { get { return @"HKEY_CURRENT_USER\SOFTWARE\Lockheed Martin"; } }
