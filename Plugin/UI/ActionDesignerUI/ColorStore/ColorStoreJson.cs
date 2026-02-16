@@ -1,13 +1,12 @@
 ﻿using CFIT.AppLogger;
 using CFIT.AppTools;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace PilotsDeck.UI.ActionDesignerUI.ColorStore
 {

@@ -17,7 +17,6 @@ namespace Installer
     {
         public bool ResetConfiguration { get; set; } = false;
         public bool Fsuipc7UseSecondary { get; set; } = true;
-        public bool InstallToHotSpot { get; set; } = false;
 
         public WorkerInstallUpdate(Config config) : base(config)
         {
@@ -27,8 +26,6 @@ namespace Installer
             Model.Title = "PilotsDeck Plugin";
             SetPropertyFromOption<bool>(Config.OptionResetConfiguration);
             SetPropertyFromOption<bool>(Config.OptionFsuipc7UseSecondary);
-            SetPropertyFromOption<bool>(Config.OptionInstallToHotSpot);
-            SetPropertyFromOption<bool>(Config.OptionHotSpotStreamDockInstall);
         }
 
         protected override async Task<bool> DoRun()

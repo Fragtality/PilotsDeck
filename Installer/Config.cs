@@ -1,4 +1,5 @@
 ﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using CFIT.Installer.LibFunc;
 using CFIT.Installer.Product;
 using Installer.Worker;
@@ -13,9 +14,7 @@ namespace Installer
         //InstallerOptions
         public virtual bool IgnoreMsfs2020 { get; set; } = false;
         public virtual bool IgnoreMsfs2024 { get; set; } = false;
-        public virtual bool IgnoreStreamDeck { get; set; } = false;
-        public virtual bool InstallToHotSpot { get; set; } = false;
-        public virtual bool HotSpotStreamDockInstall { get; set; } = false;
+        public virtual int InstallTarget { get; set; } = 0; // 0 => StreamDeck | 1 => StreamDock
         public virtual string ProfileManagerName { get { return "Profile Manager"; } }
         public virtual string ProfileManagerExePath { get { return Path.Combine(ProductPath, $"{ProfileManagerName.Replace(" ", "")}.exe"); } }
         public virtual bool Fsuipc7UseSecondaryConfig { get; set; } = true;
@@ -23,73 +22,36 @@ namespace Installer
         public static readonly string OptionFsuipc7UseSecondary = "Fsuipc7UseSecondary";
         public static readonly string OptionVjoyInstallUpdate = "VjoyInstallUpdate";
         public static readonly string OptionResetConfiguration = "ResetConfiguration";
-        public static readonly string OptionInstallToHotSpot = "InstallToHotSpot";
-        public static readonly string OptionHotSpotStreamDockInstall = "HotSpotStreamDockInstall";
+        public static readonly string OptionInstallTarget = "InstallTarget";
 
         //ConfigBase
         public override string ProductName { get { return PluginBinary; } }
-
-        public virtual bool HasAnyInstallation
-        {
-            get
-            {
-                bool streamDeckInstalled = false;
-                try
-                {
-                    string streamDeckPath = $@"{FuncStreamDeck.DeckPluginPath}\com.extension.pilotsdeck.sdPlugin";
-                    streamDeckInstalled = Directory.Exists(streamDeckPath);
-                }
-                catch { }
-
-                bool hotSpotInstalled = Directory.Exists(HotSpotPluginPath);
-                return streamDeckInstalled || hotSpotInstalled;
-            }
-        }
         public static string PluginBinary { get { return "PilotsDeck"; } }
         public override string ProductConfigFile { get { return $"PluginConfig.json"; } }
         public static readonly string AppConfigUseFsuipcForMSFS = "UseFsuipcForMSFS";
         public virtual string ProductColorFile { get { return $"ColorStore.json"; } }
         public override string ProductConfigPath { get { return Path.Combine(ProductPath, ProductConfigFile); } }
         public override string ProductExePath { get { return Path.Combine(ProductPath, ProductExe); } }
-        public override string ProductPath
+        public override string ProductPath { get { return Path.Combine(TargetPluginPath, "com.extension.pilotsdeck.sdPlugin"); } }
+        public static string DockPluginPath { get { return $@"{Sys.FolderAppDataRoaming()}\HotSpot\StreamDock\Plugins"; } }
+        public static string DeckPluginProductPath => Path.Combine(FuncStreamDeck.DeckPluginPath, "com.extension.pilotsdeck.sdPlugin");
+        public static string DockPluginProductPath => Path.Combine(DockPluginPath, "com.extension.pilotsdeck.sdPlugin");
+        public static bool IsInstalledStreamDeck => Directory.Exists(DeckPluginProductPath);
+        public static bool IsInstalledStreamDock => Directory.Exists(DockPluginProductPath);
+        public virtual string TargetPluginPath
         {
             get
             {
-                // Check if user has explicitly chosen installation location via options
-                bool installToHotSpot = GetOption<bool>(OptionInstallToHotSpot);
-                bool hotSpotStreamDockInstall = GetOption<bool>(OptionHotSpotStreamDockInstall);
+                int target = GetOption<int>(OptionInstallTarget);
 
-                if (installToHotSpot || hotSpotStreamDockInstall)
-                    return HotSpotPluginPath;
-
-                // If no explicit option, check if there's an existing installation
-                try
-                {
-                    string streamDeckPath = $@"{FuncStreamDeck.DeckPluginPath}\com.extension.pilotsdeck.sdPlugin";
-                    if (Directory.Exists(streamDeckPath))
-                        return streamDeckPath;
-                }
-                catch { }
-
-                // If HotSpot installation exists, return HotSpot path
-                if (Directory.Exists(HotSpotPluginPath))
-                    return HotSpotPluginPath;
-
-                // Default to StreamDeck path
-                return $@"{FuncStreamDeck.DeckPluginPath}\com.extension.pilotsdeck.sdPlugin";
+                if (target == 1)
+                    return DockPluginPath;
+                else
+                    return FuncStreamDeck.DeckPluginPath;
             }
         }
         public virtual string ProductPathProfiles { get { return Path.Combine(ProductPath, "Profiles"); } }
         public virtual string ProductPathScripts { get { return Path.Combine(ProductPath, "Scripts"); } }
-
-        public static string HotSpotPluginPath
-        {
-            get
-            {
-                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                return Path.Combine(appDataPath, "HotSpot", "StreamDock", "plugins", "com.extension.pilotsdeck.sdPlugin");
-            }
-        }
 
         //Worker: .NET
         public virtual bool NetRuntimeDesktop { get; set; } = true;
@@ -159,11 +121,13 @@ namespace Installer
             //ResetConfig
             SetOption(OptionResetConfiguration, false);
 
-            //HotSpot Installation
-            SetOption(OptionInstallToHotSpot, InstallToHotSpot);
+            //Install Target
+            if (Directory.Exists(DockPluginProductPath) && !Directory.Exists(FuncStreamDeck.DeckPluginPath))
+                SetOption(OptionInstallTarget, 1);
+            else
+                SetOption(OptionInstallTarget, 0);
 
-            //HotSpot StreamDock Installation
-            SetOption(OptionHotSpotStreamDockInstall, HotSpotStreamDockInstall);
+            SetOption(OptionResetConfiguration, false);
         }
 
         public virtual bool ReadFsuipcSecondaryConnector()

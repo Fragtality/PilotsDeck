@@ -1,6 +1,7 @@
 ﻿using CFIT.Installer.Product;
 using CFIT.Installer.UI.Behavior;
 using CFIT.Installer.UI.Config;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace Installer
@@ -17,7 +18,12 @@ namespace Installer
 
             Items.Add(new ConfigItemCheckbox("vJoy Driver", "Install/Update vJoy Driver (recommended)", Config.OptionVjoyInstallUpdate, Config));
 
-            Items.Add(new ConfigItemCheckbox("HotSpot StreamDock Install", "Install for HotSpot StreamDock (skip StreamDeck detection)", Config.OptionHotSpotStreamDockInstall, Config));
+            var dict = new Dictionary<int, string>()
+            {
+                { 0, "Elegato - StreamDeck" },
+                { 1, "MiraBox/HotSpot - StreamDock" }
+            };
+            Items.Add(new ConfigItemDropdown("Plugin Install Location", "Install/Update Plugin on the following Software:", dict, Config.OptionInstallTarget, Config));
 
             if (Config.Mode == SetupMode.UPDATE)
                 Items.Add(new ConfigItemCheckbox("Reset Configuration", "Reset Plugin Configuration to Default (only for Troubleshooting)", Config.OptionResetConfiguration, Config));

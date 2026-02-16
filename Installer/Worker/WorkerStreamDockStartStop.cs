@@ -1,6 +1,5 @@
 using CFIT.AppLogger;
 using CFIT.AppTools;
-using CFIT.Installer.LibFunc;
 using CFIT.Installer.LibWorker;
 using CFIT.Installer.Tasks;
 using System;

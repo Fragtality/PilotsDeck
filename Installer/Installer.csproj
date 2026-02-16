@@ -185,6 +185,7 @@
     <Compile Include="Worker\WorkerLegacyProfiles.cs" />
     <Compile Include="Worker\WorkerMobi.cs" />
     <Compile Include="Worker\WorkerStreamDeckSoftware.cs" />
+    <Compile Include="Worker\WorkerStreamDockStartStop.cs" />
     <Compile Include="Worker\WorkerVjoyInstall.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

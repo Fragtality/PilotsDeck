@@ -1,5 +1,4 @@
-﻿using System.IO;
-using CFIT.Installer.LibFunc;
+﻿using CFIT.Installer.LibFunc;
 using CFIT.Installer.LibWorker;
 using CFIT.Installer.Product;
 using CFIT.Installer.UI;
@@ -18,12 +17,12 @@ namespace Installer
 
         protected void CreateInstallUpdateTasks(SetupMode key)
         {
-            bool hotSpotStreamDockInstall = Config?.GetOption<bool>(Config.OptionHotSpotStreamDockInstall) == true;
+            bool hotSpotStreamDockInstall = Config?.GetOption<int>(Config.OptionInstallTarget) == 1;
 
             WorkerQueues[key].Enqueue(new WorkerDotNet<Config>(Config));
 
             // StreamDeck software check (only for non-HotSpot installations)
-            if (!Config.IgnoreStreamDeck && !hotSpotStreamDockInstall)
+            if (!hotSpotStreamDockInstall)
                 WorkerQueues[key].Enqueue(new WorkerStreamDeckSoftware(Config));
 
             WorkerQueues[key].Enqueue(new WorkerCheckSimulators(Config));
@@ -36,9 +35,9 @@ namespace Installer
             WorkerQueues[key].Enqueue(new WorkerFsuipc6(Config, Simulator.P3DV6));
 
             // Stop plugin/software before installation
-            if (!Config.IgnoreStreamDeck && !hotSpotStreamDockInstall)
+            if (!hotSpotStreamDockInstall)
                 WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
-            else if (hotSpotStreamDockInstall)
+            else
                 WorkerQueues[key].Enqueue(new WorkerStreamDockStartStop(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
 
             WorkerQueues[key].Enqueue(new WorkerInstallUpdate(Config));
@@ -53,9 +52,9 @@ namespace Installer
             }
 
             // Start plugin/software after installation
-            if (!Config.IgnoreStreamDeck && !hotSpotStreamDockInstall)
+            if (!hotSpotStreamDockInstall)
                 WorkerQueues[key].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, StartStopDelay = 1 });
-            else if (hotSpotStreamDockInstall)
+            else
                 WorkerQueues[key].Enqueue(new WorkerStreamDockStartStop(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, StartStopDelay = 1 });
 
             if (Config?.GetOption<bool>(ConfigBase.OptionDesktopLink) == true)
@@ -70,41 +69,20 @@ namespace Installer
         protected override void CreateRemovalTasks()
         {
             // Determine which installation(s) exist
-            bool hasHotSpotInstallation = Directory.Exists(Config.HotSpotPluginPath);
-            bool hasStreamDeckInstallation = false;
-            try
-            {
-                string streamDeckPath = $@"{FuncStreamDeck.DeckPluginPath}\com.extension.pilotsdeck.sdPlugin";
-                hasStreamDeckInstallation = Directory.Exists(streamDeckPath);
-            }
-            catch { }
+            bool hasHotSpotInstallation = Config.IsInstalledStreamDock;
+            bool hasStreamDeckInstallation = Config.IsInstalledStreamDeck;
 
             // Stop the appropriate software
-            if (!Config.IgnoreStreamDeck)
-            {
-                if (hasHotSpotInstallation && !hasStreamDeckInstallation)
-                {
-                    // Only HotSpot installation exists - stop StreamDock
-                    WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDockStartStop(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
-                }
-                else if (hasStreamDeckInstallation)
-                {
-                    // StreamDeck installation exists - stop StreamDeck
-                    WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
-                }
-            }
-
-            // Remove main installation
-            WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerAppRemove<Config>(Config));
-
-            // Also remove HotSpot installation if it exists
             if (hasHotSpotInstallation)
-            {
-                var workerHotSpotRemove = new WorkerRemoveHotSpot(Config);
-                workerHotSpotRemove.Model.DisplayCompleted = true;
-                workerHotSpotRemove.Model.DisplayInSummary = true;
-                WorkerQueues[SetupMode.REMOVE].Enqueue(workerHotSpotRemove);
-            }
+                WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDockStartStop(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
+            if (hasStreamDeckInstallation)
+                WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.STOP) { StartStopDelay = 1 });
+
+            // Remove the appropriate software
+            if (hasHotSpotInstallation)
+                WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerAppRemove<Config>(Config) { InstallerRemoveDir = Config.DockPluginProductPath });
+            if (hasStreamDeckInstallation)
+                WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerAppRemove<Config>(Config) { InstallerRemoveDir = Config.DeckPluginProductPath });
 
             var workerDesktop = new WorkerDesktopLink(Config, DesktopLinkOperation.REMOVE);
             workerDesktop.Model.DisplayCompleted = true;
@@ -112,19 +90,10 @@ namespace Installer
             WorkerQueues[SetupMode.REMOVE].Enqueue(workerDesktop);
 
             // Restart the appropriate software
-            if (!Config.IgnoreStreamDeck)
-            {
-                if (hasHotSpotInstallation && !hasStreamDeckInstallation)
-                {
-                    // Only HotSpot installation existed - restart StreamDock
-                    WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDockStartStop(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, IgnorePluginRunning = true, StartStopDelay = 1 });
-                }
-                else if (hasStreamDeckInstallation)
-                {
-                    // StreamDeck installation existed - restart StreamDeck
-                    WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, IgnorePluginRunning = true, StartStopDelay = 1 });
-                }
-            }
+            if (hasHotSpotInstallation)
+                WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDockStartStop(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, IgnorePluginRunning = true, StartStopDelay = 1 });
+            if (hasStreamDeckInstallation)
+                WorkerQueues[SetupMode.REMOVE].Enqueue(new WorkerStreamDeckStartStop<Config>(Config, DeckProcessOperation.START) { RefocusWindow = true, RefocusWindowTitle = InstallerWindow.WindowTitle, IgnorePluginRunning = true, StartStopDelay = 1 });
         }
 
         protected override void CreateUpdateTasks()

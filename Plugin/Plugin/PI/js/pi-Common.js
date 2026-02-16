@@ -184,7 +184,7 @@ function setPattern(field, type, donotrequest) {
 	var strPathXP = `(${regNameXP}[\\x2F]){1}(${regNameMultipleXP}[\\x2F])*(${regNameMultipleXP}){1}`;
 	var regCmdXP = `^(${strPathXP}){1}(:${strPathXP})*$`;
 	var regOffset = "^((0x){0,1}[0-9A-Fa-f]{4}:[0-9]{1,4}((:[ifsa]{1}(:s)?)|(:b:[0-9]{1,2}))?){1}$";
-	var regAvar = `^^\\(((A|E|L):){0,1}([\\w][\\w ]+(:\\d+){0,1}),\\s{0,1}([\\w][\\w/ ]+)\\)$`;
+	var regAvar = `^\\([AEL]:[\\w][\\w ]+(:\\d+){0,1},\\s{0,1}([\\w][\\w ]+)\\)$`;
 	var regBvarValue = `^(B:${regName}){1}$`;
 	var strBvarCmd = `((B:){0,1}${regName}(:[\\x2D\\x2B]{0,1}[0-9]+([\\x2C\\x2E]{1}[0-9]+){0,1}){0,1}){1}`;
 	var regBvarCmd = `^(${strBvarCmd}){1}(:${strBvarCmd})*$`;
