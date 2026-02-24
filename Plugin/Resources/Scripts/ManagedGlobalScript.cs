@@ -66,6 +66,7 @@ namespace PilotsDeck.Resources.Scripts
                 foreach (var callback in EventCallbacks)
                     SimController.UnsubscribeSimEvent(callback.Key, FileName);
                 EventCallbacks.Clear();
+                TimerCallbacks.Clear();
             }
 
             base.Stop();
