@@ -105,7 +105,7 @@ It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin 
 If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
 The Requirements for the Plugin:
 - Windows **10** or **11** (updated)
-- [**StreamDeck Software v7.2**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
+- [**StreamDeck Software v7.3**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
   - The Plugin can also be installed to the **MiraBox/HotSpot StreamDock** Software. Select StreamDock in the Setup Options to install or update the Plugin there.
 - [**.NET 10**](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary. Reboot recommended when the Runtime was installed for the first Time.
 - If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
