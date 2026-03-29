@@ -20,7 +20,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Platforms>x64</Platforms>
     <Title>Profile Manager</Title>
-	<WindowsSdkPackageVersion>10.0.17763.41</WindowsSdkPackageVersion>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -77,8 +76,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.Installer" Version="2026.71.19.380" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CFIT.Installer" Version="2026.88.13.1368" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 
   <ItemGroup>

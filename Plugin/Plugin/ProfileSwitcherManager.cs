@@ -251,11 +251,11 @@ namespace PilotsDeck.Plugin
                     {
                         if (deck != null)
                         {
-                            var profile = ProfileMappings.Where(p => p.SwitchBackProfile && p.DeckId == deck.id).FirstOrDefault() ?? null;
+                            var profile = ProfileMappings.Where(p => p.SwitchBackProfile && p.DeckId == deck.id.ToUpperInvariant()).FirstOrDefault() ?? null;
                             if (profile != null)
                             {
                                 Logger.Information($"Switching Deck '{deck.id}' to Profile '{profile.ProfileUUID}'");
-                                _ = DeckController.SendSwitchToProfile(DeckController.PluginContext.ToLowerInvariant(), deck.id.ToLowerInvariant(), "");
+                                _ = DeckController.SendSwitchToProfile(DeckController.PluginContext.ToLowerInvariant(), deck.id.ToLowerInvariant(), $"Profiles/{profile.ProfileName}");
                             }
                         }
                     }

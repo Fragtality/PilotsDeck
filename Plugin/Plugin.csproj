@@ -21,7 +21,6 @@
     <PackageProjectUrl>https://github.com/Fragtality/PilotsDeck</PackageProjectUrl>
     <PackageIcon>PluginIcon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Fragtality/PilotsDeck</RepositoryUrl>
-	<WindowsSdkPackageVersion>10.0.17763.41</WindowsSdkPackageVersion>
 	<RootNamespace>PilotsDeck</RootNamespace>
   </PropertyGroup>
 
@@ -87,11 +86,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CFIT.AppFramework" Version="2026.71.19.406" />
-    <PackageReference Include="CFIT.AppLogger" Version="2026.71.18.3281" />
-    <PackageReference Include="CFIT.AppTools" Version="2026.71.18.3292" />
-    <PackageReference Include="CFIT.SimConnectLib" Version="2026.71.19.393" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CFIT.AppFramework" Version="2026.88.13.1394" />
+    <PackageReference Include="CFIT.AppLogger" Version="2026.88.13.1347" />
+    <PackageReference Include="CFIT.AppTools" Version="2026.88.13.1356" />
+    <PackageReference Include="CFIT.SimConnectLib" Version="2026.88.13.1382" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="FSUIPCClientDLL" Version="3.3.16" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.4.1" />
     <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.2.2" />
