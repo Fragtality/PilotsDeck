@@ -24,7 +24,7 @@ namespace PilotsDeck.Simulator.XP.WS
         protected virtual bool ClientInitialized { get; set; } = false;
         public virtual string RestBaseUrl { get; } = "/api/v2/";
         public virtual ConcurrentDictionary<long, DataRef> KnownDataRefs { get; } = [];
-        public virtual ConcurrentDictionary<long, CommandRef> KnownCommands { get; } = [];
+        protected virtual ConcurrentDictionary<string, CommandRef> KnownCommands { get; } = [];
         public virtual bool HasEnumeratedRefs => !KnownDataRefs.IsEmpty && !KnownCommands.IsEmpty;
 
         public virtual async Task Connect()
@@ -94,7 +94,7 @@ namespace PilotsDeck.Simulator.XP.WS
             Logger.Debug($"Enumerating CommandRefs via Web API ...");
             CommandRefList commandList = await RestGet<CommandRefList>("commands");
             foreach (var command in commandList.data)
-                KnownCommands.Add(command.id, command);
+                KnownCommands.Add(command.name, command);
             Logger.Debug($"Received {KnownCommands.Count} CommandRefs");
         }
 
@@ -104,10 +104,16 @@ namespace PilotsDeck.Simulator.XP.WS
             KnownCommands.Clear();
         }
 
-        protected virtual async Task<T> RestGet<T>(string path) where T : class
+        protected virtual async Task<T> RestGet<T>(string path, (string key, string value)[] parameters = null) where T : class
         {
             T jsonObject = null;
-            HttpResponseMessage response = await RestClient.GetAsync($"{RestBaseUrl}{path}");
+            string Url = $"{RestBaseUrl}{path}";
+            if (parameters != null)
+            {
+                Url += "?" + string.Join("&", parameters.Select(p => Uri.EscapeDataString(p.key) + "=" + Uri.EscapeDataString(p.value)));
+            }
+            HttpResponseMessage response = await RestClient.GetAsync(Url);
+
             if (response.IsSuccessStatusCode)
             {
                 try
@@ -150,20 +156,29 @@ namespace PilotsDeck.Simulator.XP.WS
             return response.IsSuccessStatusCode;
         }
 
-        public virtual bool HasCommandRef(string cmdRef, out long id)
+        public virtual async Task<long?> GetCommandRefId(string cmdName)
         {
-            var query = KnownCommands.Where(kv => kv.Value.name == cmdRef);
-            if (query.Any())
+            if (KnownCommands.TryGetValue(cmdName, out CommandRef cmd))
             {
-                id = query.First().Key;
-                return true;
+                return cmd.id;
             }
-            else
+
+            Logger.Debug($"Querying for CommandRef `{cmdName}` via Web API ...");
+            CommandRefList commandList = await RestGet<CommandRefList>("commands", [("filter[name]", cmdName)] );
+            foreach (var command in commandList.data)
             {
-                Logger.Warning($"No ID found for CommandRef '{cmdRef}'");
-                id = 0;
-                return false;
+                KnownCommands.Add(command.name, command);
+                Logger.Debug($"Received CommandRef '{command}'");
             }
+            Logger.Debug($"Received {commandList.data.Count} CommandRefs");
+
+            if (KnownCommands.TryGetValue(cmdName, out cmd))
+            {
+                return cmd.id;
+            }
+
+            Logger.Warning($"No ID found for CommandRef '{cmdName}'");
+            return null;
         }
 
         public virtual async Task CloseSockets()
