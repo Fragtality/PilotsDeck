@@ -125,7 +125,7 @@ namespace PilotsDeck.Actions.Advanced
                 Context = context,
                 Address = Address.Copy(),
                 Type = CommandType,
-                IsUp = (keyUp! && CommandType == SimCommandType.XPCMD && !UseXpCommandOnce) || keyUp,
+                IsUp = (!keyUp && CommandType == SimCommandType.XPCMD && UseXpCommandOnce) || keyUp,
                 Ticks = Math.Abs(ticks),
                 TickDelay = TickDelay,
                 EncoderAction = encoderAction

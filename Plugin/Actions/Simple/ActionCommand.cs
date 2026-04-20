@@ -110,7 +110,7 @@ namespace PilotsDeck.Actions.Simple
 
             simCommand.Context = context;
             simCommand.Ticks = isCalcCode || State.IsCode ? 1 : Math.Abs(ticks);
-            simCommand.IsUp = (keyUp! && CommandType == SimCommandType.XPCMD && !UseXpCommandOnce) || keyUp;
+            simCommand.IsUp = (!keyUp && CommandType == SimCommandType.XPCMD && UseXpCommandOnce) || keyUp;
             if (SimCommand.CommandTypeUsesDelay(CommandType, DoNotRequestBvar) && UseCommandDelay)
             {
                 simCommand.CommandDelay = CommandDelay;
