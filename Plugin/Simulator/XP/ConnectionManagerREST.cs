@@ -315,7 +315,7 @@ namespace PilotsDeck.Simulator.XP
                 {
                     foreach (string xpcmd in xpcmds)
                     {
-                        if (WebSocket.HasCommandRef(xpcmd, out long id) && await SendCommandRef(id, command.IsUp))
+                        if (await SendCommandRef(xpcmd, command.IsUp))
                         {
                             success++;
                             if (command.CommandDelay > 0)
@@ -325,7 +325,7 @@ namespace PilotsDeck.Simulator.XP
                 }
                 else if (xpcmds.Length == 1)
                 {
-                    if (WebSocket.HasCommandRef(command.Address.Address, out long id) && await SendCommandRef(id, command.IsUp))
+                    if (await SendCommandRef(command.Address.Address, command.IsUp))
                         success++;
                 }
                 else
@@ -336,9 +336,13 @@ namespace PilotsDeck.Simulator.XP
 
             return success == xpcmds.Length * command.Ticks;
         }
-
-        public virtual async Task<bool> SendCommandRef(long id, bool isUp)
+        public virtual async Task<bool> SendCommandRef(string cmdName, bool isUp)
         {
+            if (await WebSocket.GetCommandRefId(cmdName) is not long id)
+            {
+                return false;
+            }
+
             var message = new SetCommandRefMessage(RequestID++);
             if (!isUp)
             {
@@ -356,7 +360,7 @@ namespace PilotsDeck.Simulator.XP
             }
             
             var cid = message.@params.commands.First().id;
-            Logger.Debug($"Sending Command Request '{message.req_id}': {cid} -> {WebSocket.KnownCommands[cid].name} | {message.@params.commands.First().duration} | {message.@params.commands.First().is_active}");
+            Logger.Debug($"Sending Command Request '{message.req_id}': {cid} -> {cmdName} | {message.@params.commands.First().duration} | {message.@params.commands.First().is_active}");
             OutstandingRequests.Add(message.req_id, OutstandingRequest.Create(message.req_id, message, RequestType.SetCommandActive));
             await WebSocket.SendJsonRequest(message);
             Logger.Debug($"Command sent.");
