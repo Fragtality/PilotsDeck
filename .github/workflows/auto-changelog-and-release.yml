@@ -1,0 +1,231 @@
+name: Auto Changelog & Release
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'Installer/Payload/version.json'
+      - 'PilotsDeck-Installer-latest.exe'
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog-and-release:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up jq
+        run: sudo apt-get install -y jq
+
+      # 1 Read version + timestamp
+      - name: Read version.json
+        id: version
+        run: |
+          VERSION=$(jq -r '.Version' Installer/Payload/version.json)
+          TIMESTAMP=$(jq -r '.Timestamp' Installer/Payload/version.json)
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+
+      # 2 Detect version change (Git-based)
+      - name: Detect version change
+        id: version_check
+        run: |
+          CURRENT=$(jq -r '.Version' Installer/Payload/version.json)
+          PREVIOUS=$(git show HEAD~1:Installer/Payload/version.json 2>/dev/null | jq -r '.Version' || echo "")
+
+          echo "Current version: $CURRENT"
+          echo "Previous version: $PREVIOUS"
+
+          if [ "$CURRENT" != "$PREVIOUS" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      # 3 Read CHANGES
+      - name: Read changes content
+        id: changes
+        run: |
+          if [ -s CHANGES.md ]; then
+            CONTENT=$(cat CHANGES.md)
+          else
+            CONTENT="- No changes recorded"
+          fi
+
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # 4 Update CHANGELOG ONLY on version change
+      - name: Update CHANGELOG
+        id: update_changelog
+        if: steps.version_check.outputs.changed == 'true'
+        run: |
+          # Ensure CHANGELOG exists with header
+          if [ ! -f CHANGELOG.md ]; then
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          fi
+
+          VERSION="v${{ steps.version.outputs.version }}"
+
+          # Prevent duplicate entries
+          if grep -q "## $VERSION" CHANGELOG.md; then
+            echo "Version already exists — skipping"
+            exit 0
+          fi
+
+          # Build new entry
+          NEW_ENTRY=$(cat <<EOF
+
+          ## $VERSION
+
+          ${{ steps.changes.outputs.changes }}
+
+          <br/><br/>
+
+          EOF
+          )
+
+          # Ensure header stays at top, then prepend new entry
+          {
+            echo "# Changelog"
+            echo ""
+            echo "$NEW_ENTRY"
+            cat CHANGELOG.md | awk 'NR>3' CHANGELOG.md
+          } > CHANGELOG.tmp.md
+
+          mv CHANGELOG.tmp.md CHANGELOG.md
+
+          # Clear input AFTER use
+          echo -n "" > CHANGES.md
+
+      # 5 Commit changelog ONLY if updated
+      - name: Commit changelog
+        if: steps.version_check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add CHANGELOG.md
+          git add CHANGES.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Auto-update CHANGELOG (version change)"
+          git push
+
+      # 6 VirusTotal Check
+      - name: Upload to VirusTotal
+        id: vt_upload
+        run: |
+          RESPONSE=$(curl --silent --request POST \
+            --url "https://www.virustotal.com/api/v3/files" \
+            --header "x-apikey: ${{ secrets.VT_API_KEY }}" \
+            --form "file=@PilotsDeck-Installer-latest.exe")
+
+          ANALYSIS_ID=$(echo $RESPONSE | jq -r '.data.id')
+
+          echo "analysis_id=$ANALYSIS_ID" >> $GITHUB_OUTPUT
+
+      - name: Wait for VirusTotal analysis
+        run: sleep 60
+
+      - name: Poll VirusTotal analysis
+        id: vt_report
+        run: |
+          ANALYSIS_ID="${{ steps.vt_upload.outputs.analysis_id }}"
+
+          for i in {1..10}; do
+            echo "Checking VirusTotal status (attempt $i)..."
+
+            RESPONSE=$(curl --silent \
+              --url "https://www.virustotal.com/api/v3/analyses/$ANALYSIS_ID" \
+              --header "x-apikey: ${{ secrets.VT_API_KEY }}")
+
+            STATUS=$(echo $RESPONSE | jq -r '.data.attributes.status')
+
+            if [ "$STATUS" = "completed" ]; then
+              echo "Analysis complete."
+
+              MALICIOUS=$(echo $RESPONSE | jq '.data.attributes.stats.malicious')
+              SUSPICIOUS=$(echo $RESPONSE | jq '.data.attributes.stats.suspicious')
+              UNDETECTED=$(echo $RESPONSE | jq '.data.attributes.stats.undetected')
+
+              TOTAL=$((MALICIOUS + SUSPICIOUS + UNDETECTED))
+              SHA256=$(echo $RESPONSE | jq -r '.meta.file_info.sha256')
+
+              URL="https://www.virustotal.com/gui/file/$SHA256"
+
+              echo "malicious=$MALICIOUS" >> $GITHUB_OUTPUT
+              echo "suspicious=$SUSPICIOUS" >> $GITHUB_OUTPUT
+              echo "undetected=$UNDETECTED" >> $GITHUB_OUTPUT
+              echo "total=$TOTAL" >> $GITHUB_OUTPUT
+              echo "url=$URL" >> $GITHUB_OUTPUT
+
+              exit 0
+            fi
+
+            echo "Still $STATUS — waiting..."
+            sleep 30
+          done
+
+          echo "VirusTotal analysis did not complete in time."
+
+          # fallback values (so workflow doesn't break)
+          echo "malicious=0" >> $GITHUB_OUTPUT
+          echo "suspicious=0" >> $GITHUB_OUTPUT
+          echo "undetected=0" >> $GITHUB_OUTPUT
+          echo "total=0" >> $GITHUB_OUTPUT
+          echo "url=https://www.virustotal.com/" >> $GITHUB_OUTPUT
+
+      # 7 Build release notes (ALWAYS updated)
+      - name: Build release notes
+        id: notes
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TIMESTAMP="${{ steps.version.outputs.timestamp }}"
+
+          NOTES="## Version: $VERSION"$'\n'
+          NOTES+="**Build Timestamp: $TIMESTAMP"$'Z**\n<br/>\n'
+
+          NOTES+="${{ steps.changes.outputs.changes }}"
+
+          NOTES+=$'\n<br/><br/><br/>\n'
+          NOTES+="## 🛡️ VirusTotal Scan"$'\n'
+          NOTES+="- ✅ Clean: ${{ steps.vt_report.outputs.undetected }} / ${{ steps.vt_report.outputs.total }} Engines"$'\n'
+          NOTES+="- ⚠️ Suspicious: ${{ steps.vt_report.outputs.suspicious }}"$'\n'
+          NOTES+="- ❌ Malicious: ${{ steps.vt_report.outputs.malicious }}"$'\n'
+          NOTES+="- 🔗 [Full Report](${{ steps.vt_report.outputs.url }})"
+
+          {
+            echo "body<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      # 8 Delete + recreate release (fresh UI timestamp)
+      - name: Delete old release
+        run: |
+          gh release delete latest -y || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest
+          name: Latest Build
+          body: ${{ steps.notes.outputs.body }}
+          files: PilotsDeck-Installer-latest.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

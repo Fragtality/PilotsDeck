@@ -20,9 +20,13 @@ namespace PilotsDeck.Resources.Variables
             get { return Conversion.ToDouble(StringValue); }
         }
 
-        public override void CheckChanged()
+        protected override bool CheckNotEqualLast()
         {
-            IsChanged = StringValue != ValueLast;
+            return StringValue?.Equals(ValueLast) == false;
+        }
+
+        protected override void SetLast()
+        {
             ValueLast = StringValue;
         }
 
@@ -34,14 +38,15 @@ namespace PilotsDeck.Resources.Variables
                 return StringValue;
         }
 
-        public override void SetValue(string value)
+        public override void SetValueString(string value)
         {
-            Logger.Verbose($"Setting Value {value}");
+            if (App.Configuration.VerboseLogging)
+                Logger.Verbose($"Setting Value {value}");
             StringValue = value;
             StringValue = StringValue.Trim('\x0');
         }
 
-        public override void SetValue(double value)
+        public override void SetValueDouble(double value)
         {
             SetValue(Conversion.ToString(value));
         }

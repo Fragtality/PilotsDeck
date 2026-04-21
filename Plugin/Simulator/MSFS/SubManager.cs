@@ -1,5 +1,4 @@
-﻿using CFIT.AppLogger;
-using CFIT.AppTools;
+﻿using CFIT.AppTools;
 using CFIT.SimConnectLib;
 using CFIT.SimConnectLib.InputEvents;
 using CFIT.SimConnectLib.Modules.MobiFlight;
@@ -9,6 +8,7 @@ using CFIT.SimConnectLib.SimVars;
 using PilotsDeck.Resources.Variables;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PilotsDeck.Simulator.MSFS
 {
@@ -36,7 +36,7 @@ namespace PilotsDeck.Simulator.MSFS
             var query = SubscriptionMappings.Where(m => m.Key.Variable.Address == variable.Address);
             if (query?.Any() == true)
             {
-                mapping = query.FirstOrDefault().Key;
+                mapping = query.First().Key;
                 return true;
             }
             else
@@ -46,15 +46,15 @@ namespace PilotsDeck.Simulator.MSFS
             }
         }
 
-        public SubMapping Subscribe(ManagedVariable variable)
+        public async Task<SubMapping> Subscribe(ManagedVariable variable)
         {
             SubMapping mapping = null;
             if (variable == null)
                 return mapping;
+
             if (TryGet(variable, out mapping))
             {
-                Logger.Debug($"Resubscribe '{variable.Address}' (ResName: {mapping.Subscription.SimResource.Name})");
-                mapping.Resubscribe(variable);
+                variable.IsSubscribed = true;
                 return mapping;
             }
 
@@ -92,9 +92,14 @@ namespace PilotsDeck.Simulator.MSFS
             return mapping;
         }
 
-        public static void Unsubscribe(SubMapping mapping)
+        public virtual async Task Unsubscribe(SubMapping mapping)
         {
-            mapping?.Unsubscribe();
+            if (mapping != null)
+            {
+                await mapping.Unsubscribe();
+                mapping.Subscription = null;
+                SubscriptionMappings.Remove(mapping);
+            }
         }
 
         public void Clear()

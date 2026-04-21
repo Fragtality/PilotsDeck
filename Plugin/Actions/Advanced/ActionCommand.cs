@@ -39,7 +39,7 @@ namespace PilotsDeck.Actions.Advanced
         public bool IsCounter { get { return WriteValue?.Length >= 2 && !WriteValue?.Contains(',') == true && Conversion.IsNumber(Code?.Split(':')?[0]); } }
         public bool IsSequence { get { return IsCode && !IsCounter && (WriteValue?.Contains(',') == true && WriteValue?.Length >= 4) || (WriteValue?.StartsWith("$=") == true && WriteValue.Length >= 3); } }
         public string Code { get { return WriteValue?.Trim()?[1..]; } }
-        public string WriteValue { get; set; } = model.WriteValue;        
+        public string WriteValue { get; set; } = model.WriteValue;
         public ConcurrentDictionary<int, ConditionHandler> Conditions { get; set; } = model.GetConditions();
         public bool AnyCondition { get; set; } = model.AnyCondition;
 
@@ -110,7 +110,7 @@ namespace PilotsDeck.Actions.Advanced
             Logger.Verbose($"Compared Conditions - success: {success} | anycondition: {AnyCondition} | count {Conditions.Count}");
             return success == Conditions.Count;
         }
-        
+
         public bool CompareTime(TimeSpan diff)
         {
             return diff >= SpanAfterLastDown;
@@ -125,7 +125,7 @@ namespace PilotsDeck.Actions.Advanced
                 Context = context,
                 Address = Address.Copy(),
                 Type = CommandType,
-                IsUp = (keyUp! && CommandType == SimCommandType.XPCMD && !UseXpCommandOnce) || keyUp,
+                IsUp = (CommandType != SimCommandType.XPCMD && keyUp) || (CommandType == SimCommandType.XPCMD && (UseXpCommandOnce || keyUp)),
                 Ticks = Math.Abs(ticks),
                 TickDelay = TickDelay,
                 EncoderAction = encoderAction
@@ -165,7 +165,7 @@ namespace PilotsDeck.Actions.Advanced
             }
 
             Logger.Verbose($"Created Command - Ticks: {command.Ticks}");
-            return command; 
+            return command;
         }
     }
 }

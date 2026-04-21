@@ -1,4 +1,5 @@
-﻿using PilotsDeck.Resources.Images;
+﻿using CFIT.AppLogger;
+using PilotsDeck.Resources.Images;
 using PilotsDeck.StreamDeck;
 using System;
 using System.Drawing;
@@ -206,6 +207,12 @@ namespace PilotsDeck.Plugin.Render
 
         public void DrawImage(ManagedImage managedImage, RectangleF drawRect, CenterType? center = null, ScaleType? scale = null)
         {
+            if (managedImage == null)
+            {
+                Logger.Debug($"Passed Image was NULL!");
+                return;
+            }
+
             Image image = GetMatchingImage(managedImage);
             drawRect = CheckSize(drawRect, image.GetPoint());
             DrawImage(image, Scale(drawRect, scale ?? DefaultScale), center ?? DefaultCenter);
@@ -213,6 +220,12 @@ namespace PilotsDeck.Plugin.Render
 
         public void DrawImage(ManagedImage managedImage, CenterType? center = null, ScaleType? scale = null)
         {
+            if (managedImage == null)
+            {
+                Logger.Debug($"Passed Image was NULL!");
+                return;
+            }
+
             Image image = GetMatchingImage(managedImage);
             DrawImage(image, Scale(image.GetRectangle(), scale ?? DefaultScale), center ?? DefaultCenter);
         }
@@ -225,7 +238,7 @@ namespace PilotsDeck.Plugin.Render
             else
                 drawBrush = new(Color.FromArgb(GetAlpha(), drawColor));
 
-            Render.DrawString(text.Replace("[[n","\n"), Scale(drawFont, drawRect, scale ?? DefaultScale), drawBrush, Scale(CheckSize(drawRect, DeviceCanvas), scale ?? DefaultScale).Center(DeviceCanvas.Center(), center ?? DefaultCenter), ToolsRender.GetStringFlags(horizontal, vertical));
+            Render.DrawString(text.Replace("[[n", "\n"), Scale(drawFont, drawRect, scale ?? DefaultScale), drawBrush, Scale(CheckSize(drawRect, DeviceCanvas), scale ?? DefaultScale).Center(DeviceCanvas.Center(), center ?? DefaultCenter), ToolsRender.GetStringFlags(horizontal, vertical));
             drawBrush.Dispose();
         }
 

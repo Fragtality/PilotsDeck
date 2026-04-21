@@ -28,8 +28,8 @@ namespace PilotsDeck.Resources.Scripts
         public virtual DateTime LastWriteTime { get; set; }
         public virtual Dictionary<ManagedAddress, bool> Variables { get; set; } = [];
         public virtual int Registrations { get; set; } = 1;
-        public virtual bool LogUseDefault { get; set; } = true;
-        protected virtual Serilog.Core.Logger Log { get; set; }
+        protected virtual Serilog.Core.Logger Log { get; }
+        protected virtual Serilog.Core.Logger ScriptLog { get; set; }
         protected virtual VariableManager VariableManager { get { return App.PluginController.VariableManager; } }
         protected static SimController SimController { get { return App.SimController; } }
 
@@ -106,7 +106,7 @@ namespace PilotsDeck.Resources.Scripts
             _env.Log = new Action<string>(WriteLog);
         }
 
-        public virtual void Start(FileInfo fileInfo = null, Serilog.Core.Logger log = null)
+        public virtual void Start(FileInfo fileInfo = null)
         {
             try
             {
@@ -115,9 +115,6 @@ namespace PilotsDeck.Resources.Scripts
 
                 fileInfo ??= new FileInfo(GetScriptFolder(FileName));
                 LastWriteTime = fileInfo.LastWriteTime;
-
-                if (log != null && (LogUseDefault || Log == null))
-                    Log = log;
 
                 LuaEngine = new();
                 CreateEnvironment();
@@ -157,6 +154,8 @@ namespace PilotsDeck.Resources.Scripts
             }
 
             Log?.Information(ScriptManager.FormatLogMessage(FileName, $"Script stopped by ScriptManager"));
+            ScriptLog?.Dispose();
+            ScriptLog = null;
             Logger.Debug($"Script stopped: {FileName}");
         }
 
@@ -416,7 +415,7 @@ namespace PilotsDeck.Resources.Scripts
                 }
 
                 LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
-                            .WriteTo.File(name, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} - {Message} {NewLine}")
+                            .WriteTo.File(name, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} - {Message} {NewLine}", fileSizeLimitBytes: 10485760)
                             .MinimumLevel.Information();
                 return loggerConfiguration.CreateLogger();
             }
@@ -429,24 +428,23 @@ namespace PilotsDeck.Resources.Scripts
 
         protected virtual void UseLog(string name)
         {
-            if (string.IsNullOrWhiteSpace(name) || !LogUseDefault)
-                return;
+            ScriptLog?.Dispose();
+            ScriptLog = null;
 
-            Log = CreaterLogger(ref name, FileName);
-            LogUseDefault = false;
+            ScriptLog = CreaterLogger(ref name, FileName);
         }
 
         protected virtual void WriteLog(string message)
         {
             try
             {
-                if (string.IsNullOrEmpty(message))
+                if (string.IsNullOrWhiteSpace(message))
                     message = "";
 
-                if (Log != null)
-                    Log.Information(ScriptManager.FormatLogMessage(FileName, message));
+                if (ScriptLog != null)
+                    ScriptLog.Information(ScriptManager.FormatLogMessage(FileName, message));
                 else
-                    Logger.Log(LogLevel.Information, FileName, message);
+                    Log.Information(ScriptManager.FormatLogMessage(FileName, message));
             }
             catch (Exception ex)
             {
@@ -466,7 +464,7 @@ namespace PilotsDeck.Resources.Scripts
             try
             {
                 using var httpClient = new HttpClient();
-                result = httpClient.GetStringAsync(url).Result;
+                result = httpClient.GetStringAsync(url).RunSync();
 
             }
             catch (Exception ex)

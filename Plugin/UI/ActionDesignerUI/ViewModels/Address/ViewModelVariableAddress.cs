@@ -17,14 +17,14 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels.Address
 
         public override bool CheckAddressValid()
         {
-            return ManagedAddress?.ReadType != SimValueType.NONE && ManagedAddress?.IsEmpty == false;
+            return ManagedAddress?.ReadType != SimValueType.NONE && ManagedAddress?.ReadType != SimValueType.CALCULATOR && ManagedAddress?.IsEmpty == false;
         }
 
         public override bool CheckInputValid(string address, out Enum detectedType)
         {
             var readType = TypeMatching.GetReadType(address);
             detectedType = readType;
-            return readType != SimValueType.NONE;
+            return readType != SimValueType.NONE && readType != SimValueType.CALCULATOR;
         }
 
         protected override bool GetHasValue()

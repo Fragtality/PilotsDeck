@@ -17,9 +17,13 @@ namespace PilotsDeck.Resources.Variables
             get { return DoubleValue; }
         }
 
-        public override void CheckChanged()
+        protected override bool CheckNotEqualLast()
         {
-            IsChanged = DoubleValue != ValueLast;
+            return DoubleValue != ValueLast;
+        }
+
+        protected override void SetLast()
+        {
             ValueLast = DoubleValue;
         }
 
@@ -28,12 +32,12 @@ namespace PilotsDeck.Resources.Variables
             return DoubleValue;
         }
 
-        public override void SetValue(string value)
+        public override void SetValueString(string value)
         {
             DoubleValue = Conversion.ToDouble(value);
         }
 
-        public override void SetValue(double value)
+        public override void SetValueDouble(double value)
         {
             DoubleValue = value;
         }

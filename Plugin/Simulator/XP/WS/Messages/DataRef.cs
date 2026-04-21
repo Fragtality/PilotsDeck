@@ -73,4 +73,16 @@ namespace PilotsDeck.Simulator.XP.WS.Messages
             return new() { data = value.Base64Encode() };
         }
     }
+
+    public class RefCount
+    {
+#pragma warning disable IDE1006
+        public int data { get; set; } = 0;
+#pragma warning restore
+
+        public static int GetCount(string json)
+        {
+            return JsonSerializer.Deserialize<RefCount>(json)?.data ?? 0;
+        }
+    }
 }

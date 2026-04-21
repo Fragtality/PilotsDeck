@@ -193,7 +193,6 @@ function setPattern(field, type, donotrequest) {
 	var rxKvarCmd = `^${validKvar}:(0x){0,1}[0-9]+(:${validKvar}:(0x){0,1}[0-9]+)+$|^${validKvar}(:(0x){0,1}[0-9]+){0,5}$`;
 	var regLuaFunc = `^(Lua|lua|LUA){1}:${regName}(\\.lua){0,1}(:${regName}){1}(\\({1}[^\\)]+\\){1}){0,1}$`;
 	var regInternal = `^(X:){1}${regName}$`;
-	var regCalcRead = `^C:[^\\s].+$`
 
 	if (type == 0) //macro
 		document.getElementById(field).pattern = `^([^:0-9]{1}${regName}:(${regName}){0,1}(:${regName}){0,}){1}$`;
@@ -206,7 +205,7 @@ function setPattern(field, type, donotrequest) {
 	else if (type == 4)  //offset
 		document.getElementById(field).pattern = regOffset;
 	else if (type == 5) //offset | lvar | dref | avar | bvar | luafunc | internal | calcRead
-		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvarValue}|${regInternal}|${rxKvarVariable}|${regLuaFunc}|${regCalcRead}|${regLvar}`;
+		document.getElementById(field).pattern = `${regOffset}|${regDref}|${regAvar}|${regBvarValue}|${regInternal}|${rxKvarVariable}|${regLuaFunc}|${regLvar}`;
 	else if (type == 6) //vjoy
 		document.getElementById(field).pattern = "^(6[4-9]|7[0-2]){1}:(0?[0-9]|1[0-9]|2[0-9]|3[0-1]){1}(:t)?$";
 	else if (type == 7) //vjoy Drv

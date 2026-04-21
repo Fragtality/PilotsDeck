@@ -1,6 +1,7 @@
 ﻿using CFIT.AppTools;
 using PilotsDeck.Simulator;
 using System;
+using System.Threading.Tasks;
 
 namespace PilotsDeck.Resources.Variables
 {
@@ -91,7 +92,17 @@ namespace PilotsDeck.Resources.Variables
         public virtual bool IsSubscribed { get; set; } = false;
         public virtual bool IsConnected { get { return true; } }
 
-        public abstract void CheckChanged();
+        public event Func<dynamic, Task> ValueSet;
+        public event Func<dynamic, Task> ValueChanged;
+
+        protected abstract bool CheckNotEqualLast();
+        protected abstract void SetLast();
+
+        public void CheckChanged()
+        {
+            IsChanged = CheckNotEqualLast();
+            SetLast();
+        }
 
         public virtual void Connect()
         {
@@ -105,9 +116,34 @@ namespace PilotsDeck.Resources.Variables
 
         public abstract dynamic RawValue();
 
-        public abstract void SetValue(string value);
+        public void SetValue(string value)
+        {
+            SetValueString(value);
+            NotifySet();
+            NotifyChanged();
+        }
 
-        public abstract void SetValue(double value);
+        public void SetValue(double value)
+        {
+            SetValueDouble(value);
+            NotifySet();
+            NotifyChanged();
+        }
+
+        public abstract void SetValueString(string value);
+
+        public abstract void SetValueDouble(double value);
+
+        protected void NotifySet()
+        {
+            _ = TaskTools.RunPool(() => ValueSet?.Invoke(RawValue()));
+        }
+
+        protected void NotifyChanged()
+        {
+            if (CheckNotEqualLast())
+                _ = TaskTools.RunPool(() => ValueChanged?.Invoke(RawValue()));
+        }
 
         public override string ToString()
         {

@@ -10,7 +10,6 @@ using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator.MSFS;
 using PilotsDeck.Tools;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -34,8 +33,6 @@ namespace PilotsDeck.Simulator
         public bool IsReadySession { get { return SimConnect.IsSessionRunning; } }
         public bool IsPaused { get { return SimConnect.IsPaused; } }
         public string AircraftString { get { return SimConnect.AircraftString; } }
-        public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; } = [];
-        //protected Dictionary<string, ISimResourceSubscription> EventSubscriptions { get; } = [];
         protected SimConnectManager SimConnect { get; }
         protected MobiModule MobiModule { get; }
         protected SubManager SubManager { get; }
@@ -118,7 +115,7 @@ DisableNagle=1
             return success;
         }
 
-        public async void Run()
+        public async Task Run()
         {
             try
             {
@@ -137,14 +134,14 @@ DisableNagle=1
                             {
                                 LastConnectionAttempt = DateTime.Now;
                                 Logger.Warning($"Stale Connection detected - force reconnect");
-                                SimConnect.Disconnect();
+                                await SimConnect.Disconnect();
                                 continue;
                             }
                             else if (FirstConnect && diff >= TimeSpan.FromMilliseconds(App.Configuration.StaleTimeout * 6))
                             {
                                 LastConnectionAttempt = DateTime.Now;
                                 Logger.Warning($"Stale initial Connection detected - force reconnect");
-                                SimConnect.Disconnect();
+                                await SimConnect.Disconnect();
                                 continue;
                             }
                         }
@@ -163,7 +160,7 @@ DisableNagle=1
                     }
 
                     if (SimConnect.IsReceiveRunning && !SimConnect.IsSimConnected && FirstConnect)
-                        SimConnect.CheckResources();
+                        await SimConnect.CheckResources();
 
                     if (SimConnect.IsSimConnected && FirstConnect)
                     {
@@ -176,7 +173,7 @@ DisableNagle=1
                         if (!RemoteRunning)
                         {
                             Logger.Warning($"Receive not running while Connection established! Reconnecting in {(App.Configuration.RetryDelay / 2) / 1000}s");
-                            SimConnect.Disconnect();
+                            await SimConnect.Disconnect();
                             FirstRun = true;
                             await Task.Delay(App.Configuration.RetryDelay / 2, App.CancellationToken);
                             continue;
@@ -184,7 +181,7 @@ DisableNagle=1
                         else
                         {
                             Logger.Warning($"Receive not running while Connection established! Assuming Remote MSFS has closed.");
-                            SimConnect.Disconnect();
+                            await SimConnect.Disconnect();
                             RemoteRunning = false;
                             continue;
                         }
@@ -226,7 +223,7 @@ DisableNagle=1
                 }
 
                 if (IsRunning && !SimConnect.QuitReceived)
-                    SimConnect.Disconnect();
+                    await SimConnect.Disconnect();
 
                 SimConnect.WindowHook.ClearHook();
             }
@@ -274,25 +271,27 @@ DisableNagle=1
             }
         }
 
-        public void Stop()
+        public virtual Task Stop()
         {
             foreach (var variable in VariableManager.VariableList.Where(v => v.IsValueMSFS()))
                 variable.IsSubscribed = false;
+
+            return Task.CompletedTask;
         }
 
-        public void Process()
+        public async Task Process()
         {
-            int count = SimConnect.CheckResources();
+            int count = await SimConnect.CheckResources();
             if (count > 0)
                 Logger.Verbose($"Resources updated on Process: {count}");
         }
 
-        public void SubscribeVariable(ManagedVariable managedVariable)
+        public Task SubscribeVariable(ManagedVariable managedVariable)
         {
-            SubscribeVariables([managedVariable]);
+            return SubscribeVariables([managedVariable]);
         }
 
-        public void SubscribeVariables(ManagedVariable[] managedVariables)
+        public async Task SubscribeVariables(ManagedVariable[] managedVariables)
         {
             if (!IsReadyProcess)
                 return;
@@ -306,16 +305,16 @@ DisableNagle=1
                     continue;
 
                 Logger.Verbose($"Subscribe Variable '{variable.Address}' of Type '{variable.Type}'");
-                SubManager.Subscribe(variable);
+                await SubManager.Subscribe(variable);
             }
         }
 
-        public void UnsubscribeVariable(ManagedVariable managedVariable)
+        public Task UnsubscribeVariable(ManagedVariable managedVariable)
         {
-            UnsubscribeVariables([managedVariable]);
+            return UnsubscribeVariables([managedVariable]);
         }
 
-        public void UnsubscribeVariables(ManagedVariable[] managedVariables)
+        public async Task UnsubscribeVariables(ManagedVariable[] managedVariables)
         {
             if (!IsReadyProcess)
                 return;
@@ -329,149 +328,16 @@ DisableNagle=1
                     continue;
 
                 Logger.Verbose($"Unsubscribe Variable '{variable.Address}'");
-                SubManager.Unsubscribe(mapping);
+                await SubManager.Unsubscribe(mapping);
             }
         }
 
-        public void RemoveUnusedResources(bool force)
+        public Task RemoveUnusedResources(bool force)
         {
             if (force)
                 SubManager.Clear();
 
-            SimConnect.ClearUnusedRessources(force);
-        }
-
-        protected void OnReceiveEvent(string evtName, object evtData)
-        {
-            try
-            {
-                if (RegisteredEvents.TryGetValue(evtName, out var events))
-                {
-                    foreach (var evt in events)
-                        evt.Callback(evt.Name, evtData);
-                }
-                else
-                    Logger.Warning($"The Event '{evtName}' is not subscribed!");
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-        }
-
-        public bool SubscribeSimEvent(string evtName, string receiverID, ISimConnector.EventCallback callbackFunction)
-        {
-            if (!IsReadyProcess)
-                return false;
-
-            if (string.IsNullOrWhiteSpace(evtName) || string.IsNullOrWhiteSpace(receiverID) || callbackFunction == null)
-                return false;
-
-            try
-            {
-                var evtAddress = new ManagedAddress(evtName);
-                if (evtAddress.IsEmpty || !evtAddress.IsRead || (evtAddress.ReadType != SimValueType.LVAR && evtAddress.ReadType != SimValueType.AVAR && evtAddress.ReadType != SimValueType.KVAR && evtAddress.ReadType != SimValueType.BVAR))
-                {
-                    Logger.Warning($"The Event '{evtName}' is not valid for Subscription!");
-                    return false;
-                }
-                var evtVariable = VariableManager.RegisterVariable(evtAddress);
-
-                bool doSub = false;
-                if (RegisteredEvents.TryGetValue(evtVariable.Address, out var regList))
-                {
-                    if (regList.Any(e => e.Name == evtName && e.ReceiverID == receiverID))
-                        Logger.Warning($"The Event '{evtVariable.Address}' is already subscribed for '{receiverID}'!");
-                    else
-                    {
-                        regList.Add(new ISimConnector.EventRegistration(evtName, receiverID, callbackFunction));
-                        Logger.Debug($"Subscribed Event '{evtName}' for '{receiverID}'");
-                    }
-                }
-                else
-                {
-                    RegisteredEvents.Add(evtVariable.Address, []);
-                    RegisteredEvents[evtVariable.Address].Add(new ISimConnector.EventRegistration(evtName, receiverID, callbackFunction));
-                    Logger.Debug($"Subscribed Event '{evtName}' for '{receiverID}'");
-                    doSub = true;
-                }
-
-                if (doSub)
-                {
-                    SubscribeVariable(evtVariable);
-                    SubManager.TryGet(evtVariable, out SubMapping subMapping);
-
-                    if (subMapping == null)
-                        return false;
-
-                    subMapping.Subscription.OnReceived += (sub, value) =>
-                    {
-                        OnReceiveEvent(evtAddress.Address, value);
-                    };
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-                return false;
-            }
-        }
-
-        public bool UnsubscribeSimEvent(string evtName, string receiverID)
-        {
-            if (!IsReadyProcess)
-                return false;
-
-            if (string.IsNullOrWhiteSpace(evtName) || string.IsNullOrWhiteSpace(receiverID))
-                return false;
-
-            try
-            {
-                var evtAddress = new ManagedAddress(evtName);
-                if (evtAddress.IsEmpty || !evtAddress.IsRead || (evtAddress.ReadType != SimValueType.LVAR && evtAddress.ReadType != SimValueType.AVAR && evtAddress.ReadType != SimValueType.KVAR && evtAddress.ReadType != SimValueType.BVAR))
-                {
-                    Logger.Warning($"The Event '{evtName}' is not valid for Subscription!");
-                    return false;
-                }
-
-                if (!VariableManager.TryGet(evtAddress, out ManagedVariable evtVariable) || !SubManager.TryGet(evtVariable, out SubMapping subMapping))
-                {
-                    Logger.Warning($"The Event '{evtName}' has no registered Variable or SubMapping!");
-                    return false;
-                }
-
-                if (RegisteredEvents.TryGetValue(evtAddress.Address, out var regList))
-                {
-                    ISimConnector.EventRegistration reg = regList.FirstOrDefault(e => e.Name == evtName && e.ReceiverID == receiverID, null);
-                    if (reg == null)
-                        Logger.Warning($"The Event '{evtAddress.Address}' is not subscribed for '{receiverID}'!");
-                    else
-                    {
-                        regList.Remove(reg);
-                        Logger.Debug($"Unsubscribed Event '{evtName}' for '{receiverID}'");
-                        if (regList.Count == 0)
-                        {
-                            RegisteredEvents.Remove(evtName);
-                            subMapping.Subscription.OnReceived -= (sub, value) =>
-                            {
-                                OnReceiveEvent(evtAddress.Address, value);
-                            };
-                            UnsubscribeVariable(evtVariable);
-                        }
-                    }
-                }
-                else
-                    Logger.Warning($"The Event '{evtName}' is not subscribed!");
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-                return false;
-            }
+            return SimConnect.ClearUnusedRessources(force);
         }
 
         public static bool IsCommandMSFS(SimCommandType? type)
@@ -514,7 +380,7 @@ DisableNagle=1
                 Logger.Debug($"Need to Register Variable for Command");
                 variable = VariableManager.RegisterVariable(command.Address);
                 if (variable != null)
-                    SubscribeVariable(variable);
+                    await SubscribeVariable(variable);
                 else
                 {
                     Logger.Warning($"Could not register Variable!");
@@ -579,7 +445,7 @@ DisableNagle=1
             if (!command.DoNotRequest && TypeMatching.rxBvarValue.IsMatch(command.Address))
                 return await WriteInputEventVariable(command);
             else if (command.DoNotRequest && TypeMatching.rxBvarCmd.IsMatch(command.Address))
-                return await WriteInputEventCommand(command);            
+                return await WriteInputEventCommand(command);
             else
                 return false;
         }

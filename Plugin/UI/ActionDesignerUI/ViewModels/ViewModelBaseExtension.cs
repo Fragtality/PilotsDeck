@@ -26,7 +26,6 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
         public void CopyToModelList<T>(ICollection<T> itemsSource, Func<T, T> transformItem = null, [CallerMemberName] string propertyName = null!);
         public void StepModelProperty<T>(double step = 1, T[] range = default, Func<T, T> transformator = null, [CallerMemberName] string propertyName = null!);
         public void SetModelEnum<T>(object parameter, bool useSource = true, [CallerMemberName] string propertyName = null!) where T : struct;
-        //public T SourceCopy<T>();
     }
 
     public abstract partial class ViewModelBaseExtension<TObject>(TObject source, ViewModelAction modelAction) : ViewModelBase<TObject>(source), IViewModelBaseExtension, ICopyPasteSettings where TObject : class
@@ -70,7 +69,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.ViewModels
                 if (v is ICloneable clonable)
                     return (T)clonable.Clone();
                 else
-                return v;
+                    return v;
             };
 
             itemDestination.Clear();

@@ -116,7 +116,7 @@ namespace PilotsDeck.Resources
                         Logger.Warning($"Could not create Variable for Address '{address}'!");
                         return null;
                     }
-                    
+
                     ManagedVariables.TryAdd(variable.Address, variable);
 
                     if (variable.IsValueInternal())
@@ -132,8 +132,9 @@ namespace PilotsDeck.Resources
             return variable;
         }
 
-        public void DeregisterVariable(ManagedAddress address)
+        public ManagedVariable DeregisterVariable(ManagedAddress address)
         {
+            ManagedVariable variable = null;
             try
             {
                 if (address == SimValueType.LUAFUNC)
@@ -141,7 +142,7 @@ namespace PilotsDeck.Resources
                     ScriptManager.DeregisterScript(address);
                 }
 
-                if (address != null && ManagedVariables.TryGetValue(address, out ManagedVariable variable))
+                if (address != null && ManagedVariables.TryGetValue(address, out variable))
                 {
                     variable.RemoveRegistration();
                     if (variable.Registrations >= 1)
@@ -160,6 +161,8 @@ namespace PilotsDeck.Resources
             {
                 Logger.LogException(ex);
             }
+
+            return variable;
         }
 
         public int RemoveUnused()

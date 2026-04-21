@@ -33,28 +33,23 @@ namespace PilotsDeck.UI.DeveloperUI
                     LabelVersionCheck.FontSize = 14;
                     LabelVersionCheck.Text = "";
                     LabelVersionCheck.Inlines.Clear();
-                    
-                    if (App.UpdateIsDev)
-                        LabelVersionCheck.Inlines.Add("New Develop Version ");
-                    else
-                        LabelVersionCheck.Inlines.Add("New Stable Version ");
-                    var run = new Run($"{App.UpdateVersion}");
 
-                    Hyperlink hyperlink;
-                    if (App.UpdateIsDev)
-                        hyperlink = new Hyperlink(run)
-                        {
-                            NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck/blob/master/PilotsDeck-Installer-latest.exe")
-                        };
+                    if (App.IsUpdateVersion)
+                        LabelVersionCheck.Inlines.Add("New Plugin Version ");
                     else
-                        hyperlink = new Hyperlink(run)
-                        {
-                            NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck/releases/latest")
-                        };
+                        LabelVersionCheck.Inlines.Add("New Plugin Build ");
+                    var run = new Run($"{App.OnlineVersion}");
+
+                    Hyperlink hyperlink = new(run)
+                    {
+                        NavigateUri = new Uri("https://github.com/Fragtality/PilotsDeck/releases/latest")
+                    };
                     LabelVersionCheck.Inlines.Add(hyperlink);
                     LabelVersionCheck.Inlines.Add(" available!");
                     this.AddHandler(Hyperlink.RequestNavigateEvent, new RequestNavigateEventHandler(Nav.RequestNavigateHandler));
                     LabelVersionCheck.Visibility = Visibility.Visible;
+
+                    this.Icon = App.GetIcon().ToImageSource();
                 }
             }
             catch (Exception ex)
@@ -71,7 +66,7 @@ namespace PilotsDeck.UI.DeveloperUI
                 CurrentView?.Stop();
                 CurrentView = null;
             }
-            
+
             CheckVersion();
 
             CurrentView = newView;
@@ -131,6 +126,11 @@ namespace PilotsDeck.UI.DeveloperUI
         {
             NotifyIconViewModel.OpenProfileManager();
             NotifyIconViewModel.ToggleWindow();
+        }
+
+        private void ButtonSettings_Click(object sender, RoutedEventArgs e)
+        {
+            LoadView(new ViewSettings());
         }
     }
 }

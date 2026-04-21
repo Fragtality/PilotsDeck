@@ -43,12 +43,12 @@ namespace PilotsDeck.Simulator.XP
             _ => true
         };
 
-        public virtual async void Run()
+        public virtual async Task Run()
         {
             try
             {
                 do
-                { 
+                {
                     if (!IsConnected || !IsSocketStateValid())
                     {
                         try
@@ -59,6 +59,7 @@ namespace PilotsDeck.Simulator.XP
                         catch (Exception ex)
                         {
                             Logger.LogException(ex);
+                            IsConnected = false;
                         }
 
                         if (!IsConnected)
@@ -99,6 +100,7 @@ namespace PilotsDeck.Simulator.XP
                 {
                     Logger.LogException(ex);
                 }
+                WebSocket.SetCheckTime();
                 IsWorking = false;
             }
         }
@@ -116,12 +118,16 @@ namespace PilotsDeck.Simulator.XP
                 {
                     Logger.LogException(ex);
                 }
+                WebSocket.SetCheckTime(true);
                 IsWorking = false;
             }
         }
 
         protected virtual void ProcessReceived(string json)
         {
+            if (string.IsNullOrWhiteSpace(json))
+                return;
+
             var result = ResultXP.GetResult(json);
             Logger.Verbose($"Result ID '{result.req_id}' of Type '{result.type}'");
             if (result.type == ResultType.Request)
@@ -190,7 +196,7 @@ namespace PilotsDeck.Simulator.XP
             {
                 Logger.Warning($"Unknown Message with ID '{result.req_id}' received - Type: {result.type}");
             }
-                
+
         }
 
         protected virtual bool DoRefSubscribe(ManagedAddress address, out long id)
@@ -201,7 +207,7 @@ namespace PilotsDeck.Simulator.XP
                 return false;
             else
                 id = query.First().Key;
-            
+
             return true;
         }
 
@@ -315,7 +321,7 @@ namespace PilotsDeck.Simulator.XP
                 {
                     foreach (string xpcmd in xpcmds)
                     {
-                        if (await SendCommandRef(xpcmd, command.IsUp))
+                        if (WebSocket.HasCommandRef(xpcmd, out long id) && await SendCommandRef(id, command.IsUp))
                         {
                             success++;
                             if (command.CommandDelay > 0)
@@ -325,7 +331,7 @@ namespace PilotsDeck.Simulator.XP
                 }
                 else if (xpcmds.Length == 1)
                 {
-                    if (await SendCommandRef(command.Address.Address, command.IsUp))
+                    if (WebSocket.HasCommandRef(command.Address.Address, out long id) && await SendCommandRef(id, command.IsUp))
                         success++;
                 }
                 else
@@ -336,13 +342,9 @@ namespace PilotsDeck.Simulator.XP
 
             return success == xpcmds.Length * command.Ticks;
         }
-        public virtual async Task<bool> SendCommandRef(string cmdName, bool isUp)
-        {
-            if (await WebSocket.GetCommandRefId(cmdName) is not long id)
-            {
-                return false;
-            }
 
+        public virtual async Task<bool> SendCommandRef(long id, bool isUp)
+        {
             var message = new SetCommandRefMessage(RequestID++);
             if (!isUp)
             {
@@ -350,7 +352,7 @@ namespace PilotsDeck.Simulator.XP
                 if (!ActiveCommands.TryAdd(id, true))
                     ActiveCommands[id] = true;
             }
-            else 
+            else
             {
                 if (ActiveCommands.TryGetValue(id, out bool isActive) && isActive)
                     message.AddCommandRef(id, false, null);
@@ -358,9 +360,10 @@ namespace PilotsDeck.Simulator.XP
                     message.AddCommandRef(id, true, 0);
                 ActiveCommands.TryRemove(id, out _);
             }
-            
+
             var cid = message.@params.commands.First().id;
-            Logger.Debug($"Sending Command Request '{message.req_id}': {cid} -> {cmdName} | {message.@params.commands.First().duration} | {message.@params.commands.First().is_active}");
+            var duration = message.@params.commands.First().duration;
+            Logger.Debug($"Sending Command Request '{message.req_id}': {cid} -> {WebSocket.KnownCommands[cid].name} | {(duration != null ? duration : "null")} | {message.@params.commands.First().is_active}");
             OutstandingRequests.Add(message.req_id, OutstandingRequest.Create(message.req_id, message, RequestType.SetCommandActive));
             await WebSocket.SendJsonRequest(message);
             Logger.Debug($"Command sent.");

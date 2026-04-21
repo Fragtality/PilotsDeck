@@ -16,6 +16,7 @@ namespace PilotsDeck.Simulator.XP.WS
         public virtual ConcurrentDictionary<long, List<IdMappingXP>> SubscribedDataIds { get; } = [];
         protected virtual WebSocketXP WebSocket { get; } = socketXP;
         protected virtual ConcurrentDictionary<long, DataRef> KnownDataRefs => WebSocket.KnownDataRefs;
+        protected virtual ConcurrentDictionary<long, CommandRef> KnownCommands => WebSocket.KnownCommands;
         public virtual bool HasDataRefMappings => !SubscribedDataIds.IsEmpty;
 
         public virtual bool HasDataRef(string name, out DataRef dataRef)

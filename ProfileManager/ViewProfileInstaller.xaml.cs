@@ -129,6 +129,14 @@ namespace ProfileManager
             await InstallWorker.InstallPackageAsync();
         }
 
+        protected virtual void CloseInstaller(ViewProfileInstaller v)
+        {
+            if (MainWindow.Instance.InstallProfileCommandline)
+                MainWindow.Instance.Close();
+            else
+                v.SetStateOpenPackage();
+        }
+
         protected void SetStateInstalledPackage()
         {
             AreaTaskStatus.Visibility = Visibility.Visible;
@@ -141,7 +149,7 @@ namespace ProfileManager
 
             if (InstallWorker.IsInstalled)
             {
-                ActionButtonConfirmation = v => v.SetStateOpenPackage();
+                ActionButtonConfirmation = v => CloseInstaller(v);
                 SetButtonState(true, false, true, "Close", "check-square", "Close this View");
             }
             else

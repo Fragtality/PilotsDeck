@@ -26,7 +26,7 @@ namespace PilotsDeck.StreamDeck
         protected Channel<string> ChannelEventsSend { get; } = Channel.CreateUnbounded<string>();
         public ChannelWriter<string> SendChannel { get { return ChannelEventsSend.Writer; } }
 
-        public async void Run()
+        public async Task Run()
         {
             try
             {
@@ -48,7 +48,8 @@ namespace PilotsDeck.StreamDeck
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                if (ex is not TaskCanceledException)
+                    Logger.LogException(ex);
             }
             Logger.Information("DeckController ended");
         }
@@ -151,7 +152,7 @@ namespace PilotsDeck.StreamDeck
             var query = DeckInfo.devices.Where(d => d.id.Equals(sdEvent.device, StringComparison.InvariantCultureIgnoreCase));
             if (query.Any())
             {
-                var device = query.First(); 
+                var device = query.First();
                 device.type = sdEvent.deviceInfo.type;
                 device.name = sdEvent.deviceInfo.name;
                 device.size = sdEvent.deviceInfo.size;

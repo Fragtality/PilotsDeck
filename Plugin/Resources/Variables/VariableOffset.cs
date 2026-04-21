@@ -50,9 +50,13 @@ namespace PilotsDeck.Resources.Variables
             }
         }
 
-        public override void CheckChanged()
+        protected override bool CheckNotEqualLast()
         {
-            IsChanged = Value != ValueLast;
+            return Value?.Equals(ValueLast) == false;
+        }
+
+        protected override void SetLast()
+        {
             ValueLast = Value;
         }
 
@@ -223,7 +227,7 @@ namespace PilotsDeck.Resources.Variables
             }
         }
 
-        public override void SetValue(string newValue)
+        public override void SetValueString(string newValue)
         {
             if (IsBit && int.TryParse(newValue, out int result))
             {
@@ -244,7 +248,7 @@ namespace PilotsDeck.Resources.Variables
             }
         }
 
-        public override void SetValue(double newValue)
+        public override void SetValueDouble(double newValue)
         {
             if (IsBit)
             {

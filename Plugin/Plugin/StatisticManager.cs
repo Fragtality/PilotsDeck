@@ -31,7 +31,7 @@ namespace PilotsDeck.Plugin
 
         public static StatisticTracker AddTracker(StatisticID id)
         {
-            StatisticTracker tracker = new(id); 
+            StatisticTracker tracker = new(id);
             Tracker.TryAdd(id, tracker);
             return tracker;
         }
@@ -93,7 +93,7 @@ namespace PilotsDeck.Plugin
                 MaxValue = elapsed;
             if (elapsed < MinValue)
                 MinValue = elapsed;
-            
+
             Elapsed += elapsed;
             Ticks++;
         }
@@ -120,7 +120,7 @@ namespace PilotsDeck.Plugin
                 max = 0;
             }
             if (Ticks > 0)
-                Logger.Debug($"STATISTICS FOR {string.Format("{0,16}", ID)} - Ticks: {Ticks:0000} | Average: {average:F3}ms | Minimum: {min:F3}ms | Maximum: {max:F3}ms | Total: {Elapsed/1000.0:F2}s / {App.Configuration.IntervalUnusedRessources/1000.0:F0}s");
+                Logger.Debug($"STATISTICS FOR {string.Format("{0,16}", ID)} - Ticks: {Ticks:0000} | Average: {average:F3}ms | Minimum: {min:F3}ms | Maximum: {max:F3}ms | Total: {Elapsed / 1000.0:F2}s / {App.Configuration.IntervalUnusedRessources / 1000.0:F0}s");
             Reset();
         }
 
@@ -137,7 +137,7 @@ namespace PilotsDeck.Plugin
                     min = 0;
                     max = 0;
                 }
-                return string.Format("{0,-16} Ticks\t{1:0000}\tAverage {2:000.000}ms\tMinimum {3:000.000}ms\tMaximum {4:000.000}ms\tTime {5:00.00}/{6:00}s", ID.ToString().Replace("_",""), Ticks, average, min, max, Elapsed/1000.0, App.Configuration.IntervalUnusedRessources / 1000.0);
+                return string.Format("{0,-16} Ticks\t{1:0000}\tAverage {2:000.000}ms\tMinimum {3:000.000}ms\tMaximum {4:000.000}ms\tCPU Time {5:00.00}/{6:00}s", ID.ToString().Replace("_", ""), Ticks, average, min, max, Elapsed / 1000.0, App.Configuration.IntervalUnusedRessources / 1000.0);
             }
             catch
             {

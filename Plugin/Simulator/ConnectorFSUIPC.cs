@@ -5,7 +5,6 @@ using PilotsDeck.Resources;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator.FSUIPC;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,7 +15,7 @@ namespace PilotsDeck.Simulator
         public SimulatorType Type { get; protected set; } = type;
         public SimulatorState SimState { get; protected set; } = SimulatorState.RUNNING;
         public bool IsPrimary { get; set; } = true;
-        public bool IsRunning { get { return ISimConnector.GetRunning(Type) || (Type == SimulatorType.FSUIPC7 && (Sys.GetProcessRunning(App.Configuration.BinaryFSUIPC7) || App.Configuration.SimBinaries[SimulatorType.MSFS].Where(b => Sys.GetProcessRunning(b)).Any())); } }
+        public bool IsRunning { get { return ISimConnector.GetRunning(Type) || (Type == SimulatorType.FSUIPC7 && (ISimConnector.GetRunning(App.Configuration.BinaryFSUIPC7) || App.Configuration.SimBinaries[SimulatorType.MSFS].Where(b => ISimConnector.GetRunning(b)).Any())); } }
         public bool IsLoading { get { return SimLoading; } }
         public bool IsReadyProcess { get { return FSUIPCConnection.IsOpen && FsuipcManager.IsInitialized; } }
         protected bool LastProcess { get; set; } = false;
@@ -32,9 +31,7 @@ namespace PilotsDeck.Simulator
         protected static VariableManager VariableManager { get { return App.PluginController.VariableManager; } }
         protected FsuipcManager FsuipcManager { get; } = new();
 
-        public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; private set; } = [];
-
-        public async void Run()
+        public async Task Run()
         {
             try
             {
@@ -90,12 +87,13 @@ namespace PilotsDeck.Simulator
             Logger.Information($"ConnectorFSUIPC Task ended");
         }
 
-        public void Stop()
+        public virtual Task Stop()
         {
             ResetVariables();
+            return Task.CompletedTask;
         }
 
-        protected static void ResetVariables()
+        protected virtual void ResetVariables()
         {
             foreach (var variable in App.PluginController.VariableManager.VariableList.Where(v => v.IsValueFSUIPC()))
                 variable.IsSubscribed = false;
@@ -112,7 +110,7 @@ namespace PilotsDeck.Simulator
             return IsCommandFSUIPC(command?.Type);
         }
 
-        public void Process()
+        public Task Process()
         {
             try
             {
@@ -175,6 +173,8 @@ namespace PilotsDeck.Simulator
                 Logger.LogException(ex);
                 LastProcess = false;
             }
+
+            return Task.CompletedTask;
         }
 
         public async Task<bool> RunCommand(SimCommand command)
@@ -324,12 +324,7 @@ namespace PilotsDeck.Simulator
             return result;
         }
 
-        public bool SubscribeSimEvent(string evtName, string receiverID, ISimConnector.EventCallback callbackFunction)
-        {
-            return false;
-        }
-
-        public void SubscribeVariable(ManagedVariable managedVariable)
+        public Task SubscribeVariable(ManagedVariable managedVariable)
         {
             try
             {
@@ -342,9 +337,11 @@ namespace PilotsDeck.Simulator
             {
                 Logger.LogException(ex);
             }
+
+            return Task.CompletedTask;
         }
 
-        public void SubscribeVariables(ManagedVariable[] managedVariables)
+        public Task SubscribeVariables(ManagedVariable[] managedVariables)
         {
             try
             {
@@ -358,14 +355,11 @@ namespace PilotsDeck.Simulator
             {
                 Logger.LogException(ex);
             }
+
+            return Task.CompletedTask;
         }
 
-        public bool UnsubscribeSimEvent(string evtName, string receiverID)
-        {
-            return false;
-        }
-
-        public void UnsubscribeVariable(ManagedVariable managedVariable)
+        public virtual Task UnsubscribeVariable(ManagedVariable managedVariable)
         {
             try
             {
@@ -381,9 +375,11 @@ namespace PilotsDeck.Simulator
             {
                 Logger.LogException(ex);
             }
+
+            return Task.CompletedTask;
         }
 
-        public void UnsubscribeVariables(ManagedVariable[] managedVariables)
+        public virtual Task UnsubscribeVariables(ManagedVariable[] managedVariables)
         {
             try
             {
@@ -402,11 +398,13 @@ namespace PilotsDeck.Simulator
             {
                 Logger.LogException(ex);
             }
+
+            return Task.CompletedTask;
         }
 
-        public void RemoveUnusedResources(bool force)
+        public virtual Task RemoveUnusedResources(bool force)
         {
-            
+            return Task.CompletedTask;
         }
 
 

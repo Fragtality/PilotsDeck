@@ -1,7 +1,7 @@
-﻿using CFIT.AppTools;
-using PilotsDeck.Resources.Variables;
+﻿using PilotsDeck.Resources.Variables;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,31 +37,38 @@ namespace PilotsDeck.Simulator
         public bool IsReadyCommand { get; }
         public bool IsReadySession { get; }
         public bool IsPaused { get; }
-        public static bool GetRunning(SimulatorType type)
-        {
-            return App.Configuration.SimBinaries.ContainsKey(type) && App.Configuration.SimBinaries[type].Where(b => Sys.GetProcessRunning(b)).Any();
-        }
         public string AircraftString { get; }
 
-        public delegate void EventCallback(string evtName, object evtData);
-        public class EventRegistration(string evtName, string receiverID, EventCallback callbackFunction)
-        {
-            public string Name { get; set; } = evtName;
-            public string ReceiverID { get; set; } = receiverID;
-            public EventCallback Callback { get; set; } = callbackFunction;
-        }
-        public Dictionary<string, List<EventRegistration>> RegisteredEvents { get; }
+        public static DateTime NextBinaryCheck { get; set; } = DateTime.MinValue;
+        protected static List<Process> Processes { get; set; } = [.. System.Diagnostics.Process.GetProcesses()];
 
-        public void Run();
-        public void Stop();
-        public void Process();
-        public void SubscribeVariable(ManagedVariable managedVariable);
-        public void SubscribeVariables(ManagedVariable[] managedVariables);
-        public void UnsubscribeVariable(ManagedVariable managedVariable);
-        public void UnsubscribeVariables(ManagedVariable[] managedVariables);
-        public void RemoveUnusedResources(bool force);
-        public bool SubscribeSimEvent(string evtName, string receiverID, EventCallback callbackFunction);
-        public bool UnsubscribeSimEvent(string evtName, string receiverID);
+        public static void RefreshProcesses()
+        {
+            Processes = [.. System.Diagnostics.Process.GetProcesses()];
+            NextBinaryCheck = DateTime.Now + TimeSpan.FromMilliseconds(App.Configuration.IntervalSimMonitor);
+        }
+
+        public static bool GetRunning(SimulatorType type)
+        {
+            return App.Configuration.SimBinaries.ContainsKey(type) && App.Configuration.SimBinaries[type].Where(b => GetRunning(b)).Any();
+        }
+
+        public static bool GetRunning(string binaryName)
+        {
+            if (NextBinaryCheck < DateTime.Now)
+                RefreshProcesses();
+
+            return Processes.Where((p) => p?.ProcessName?.Equals(binaryName, StringComparison.InvariantCultureIgnoreCase) == true).Any();
+        }
+
+        public Task Run();
+        public Task Stop();
+        public Task Process();
+        public Task SubscribeVariable(ManagedVariable managedVariable);
+        public Task SubscribeVariables(ManagedVariable[] managedVariables);
+        public Task UnsubscribeVariable(ManagedVariable managedVariable);
+        public Task UnsubscribeVariables(ManagedVariable[] managedVariables);
+        public Task RemoveUnusedResources(bool force);
         public bool CanRunCommand(SimCommand command);
         public Task<bool> RunCommand(SimCommand command);
     }

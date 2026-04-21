@@ -141,7 +141,7 @@ namespace PilotsDeck.UI.DeveloperUI
             sb.AppendLine(string.Format("{0,-6} | {1,-5} | {2,-6} | {3}", "Sub", "Reg", "Abnrm", "Name"));
             foreach (var variable in VariableManager.VariableList)
             {
-                bool abnorm = variable.IsSubscribed && variable.Registrations <= 0;
+                bool abnorm = (variable.IsSubscribed && variable.Registrations <= 0) || (SimController.SimState == SimulatorState.SESSION && !variable.IsSubscribed && variable.Registrations > 0);
                 sb.AppendLine(string.Format("{0,-6} | {1,-5} | {2,-6} | {3}", variable.IsSubscribed, variable.Registrations, (abnorm ? "*" : ""), variable.Address));
             }
             RessourceWindow("Variables", sb.ToString());

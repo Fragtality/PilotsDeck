@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace PilotsDeck.Simulator
 {
@@ -17,11 +16,11 @@ namespace PilotsDeck.Simulator
     {
         protected Channel<SimCommand> ChannelCommandsSend { get; } = Channel.CreateUnbounded<SimCommand>();
         public ChannelWriter<SimCommand> CommandChannel { get { return ChannelCommandsSend.Writer; } }
-        
-        protected DispatcherTimer TimerProcess { get; set; } = new();
+
+        protected DispatcherTimerAsync TimerProcess { get; set; } = new();
         protected DateTime LastUnusedCheck { get; set; } = DateTime.Now;
         protected bool FirstProcess { get; set; } = true;
-        protected DispatcherTimer TimerMonitor { get; set; } = new();
+        protected DispatcherTimerAsync TimerMonitor { get; set; } = new();
         protected static VariableManager VariableManager { get { return App.PluginController.VariableManager; } }
         public ConcurrentDictionary<SimulatorType, ISimConnector> ActiveConnectors { get; protected set; } = [];
 
@@ -34,8 +33,9 @@ namespace PilotsDeck.Simulator
         public bool IsReadySession { get { return ActiveConnectors.Values.Where(c => c.IsPrimary && c.IsReadySession).Any(); } }
         public bool IsPaused { get { return ActiveConnectors.Values.Where(c => c.IsPrimary && c.IsPaused).Any(); } }
         public string AircraftString { get { return ActiveConnectors.Values.Where(c => c.IsPrimary && c.IsReadySession).FirstOrDefault()?.AircraftString; } }
+        protected bool ProcessIsRunning { get; set; } = false;
 
-        public async void Run()
+        public async Task Run()
         {
             StatisticManager.AddTracker(StatisticID.SIM_PROCESS);
             StatisticManager.AddTracker(StatisticID.SIM_COMMANDS);
@@ -54,7 +54,7 @@ namespace PilotsDeck.Simulator
             Logger.Information("SimController ended");
         }
 
-        protected async void MonitorSimulators(object sender, EventArgs e)
+        protected async Task MonitorSimulators()
         {
             if (App.CancellationTokenSource.IsCancellationRequested)
             {
@@ -66,13 +66,14 @@ namespace PilotsDeck.Simulator
             if (TimerMonitor.Interval.Milliseconds != App.Configuration.IntervalSimMonitor)
                 TimerMonitor.Interval = TimeSpan.FromMilliseconds(App.Configuration.IntervalSimMonitor);
 
+            ISimConnector.RefreshProcesses();
             foreach (var sim in App.Configuration.SimBinaries)
             {
-                if (!ActiveConnectors.ContainsKey(sim.Key) && (sim.Value.Where(b => Sys.GetProcessRunning(b)).Any() || await ConnectorXP.CheckRemoteXP(sim.Key) || await ConnectorMSFS.CheckRemoteMsfs(sim.Key)))
+                if (!ActiveConnectors.ContainsKey(sim.Key) && (sim.Value.Where(b => ISimConnector.GetRunning(b)).Any() || await ConnectorXP.CheckRemoteXP(sim.Key) || await ConnectorMSFS.CheckRemoteMsfs(sim.Key)))
                 {
                     Logger.Information($"Simulator Binary '{string.Join(" | ", sim.Value)}' detected - finding Connector for Type '{sim.Key}'");
                     ISimConnector simConnector = null;
-                    ISimConnector secondaryConnector = null;
+                    ConnectorFSUIPC secondaryConnector = null;
                     SimulatorType secondaryType = SimulatorType.NONE;
                     switch (sim.Key)
                     {
@@ -101,15 +102,13 @@ namespace PilotsDeck.Simulator
                             break;
                     }
                     ActiveConnectors.TryAdd(sim.Key, simConnector);
-                    Task task = new(simConnector.Run, App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                    task.Start();
+                    Task task = Task.Factory.StartNew(async () => await simConnector.Run(), App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
                     Logger.Information($"Connector Task for '{sim.Key}' started");
 
                     if (secondaryConnector != null)
                     {
                         ActiveConnectors.TryAdd(secondaryType, secondaryConnector);
-                        task = new(secondaryConnector.Run, App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                        task.Start();
+                        task = Task.Factory.StartNew(async () => await secondaryConnector.Run(), App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
                         Logger.Information($"Secondary Connector Task for '{secondaryType}' started");
                     }
 
@@ -122,12 +121,12 @@ namespace PilotsDeck.Simulator
             {
                 Logger.Information($"Connector for '{sim}' has closed - remove from active");
                 var connector = ActiveConnectors[sim];
-                connector.Stop();
+                await connector.Stop();
                 ActiveConnectors[sim] = null;
                 ActiveConnectors.Remove(sim, out _);
                 _ = Task.Delay(App.Configuration.IntervalSimMonitor / 2).ContinueWith(s => DelayedDispose(connector));
             }
-            
+
             if (!ActiveConnectors.Where(s => s.Value.IsRunning).Any() && TimerProcess.IsEnabled)
             {
                 Logger.Debug($"Stopping Process Timer");
@@ -150,14 +149,19 @@ namespace PilotsDeck.Simulator
             connector?.Dispose();
         }
 
-        protected void Process(object sender, EventArgs e)
+        protected async Task Process()
         {
+            if (ProcessIsRunning)
+                return;
+            ProcessIsRunning = true;
+
             StatisticManager.StartTrack(StatisticID.SIM_PROCESS);
 
             if (App.CancellationTokenSource.IsCancellationRequested)
             {
                 Logger.Information($"Cancellation received - stopping Process Timer");
                 TimerProcess.Stop();
+                ProcessIsRunning = false;
                 return;
             }
 
@@ -171,12 +175,12 @@ namespace PilotsDeck.Simulator
                     if (query.Count > 0)
                     {
                         Logger.Verbose($"Subscribe {query.Count} Variables");
-                        SubscribeVariables(query);
+                        await SubscribeVariables(query);
                     }
 
                     ConnectorNone.Process();
                     foreach (var connector in readyConnectors)
-                        connector.Process();
+                        await connector.Process();
 
                     if (FirstProcess)
                     {
@@ -191,9 +195,9 @@ namespace PilotsDeck.Simulator
                             Logger.Information($"Unsubscribing {list.Count} unused Variables");
                             foreach (var value in list)
                                 Logger.Debug(value.Address);
-                            UnsubscribeVariables(list);
-                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(false);
-                            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(false);
+                            await UnsubscribeVariables(list);
+                            await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(false) ?? Task.CompletedTask);
+                            await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(false) ?? Task.CompletedTask);
                         }
                         LastUnusedCheck = DateTime.Now;
                     }
@@ -205,69 +209,61 @@ namespace PilotsDeck.Simulator
             }
 
             StatisticManager.EndTrack(StatisticID.SIM_PROCESS);
+            if (TimerProcess.Interval.TotalMilliseconds != App.Configuration.IntervalSimProcess)
+            {
+                Logger.Debug($"Updating TimerProcess to {App.Configuration.IntervalSimProcess}ms");
+                TimerProcess.Interval = TimeSpan.FromMilliseconds(App.Configuration.IntervalSimProcess);
+            }
+            ProcessIsRunning = false;
         }
 
-        public void RemoveUnusedResources(bool force)
+        public async Task RemoveUnusedResources(bool force)
         {
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(force);
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(force);
+            await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(force) ?? Task.CompletedTask);
+            await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.RemoveUnusedResources(force) ?? Task.CompletedTask);
         }
-        
-        public void SubscribeVariable(ManagedVariable managedVariable)
+
+        public async Task SubscribeVariable(ManagedVariable managedVariable)
         {
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.SubscribeVariable(managedVariable);
+            await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.SubscribeVariable(managedVariable) ?? Task.CompletedTask);
             if (!managedVariable.IsSubscribed)
-                ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.SubscribeVariable(managedVariable);
+                await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.SubscribeVariable(managedVariable) ?? Task.CompletedTask);
 
             if (!managedVariable.IsSubscribed)
                 Logger.Error($"Could not subscribe Managed Value '{managedVariable.Address}' on any Connector");
         }
 
-        public void SubscribeVariables(List<ManagedVariable> managedVariables)
+        public async Task SubscribeVariables(List<ManagedVariable> managedVariables)
         {
             var primaryConnector = ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary).FirstOrDefault();
-            primaryConnector?.SubscribeVariables([.. managedVariables]);
+            await (primaryConnector?.SubscribeVariables([.. managedVariables]) ?? Task.CompletedTask);
 
             var query = ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary);
             if (query.Any())
             {
                 managedVariables = [.. managedVariables.Where(v => !v.IsSubscribed && v.Registrations >= 1)];
-                query.First().SubscribeVariables([.. managedVariables]);
+                await query.First().SubscribeVariables([.. managedVariables]);
             }
         }
 
-        public void UnsubscribeVariable(ManagedVariable managedVariable)
+        public async Task UnsubscribeVariable(ManagedVariable managedVariable)
         {
-            ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.UnsubscribeVariable(managedVariable);
+            await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.UnsubscribeVariable(managedVariable) ?? Task.CompletedTask);
             if (managedVariable.IsSubscribed)
-                ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.UnsubscribeVariable(managedVariable);
+                await (ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.UnsubscribeVariable(managedVariable) ?? Task.CompletedTask);
 
             if (managedVariable.IsSubscribed)
                 Logger.Error($"Could not unsubscribe Managed Value '{managedVariable.Address}' on any Connector");
         }
 
-        public void UnsubscribeVariables(List<ManagedVariable> managedVariables)
+        public async Task UnsubscribeVariables(List<ManagedVariable> managedVariables)
         {
             var primaryConnector = ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary).FirstOrDefault();
-            primaryConnector?.UnsubscribeVariables([.. managedVariables]);
+            await (primaryConnector?.UnsubscribeVariables([.. managedVariables]) ?? Task.CompletedTask);
 
             var query = ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary);
             if (query.Any())
-                query.First().UnsubscribeVariables([.. managedVariables]);
-        }
-
-        public void SubscribeSimEvent(string evtName, string receiverID, ISimConnector.EventCallback callbackFunction)
-        {
-            if (ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.SubscribeSimEvent(evtName, receiverID, callbackFunction) != true)
-                if (ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.SubscribeSimEvent(evtName, receiverID, callbackFunction) != true)
-                    Logger.Debug($"Could not subscribe SimEvent '{evtName}' for '{receiverID}' on any Connector");
-        }
-
-        public void UnsubscribeSimEvent(string evtName, string receiverID)
-        {
-            if (ActiveConnectors.Values.Where(c => c.IsReadyProcess && c.IsPrimary)?.FirstOrDefault()?.UnsubscribeSimEvent(evtName, receiverID) != true)
-                if (ActiveConnectors.Values.Where(c => c.IsReadyProcess && !c.IsPrimary)?.FirstOrDefault()?.UnsubscribeSimEvent(evtName, receiverID) != true)
-                    Logger.Debug($"Could not unsubscribe SimEvent '{evtName}' for '{receiverID}' on any Connector");
+                await query.First().UnsubscribeVariables([.. managedVariables]);
         }
 
         protected async Task CommandTask()

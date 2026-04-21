@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="PilotsDeck.UI.DeveloperUI.ViewSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PilotsDeck.UI.DeveloperUI"
+             d:DataContext="{d:DesignInstance Type=local:ModelConfig}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" MinWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="DefaultLabel" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="SettingLabel" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="FontWeight" Value="DemiBold" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="CheckBox" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="MinHeight" Value="24" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold" FontSize="14">
+                    Update/Refresh Timings
+                </Label>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="256"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource SettingLabel}" MinHeight="26"
+                       ToolTip="The Interval at which the Plugin will Refresh/Redraw currently visible Actions (Redraw is only done when Variable Values have changed).&#x0a;Increase the Value to decrease CPU Usage but slower Redraw.&#x0a;Use the 'CPU Time' Column in the Statistics (Monitor View) for 'PLUGINREFRESH' to confirm high CPU Usage for the Refresh.">
+                    Action Refresh Interval
+                </Label>
+                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" ToolTip="The Interval at which the Plugin will Refresh/Redraw currently visible Actions (Redraw is only done when Variable Values have changed).&#x0a;Increase the Value to decrease CPU Usage but slower Redraw.&#x0a;Use the 'CPU Time' Column in the Statistics (Monitor View) for 'PLUGINREFRESH' to confirm high CPU Usage for the Refresh.">
+                    <Slider Minimum="50" Maximum="250" MinWidth="256" MinHeight="26" Value="{Binding IntervalDeckRefresh, Mode=TwoWay}" TickFrequency="25" TickPlacement="BottomRight" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                    <Label Content="{Binding IntervalDeckRefresh}" Margin="6,0,0,0" MinHeight="26" Style="{StaticResource DefaultLabel}"/>
+                    <Label Margin="2,0,0,0" MinHeight="26" Style="{StaticResource DefaultLabel}">ms</Label>
+                </StackPanel>
+
+                <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource SettingLabel}" MinHeight="26"
+                       ToolTip="The Interval at which the Plugin will subscribe new Variables and poll the Simulator for Values (only for certain Variable Types like Offsets or C-Vars).&#x0a;Increase the Value to decrease CPU Usage/Sim Load but slower Value Updates.&#x0a;Use the 'CPU Time' Column in the Statistics (Monitor View) for 'SIMPROCESS' to confirm high CPU Usage for the Refresh.">
+                    Sim Process Interval
+                </Label>
+                <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" ToolTip="The Interval at which the Plugin will subscribe new Variables and poll the Simulator for Values (only for certain Variable Types like Offsets or C-Vars).&#x0a;Increase the Value to decrease CPU Usage/Sim Load but slower Value Updates.&#x0a;Use the 'CPU Time' Column in the Statistics (Monitor View) for 'SIMPROCESS' to confirm high CPU Usage for the Refresh.">
+                    <Slider Minimum="50" Maximum="250" MinWidth="256" MinHeight="26" Value="{Binding IntervalSimProcess, Mode=TwoWay}" TickFrequency="25" TickPlacement="BottomRight" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+                    <Label Content="{Binding IntervalSimProcess}" Margin="6,0,0,0" MinHeight="26" Style="{StaticResource DefaultLabel}"/>
+                    <Label Margin="2,0,0,0" MinHeight="26" Style="{StaticResource DefaultLabel}">ms</Label>
+                </StackPanel>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" BorderBrush="DarkGray" BorderThickness="1" Width="Auto" Height="Auto" Margin="16">
+            <GroupBox.Header>
+                <Label FontWeight="Bold" FontSize="14">
+                    Sim Connectors
+                </Label>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="256"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource SettingLabel}" MinHeight="26"
+                       ToolTip="Use/Connect to FSUIPC7 when MSFS is running.&#x0a;(Needs Plugin or Sim Restart)">
+                    MSFS: Use FSUIPC7
+                </Label>
+                <CheckBox Grid.Column="1" Grid.Row="0" Style="{StaticResource CheckBox}" IsChecked="{Binding UseFsuipcForMSFS}"
+                          ToolTip="Use/Connect to FSUIPC7 when MSFS is running.&#x0a;(Needs Plugin or Sim Restart)"/>
+
+                <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource SettingLabel}" MinHeight="26"
+                       ToolTip="EXPERIMENTAL&#x0a;Use the new WebAPI introduced in X-Plane 12 to subscribe to DataRef Updates and to send Commands to the Sim.&#x0a;Note: The WebAPI allows Hold Switches to behave like a Joystick Button (Command is active as long the Button is pressed - but 'Command Once' has to be disabled).&#x0a;(Needs Plugin Restart)">
+                    X-Plane: Use WebAPI on v12.1.4+
+                </Label>
+                <CheckBox Grid.Column="1" Grid.Row="1" Style="{StaticResource CheckBox}" IsChecked="{Binding XPlaneUseWebApi}"
+                          ToolTip="EXPERIMENTAL&#x0a;Use the new WebAPI introduced in X-Plane 12 to subscribe to DataRef Updates and to send Commands to the Sim.&#x0a;Note: The WebAPI allows Hold Switches to behave like a Joystick Button (Command is active as long the Button is pressed - but 'Command Once' has to be disabled).&#x0a;(Needs Plugin Restart)"/>
+
+                <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource SettingLabel}" MinHeight="26"
+                       ToolTip="Use the WebAPI only to send Commands - Variables/DataRefs are still requested through the classic UDP Data Output.&#x0a;(Needs Plugin Restart)">
+                    X-Plane: Use WebAPI only for Commands
+                </Label>
+                <CheckBox Grid.Column="1" Grid.Row="2" Style="{StaticResource CheckBox}" IsChecked="{Binding XPlaneWebApiCmdOnly}"
+                          ToolTip="Use the WebAPI only to send Commands - Variables/DataRefs are still requested through the classic UDP Data Output.&#x0a;(Needs Plugin Restart)"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</UserControl>

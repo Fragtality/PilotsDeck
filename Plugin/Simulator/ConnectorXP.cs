@@ -1,15 +1,14 @@
 ﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator.XP;
 using PilotsDeck.Simulator.XP.UDP;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace PilotsDeck.Simulator
 {
@@ -30,8 +29,7 @@ namespace PilotsDeck.Simulator
         protected ConnectionManagerUDP ConnectionUDP { get; }
         protected ConnectionManagerREST ConnectionREST { get; }
         protected Task RestTask { get; set; } = null;
-        public DispatcherTimer TimerCheckLoading { get; } = new();
-        public Dictionary<string, List<ISimConnector.EventRegistration>> RegisteredEvents { get; private set; } = [];
+        public DispatcherTimerAsync TimerCheckLoading { get; } = new();
         public bool UseWebAPI => App.Configuration.XPlaneUseWebApi && SimVersion >= ConnectionManagerREST.VERSIONWEBAPI;
         public bool WebApiCmdOnly => UseWebAPI && App.Configuration.XPlaneUseWebApi;
         protected virtual DateTime LastKeepAlive { get; set; } = DateTime.Now;
@@ -85,7 +83,7 @@ namespace PilotsDeck.Simulator
             return result;
         }
 
-        public async void Run()
+        public async Task Run()
         {
             try
             {
@@ -106,7 +104,7 @@ namespace PilotsDeck.Simulator
             Logger.Information($"ConnectorXP Task ended");
         }
 
-        protected void CheckLoadingTask(object sender, EventArgs e)
+        protected async Task CheckLoadingTask()
         {
             if (!IsRunning || App.CancellationTokenSource.IsCancellationRequested || ConnectionUDP.ReceiveTokenSource.IsCancellationRequested)
             {
@@ -136,7 +134,7 @@ namespace PilotsDeck.Simulator
                 Logger.Debug("Changed to LOADING");
                 SimState = SimulatorState.LOADING;
                 if (UseWebAPI)
-                    _ = ConnectionREST.OnSessionLeave();
+                    await ConnectionREST.OnSessionLeave();
             }
 
             if (SimState >= SimulatorState.LOADING && (!IsRunning && App.Configuration.XPlaneIP == "127.0.0.1") || (!RemoteRunning && App.Configuration.XPlaneIP != "127.0.0.1"))
@@ -148,19 +146,18 @@ namespace PilotsDeck.Simulator
             if (UseWebAPI && SimState >= SimulatorState.LOADING && RestTask == null)
             {
                 Logger.Debug($"Starting X-Plane WebAPI");
-                RestTask = new(ConnectionREST.Run, App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                RestTask.Start();
+                RestTask = Task.Factory.StartNew(async () => await ConnectionREST.Run(), App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
             }
 
             if (UseWebAPI && SimState >= SimulatorState.LOADING && ConnectionREST.IsConnected && !ConnectionUDP.IsLoading)
             {
                 if (!ConnectionREST.HasEnumeratedRefs)
-                    _ = ConnectionREST.OnSessionEnter();
+                    await ConnectionREST.OnSessionEnter();
 
                 if (DateTime.Now - LastKeepAlive > TimeSpan.FromMilliseconds(App.Configuration.XPlaneWebApiKeepAlive))
                 {
                     LastKeepAlive = DateTime.Now;
-                    _ = ConnectionREST.WebSocket.CheckConnected();
+                    await ConnectionREST.WebSocket.CheckConnected();
                 }
             }
         }
@@ -176,65 +173,72 @@ namespace PilotsDeck.Simulator
                 _ = ConnectionREST.UnsubscribeAllRefs();
         }
 
-        public void Stop()
+        public Task Stop()
         {
             UnsubscribeAllRefs();
 
             ConnectionUDP.Stop();
             if (UseWebAPI)
-                _ = ConnectionREST?.Stop();
+                return ConnectionREST?.Stop();
+            else
+                return Task.CompletedTask;
         }
 
-        public void Process()
+        public Task Process()
         {
-
+            if (UseWebAPI && SimState == SimulatorState.SESSION)
+                return ConnectionREST.WebSocket.CheckRefCounts();
+            else
+                return Task.CompletedTask;
         }
 
-        public void SubscribeVariable(ManagedVariable managedVariable)
+        public Task SubscribeVariable(ManagedVariable managedVariable)
         {
             if (!UseWebAPI || WebApiCmdOnly)
+            {
                 ConnectionUDP.SubscribeVariable(managedVariable);
+                return Task.CompletedTask;
+            }
             else
-                _ = ConnectionREST.SubscribeVariables([managedVariable]);
+                return ConnectionREST.SubscribeVariables([managedVariable]);
         }
 
-        public void SubscribeVariables(ManagedVariable[] managedVariables)
+        public Task SubscribeVariables(ManagedVariable[] managedVariables)
         {
             if (!UseWebAPI || WebApiCmdOnly)
+            {
                 ConnectionUDP.SubscribeVariables(managedVariables);
+                return Task.CompletedTask;
+            }
             else
-                _ = ConnectionREST.SubscribeVariables(managedVariables);
+                return ConnectionREST.SubscribeVariables(managedVariables);
         }
 
-        public void UnsubscribeVariable(ManagedVariable managedVariable)
+        public virtual Task UnsubscribeVariable(ManagedVariable managedVariable)
         {
             if (!UseWebAPI || WebApiCmdOnly)
+            {
                 ConnectionUDP.UnsubscribeVariable(managedVariable);
+                return Task.CompletedTask;
+            }
             else
-                _ = ConnectionREST.UnsubscribeVariables([managedVariable]);
+                return ConnectionREST.UnsubscribeVariables([managedVariable]);
         }
 
-        public void UnsubscribeVariables(ManagedVariable[] managedVariables)
+        public Task UnsubscribeVariables(ManagedVariable[] managedVariables)
         {
             if (!UseWebAPI || WebApiCmdOnly)
+            {
                 ConnectionUDP.UnsubscribeVariables(managedVariables);
+                return Task.CompletedTask;
+            }
             else
-                _ = ConnectionREST.UnsubscribeVariables(managedVariables);
+                return ConnectionREST.UnsubscribeVariables(managedVariables);
         }
 
-        public void RemoveUnusedResources(bool force)
+        public Task RemoveUnusedResources(bool force)
         {
-
-        }
-
-        public bool SubscribeSimEvent(string evtName, string receiverID, ISimConnector.EventCallback callbackFunction)
-        {
-            return false;
-        }
-
-        public bool UnsubscribeSimEvent(string evtName, string receiverID)
-        {
-            return false;
+            return Task.CompletedTask;
         }
 
         public static bool IsCommandXP(SimCommandType? type)
@@ -253,14 +257,14 @@ namespace PilotsDeck.Simulator
                 return false;
 
             bool result = false;
-            
+
             if (command.Type == SimCommandType.XPCMD)
             {
                 if (!UseWebAPI)
                     result = await ConnectionUDP.SendCommand(command);
                 else
                     result = await ConnectionREST.SendCommand(command);
-                
+
             }
             else if (command.Type == SimCommandType.XPWREF)
             {

@@ -8,7 +8,7 @@ namespace PilotsDeck.Simulator.XP.UDP
     public class SocketXP(ConnectorXP connector) : IDisposable
     {
 
-        protected ConnectorXP ConnectorXP {  get; set; } = connector;
+        protected ConnectorXP ConnectorXP { get; set; } = connector;
         protected IPEndPoint EndPointXP { get; set; } = new IPEndPoint(App.Configuration.ParsedXPlaneIP, App.Configuration.XPlanePort);
         protected IPEndPoint EndPointLocal { get; set; } = null;
         public UdpClient SocketSend { get; protected set; } = null;
@@ -27,7 +27,7 @@ namespace PilotsDeck.Simulator.XP.UDP
                 ReleaseSockets();
 
                 Logger.Information($"Connecting to X-Plane on '{App.Configuration.XPlaneIP}:{App.Configuration.XPlanePort}' ...");
-                
+
                 SocketSend = new UdpClient();
                 SocketSend.Connect(EndPointXP);
                 if (!SocketSend.Client.Connected)
@@ -62,12 +62,11 @@ namespace PilotsDeck.Simulator.XP.UDP
         {
             try
             {
-                _ = SocketSend.SendAsync(data, data.Length);
-                return true;
+                return SocketSend.Send(data, data.Length) == data.Length;
             }
             catch (Exception ex)
             {
-                Logger.LogException (ex);
+                Logger.LogException(ex);
                 return false;
             }
         }
@@ -123,7 +122,7 @@ namespace PilotsDeck.Simulator.XP.UDP
             {
                 if (disposing)
                 {
-                    ReleaseSockets();                 
+                    ReleaseSockets();
                 }
                 _disposed = true;
             }

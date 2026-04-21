@@ -1,4 +1,5 @@
-﻿using CFIT.AppLogger;
+﻿using CFIT.AppFramework.AppConfig;
+using CFIT.AppLogger;
 using CFIT.AppTools;
 using H.NotifyIcon;
 using PilotsDeck.Actions.Advanced;
@@ -15,7 +16,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -52,11 +52,13 @@ namespace PilotsDeck
         public static int ExitCode { get; set; } = 0;
         public static bool CloseReceived { get; set; } = false;
         public static ConcurrentQueue<ActionMeta> DesignerQueue { get; private set; } = [];
-        public static ConcurrentDictionary<string, bool> ActiveDesigner {  get; private set; } = [];
+        public static ConcurrentDictionary<string, bool> ActiveDesigner { get; private set; } = [];
         public static DispatcherTimer StatisticTimer { get; private set; } = null;
-        public static bool UpdateDetected { get; private set; } = false;
-        public static bool UpdateIsDev { get; private set; } = false; 
-        public static string UpdateVersion { get; private set; } = "";
+        public static bool UpdateDetected => IsUpdateVersion || IsUpdateBuild;
+        public static bool IsUpdateVersion { get; private set; } = false;
+        public static bool IsUpdateBuild { get; private set; } = false;
+        public static string OnlineVersion { get; private set; } = "";
+
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
@@ -88,7 +90,7 @@ namespace PilotsDeck
                 Logger.Information($"CFIT.AppLogger Version: {CFIT.AppLogger.LibVersion.Version}");
                 Logger.Information($"CFIT.AppTools Version: {CFIT.AppTools.LibVersion.Version}");
                 Logger.Information($"CFIT.SimConnectManager Version: {CFIT.SimConnectLib.LibVersion.Version}");
-                Logger.Information($"Plugin started. Checking Version (current {VersionTools.GetEntryAssemblyVersion(3)}) ...");
+                Logger.Information($"Plugin started. Checking Version ...");
                 await CheckVersion();
 
                 Logger.Information($"Version checked. Loading Configuration ...");
@@ -107,8 +109,7 @@ namespace PilotsDeck
                 InitMainWindow();
 
                 Logger.Information($"Main Window Hook created. Starting DeckController Thread ...");
-                Task task = new (DeckController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                task.Start();
+                Task task = Task.Factory.StartNew(async () => await DeckController.Run(), App.CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
                 while (!DeckController.IsConnected)
                     await Task.Delay(250);
 
@@ -118,16 +119,13 @@ namespace PilotsDeck
                 Logger.Information($"---------------------------------------------------------------------------");
                 Logger.Information($"Plugin startup completed: {VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()}");
                 Logger.Information($"Starting Plugin Controller Thread ...");
-                task = new(PluginController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                task.Start();
+                task = Task.Factory.StartNew(async () => await PluginController.Run(), CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
 
                 Logger.Information($"Starting Sim Controller Thread ...");
-                task = new(SimController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                task.Start();
+                task = Task.Factory.StartNew(async () => await SimController.Run(), CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
 
                 Logger.Information($"Starting API Controller Thread ...");
-                task = new(ApiController.Run, CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
-                task.Start();
+                task = Task.Factory.StartNew(async () => await ApiController.Run(), CancellationToken, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
 
                 StatisticTimer = new DispatcherTimer()
                 {
@@ -160,7 +158,8 @@ namespace PilotsDeck
                         {
                             WindowStartupLocation = WindowStartupLocation.CenterScreen,
                             MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth,
-                            MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight
+                            MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight,
+                            Icon = GetIcon().ToImageSource()
                         };
                         window.Show(disableEfficiencyMode: true);
                         ActiveDesigner.Add(action.Context);
@@ -207,9 +206,10 @@ namespace PilotsDeck
             CancellationTokenSource.Cancel();
             if (shutdownApp)
             {
-                Task.Run(async () => {
+                Task.Run(async () =>
+                {
                     await Task.Delay(App.Configuration.DelayExit);
-                    Environment.Exit(ExitCode); 
+                    Environment.Exit(ExitCode);
                 });
                 try { NotifyIcon?.Dispose(); } catch { }
             }
@@ -253,10 +253,15 @@ namespace PilotsDeck
             AppContext.SetSwitch("Switch.System.Windows.Controls.Grid.StarDefinitionsCanExceedAvailableSpace", true);
         }
 
+        public static System.Drawing.Icon GetIcon()
+        {
+            return UpdateDetected ? Img.GetIcon("PluginIconUpdate.ico") : Img.GetIcon("PluginIcon.ico");
+        }
+
         protected void InitSystray()
         {
             NotifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
-            NotifyIcon.Icon = UpdateDetected ? Img.GetIcon("PluginIconUpdate.ico") : Img.GetIcon("PluginIcon.ico");
+            NotifyIcon.Icon = GetIcon();
             NotifyIcon.ForceCreate(false);
             DeveloperView = new DeveloperView(NotifyIcon.DataContext as NotifyIconViewModel);
         }
@@ -305,7 +310,7 @@ namespace PilotsDeck
             {
                 for (int i = 1; i < args.Length - 1; i++)
                 {
-                    string name = args[i].Replace("-","");
+                    string name = args[i].Replace("-", "");
                     i++;
                     CommandLineArgs.Add(name, args[i]);
                     Logger.Information($"\t\t{name} = {args[i]}");
@@ -337,60 +342,43 @@ namespace PilotsDeck
             return result;
         }
 
-        protected static async Task CheckVersion()
+        protected virtual async Task CheckVersion()
         {
             try
             {
-                var appVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
+                Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                string appTimestamp = VersionTools.GetEntryAssemblyTimestamp();
 
                 HttpClient client = new()
                 {
-                    Timeout = TimeSpan.FromMilliseconds(1000)
+                    Timeout = TimeSpan.FromSeconds(3),
                 };
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
-                client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
-
-                string json = await client.GetStringAsync("https://api.github.com/repos/Fragtality/PilotsDeck/releases/latest");
-                Logger.Verbose($"json received len: {json?.Length}");
+                string url = $"{ProductDefinitionBase.GetUrlCdn("Installer/Payload/version.json", "Fragtality", "PilotsDeck", "master")}?{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                Logger.Debug($"Fetch version File from: {url}");
+                string json = await client.GetStringAsync(url);
+                Logger.Verbose($"json received: len {json?.Length}");
                 JsonNode node = JsonSerializer.Deserialize<JsonNode>(json);
-                string tag_name = node["tag_name"].ToString();
-                if (tag_name.StartsWith('v'))
-                    tag_name = tag_name[1..];
+                Version repoVersion = Version.Parse(node["Version"].ToString());
+                string repoTimestamp = node["Timestamp"].ToString();
+                OnlineVersion = $"{repoVersion.ToString(3)}-{repoTimestamp}";
+                Logger.Debug($"Found online: {OnlineVersion}");
 
-                if (Version.TryParse(tag_name, out Version repoVersion))
+                if (repoVersion > appVersion)
                 {
-                    Logger.Debug($"Comparing {repoVersion} to {appVersion}");
-                    if (repoVersion > appVersion)
-                    {
-                        UpdateDetected = true;
-                        UpdateVersion = repoVersion.ToString(3);
-                        Logger.Information($"New Stable Version detected: {UpdateVersion}");
-                    }
-                    else if (repoVersion <= appVersion)
-                    {
-                        json = await client.GetStringAsync("https://raw.githubusercontent.com/Fragtality/PilotsDeck/refs/heads/master/Installer/Payload/version.json");
-                        Logger.Debug($"json received: len {json?.Length}");
-                        node = JsonSerializer.Deserialize<JsonNode>(json);
-                        string timestamp = VersionTools.GetEntryAssemblyTimestamp();
-                        Logger.Debug($"Comparing {node["Timestamp"]!} to {timestamp}");
-                        if (string.Compare(node["Timestamp"]!.ToString(), timestamp, StringComparison.InvariantCultureIgnoreCase) > 0)
-                        {
-                            UpdateDetected = true;
-                            UpdateVersion = node["Timestamp"]!.ToString();
-                            UpdateIsDev = true;
-                            Logger.Information($"New Dev Version detected: {UpdateVersion}");
-                        }
-                        else
-                            Logger.Information($"Application up-to-date!");
-                    }
-                    else
-                        Logger.Debug($"Mismatch of Repo to App Version ({repoVersion} vs. {appVersion})");
+                    Logger.Information($"New Version detected: {repoVersion.ToString(3)}");
+                    IsUpdateVersion = true;
                 }
+                else if (string.Compare(repoTimestamp, appTimestamp, StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    Logger.Information($"New Build detected: {repoTimestamp}");
+                    IsUpdateBuild = true;
+                }
+                else
+                    Logger.Information($"Plugin up-to-date!");
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                Logger.Error($"Error '{ex.GetType().Name}' while checking Version: {ex.Message}");
             }
         }
     }

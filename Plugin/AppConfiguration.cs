@@ -15,7 +15,7 @@ using System.Text.Json.Serialization;
 
 namespace PilotsDeck
 {
-    public class AppConfiguration: ISimConnectConfig, ILoggerConfig, IMobiConfig
+    public class AppConfiguration : ISimConnectConfig, ILoggerConfig, IMobiConfig
     {
         //Constants
         [JsonIgnore]
@@ -39,7 +39,7 @@ namespace PilotsDeck
         [JsonIgnore]
         public static int BuildModelVersion { get; } = 10;
         [JsonIgnore]
-        public static int BuildConfigVersion { get; } = 19;
+        public static int BuildConfigVersion { get; } = 20;
         [JsonIgnore]
         public static string PluginUUID { get; } = "com.extension.pilotsdeck";
         [JsonIgnore]
@@ -227,6 +227,7 @@ namespace PilotsDeck
         public bool XPlaneUseLiveryRefOn12 { get; set; } = false;
         public bool XPlaneUseWebApi { get; set; } = false;
         public bool XPlaneWebApiCmdOnly { get; set; } = true;
+        public int XPlaneWebApiCheckInterval { get; set; } = 15000;
         public string XPlaneWebApiHost { get; set; } = "127.0.0.1:8086";
         public int XPlaneWebApiKeepAlive { get; set; } = 10000;
         public int MsfsRetryDelay { get; set; } = 30000;

@@ -12,7 +12,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace PilotsDeck.Plugin
 {
@@ -25,7 +24,7 @@ namespace PilotsDeck.Plugin
 
     public class PluginController
     {
-        protected DispatcherTimer TimerRefresh { get; } = new();
+        protected DispatcherTimerAsync TimerRefresh { get; } = new();
         protected static DeckController DeckController { get { return App.DeckController; } }
         protected bool DevicesExport { get; set; } = false;
         protected static SimController SimController { get { return App.SimController; } }
@@ -38,11 +37,12 @@ namespace PilotsDeck.Plugin
         protected string LastAircraftString { get; set; } = "";
         protected DateTime LastRemovedUnused { get; set; } = DateTime.Now;
         protected DateTime LastCheckedScripts { get; set; } = DateTime.Now;
-        protected DateTime ResetImageTime {  get; set; } = DateTime.Now;
+        protected DateTime ResetImageTime { get; set; } = DateTime.Now;
         public PluginState State { get; protected set; } = PluginState.IDLE;
         protected bool FirstRun { get; set; } = true;
         protected bool ForcedRefresh { get; set; } = false;
         protected bool ResetInProgress { get; set; } = false;
+        protected bool RefreshIsRunning { get; set; } = false;
 
         public PluginController()
         {
@@ -50,7 +50,7 @@ namespace PilotsDeck.Plugin
             JsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
-        public async void Run()
+        public async Task Run()
         {
             StatisticManager.AddTracker(StatisticID.PLUGIN_REFRESH);
             StatisticManager.AddTracker(StatisticID.PLUGIN_RECEIVE);
@@ -110,7 +110,7 @@ namespace PilotsDeck.Plugin
                             break;
                         case "willDisappear":
                             ActionManager.DeregisterAction(sdEvent);
-                            break;                        
+                            break;
                         case "titleParametersDidChange":
                             ActionManager.SetTitleParameters(sdEvent);
                             break;
@@ -176,11 +176,11 @@ namespace PilotsDeck.Plugin
             }
         }
 
-        protected void RemoveUnusedResources(bool force = false)
+        protected async Task RemoveUnusedResources(bool force = false)
         {
-            int count = 0;            
+            int count = 0;
             count += ScriptManager.RemoveUnused();
-            SimController.RemoveUnusedResources(force);
+            await SimController.RemoveUnusedResources(force);
             count += ImageManager.RemoveUnused();
             count += VariableManager.RemoveUnused();
 
@@ -194,15 +194,20 @@ namespace PilotsDeck.Plugin
             StatisticManager.PrintRessourceStatistics();
         }
 
-        private void RefreshTask(object sender, EventArgs e)
+        private async Task RefreshTask()
         {
+            if (RefreshIsRunning)
+                return;
+            RefreshIsRunning = true;
+
             StatisticManager.StartTrack(StatisticID.PLUGIN_REFRESH);
             try
-            {   
+            {
                 if (App.CancellationTokenSource.IsCancellationRequested)
                 {
                     Logger.Information($"Cancellation received - stopping Refresh Timer");
                     TimerRefresh.Stop();
+                    RefreshIsRunning = false;
                     return;
                 }
 
@@ -235,7 +240,7 @@ namespace PilotsDeck.Plugin
                         State = PluginState.WAIT;
                         ResetImageTime = DateTime.Now + TimeSpan.FromSeconds(5);
                         ScriptManager.StopGlobalScripts();
-                        RemoveUnusedResources(true);
+                        await RemoveUnusedResources(true);
                     }
 
                     if (SimController.SimState == SimulatorState.RUNNING)
@@ -255,7 +260,7 @@ namespace PilotsDeck.Plugin
                         if (LastSimState == SimulatorState.SESSION)
                         {
                             ScriptManager.StopGlobalScripts();
-                            RemoveUnusedResources();
+                            await RemoveUnusedResources();
                             ActionManager.ProfileSwitcherManager.ResetAircraft();
                         }
                     }
@@ -268,17 +273,16 @@ namespace PilotsDeck.Plugin
                         State = PluginState.READY;
 
                         ResetInProgress = true;
-                        ActionManager.ProfileSwitcherManager.SwitchProfiles();                        
-                        Task.Run(async () =>
+                        ActionManager.ProfileSwitcherManager.SwitchProfiles();
+                        _ = TaskTools.RunDelayed(async () =>
                         {
-                            await Task.Delay(500);
-                            RemoveUnusedResources(true);
-                            await Task.Delay(500);
+                            await RemoveUnusedResources(true);
+                            await Task.Delay(250);
                             ScriptManager.StartGlobalScripts();
-                            await Task.Delay(500);
+                            await Task.Delay(250);
                             ResetInProgress = false;
-                        });
-                        ForcedRefresh = true;
+                            ForcedRefresh = true;
+                        }, App.Configuration.IntervalCheckScripts, App.CancellationToken);
                     }
 
                     LastSimState = SimController.SimState;
@@ -301,7 +305,7 @@ namespace PilotsDeck.Plugin
                     Logger.Information("--- Plugin changed to IDLE ---");
                     State = PluginState.IDLE;
                     ActionManager.ProfileSwitcherManager.SwitchBack();
-                    RemoveUnusedResources();
+                    await RemoveUnusedResources();
                     LastSimReadyCmd = false;
                     LastSimState = SimulatorState.UNKNOWN;
                     LastAircraftString = "";
@@ -324,7 +328,7 @@ namespace PilotsDeck.Plugin
                 if (DateTime.Now - LastRemovedUnused > TimeSpan.FromMilliseconds(App.Configuration.IntervalUnusedRessources))
                 {
                     if (State != PluginState.READY)
-                        RemoveUnusedResources();
+                        await RemoveUnusedResources();
                     else
                     {
                         LastRemovedUnused = DateTime.Now;
@@ -348,9 +352,19 @@ namespace PilotsDeck.Plugin
             {
                 Logger.LogException(ex);
             }
-            
+            finally
+            {
+
+            }
+
             ForcedRefresh = false;
             StatisticManager.EndTrack(StatisticID.PLUGIN_REFRESH);
+            if (TimerRefresh.Interval.TotalMilliseconds != App.Configuration.IntervalDeckRefresh)
+            {
+                Logger.Debug($"Updating TimerRefresh to {App.Configuration.IntervalDeckRefresh}ms");
+                TimerRefresh.Interval = TimeSpan.FromMilliseconds(App.Configuration.IntervalDeckRefresh);
+            }
+            RefreshIsRunning = false;
         }
 
         protected static void ExportDeviceInfo()

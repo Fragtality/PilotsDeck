@@ -22,6 +22,7 @@ namespace ProfileManager
         protected Brush BrushDefault { get; set; }
         protected Brush BrushHighlight { get; } = SystemColors.HighlightBrush;
         protected bool StoppedStreamDeck { get; set; } = false;
+        public bool InstallProfileCommandline { get; protected set; } = false;
 
         public MainWindow()
         {
@@ -35,8 +36,14 @@ namespace ProfileManager
                 Title = $"{Title} ({VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()})";
                 AppTitle = Title;
 
-                ExecuteCommandLine();
-                ButtonProfileInstaller_Click(null, null);
+                InstallProfileCommandline = ExecuteCommandLine();
+                if (!InstallProfileCommandline)
+                    ButtonProfileInstaller_Click(null, null);
+                else
+                {
+                    LabelDesc.Text = "";
+                    LabelDesc.Visibility = Visibility.Collapsed;
+                }
                 this.SizeChanged += MainWindow_SizeChanged;
             }
             catch (Exception ex)
@@ -51,18 +58,25 @@ namespace ProfileManager
                 this.Top = 24;
         }
 
-        private void ExecuteCommandLine()
+        private bool ExecuteCommandLine()
         {
+            bool result = false;
             foreach (var pair in App.CommandLineArgs)
             {
                 if (pair.Value == null && !string.IsNullOrEmpty(Path.GetExtension(pair.Key)))
+                {
                     ShowInstallerView(pair.Key);
+                    result = true;
+                    break;
+                }
                 else if (pair.Key == "cleanprofiles")
                 {
                     ExecuteCleanProfiles();
                     App.Current.Shutdown();
                 }
             }
+
+            return result;
         }
 
         private void ExecuteCleanProfiles()

@@ -53,7 +53,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Clipboard
         public virtual Thickness ThicknessCopyPaste => GetThickness();
         public static Thickness ThicknessPaste { get; } = new Thickness(1.5);
         public static Thickness ThicknessDefault { get; } = new Thickness(1);
-        
+
         public ActionClipboard(ViewModelAction modelAction)
         {
             ModelAction = modelAction;
@@ -125,7 +125,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Clipboard
 
         public static bool IsCopyable(TreeItemData currentItem)
         {
-            return CopiedItem == null && (currentItem.IsModifiable() || currentItem.IsCommandType());
+            return CopiedItem == null && currentItem != null && (currentItem.IsModifiable() || currentItem.IsCommandType());
         }
 
         public virtual bool IsPasteable()
@@ -418,7 +418,7 @@ namespace PilotsDeck.UI.ActionDesignerUI.Clipboard
                 target.IsExpanded = true;
             }
             else
-                collection.TreeItems.Add(newItem);            
+                collection.TreeItems.Add(newItem);
 
             CopiedItem = null;
             collection.RefreshFocus = true;

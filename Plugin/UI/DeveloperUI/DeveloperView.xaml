@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PilotsDeck.UI.DeveloperUI"
         mc:Ignorable="d"
-        Title="Developer UI" MinHeight="300" MaxWidth="1048" SizeToContent="WidthAndHeight" IsVisibleChanged="Window_IsVisibleChanged" Closing="Window_Closing">
+        Title="Developer UI" MinHeight="300" MaxWidth="1048" SizeToContent="WidthAndHeight" IsVisibleChanged="Window_IsVisibleChanged" Closing="Window_Closing" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -30,8 +30,14 @@
             </Button>
             <Button Name="ButtonProfileManager" MinWidth="128" VerticalAlignment="Center" MinHeight="48" Click="ButtonProfileManager_Click" Margin="16,0,16,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,4,0">
-                    <Label VerticalAlignment="Center" FontWeight="DemiBold" FontSize="12">Profile Manager</Label>
+                    <Label VerticalAlignment="Center" FontWeight="DemiBold" FontSize="13">Profile Manager</Label>
                     <Image Source="../Icons/arrow-left-right.png" Width="24" Height="24"/>
+                </StackPanel>
+            </Button>
+            <Button Name="ButtonSettings" MinWidth="128" VerticalAlignment="Center" MinHeight="48" Click="ButtonSettings_Click" Margin="16,0,16,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,4,0">
+                    <Label VerticalAlignment="Center" FontWeight="DemiBold" FontSize="14">Settings</Label>
+                    <Image Source="../Icons/Commands.png" Width="24" Height="24"/>
                 </StackPanel>
             </Button>
         </StackPanel>

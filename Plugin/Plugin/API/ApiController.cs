@@ -1,9 +1,11 @@
 ﻿using CFIT.AppLogger;
+using CFIT.AppTools;
 using PilotsDeck.Resources;
 using PilotsDeck.Resources.Variables;
 using PilotsDeck.Simulator;
 using PilotsDeck.Tools;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -17,13 +19,14 @@ namespace PilotsDeck.Plugin.API
         public static string Url => $@"http://localhost:{App.Configuration.ApiPortNumber}/";
         public static VariableManager VariableManager => App.PluginController.VariableManager;
         public static SimController SimController => App.SimController;
+        protected ConcurrentDictionary<string, int> RegisteredAddresses { get; } = [];
 
         public ApiController()
         {
             HttpListener = new();
         }
 
-        public async virtual void Run()
+        public async virtual Task Run()
         {
             HttpListener.Prefixes.Add(Url);
             HttpListener.Start();
@@ -81,26 +84,33 @@ namespace PilotsDeck.Plugin.API
             Logger.Verbose($"Result: {context.Response.StatusCode}");
         }
 
-        protected virtual void HandleVariableRegisterRequest(HttpListenerContext context, string variableName)
+        protected virtual ManagedVariable HandleVariableRegisterRequest(HttpListenerContext context, string variableName)
         {
             var address = new ManagedAddress(variableName);
-            if (!VariableManager.TryGet(address, out _))
+            var variable = VariableManager.RegisterVariable(address);
+            if (variable != null)
             {
-                if (VariableManager.RegisterVariable(address) != null)
-                    context.Response.StatusCode = (int)HttpStatusCode.OK;
-                else
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                RegisteredAddresses.AddOrUpdate(address.Address, 1, (key, value) => value + 1);
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                return variable;
             }
             else
-                context.Response.StatusCode = (int)HttpStatusCode.OK;
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return null;
+            }
         }
 
         protected virtual void HandleVariableUnregisterRequest(HttpListenerContext context, string variableName)
         {
             var address = new ManagedAddress(variableName);
-            if (VariableManager.TryGet(address, out _))
+            if (RegisteredAddresses.TryGetValue(address.Address, out int registrations) && registrations > 0)
             {
                 VariableManager.DeregisterVariable(address);
+                if (registrations > 1)
+                    RegisteredAddresses.AddOrUpdate(address.Address, 1, (key, value) => value + 1);
+                else
+                    RegisteredAddresses.Remove(address.Address);
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
             }
             else
@@ -154,7 +164,7 @@ namespace PilotsDeck.Plugin.API
             }
             else if (address.ReadType == SimValueType.INTERNAL)
             {
-                variable = VariableManager.RegisterVariable(address);
+                variable = HandleVariableRegisterRequest(context, address.Address);
                 variable.SetValue(value);
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
             }
@@ -177,7 +187,7 @@ namespace PilotsDeck.Plugin.API
                 Type = (SimCommandType)actionType,
                 IsUp = true,
             };
-            
+
             SimController.CommandChannel.TryWrite(command);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
         }
