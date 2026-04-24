@@ -1,7 +1,7 @@
 # Changelog
 
 
-## v0.9.1.0
+## v0.9.1
 
 ### Plugin
 - DEPRECATION NOTICE: Using RPN Code as Variable (aka 'C-Var') is now considered deprecated!
