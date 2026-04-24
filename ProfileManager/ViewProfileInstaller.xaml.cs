@@ -69,11 +69,12 @@ namespace ProfileManager
             AreaTaskStatus.Deactivate(true);
 
             TreeFileContents.Items.Clear();
+            TreeRemoveFiles.Items.Clear();
             InstallWorker?.Dispose();
             InstallWorker = new();
 
             ActionButtonConfirmation = null;
-        }       
+        }
 
         protected void SetStateLoadingPackage(string filePath)
         {
@@ -87,7 +88,7 @@ namespace ProfileManager
             InstallWorker.SetFile(filePath);
 
             AreaTaskStatus.Activate(SetStateShowPackage, SetStateLoadFailed);
-            
+
             Task.Run(InstallWorker.LoadPackage);
         }
 
@@ -226,6 +227,17 @@ namespace ProfileManager
                 AddTreeItems($"{PackageFile.CountScripts} Scripts", PackageFile.FilesScripts);
                 AddTreeItems($"{PackageFile.CountExtras} Extras", PackageFile.FilesExtras);
                 AddTreeItems($"{PackageFile.FilesUnknown.Count} Unknown", PackageFile.FilesUnknown, new SolidColorBrush(Colors.Orange));
+                if (PackageFile.Manifest.RemoveFiles.Count > 0)
+                {
+                    AddTreeItems($"{PackageFile.Manifest.RemoveFiles.Count} Remove", PackageFile.Manifest.RemoveFiles, new SolidColorBrush(Colors.Orange), true, TreeRemoveFiles);
+                    LabelRemoveFiles.Visibility = Visibility.Visible;
+                    TreeRemoveFiles.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    LabelRemoveFiles.Visibility = Visibility.Collapsed;
+                    TreeRemoveFiles.Visibility = Visibility.Collapsed;
+                }
 
                 CheckboxRemoveOld.IsChecked = InstallWorker.OptionRemoveOldProfiles;
                 if (InstallWorker.CountProfileUpdates > 0)
@@ -248,7 +260,7 @@ namespace ProfileManager
             }
         }
 
-        protected void AddTreeItems(string header, List<string> items, Brush brush = null, bool expand = false)
+        protected void AddTreeItems(string header, List<string> items, Brush brush = null, bool expand = false, TreeView treeView = null)
         {
             if (items.Count == 0)
                 return;
@@ -263,7 +275,10 @@ namespace ProfileManager
                     treeitem.Items.Add(new TreeViewItem() { Header = item });
             }
             treeitem.IsExpanded = expand;
-            TreeFileContents.Items.Add(treeitem);
+            if (treeView == null)
+                TreeFileContents.Items.Add(treeitem);
+            else
+                treeView.Items.Add(treeitem);
         }
 
         protected void RequestNavigateHandler(object sender, RequestNavigateEventArgs e)

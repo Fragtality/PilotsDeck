@@ -1,6 +1,7 @@
 ﻿using CFIT.AppLogger;
 using CFIT.AppTools;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -14,6 +15,7 @@ namespace PilotsDeck.UI.DeveloperUI
         protected IView CurrentView { get; set; } = null;
         protected static Thickness ThicknessSelected { get; set; } = new Thickness(1.5);
         protected static Thickness ThicknessDefault { get; set; } = new Thickness(1);
+        protected static Dictionary<string, IView> Views { get; } = [];
 
         public DeveloperView(NotifyIconViewModel notifyModel)
         {
@@ -21,6 +23,9 @@ namespace PilotsDeck.UI.DeveloperUI
             InitializeComponent();
 
             Title = $"{Title} ({VersionTools.GetEntryAssemblyVersion(3)}-{VersionTools.GetEntryAssemblyTimestamp()})";
+            Views.Add(nameof(ViewState), new ViewState());
+            Views.Add(nameof(ViewReference), new ViewReference());
+            Views.Add(nameof(ViewSettings), new ViewSettings());
         }
 
         protected void CheckVersion()
@@ -58,9 +63,9 @@ namespace PilotsDeck.UI.DeveloperUI
             }
         }
 
-        protected void LoadView(IView newView)
+        protected void LoadView(string viewName)
         {
-            Logger.Debug($"Loading View '{newView.GetType().Name}' ...");
+            Logger.Debug($"Loading View '{viewName}' ...");
             if (CurrentView != null)
             {
                 CurrentView?.Stop();
@@ -69,12 +74,13 @@ namespace PilotsDeck.UI.DeveloperUI
 
             CheckVersion();
 
-            CurrentView = newView;
+            CurrentView = Views[viewName];
             PanelView.Content = CurrentView as UserControl;
             CurrentView.Start();
 
             SetMenuButton(ButtonMonitor, CurrentView is ViewState);
             SetMenuButton(ButtonReference, CurrentView is ViewReference);
+            SetMenuButton(ButtonSettings, CurrentView is ViewSettings);
             Logger.Debug($"View loaded.");
         }
 
@@ -101,7 +107,7 @@ namespace PilotsDeck.UI.DeveloperUI
                 Topmost = true;
                 Focus();
                 Topmost = false;
-                LoadView(new ViewReference());
+                LoadView(nameof(ViewReference));
             }
         }
 
@@ -114,12 +120,12 @@ namespace PilotsDeck.UI.DeveloperUI
 
         private void ButtonMonitor_Click(object sender, RoutedEventArgs e)
         {
-            LoadView(new ViewState());
+            LoadView(nameof(ViewState));
         }
 
         private void ButtonReference_Click(object sender, RoutedEventArgs e)
         {
-            LoadView(new ViewReference());
+            LoadView(nameof(ViewReference));
         }
 
         private void ButtonProfileManager_Click(object sender, RoutedEventArgs e)
@@ -130,7 +136,7 @@ namespace PilotsDeck.UI.DeveloperUI
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
-            LoadView(new ViewSettings());
+            LoadView(nameof(ViewSettings));
         }
     }
 }

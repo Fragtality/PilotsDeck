@@ -308,6 +308,37 @@ namespace ProfileManager
                 if (CountExtras > 0)
                     CopyExtraFiles();
 
+                if (Manifest.RemoveFiles?.Count > 0)
+                {
+                    Logger.Debug($"Remove File List specified by Package");
+                    foreach (var file in Manifest.RemoveFiles)
+                    {
+                        if (string.IsNullOrWhiteSpace(file) || file.Contains("..") || (!file.StartsWith(Parameters.PLUGIN_SCRIPTS_FOLDER, StringComparison.InvariantCultureIgnoreCase) && !file.StartsWith(Parameters.PLUGIN_IMAGE_FOLDER, StringComparison.InvariantCultureIgnoreCase)))
+                        {
+                            Logger.Debug($"Skipping invalid file: {file}");
+                            continue;
+                        }
+
+                        var path = Path.Combine(Parameters.PLUGIN_PATH, file.Replace('/', '\\'));
+                        if (File.Exists(path))
+                        {
+                            Logger.Debug($"Removing old Package File: {path}");
+                            try
+                            {
+                                File.Delete(path);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error($"Failed to remove old File with Error '{ex.GetType().Name}': {ex.Message}");
+                            }
+                        }
+                        else
+                        {
+                            Logger.Debug($"The Path does not exist: {path}");
+                        }
+                    }
+                }
+
                 if (!KeepPackageContents && Directory.Exists(ProfileWorkPath))
                 {
                     task.Message = "Cleanup Work-Directory";

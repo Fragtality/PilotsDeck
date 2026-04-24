@@ -34,7 +34,7 @@ Other Examples can be found under [here](#51---examples).<br/>
 | **Prepar3D v5** | **yes** | **yes** | FSUIPC 6 |
 | Prepar3D v4 | yes | no | FSUIPC 5/6 |
 | Prepar3D v1-3 | yes | no | FSUIPC 4 |
-| **X-Plane 12** | **yes** | **yes** | UDP (local/remote) |
+| **X-Plane 12** | **yes** | **yes** | UDP or WebAPI (local/remote) |
 | X-Plane 11 | yes | yes | UDP (local/remote) |
 | X-Plane <=10 | yes | no | UDP (local/remote) |
 
@@ -59,7 +59,7 @@ How Commands and Variables are configured and the different Options how they can
 | [**KVAR**](#kvar) | Send / Write to any Event-ID (also known as K-Var / SimConnect Event) | ✔️ | ✔️\*\*\* | MSFS |
 | [**HVAR**](#hvar) | Trigger any HTML Event in the Simulator (also known as H-Var) | ✔️ | ✖️ | MSFS |
 | [**BVAR**](#bvar) | Trigger InputEvents (also known as B-Var) - but only those that MSFS enumerates via SimConnect | ✔️ | (✔️)\* | MSFS |
-| [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✔️\*\* | MSFS |
+| [**CALCULATOR**](#calculator) | Run any Calculator/Gauge Code in the Simulator | ✔️ | ✖️\*\* | MSFS |
 | [**XPCMD**](#xpcmd) | Send any Command known to X-Plane (as command_once) | ✔️ | ✖️ | XP |
 | [**XPWREF**](#xpwref) | Read from / Write to any X-Plane DataRef | ✔️ | ✔️ | XP |
 | [**LUAFUNC**](#luafunc) | Run a Lua Function in the Plugin's own Lua Engine | ✔️ | ✔️ | ALL |
@@ -67,7 +67,7 @@ How Commands and Variables are configured and the different Options how they can
 
 
 \* = Per Default, B-Vars treated as Command-only Type - only some B-Var have an actual Value to read.<br/>
-\*\* = While you can read the Result from a RPN Expression, you can't write to it (like with other Variable Types).<br/>
+\*\* = Reading from a RPN Expression is now considered **deprecated** - use Composite Actions and/or Lua Scripts as Replacement.<br/>
 \*\*\* = Will only be updated when the Event is received.<br/>
 :grey_exclamation: Please mind that the Command Types Script, Macro, Lvar (on P3D/FSX) and vJoy can only work with a **registered** Version of FSUIPC!<br/>
 :grey_exclamation: Both **vJoy** Command Types are independent of each other and are two different Things! "VJOY" can only be assigned within FSUIPC (and not in the Simulator). The "VJOYDRV" can be assigned by anything which understands a Joystick Button (Simulator, FSUIPC, Addons, ...).
@@ -97,27 +97,38 @@ How to add Custom Images is described under [3.3 - Custom Images](#33---custom-i
 
 ## 1.4 - Install, Update, Remove
 Just [Download](https://github.com/Fragtality/PilotsDeck/releases/latest) & Run the **Installer** Binary! It will check and install all Requirements and installs/updates the Plugin (or remove it).<br/>
-On the second Installer Page there are some Options to customize the Process - in most Cases it is recommended to leave them at the preselected Default!<br/>
-You do *not* need to remove the old Version for an Update - using 'Remove' in the Installer will also **remove all custom** Images and Scripts!<br/>
-<br/><br/>
-It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues because either the Binary is blocked from running or is blocked when connecting to the StreamDeck Software.<br/>
-**DO NOT** run the Installer, Plugin or StreamDeck Software "as Admin". It is not recommended to MSFS or FSUIPC7 "as Admin" - it might work, it might fail.<br/>
-If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
-The Requirements for the Plugin:
-- Windows **10** or **11** (updated)
-- [**StreamDeck Software v7.3**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary.
-  - The Plugin can also be installed to the **MiraBox/HotSpot StreamDock** Software. Select StreamDock in the Setup Options to install or update the Plugin there.
-- [**.NET 10**](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary. Reboot recommended when the Runtime was installed for the first Time.
-- If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
-- If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest) - will be installed/updated by the Installer, if necessary.
-- Optional: If you want to use **VJOYDRV** Commands you need the [BrunnerInnovations Fork](https://github.com/BrunnerInnovation/vJoy/releases/latest) of the vJoy Driver - the Installer will check the State, and offers to optionally install/update it for you.<br/>**NOTE**: If you install the vJoy Driver for the first Time, don't forget that you need to enable at least one Joystick (configured to have 128 Buttons) in the vJoyConf Application to use it!
+On the second Installer Page are some Options to customize your Installation:
+- Desktop Icon to the Profile Manager App
+- Enable (and Check) FSUIPC7 as secondary Connector for MSFS
+- Install/Update the vJoy Driver
+- **Install Location**: Choose if the Plugin should be installed to Elegato StreamD**e**ck or MiraBox/HotSpot StreamD**o**ck
+  - :exclamation: The Plugin is primarily for StreamDeck and focuses on Compatibility with Elgato. As long as MiraBox/HotSpot mimics the same API, it should be fine.
 
 <br/>
-The Plugin will be installed to:
 
-`%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin`
+You do *not* need to remove the old Version for an Update - using 'Remove' in the Installer will also **remove all custom** Images and Scripts!<br/>
+<br/>
+:warning: It is highly likely that you need to **Unblock/Exclude** the Installer & Plugin from BitDefender and other AV-/Security-Software. It's the number one Reason for "the Plugin is not working"-Issues because either the Binary is blocked from running or is blocked when connecting to the StreamDeck Software.<br/>
 
-It is automatically started with the StreamDeck Software. It will spawn its own Icon in the System-Tray / Notification Area. Use this Icon to see if a Plugin Update is available, to access the [Developer UI](#32---developer-ui) or open the **Profile Manager** to configure [Profile Switching](#34---profile-switching).<br/>
+:warning: **DO NOT** run the Installer, Plugin or StreamDeck Software "as Admin". It is not recommended to MSFS or FSUIPC7 "as Admin" - it might work, it might fail.<br/>
+If it still does not work right or at all, please check [4.2 - Troubleshooting](#42---troubleshooting).<br/><br/>
+
+The Requirements for the Plugin:
+- Windows **10** or **11** (updated)
+- [**StreamDeck Software v7.4**](https://www.elgato.com/downloads) and above - The StreamDeck Software will be installed/updated by the Installer, if necessary. (No Guidance on the StreamD**o**ck Version)
+- [**.NET 10**](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) - The x64 Desktop Runtime will be installed/updated by the Installer, if necessary.
+  - :warning: **Reboot** recommended when the Runtime (in that Major-Version) was installed for the **first Time**!
+- If used for MSFS/P3D/FSX: The **latest** Release of the [**FSUIPC**](http://fsuipc.com/) Major Version specific to your Simulator (e.g. FSUIPC 6 for Prepar3D v4/5) - will be installed/updated by the Installer, if necessary.
+- If used for MSFS: The **latest** Release of the WASM-Module from [**MobiFlight**](https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest) - will be installed/updated by the Installer, if necessary.
+- Optional: If you want to use **VJOYDRV** Commands you need the [BrunnerInnovations Fork](https://github.com/BrunnerInnovation/vJoy/releases/latest) of the vJoy Driver - the Installer will check the State, and offers to optionally install/update it for you.
+  - :warning: If you install the vJoy Driver for the **first Time**, don't forget that you need to enable at least **one Joystick** (configured to have 128 Buttons) in the **vJoyConf** Application to use it!
+
+<br/>
+
+Install Location for Elegato StreamDeck: `%appdata%\Elgato\StreamDeck\Plugins\com.extension.pilotsdeck.sdPlugin` <br/>
+Install Location for MiraBox/HotSpot StreamDock: `%appdata%\HotSpot\StreamDock\Plugins\com.extension.pilotsdeck.sdPlugin`
+
+The Plugin is automatically started with the StreamDeck/Dock Software. It will spawn its own Icon in the System-Tray / Notification Area. Use this Icon to see if a Plugin Update is available, to access the [Developer UI](#32---developer-ui) or open the **Profile Manager** to configure [Profile Switching](#34---profile-switching).<br/>
 <img src="img/Plugin-Systray.png" width="267"><br/><br/>
 
 **Note:** Since FSUIPC is only a "secondary" Connector for MSFS, you do not need to have it installed anymore (for MSFS). If you not plan to install/run FSUIPC7, uncheck the respective Option in the Installer!<br/>
@@ -163,7 +174,7 @@ Some Command/Variable Types have a Reference to look them up - you can quickly o
 
 <br/>
 
-**Youtube Guide**: The Creator aimoii uploaded a [Step-by-Step Series](https://www.youtube.com/watch?v=DQOa7yLfDi8&list=PL_j2bl-uw9xFdxFwlzT4QosIALjObRVEk) on his Youtube Channel on how to configure the Plugin Actions! Check it out and leave a Like ❤️
+:rotating_light: **Youtube Guide**: The Creator **aimoii** uploaded a [Step-by-Step Series](https://www.youtube.com/watch?v=DQOa7yLfDi8&list=PL_j2bl-uw9xFdxFwlzT4QosIALjObRVEk) on his Youtube Channel on how to configure the Plugin Actions! Check it out and leave a Like ❤️
 
 <br/>
 
@@ -462,7 +473,7 @@ A great Source for B-Vars and (other Stuff) is [HubHop](https://hubhop.mobifligh
 
 
 #### CALCULATOR
-| Command or Variable | MSFS | `RPN-Code \| $Name:Step(:Limit) \| $K:Name(:Parameter1(:Parameter2))` or `C:RPN-Code` |
+| Command | MSFS | `RPN-Code \| $Name:Step(:Limit) \| $K:Name(:Parameter1(:Parameter2))` |
 | --- | --- | --- |
 - *RPN-Code*: The Code in normal RPN Syntax you want to run with the execute_calculator_code Function.
 
@@ -477,7 +488,7 @@ For simple Tasks like triggering a **K-Var** (Event) you can use the `$K:Name(:P
 - *Parameter1*: An optional numeric Parameter to send (the first / inner).
 - *Parameter2*: An optional numeric Parameter to send (the second / outer).
 
-If you want to read the **Result** of the RPN-Code as a **Variable**, prefix your Code with `C:` in any of the Variable Address Fields! Note that you can't write to those special Type of Variable.
+Reading from a RPN Expression is now considered **deprecated** - use Composite Actions and/or Lua Scripts as Replacement.
 
 *Examples*
 - `(A:LIGHT POTENTIOMETER:13, percent over 100) 0.0 > if{ (A:LIGHT POTENTIOMETER:13, percent over 100) 0.1 - 100 * (>K:LIGHT_POTENTIOMETER_13_SET) }` - Example of RPN Code (Decreasing Cabin Lights in the Fenix Airbus).
@@ -487,7 +498,6 @@ If you want to read the **Result** of the RPN-Code as a **Variable**, prefix you
 - `$K:FUELSYSTEM_PUMP_TOGGLE:2` - Trigger the Standard Event *FUELSYSTEM_PUMP_TOGGLE* with Parameter *2*.
 - `$K:FUELSYSTEM_PUMP_TOGGLE:2:3` - Trigger the Standard Event *FUELSYSTEM_PUMP_TOGGLE* with Parameter *2* and *3*. Resulting RPN Code: `3 2 (>K:FUELSYSTEM_PUMP_TOGGLE)`
 - `$K:A32NX.FCU_SPD_DEC` - Trigger the Custom Event *A32NX.FCU_SPD_DEC*.
-- `C:(A:FUELSYSTEM PUMP SWITCH:1, Enum) 1 == (A:FUELSYSTEM LINE FUEL PRESSURE:2, KPa) 0 == and if{ 1 } els{ 0 }` - RPN Code to read the correct State of the (MSFS) 787 left Center Pump Pressure.
 
 Templates have to start with the Dollar-Sign!<br/>
 Note that there is no Syntax-Checking at all for Calculator Code (except for the Templates). Only use direct RPN-Code if you are used to it.<br/><br/>
@@ -517,7 +527,7 @@ In Comparison to other Simulators, X-Plane Commands can be requested to be activ
 Per Default the Plugin will trigger X-Plane Commands as "command_once" which is fine for most Buttons, Switches and Knobs. But in Cases of Buttons that need to be hold (kept pressed) for some Time and then released (e.g. CVR Test, TO CONF, Fire Tests) the Configuration depends on your X-Plane Version:
 - For X-Plane Versions *earlier* than 12.1.4: You can only trigger Commands as "command_once". If you need to configure a holdable Switch, you have to use a *vJoy* (Driver) Command (with the corresponding vJoy Button mapped in X-Plane).
 - For X-Plane Versions *at or greater* than 12.1.4 (and WebAPI enabled in the Plugin Config): You can enable the *Hold Switch* Option and disable the *Command Once* Option of the Plugin to create an holdable Button/Switch (use the same Command Ref in both Addresses). On the Composite Action you need to add the Command Ref to both the UP and DOWN StreamDeck Events with the *Command Once* Option disabled.
-- **NOTE**: The WebAPI is disabled per default since there is an open X-Plane Bug (XPD-16752) leading to the API not delivering DataRef Updates as requested.
+- **NOTE**: The WebAPI is still considered **Experimental** since I never heard anything back from LM on the Bug Report - but it seems to be more reliable now for Variable Requests?
 
 Note on Sequences for Hold Switches: All Commands will be set active - make sure to use the same Sequence for both Addresses!
 <br/><br/>
@@ -1261,7 +1271,13 @@ Clicking on the Resource Counts will spawn a List with the respective Resource N
 **QRH View**<br/>
 The QRH View is basically a Compilation of Links to quickly navigate to useful References or Plugin Folders.<br/>
 For Example: you can directly open the InputEvents File in your Text-Editor, go directly to the Script Folder in your Explorer, or directly open the MSFS SDK in your Browser.<br/>
-<img src="img/DevUI-QRH.png" width="512">
+<img src="img/DevUI-QRH.png" width="512"><br/><br/>
+
+**Profile Manager**<br/>
+Open the Profile Manager Application (and close the Developer UI) - just another Shortcut.<br/>
+
+**Settings View**<br/>
+Modify selected Settings of the Plugin Configuration like Refresh/Process Intervals or common Connection Options (MSFS/FSUIPC, X-Plane/WebAPI).<br/>
 
 <br/><br/><br/>
 
@@ -1643,17 +1659,32 @@ There can only be one Call to RunSim per Script and it need to be placed at the 
 <br/><br/><br/>
 
 
-| RunEvent | `RunEvent("event", "callback")` |
+| RunEvent | `RunEvent("variable", "callback")` |
 | --- | --- |
 
-The specified *callback* Function in the Script is called as soon as the Plugin receives a Notification for the specified *event*. The Value of the Event/Variable will be passed as a Parameter to the *callback* Function.<br/>
-This is currently only supported for MSFS (as the other Connectors do not offer an Event-based API). You can subscribe to K-Var ([SimEvents](https://docs.flightsimulator.com/html/Programming_Tools/Event_IDs/Event_IDs.htm)), L-Vars, A-Vars ([SimVars](https://docs.flightsimulator.com/html/Programming_Tools/SimVars/Simulation_Variables.htm)) and B-Vars (InputEvents). Use the Plugin-Syntax as documented and always set the correct Prefix!<br/>
+The specified *callback* Function in the Script is called as soon as the Plugin receives and sets a Value for *variable*. The Value of the Variable will be passed as a Parameter to the *callback* Function.<br/>
+All Variable Types known to the Plugin can be used. Use the Plugin-Syntax as documented and always set the correct Prefix (so even if noted as optional)!<br/>
+**Be aware** that certain Variable Types are polled (Offsets) or send at a constant interval (X-Plane UDP) - so the *callback* Function will be **called a lot** (every ~50ms per Default). Consider `RunEventChanged` if only Callbacks on Value Change are required.<br/>
 There can multiple Calls to RunEvent per Script to track different Events (in different Functions). These need to be placed at the Beginning of the Script (globally) - typically with your RunInterval Statement.<br/>
 *Examples:*<br/>
 `RunEvent("K:EXTERNAL_SYSTEM_TOGGLE", "SYSTEM_EVENT")`<br/>
 `RunEvent("L:CABaroKnob", "LVAR_UPDATE")`<br/>
 `RunEvent("(A:SIM ON GROUND, Bool)", "AVAR_UPDATE")`
 <br/><br/><br/>
+
+
+| RunEventChanged | `RunEventChanged("variable", "callback")` |
+| --- | --- |
+
+The specified *callback* Function in the Script is called as soon as the Plugin receives and sets a *changed* (different) Value for *variable*. The Value of the Variable will be passed as a Parameter to the *callback* Function.<br/>
+All Variable Types known to the Plugin can be used. Use the Plugin-Syntax as documented and always set the correct Prefix (so even if noted as optional)!<br/>
+There can multiple Calls to RunEventChanged per Script to track different Events (in different Functions). These need to be placed at the Beginning of the Script (globally) - typically with your RunInterval Statement.<br/>
+*Examples:*<br/>
+`RunEventChanged("K:EXTERNAL_SYSTEM_TOGGLE", "SYSTEM_EVENT")`<br/>
+`RunEventChanged("L:CABaroKnob", "LVAR_UPDATE")`<br/>
+`RunEventChanged("(A:SIM ON GROUND, Bool)", "AVAR_UPDATE")`
+<br/><br/><br/>
+
 
 **Migration from FSUIPC** <br/>
 Most FSUIPC Scripts can be easily migrated:

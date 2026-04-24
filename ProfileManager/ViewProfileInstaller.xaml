@@ -22,7 +22,7 @@
 
 
         <!--FILE DROP-->
-        <Grid Name="AreaFileDrop" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Visibility="Visible">
+        <Grid Name="AreaFileDrop" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -40,12 +40,13 @@
         </Grid>
 
         <!--PACKAGE INFO-->
-        <Grid Name="AreaPackageInfo" Grid.Row="2" HorizontalAlignment="Center" Visibility="Collapsed" Margin="12">
+        <Grid Name="AreaPackageInfo" Grid.Row="2" HorizontalAlignment="Center" Visibility="Visible" Margin="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="128" Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -79,25 +80,28 @@
             <TextBlock Grid.Row="6" Grid.Column="0" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4">Included Files:</TextBlock>
             <TreeView Grid.Row="6" Grid.Column="1" Name="TreeFileContents" FontSize="12" Margin="6,8,4,4" BorderThickness="0" PreviewMouseWheel="TreeFileContents_PreviewMouseWheel"/>
 
-            <TextBlock Grid.Row="7" Grid.Column="0" Name="LabelRemoveOld" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4"
+            <TextBlock Grid.Row="7" Grid.Column="0" Name="LabelRemoveFiles" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4">Remove Files:</TextBlock>
+            <TreeView Grid.Row="7" Grid.Column="1" Name="TreeRemoveFiles" FontSize="12" Margin="6,8,4,4" BorderThickness="0"/>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Name="LabelRemoveOld" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4"
                        ToolTip="If you still have the old Profiles in your StreamDeck Software, the new Profiles will be added as a Copy by the Software.&#x0a;The Installer will delete the old Profile (kept in Trash), rename the new Profile and will copy the existing Mapping over.&#x0a;The Matching is done by the Profile's Name and the Installer will only change/remove anything when there is a 1:1 Match.">
                 Remove old Profiles:
             </TextBlock>
-            <CheckBox Grid.Row="7" Grid.Column="1" Name="CheckboxRemoveOld" Click="CheckboxRemoveOld_Click" FontSize="12" Margin="10,9,4,4"
+            <CheckBox Grid.Row="8" Grid.Column="1" Name="CheckboxRemoveOld" Click="CheckboxRemoveOld_Click" FontSize="12" Margin="10,9,4,4"
                       ToolTip="If you still have the old Profiles in your StreamDeck Software, the new Profiles will be added as a Copy by the Software.&#x0a;The Installer will delete the old Profile (kept in Trash), rename the new Profile and will copy the existing Mapping over.&#x0a;The Matching is done by the Profile's Name and the Installer will only change/remove anything when there is a 1:1 Match.">
                 Remove old Profiles from StreamDeck for updated Profiles
             </CheckBox>
 
-            <TextBlock Grid.Row="8" Grid.Column="0" Name="LabelKeepContents" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4"
+            <TextBlock Grid.Row="9" Grid.Column="0" Name="LabelKeepContents" FontSize="12" FontWeight="DemiBold" Margin="4,8,4,4"
                        ToolTip="The Contents of this Package will be kept in the Plugin-Folder under Profiles\Packagename.&#x0a;If this Option can not be disabled, the Package Creator has preset this Option!&#x0a;(Check the Readme/Notes for additional Files)">
                 Keep Contents:
             </TextBlock>
-            <CheckBox Grid.Row="8" Grid.Column="1" Name="CheckboxKeepContents" Click="CheckboxKeepContents_Click" FontSize="12" Margin="10,9,4,4"
+            <CheckBox Grid.Row="9" Grid.Column="1" Name="CheckboxKeepContents" Click="CheckboxKeepContents_Click" FontSize="12" Margin="10,9,4,4"
                       ToolTip="The Contents of this Package will be kept in the Plugin-Folder under Profiles\Packagename.&#x0a;If this Option can not be disabled, the Package Creator has preset this Option!&#x0a;(Check the Readme/Notes for additional Files)">
                 Keep extracted Files after Installation is finished
             </CheckBox>
 
-            <TextBlock Grid.Row="9" Grid.Column="1" FontSize="12" FontWeight="DemiBold" Margin="4,20,4,4" TextWrapping="Wrap">Note: The StreamDeck Software will be automatically started and stopped as needed!</TextBlock>
+            <TextBlock Grid.Row="10" Grid.Column="1" FontSize="12" FontWeight="DemiBold" Margin="4,20,4,4" TextWrapping="Wrap">Note: The StreamDeck Software will be automatically started and stopped as needed!</TextBlock>
         </Grid>
 
 

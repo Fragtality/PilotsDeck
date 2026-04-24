@@ -1,4 +1,5 @@
 ﻿using CFIT.AppLogger;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -27,9 +28,11 @@ namespace ProfileManager
 
         [JsonPropertyName("notes")]
         public string Notes { get; set; } = "";
-        
+
         [JsonPropertyName("versionplugin")]
-        public string VersionPlugin { get; set; } = "0.8.0";
+        public string VersionPlugin { get; set; } = "0.9.0";
+        [JsonPropertyName("removefiles")]
+        public List<string> RemoveFiles { get; set; } = [];
 
         public static PackageManifest LoadManifest(string json)
         {
