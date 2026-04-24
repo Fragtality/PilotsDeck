@@ -26,10 +26,11 @@ jobs:
       - name: Read version.json
         id: version
         run: |
-          VERSION=$(jq -r '.Version' Installer/Payload/version.json)
+          RAW_VERSION=$(jq -r '.Version' Installer/Payload/version.json)
           TIMESTAMP=$(jq -r '.Timestamp' Installer/Payload/version.json)
+          CLEAN_VERSION=$(echo "$RAW_VERSION" | sed -E 's/^v?([0-9]+\.[0-9]+\.[0-9]+).*$/\1/')
 
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
       # 2 Detect version change (Git-based)
