@@ -15,8 +15,9 @@ namespace PilotsDeck.Plugin
         public List<ProfileMapping> ProfileMappings { get; protected set; } = [];
         public int Count { get { return ProfileMappings.Count; } }
         public ModelGlobalSettings GlobalSettings { get; protected set; } = new();
+        public bool ReceivedGlobalSettings { get; protected set; } = false;
         public List<string> ProfileSwitcherActions { get; protected set; } = [];
-        public Dictionary<string,string> ActiveDecks { get; protected set; } = [];
+        public Dictionary<string, string> ActiveDecks { get; protected set; } = [];
         protected static DeckController DeckController { get { return App.DeckController; } }
         protected static SimController SimController { get { return App.SimController; } }
         protected string LastKnownAircraft { get; set; } = "";
@@ -53,6 +54,7 @@ namespace PilotsDeck.Plugin
             _ = DeckController.SendSetGlobalSettings(GlobalSettings.Serialize());
             UpdateProfileSwitchers();
             Logger.Information($"Received Configuration for Profile Switching. (Switching Enabled: {GlobalSettings.EnableSwitching} | Switch Back Enabled: {GlobalSettings.SwitchBack})");
+            ReceivedGlobalSettings = true;
         }
 
         public static void SetActionImage(string context, bool switchState)

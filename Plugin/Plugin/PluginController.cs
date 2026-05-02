@@ -41,7 +41,6 @@ namespace PilotsDeck.Plugin
         public PluginState State { get; protected set; } = PluginState.IDLE;
         protected bool FirstRun { get; set; } = true;
         protected bool ForcedRefresh { get; set; } = false;
-        protected bool ResetInProgress { get; set; } = false;
         protected bool RefreshIsRunning { get; set; } = false;
 
         public PluginController()
@@ -265,24 +264,20 @@ namespace PilotsDeck.Plugin
                         }
                     }
 
-                    if (SimController.SimState == SimulatorState.SESSION)
+                    if (SimController.SimState == SimulatorState.SESSION && ActionManager.ProfileSwitcherManager.ReceivedGlobalSettings)
                     {
                         Logger.Information("--- Sim changed to SESSION ---");
                         if (State != PluginState.READY)
                             Logger.Information("--- Plugin changed to READY ---");
                         State = PluginState.READY;
 
-                        ResetInProgress = true;
                         ActionManager.ProfileSwitcherManager.SwitchProfiles();
-                        _ = TaskTools.RunDelayed(async () =>
-                        {
-                            await RemoveUnusedResources(true);
-                            await Task.Delay(250);
-                            ScriptManager.StartGlobalScripts();
-                            await Task.Delay(250);
-                            ResetInProgress = false;
-                            ForcedRefresh = true;
-                        }, App.Configuration.IntervalCheckScripts, App.CancellationToken);
+                        await Task.Delay(750, App.CancellationToken);
+                        await RemoveUnusedResources(true);
+                        await Task.Delay(250);
+                        ScriptManager.StartGlobalScripts();
+                        await Task.Delay(250);
+                        ForcedRefresh = true;
                     }
 
                     LastSimState = SimController.SimState;
@@ -313,7 +308,7 @@ namespace PilotsDeck.Plugin
 
 
                 //MAIN - Run, Refresh, Update
-                if (SimController.SimState == SimulatorState.SESSION && State == PluginState.READY && !ResetInProgress)
+                if (SimController.SimState == SimulatorState.SESSION && State == PluginState.READY)
                     ScriptManager.RunGlobalScripts();
 
                 if (ForcedRefresh)

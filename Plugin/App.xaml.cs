@@ -353,8 +353,14 @@ namespace PilotsDeck
                 {
                     Timeout = TimeSpan.FromSeconds(3),
                 };
-                string url = $"{ProductDefinitionBase.GetUrlCdn("Installer/Payload/version.json", "Fragtality", "PilotsDeck", "master")}?{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-                Logger.Debug($"Fetch version File from: {url}");
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+
+                string commit = await ProductDefinitionBase.GetLatestCommit(client, "Fragtality", "PilotsDeck", "Installer/Payload/version.json");
+                Logger.Debug($"Latest commit: {commit}");
+                string url = ProductDefinitionBase.GetUrlCommit("Installer/Payload/version.json", "Fragtality", "PilotsDeck", commit);
+                Logger.Verbose($"Fetch version File from: {url}");
+
                 string json = await client.GetStringAsync(url);
                 Logger.Verbose($"json received: len {json?.Length}");
                 JsonNode node = JsonSerializer.Deserialize<JsonNode>(json);

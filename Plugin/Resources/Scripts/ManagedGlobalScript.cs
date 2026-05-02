@@ -5,6 +5,7 @@ using PilotsDeck.Simulator;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace PilotsDeck.Resources.Scripts
@@ -62,12 +63,16 @@ namespace PilotsDeck.Resources.Scripts
             _env.SimVar = new Func<string, bool>(RegisterVariable);
             _env.SimRead = new Func<string, dynamic>(SimRead);
             _env.SimReadString = new Func<string, string>(SimReadString);
-            _env.SimWrite = new Func<string, object, bool>(SimWrite);
+            _env.SimWrite = new Func<string, dynamic, bool>(SimWrite);
             _env.SimCommand = new Func<string, bool>(SimCommand);
+            _env.JoystickCommand = new Func<string, string, bool>(JoystickCommand);
             _env.SimCalculator = new Func<string, bool>(SimCalculator);
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
             _env.GetRegistryValue = new Func<string, string, string>(GetRegistryValue);
+            _env.HttpGet = new Func<string, string>(DoHttpGet);
+            _env.Serialize = new Func<object, string>(JsonSerialize);
+            _env.Deserialize = new Func<string, JsonNode>(JsonDeserialize);
             _env.RunInterval = new Action<int, string>(RunInterval);
             _env.RunSim = new Action<string>(RunSim);
             _env.RunAircraft = new Action<string>(RunAircraft);
