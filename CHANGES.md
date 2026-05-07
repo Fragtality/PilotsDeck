@@ -7,3 +7,4 @@
 
 ### Installer
 - Set .NET 10.0.7 as Target
+- Set FSUIPC 7.5.7 as Target

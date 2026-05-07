@@ -66,7 +66,7 @@ namespace Installer
 
         //Worker: FSUIPC7
         public virtual bool Fsuipc7Required { get; set; } = true;
-        public virtual string Fsuipc7Version { get; set; } = "7.5.6";
+        public virtual string Fsuipc7Version { get; set; } = "7.5.7";
         public virtual string Fsuipc7WasmVersion { get; set; } = "1.1.0";
         public virtual string Fsuipc7Url { get; set; } = "https://fsuipc.com/download/Install_FSUIPC7.zip";
         public virtual bool Fsuipc7AllowBeta { get; set; } = false;
