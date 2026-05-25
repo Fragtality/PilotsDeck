@@ -121,8 +121,7 @@ namespace PilotsDeck.Simulator
                 Logger.Debug("Changed to LOADING");
                 SimState = SimulatorState.LOADING;
             }
-
-            if (SimState == SimulatorState.LOADING && !IsLoading && !string.IsNullOrWhiteSpace(AircraftString) && !IsPaused
+            else if (SimState == SimulatorState.LOADING && !IsLoading && !string.IsNullOrWhiteSpace(AircraftString) && !IsPaused
                 && (!UseWebAPI || (UseWebAPI && ConnectionREST.HasEnumeratedRefs)))
             {
                 Logger.Debug("Changed to SESSION");
