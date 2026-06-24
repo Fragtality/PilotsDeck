@@ -1,5 +1,6 @@
 ﻿using PilotsDeck.Resources.Images;
 using PilotsDeck.StreamDeck.Messages;
+using System;
 using System.Drawing;
 
 namespace PilotsDeck.StreamDeck
@@ -44,7 +45,7 @@ namespace PilotsDeck.StreamDeck
         {
             StreamDeckCanvasInfo info = new()
             {
-                IsEncoder = sdEvent?.payload?.controller == AppConfiguration.SdEncoder,
+                IsEncoder = string.Equals(sdEvent?.payload?.controller, AppConfiguration.SdEncoder, StringComparison.InvariantCultureIgnoreCase),
                 Type = DeckController.GetDeckType(sdEvent?.device),
             };
 
