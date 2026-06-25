@@ -38,7 +38,7 @@ namespace PilotsDeck.Actions.Simple
         public ActionBaseSimple(StreamDeckEvent sdEvent)
         {
             Context = sdEvent.context;
-            IsEncoder = sdEvent.payload.controller == AppConfiguration.SdEncoder;
+            IsEncoder = string.Equals(sdEvent?.payload?.controller, AppConfiguration.SdEncoder, StringComparison.InvariantCultureIgnoreCase);
             Settings = SettingsModelSimple.Create(sdEvent);
             CanvasInfo = StreamDeckCanvasInfo.GetInfo(sdEvent);
             CheckVersion();
@@ -233,7 +233,7 @@ namespace PilotsDeck.Actions.Simple
 
         protected virtual void RegisterVariables()
         {
-            
+
         }
 
         protected virtual void RegisterCommands()
@@ -338,7 +338,7 @@ namespace PilotsDeck.Actions.Simple
 
         protected virtual void DeregisterVariables()
         {
-            
+
         }
 
         protected virtual void DeregisterCommands()
@@ -385,7 +385,7 @@ namespace PilotsDeck.Actions.Simple
                 var titleParam = TitleSettings ?? new SettingsTitle();
                 if (titleParam.ShowTitle)
                     render.DrawEncoderTitle(Title, titleParam.GetFont(12), titleParam.GetColor(), center);
-            }            
+            }
         }
 
         protected virtual void RenderGuard(Renderer render, string currentControlValue)

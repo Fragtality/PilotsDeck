@@ -22,7 +22,7 @@ namespace PilotsDeck.Actions.Advanced
         IMAGE,
         PRIMITIVE,
         TEXT,
-        VALUE,      
+        VALUE,
     }
 
     public enum ELEMENT_MANIPULATOR
@@ -76,7 +76,7 @@ namespace PilotsDeck.Actions.Advanced
         public ActionMeta(StreamDeckEvent sdEvent)
         {
             Context = sdEvent.context;
-            IsEncoder = sdEvent.payload.controller == AppConfiguration.SdEncoder;
+            IsEncoder = string.Equals(sdEvent?.payload?.controller, AppConfiguration.SdEncoder, StringComparison.InvariantCultureIgnoreCase);
             CanvasInfo = StreamDeckCanvasInfo.GetInfo(sdEvent);
             CanvasSize = CanvasInfo.GetCanvasSize();
             SetSettingModel(sdEvent);
@@ -89,7 +89,7 @@ namespace PilotsDeck.Actions.Advanced
             try
             {
                 Settings = SettingsModelMeta.Create(sdEvent, out bool updated);
-                
+
                 if (updated)
                     SettingModelUpdated = true;
 
@@ -232,13 +232,13 @@ namespace PilotsDeck.Actions.Advanced
 
             if (!Settings.DisplayElements.Remove(id))
                 return false;
-            
+
             var elements = Settings.DisplayElements.Values.ToList();
             Settings.DisplayElements.Clear();
             int n = 0;
             foreach (var element in elements)
                 Settings.DisplayElements.TryAdd(n++, element);
-            
+
             Logger.Debug($"Removed DisplayElement for ID '{id}'");
             return true;
         }
@@ -273,7 +273,7 @@ namespace PilotsDeck.Actions.Advanced
                 int n = 0;
                 foreach (var cmd in oldDict.Values)
                     Settings.ActionCommands[sdCommand].TryAdd(n++, cmd);
-                
+
                 Logger.Debug($"Removed Command for ID '{id}'");
                 return true;
             }
@@ -300,14 +300,14 @@ namespace PilotsDeck.Actions.Advanced
             if (Settings.ActionCommands[type][commandID]?.Conditions?.ContainsKey(conditionID) == true)
             {
                 if (!Settings.ActionCommands[type][commandID].Conditions.Remove(conditionID, out _))
-                    return false;                
-                
+                    return false;
+
                 var oldDict = Settings.ActionCommands[type][commandID].Conditions;
                 Settings.ActionCommands[type][commandID].Conditions = [];
                 int n = 0;
                 foreach (var condition in oldDict.Values)
                     Settings.ActionCommands[type][commandID].Conditions.TryAdd(n++, condition);
-                
+
                 Logger.Debug($"Removed Condition for ID '{conditionID}'");
                 return true;
             }
@@ -399,7 +399,7 @@ namespace PilotsDeck.Actions.Advanced
                 element.RegisterRessources();
 
             foreach (var type in ActionCommands.Values)
-                foreach(var command in type.Values)
+                foreach (var command in type.Values)
                     command.RegisterRessources();
 
             NeedRefresh = true;
@@ -575,7 +575,7 @@ namespace PilotsDeck.Actions.Advanced
             LastKeyDown = DateTime.Now;
 
             return GetUntimedCommands(StreamDeckCommand.KEY_DOWN, 1);
-        }        
+        }
 
         public virtual SimCommand[] OnKeyUp(StreamDeckEvent sdEvent)
         {
