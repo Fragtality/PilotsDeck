@@ -74,6 +74,8 @@ namespace PilotsDeck.Plugin
                     var sdEvent = await DeckController.ReceiveChannel.ReadAsync(App.CancellationToken);
                     StatisticManager.StartTrack(StatisticID.PLUGIN_RECEIVE);
                     SimCommand[] commands = null;
+                    if (App.Configuration.LogLevel == LogLevel.Verbose)
+                        Logger.Verbose(JsonSerializer.Serialize(sdEvent));
 
                     switch (sdEvent.Event)
                     {
