@@ -11,10 +11,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },
@@ -33,10 +30,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },
@@ -70,10 +64,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },
@@ -92,10 +83,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },
@@ -114,10 +102,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },
@@ -136,10 +121,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },
@@ -173,10 +155,7 @@
           "FontSize": 10
         }
       ],
-      "Controllers": [
-        "Keypad",
-        "Encoder"
-      ],
+      "Controllers": ["Keypad", "Encoder", "Knob"],
       "Encoder": {
         "layout": "Plugin/layout-pilotsdeck.json"
       },

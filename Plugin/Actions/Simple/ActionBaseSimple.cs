@@ -38,7 +38,7 @@ namespace PilotsDeck.Actions.Simple
         public ActionBaseSimple(StreamDeckEvent sdEvent)
         {
             Context = sdEvent.context;
-            IsEncoder = string.Equals(sdEvent?.payload?.controller, AppConfiguration.SdEncoder, StringComparison.InvariantCultureIgnoreCase);
+            IsEncoder = AppConfiguration.IsControllerEncoder(sdEvent?.payload?.controller);
             Settings = SettingsModelSimple.Create(sdEvent);
             CanvasInfo = StreamDeckCanvasInfo.GetInfo(sdEvent);
             CheckVersion();

@@ -76,7 +76,7 @@ namespace PilotsDeck.Actions.Advanced
         public ActionMeta(StreamDeckEvent sdEvent)
         {
             Context = sdEvent.context;
-            IsEncoder = string.Equals(sdEvent?.payload?.controller, AppConfiguration.SdEncoder, StringComparison.InvariantCultureIgnoreCase);
+            IsEncoder = AppConfiguration.IsControllerEncoder(sdEvent?.payload?.controller);
             CanvasInfo = StreamDeckCanvasInfo.GetInfo(sdEvent);
             CanvasSize = CanvasInfo.GetCanvasSize();
             SetSettingModel(sdEvent);

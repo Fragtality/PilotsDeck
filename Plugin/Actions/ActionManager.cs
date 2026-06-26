@@ -260,7 +260,7 @@ namespace PilotsDeck.Actions
                     {
                         Redraws++;
                         Logger.Verbose($"--REDRAW-- for State '{state}' - Needs Redraw, Refresh ({action.Value.NeedRedraw}, {action.Value.NeedRefresh}) ID {action.Value.ActionID}");
-                        if (action.Value.IsEncoder)
+                        if (action.Value.IsEncoder && action.Value.CanvasInfo.UsesFeedbackLayout)
                         {
                             _ = DeckController.SetFeedbackItemImageRaw(AppConfiguration.SdTargetImage, action.Key, SelectImage(action.Value, state));
                             if (action.Value.FirstLoad)

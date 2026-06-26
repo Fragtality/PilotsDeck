@@ -10,6 +10,9 @@ namespace PilotsDeck.StreamDeck
         public static DeckController DeckController { get { return App.DeckController; } }
         public StreamDeckType Type { get; set; }
         public bool IsEncoder { get; set; }
+        // True for real Stream Deck+ Encoders that render through a layout + setFeedback.
+        // False for Knob controllers (e.g. StreamDock), which must use setImage instead.
+        public bool UsesFeedbackLayout { get; set; } = false;
 
         public PointF GetCanvasSize()
         {
@@ -45,7 +48,8 @@ namespace PilotsDeck.StreamDeck
         {
             StreamDeckCanvasInfo info = new()
             {
-                IsEncoder = string.Equals(sdEvent?.payload?.controller, AppConfiguration.SdEncoder, StringComparison.InvariantCultureIgnoreCase),
+                IsEncoder = AppConfiguration.IsControllerEncoder(sdEvent?.payload?.controller),
+                UsesFeedbackLayout = AppConfiguration.IsControllerFeedbackEncoder(sdEvent?.payload?.controller),
                 Type = DeckController.GetDeckType(sdEvent?.device),
             };
 

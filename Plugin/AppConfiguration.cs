@@ -21,6 +21,22 @@ namespace PilotsDeck
         [JsonIgnore]
         public static string SdEncoder { get; } = "Encoder";
         [JsonIgnore]
+        public static string SdKnob { get; } = "Knob";
+        public static bool IsControllerEncoder(string controller)
+        {
+            if (string.IsNullOrWhiteSpace(controller))
+                return false;
+
+            return string.Equals(controller, SdEncoder, StringComparison.InvariantCultureIgnoreCase)
+                || string.Equals(controller, SdKnob, StringComparison.InvariantCultureIgnoreCase);
+        }
+        // true only for real Stream Deck+ "Encoder" controllers, which render via a layout + setFeedback.
+        // "Knob" controllers (e.g. StreamDock) do not support layout feedback and must use setImage.
+        public static bool IsControllerFeedbackEncoder(string controller)
+        {
+            return string.Equals(controller, SdEncoder, StringComparison.InvariantCultureIgnoreCase);
+        }
+        [JsonIgnore]
         public static string SdTargetImage { get; } = "canvas";
         [JsonIgnore]
         public static string SdEncoderBackground { get; } = "Plugin/Images/Encoder.png";
