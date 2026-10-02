@@ -48,7 +48,7 @@ namespace Installer
 
         //Worker: FSUIPC7
         public virtual bool Fsuipc7Required { get; set; } = true;
-        public virtual string Fsuipc7Version { get; set; } = "7.5.7";
+        public virtual string Fsuipc7Version { get; set; } = "7.5.9";
         public virtual string Fsuipc7WasmVersion { get; set; } = "1.1.0";
         public virtual string Fsuipc7Url { get; set; } = "https://fsuipc.com/download/Install_FSUIPC7.zip";
         public virtual bool Fsuipc7AllowBeta { get; set; } = false;
@@ -62,9 +62,9 @@ namespace Installer
 
         //Worker: StreamDeck
         public virtual string DeckVersionMinimum { get { return "7.1.0"; } }
-        public virtual string DeckVersionTarget { get { return "7.5.1"; } }
-        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_7.5.1.22901.msi"; } }
-        public virtual string DeckInstaller { get { return "Stream_Deck_7.5.1.22901.msi"; } }
+        public virtual string DeckVersionTarget { get { return "7.6.0"; } }
+        public virtual string DeckUrl { get { return "https://edge.elgato.com/egc/windows/sd/Stream_Deck_7.6.0.23012.msi"; } }
+        public virtual string DeckInstaller { get { return "Stream_Deck_7.6.0.23012.msi"; } }
 
         //Prepar3D
         public virtual string P3dRegPath { get { return @"HKEY_CURRENT_USER\SOFTWARE\Lockheed Martin"; } }
