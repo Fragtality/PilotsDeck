@@ -38,7 +38,7 @@ namespace PilotsDeck.Simulator
         protected SubManager SubManager { get; }
         protected bool FirstRun { get; set; } = true;
         protected bool FirstConnect { get; set; } = true;
-        protected bool IsWritingFile { get; set; } = false;
+        protected DateTime WriteInputFileAt { get; set; } = DateTime.MaxValue;
         protected DateTime LastConnectionAttempt { get; set; } = DateTime.MinValue;
         public const string SimConnectTemplate =
 """
@@ -213,6 +213,9 @@ DisableNagle=1
                         SimState = SimulatorState.STOPPED;
                     }
 
+                    if (WriteInputFileAt < DateTime.Now)
+                        CheckInputFile();
+
                     await Task.Delay(App.Configuration.MsfsStateCheckInterval, App.CancellationToken);
                 }
 
@@ -235,39 +238,37 @@ DisableNagle=1
             Logger.Information($"ConnectorMSFS Task ended (simRunning: {IsRunning} | quitReceived: {SimConnect?.QuitReceived} | cancelled: {App.CancellationToken.IsCancellationRequested})");
         }
 
-
         protected virtual void InputEventsEnumerated(InputEventManager manager, bool enumerated)
+        {
+            WriteInputFileAt = DateTime.Now + TimeSpan.FromSeconds(1);
+        }
+
+        protected virtual void CheckInputFile()
         {
             try
             {
-                if (IsWritingFile)
-                {
-                    Logger.Debug($"Waiting to write File ...");
-                    while (IsWritingFile)
-                        Task.Delay(App.Configuration.CheckInterval, App.CancellationToken);
-                    Logger.Debug($"Wait ended");
-                }
-                IsWritingFile = true;
+                WriteInputFileAt = DateTime.MaxValue;
 
-                if (enumerated)
+                if (SimConnect.InputManager.HasEventsEnumerated)
                 {
                     StringBuilder text = new();
-                    var inputEvents = manager.InputEvents.Values.Select(i => i.Name).ToList();
+                    var inputEvents = SimConnect.InputManager.InputEvents.Values.Select(i => i.Name).ToList();
                     inputEvents.Sort();
                     foreach (var inputEvent in inputEvents)
                         text.AppendLine($"B:{inputEvent}");
+
                     File.WriteAllText(AppConfiguration.FILE_BVAR, text.ToString());
+                    Logger.Debug($"Input Event File updated ({SimConnect.InputManager.InputEvents.Count} Events)");
                 }
                 else
+                {
                     File.Delete(AppConfiguration.FILE_BVAR);
+                    Logger.Debug("Input Event File deleted");
+                }
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
-            }
-            finally
-            {
-                IsWritingFile = false;
             }
         }
 

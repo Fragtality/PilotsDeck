@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -98,12 +99,23 @@ namespace PilotsDeck.Resources.Scripts
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
             _env.GetRegistryValue = new Func<string, string, string>(GetRegistryValue);
-            _env.HttpGet = new Func<string, string>(DoHttpGet);
+            _env.HttpGet = new Func<string, string, string>(DoHttpGet);
+            _env.HttpPost = new Func<string, string, string>(DoHttpPost);
             _env.Serialize = new Func<object, string>(JsonSerialize);
             _env.Deserialize = new Func<string, JsonNode>(JsonDeserialize);
             _env.Sleep = new Action<int>(ScriptSleep);
             _env.UseLog = new Action<string>(UseLog);
             _env.Log = new Action<string>(WriteLog);
+        }
+
+        public virtual void LogException(Exception ex, string source)
+        {
+            if (ex is LuaRuntimeException luaEx)
+                Logger.Error($"LuaRuntimeException in File {FileName} Line {luaEx.Line} on {source}");
+            else if (ex is LuaParseException parseEx)
+                Logger.Error($"LuaParseException in File {FileName} Line {parseEx.Line} on {source}");
+            else
+                Logger.Error($"{ex.GetType().Name} in File {FileName} on {source}: {ex.Message}");
         }
 
         public virtual void Start(FileInfo fileInfo = null)
@@ -128,7 +140,7 @@ namespace PilotsDeck.Resources.Scripts
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                LogException(ex, "Script Start");
             }
         }
 
@@ -227,7 +239,8 @@ namespace PilotsDeck.Resources.Scripts
                 }
                 catch (Exception ex)
                 {
-                    Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"Exception '{ex.GetType()}' on SimRead for '{name}': {ex.Message}"));
+                    LogException(ex, $"SimRead for '{name}'");
+
                     return 0;
                 }
             }
@@ -249,7 +262,8 @@ namespace PilotsDeck.Resources.Scripts
                 }
                 catch (Exception ex)
                 {
-                    Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"Exception '{ex.GetType()}' on SimReadString for '{name}': {ex.Message}"));
+                    LogException(ex, $"SimReadString for '{name}'");
+
                     return "";
                 }
             }
@@ -448,7 +462,7 @@ namespace PilotsDeck.Resources.Scripts
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                LogException(ex, $"WriteLog");
             }
         }
 
@@ -457,22 +471,45 @@ namespace PilotsDeck.Resources.Scripts
             return Sys.GetRegistryValue<string>(path, value) ?? "";
         }
 
-        protected virtual string DoHttpGet(string url)
+        protected virtual string DoHttp(HttpMethod method, string url, string content)
         {
             string result = "";
 
             try
             {
                 using var httpClient = new HttpClient();
-                result = httpClient.GetStringAsync(url).RunSync();
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    result = httpClient.GetStringAsync(url).RunSync();
+                }
+                else
+                {
+                    using var request = new HttpRequestMessage(method, url)
+                    {
+                        Content = new StringContent(content, Encoding.UTF8, "application/json")
+                    };
+                    using var response = httpClient.Send(request);
+                    result = response.Content.ReadAsStringAsync().RunSync();
+                }
 
             }
             catch (Exception ex)
             {
+                LogException(ex, $"DoHttp {method} for '{url}'");
                 Logger.LogException(ex);
             }
 
             return result;
+        }
+
+        protected virtual string DoHttpGet(string url, string content)
+        {
+            return DoHttp(HttpMethod.Get, url, content);
+        }
+
+        protected virtual string DoHttpPost(string url, string content)
+        {
+            return DoHttp(HttpMethod.Post, url, content);
         }
 
         protected virtual string JsonSerialize(object obj)
@@ -486,7 +523,7 @@ namespace PilotsDeck.Resources.Scripts
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                LogException(ex, $"JsonSerialize");
             }
 
             return result;
@@ -498,12 +535,13 @@ namespace PilotsDeck.Resources.Scripts
 
             try
             {
+
                 result = JsonNode.Parse(json);
 
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                LogException(ex, $"JsonDeserialize for '{json}'");
             }
 
             return result;

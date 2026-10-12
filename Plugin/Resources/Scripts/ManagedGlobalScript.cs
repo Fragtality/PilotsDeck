@@ -70,7 +70,8 @@ namespace PilotsDeck.Resources.Scripts
             _env.SharpFormat = new Func<string, object[], string>(SharpFormat);
             _env.SharpFormatLocale = new Func<string, object[], string>(SharpFormatLocale);
             _env.GetRegistryValue = new Func<string, string, string>(GetRegistryValue);
-            _env.HttpGet = new Func<string, string>(DoHttpGet);
+            _env.HttpGet = new Func<string, string, string>(DoHttpGet);
+            _env.HttpPost = new Func<string, string, string>(DoHttpPost);
             _env.Serialize = new Func<object, string>(JsonSerialize);
             _env.Deserialize = new Func<string, JsonNode>(JsonDeserialize);
             _env.RunInterval = new Action<int, string>(RunInterval);
@@ -106,20 +107,22 @@ namespace PilotsDeck.Resources.Scripts
             if (!IsRunning || TimerCallbacks.Count == 0)
                 return;
 
+            string function = "";
             try
             {
                 foreach (var callback in TimerCallbacks)
                 {
                     if (now >= callback.Value.NextRun)
                     {
-                        DoChunk($"{callback.Value.CallbackFunction}()");
+                        function = $"{callback.Value.CallbackFunction}()";
+                        DoChunk(function);
                         callback.Value.SetNextRun(now);
                     }
                 }
             }
-            catch (LuaRuntimeException ex)
+            catch (Exception ex)
             {
-                Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"{ex.GetType()}: {ex.Message}"));
+                LogException(ex, $"RunGlobal for '{function}'");
             }
         }
 
@@ -236,25 +239,24 @@ namespace PilotsDeck.Resources.Scripts
             if (!IsActiveGlobal || !IsRunning)
                 return Task.CompletedTask;
 
+            string function = "";
             try
             {
                 if (EventCallbacks.TryGetValue(evtName, out var callback))
                 {
                     if (evtData is string stringData)
-                        DoChunk($"{callback.Function}('{stringData}')");
+                        function = $"{callback.Function}('{stringData}')";
                     else
-                        DoChunk($"{callback.Function}({evtData})");
+                        function = $"{callback.Function}({evtData})";
+
+                    DoChunk(function);
                 }
                 else
                     Logger.Debug($"Script '{FileName}' has no Callback for Event '{evtName}'");
             }
-            catch (LuaRuntimeException ex)
-            {
-                Log.Fatal(ScriptManager.FormatLogMessage(FileName, $"{ex.GetType()}: {ex.Message}"));
-            }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
+                LogException(ex, $"DoEvent for '{function}'");
             }
 
             return Task.CompletedTask;

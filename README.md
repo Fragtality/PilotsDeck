@@ -1544,12 +1544,22 @@ Use the string.Format Function of C# as an Alternative to Lua builtin string.for
 <br/><br/><br/>
 
 
-| HttpGet | `HttpGet("url")` |
+| HttpGet | `HttpGet("url", "json")` |
 | --- | --- |
 
-Execute a HTTP GET Request to the passed URL and return the Response (Body) as String.<br/>
+Execute a HTTP GET Request to the passed URL and returns the Response (Body) as String.<br/>
+The json Parameter can be used to pass a JSON-String as Content/Body for the Request (optional, can be omitted if not needed).<br/>
 *Example:*<br/>
 `local ofp = HttpGet("https://www.simbrief.com/api/xml.fetcher.php?json=1&username=OttoThePilot")`
+<br/><br/><br/>
+
+| HttpPost | `HttpPost("url", "json")` |
+| --- | --- |
+
+Execute a HTTP POST Request to the passed URL and returns the Response (Body) as String.<br/>
+The json Parameter can be used to pass a JSON-String as Content/Body for the Request (optional, can be omitted if not needed).<br/>
+*Example:*<br/>
+`HttpPost("http://localhost:10001/v1/external", '{"request":"setPushDirection","data":"Area 3 - N8"}')`
 <br/><br/><br/>
 
 

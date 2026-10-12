@@ -23,7 +23,7 @@ namespace PilotsDeck.Resources
         public ConcurrentDictionary<string, ManagedImageScript> ManagedImageScripts { get; private set; } = [];
         private static string LogFile = "lua.log";
         protected Serilog.Core.Logger Log { get; set; } = ManagedScript.CreaterLogger(ref LogFile, "ScriptManager");
-        public int Count {  get { return ManagedScripts.Count; } }
+        public int Count { get { return ManagedScripts.Count; } }
         public int CountGlobal { get { return ManagedGlobalScripts.Where(kv => kv.Value.IsActiveGlobal).Count(); } }
         public int CountImages { get { return ManagedImageScripts.Count; } }
         public int CountTotal { get { return Count + CountGlobal + CountImages; } }
@@ -143,7 +143,7 @@ namespace PilotsDeck.Resources
                     if (script.Value.FileHasChanged())
                     {
                         Logger.Information($"Script File '{script.Key}' has changed in Size - Reloading ...");
-                        
+
                         script.Value.Reload();
                         result++;
                     }
@@ -157,7 +157,7 @@ namespace PilotsDeck.Resources
                     if (!ManagedGlobalScripts.TryGetValue(fileName, out ManagedGlobalScript script))
                     {
                         Logger.Information($"Adding Global Script File '{fileName}'");
-                        
+
                         script = new ManagedGlobalScript(fileName, Log);
                         script.Stop();
                         ManagedGlobalScripts.TryAdd(fileName, script);
@@ -167,7 +167,7 @@ namespace PilotsDeck.Resources
                     else if (script.FileHasChanged())
                     {
                         Logger.Information($"Script File '{script.FileName}' has changed in Size - Reloading ...");
-                        
+
                         if (ToggleGlobalScript(script, true))
                             result++;
                     }
@@ -403,19 +403,15 @@ namespace PilotsDeck.Resources
                 }
                 else
                 {
-                    LuaResult luaResult = script.DoChunkWithResult($"return {function}");
+                    function = $"return {function}";
+                    LuaResult luaResult = script.DoChunkWithResult(function);
                     result = $"{luaResult[0]}";
                 }
-            }
-            catch (LuaRuntimeException ex)
-            {
-                hasError = true;
-                Log.Fatal(FormatLogMessage(script.FileName, $"{ex.GetType()}: {ex.Message}"));
             }
             catch (Exception ex)
             {
                 hasError = true;
-                Logger.LogException(ex);
+                script.LogException(ex, $"DoChunk for '{function}'");
             }
 
 
