@@ -260,10 +260,17 @@ namespace PilotsDeck
 
         protected void InitSystray()
         {
-            NotifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
-            NotifyIcon.Icon = GetIcon();
-            NotifyIcon.ForceCreate(false);
-            DeveloperView = new DeveloperView(NotifyIcon.DataContext as NotifyIconViewModel);
+            try
+            {
+                NotifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
+                NotifyIcon.Icon = GetIcon();
+                NotifyIcon.ForceCreate(false);
+                DeveloperView = new DeveloperView(NotifyIcon.DataContext as NotifyIconViewModel);
+            }
+            catch
+            {
+                DeveloperView = new DeveloperView(new NotifyIconViewModel());
+            }
         }
 
         private static void LoadConfiguration()
