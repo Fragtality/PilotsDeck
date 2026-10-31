@@ -228,8 +228,8 @@ namespace PilotsDeck.Plugin
                 }
 
 
-                // State Switching
-                if (LastSimState != SimController.SimState)
+                // State Switching - don't process SESSION before the Global Settings are received, otherwise the READY Transition is never executed
+                if (LastSimState != SimController.SimState && (SimController.SimState != SimulatorState.SESSION || ActionManager.ProfileSwitcherManager.ReceivedGlobalSettings))
                 {
                     Logger.Debug($"SimState changed to {SimController.SimState}");
 
