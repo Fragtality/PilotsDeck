@@ -390,6 +390,7 @@ namespace PilotsDeck.Resources
                 if (!ManagedGlobalScripts.TryGetValue(file, out ManagedGlobalScript globalScript) || globalScript?.IsRunning == false)
                 {
                     Logger.Warning($"The Script '{file}' is not registered or running");
+                    return "";
                 }
                 else
                     script = globalScript;

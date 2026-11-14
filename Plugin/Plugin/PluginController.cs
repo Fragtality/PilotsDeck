@@ -54,6 +54,11 @@ namespace PilotsDeck.Plugin
             StatisticManager.AddTracker(StatisticID.PLUGIN_REFRESH);
             StatisticManager.AddTracker(StatisticID.PLUGIN_RECEIVE);
 
+            Logger.Information($"Initializing Plugin Controller ...");
+            _ = DeckController.SendGetGlobalSettings();
+            ActionManager.ProfileSwitcherManager.LoadProfileMappings();
+            ScriptManager.CheckFiles();
+
             Logger.Information($"Starting Refresh Timer");
             TimerRefresh.Interval = TimeSpan.FromMilliseconds(App.Configuration.IntervalDeckRefresh);
             TimerRefresh.Tick += RefreshTask;
@@ -212,12 +217,10 @@ namespace PilotsDeck.Plugin
                     return;
                 }
 
-                if (FirstRun)
+                if (!ActionManager.ProfileSwitcherManager.ReceivedGlobalSettings)
                 {
-                    _ = DeckController.SendGetGlobalSettings();
-                    ActionManager.ProfileSwitcherManager.LoadProfileMappings();
-                    ScriptManager.CheckFiles();
-                    FirstRun = false;
+                    RefreshIsRunning = false;
+                    return;
                 }
 
                 if (LastAircraftString != SimController.AircraftString)
@@ -226,7 +229,6 @@ namespace PilotsDeck.Plugin
                     ActionManager.ProfileSwitcherManager.UpdateActivePropertyInspector();
                     LastAircraftString = SimController.AircraftString;
                 }
-
 
                 // State Switching
                 if (LastSimState != SimController.SimState)
@@ -266,7 +268,7 @@ namespace PilotsDeck.Plugin
                         }
                     }
 
-                    if (SimController.SimState == SimulatorState.SESSION && ActionManager.ProfileSwitcherManager.ReceivedGlobalSettings)
+                    if (SimController.SimState == SimulatorState.SESSION)
                     {
                         Logger.Information("--- Sim changed to SESSION ---");
                         if (State != PluginState.READY)

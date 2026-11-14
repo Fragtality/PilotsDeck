@@ -244,8 +244,17 @@ namespace PilotsDeck
 
             };
             App.Current.MainWindow = HelperWindow;
-            HelperWindow.Show(disableEfficiencyMode: true);
-            HelperWindow.Hide(enableEfficiencyMode: false);
+            try
+            {
+                HelperWindow.Show(disableEfficiencyMode: true);
+                HelperWindow.Hide(enableEfficiencyMode: false);
+            }
+            catch
+            {
+                Logger.Warning($"Failed to set Efficiency Mode - using Fallback ...");
+                HelperWindow.Show();
+                HelperWindow.Hide();
+            }
             WindowHandle = new WindowInteropHelper(HelperWindow).Handle;
             Logger.Debug($"Window Handle is: {WindowHandle}");
             HwndSource mainWindowSrc = HwndSource.FromHwnd(WindowHandle);
